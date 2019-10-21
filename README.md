@@ -17,10 +17,25 @@ X86 processor, just copy the script to a build directory and run it.
 
 Suggested building procedure:
 ```
-1. Create a build directory in your Checked C root directory.
-2. Copy the cmake-llvm.sh script to this build folder.
-3. Run this script.
-4. Run "make clang -jn" to build the compiler.
+cd checkedc-project-root-directory
+
+git clone https://github.com/jzhou76/checkedc-llvm llvm
+
+cd llvm/tools
+
+git clone https://github.com/jzhou76/checkedc-clang.git clang
+
+cd ../projects/checkedc-wrapper
+
+git clone https://github.com/jzhou76/checkedc.git
+
+cd ../../ ; mkdir build ; cd build
+
+cp ../misc/scripts/cmake-llvm.sh ./
+
+./cmake-llvm.sh
+
+make clang -jn
 ```
 
 Here is Microsoft instructions on building the compiler: [Setting up your
