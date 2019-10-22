@@ -19,6 +19,8 @@ Suggested building procedure:
 ```
 cd checkedc-project-root-directory
 
+git clone https://github.com/jzhou76/checkedc-safe-mm-misc.git misc
+
 git clone https://github.com/jzhou76/checkedc-llvm llvm
 
 cd llvm/tools
@@ -29,7 +31,7 @@ cd ../projects/checkedc-wrapper
 
 git clone https://github.com/jzhou76/checkedc.git
 
-cd ../../ ; mkdir build ; cd build
+cd ../../.. ; mkdir build ; cd build
 
 cp ../misc/scripts/cmake-llvm.sh ./
 
