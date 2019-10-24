@@ -14,7 +14,7 @@ typedef struct {
   uint64_t ID;
 } _MMSafe_ptr_Rep;
 
-uint64_t key = rand();
+uint64_t key = 1;
 
 //
 // Function: mmsafe_alloc()
