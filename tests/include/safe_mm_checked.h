@@ -14,6 +14,7 @@ typedef struct {
   uint64_t ID;
 } _MMSafe_ptr_Rep;
 
+uint64_t key = rand();
 
 //
 // Function: mmsafe_alloc()
@@ -23,13 +24,14 @@ typedef struct {
 // the type of an implicit pointer to the type of a pointer to a _MMSafe_ptr.
 // Finally it returns the dereference of the pointer to _MMSafe_ptr.
 //
+__attribute__ ((noinline))
 for_any(T) mmsafe_ptr<T> mmsafe_alloc(unsigned long struct_size) {
     void *raw_ptr = malloc(struct_size);
 
     // Generate a random number as the ID.
     // FIXME: replace the naive rand() function with a robust random
     // number generator which gives a good 64-bit random number.
-    uint64_t new_ID = rand();
+    uint64_t new_ID = key++;
     // We assume that ID is always the first field of a struct; so here
     // we can set the ID without knowing the concrete structure of a struct.
     *((uint64_t *)(raw_ptr)) = new_ID;
