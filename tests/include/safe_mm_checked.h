@@ -2,6 +2,8 @@
  * This files provides a customized memory allocator and a deallocator
  * for struct objects pointed by a _MMSafe_ptr<T>.
  * */
+#ifndef _SAFE_MM_CHECKED_H
+#define _SAFE_MM_CHECKED_H
 
 #include "stdchecked.h"
 #include <stdint.h>
@@ -62,3 +64,4 @@ for_any(T) void mmsafe_free(mmsafe_ptr<T> p) {
 
   free(mmsafe_ptr_ptr->p);
 }
+#endif
