@@ -2,19 +2,24 @@
 
 Note: the **ptr** appeared in the following text means the new safe pointer.
 
+## assignment
 - assign the address of newly allocated heap object
 - assign NULL
 - assign NULL to an array of pointers statically
 - assign one safe pointer to another
+- forbid directly assigning an address to a ptr
 
-- have ptr inside a struct; check whether `sizeof` can determine the size correctly
+## dereference
 - dereference a ptr pointing to an allocated object
 - dereference a null ptr
 - dereference a ptr pointing to a freed object
 
+## function calls
 - pass 1 ptr as function argument
 - pass n ptr as function arguments
 - return ptr from a function
 
 - pointer arithmetic, ptr++/--, ptr + const, ptr1 + ptr2
 - Pointer type cast
+
+- have ptr inside a struct; check whether `sizeof` can determine the size correctly
