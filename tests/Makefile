@@ -1,7 +1,7 @@
 #
 # LLVM build directory
 #
-LLVM_DIR = ../../../build/bin
+LLVM_DIR = ../../build/bin
 
 OPT=-O0
 CFLAGS = $(OPT) -I../include
@@ -11,14 +11,42 @@ CFLAGS = $(OPT) -I../include
 #
 CC = $(LLVM_DIR)/clang $(CFLAGS)
 
-SRC = hello.c
+SRC = dereference.c
+OBJ = $(SRC:%.c=%.o)
+ASM = $(SRC:%.c=%.s)
+LL = $(SRC:%.l=$.ll)
+BIN = $(SRC:%.c=%)
 
-hello: $(SRC)
+HELLO = hello.c
+OBJ += hello.o
+BIN += hello
+
+
+#
+# Compile hello.c to test the currently developed functionality.
+#
+hello: $(HELLO)
 	$(CC) $^ -o hello
 	objdump -d hello > hello.s
 
-ll: $(SRC)
+ll: $(HELLO)
 	$(CC) -S -emit-llvm $^
 
-clean:
-	rm -f *.o *.s *.ll *.tmp hello
+o1: $(HELLO)
+	$(CC) -S -O1 -emit-llvm $^
+
+o2: $(HELLO)
+	$(CC) -S -O2 -emit-llvm $^
+
+
+#
+# Regression test
+#
+rt: $(SRC)
+	for src in $(BIN) ; do \
+		$(CC) $$src.c -o $$src ; \
+		./$$src ; \
+	done
+
+clean: $(SRC)
+	rm -f $(BIN) *.s *.o *.tmp *.ll a.out
