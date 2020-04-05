@@ -11,16 +11,13 @@ CFLAGS = $(OPT) -I../include
 #
 CC = $(LLVM_DIR)/clang $(CFLAGS)
 
-SRC = dereference.c
+SRC = dereference.c assign.c
 OBJ = $(SRC:%.c=%.o)
 ASM = $(SRC:%.c=%.s)
 LL = $(SRC:%.l=$.ll)
 BIN = $(SRC:%.c=%)
 
 HELLO = hello.c
-OBJ += hello.o
-BIN += hello
-
 
 #
 # Compile hello.c to test the currently developed functionality.
@@ -45,8 +42,7 @@ o2: $(HELLO)
 rt: $(SRC)
 	for src in $(BIN) ; do \
 		$(CC) $$src.c -o $$src ; \
-		./$$src ; \
 	done
 
 clean: $(SRC)
-	rm -f $(BIN) *.s *.o *.tmp *.ll a.out
+	rm -f $(BIN) *.s *.o *.tmp *.ll hello a.out

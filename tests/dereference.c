@@ -2,25 +2,8 @@
 // expected-no-diagnostics
 //
 
-#include <stdio.h>
 #include <stdbool.h>
-#include "safe_mm_checked.h"
-
-typedef struct data {
-    uint64_t ID;
-    int i;
-    int j;
-    long l;
-    unsigned long ul;
-    float f;
-} Data;
-
-typedef struct {
-    uint64_t ID;
-    int val;
-    long long_val;
-    char c;
-} Node;
+#include "header.h"
 
 
 //
