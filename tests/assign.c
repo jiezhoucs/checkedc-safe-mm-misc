@@ -3,25 +3,6 @@
  * */
 
 #include "header.h"
-#include <signal.h>
-#include <setjmp.h>
-
-jmp_buf resume_context;
-
-//
-// This signal handler resumes execution after a segmentation fault.
-void segv_handler(int sig) {
-    printf("Segmantation fault due to dereferencing a NULL pointer.\n");
-    longjmp(resume_context, 1);
-}
-
-//
-// This illegal instruction signal handler resumes execution
-// after a Use-After-Free is detected.
-void ill_handler(int sig) {
-    printf("A UAF bug was detected.\n");
-    longjmp(resume_context, 1);
-}
 
 //
 // Testing assigning an MMSafe_ptr to another.
@@ -80,6 +61,6 @@ int main(int argc, char *argv[]) {
 
     f2();
 
-    printf("===== Finish testing assignment functionality. =====\n");
+    printf("===== Finish testing assignment functionality. =====\n\n");
     return 0;
 }

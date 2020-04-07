@@ -6,7 +6,13 @@
 #define _HEADER_H
 
 #include <stdio.h>
+
+#include <signal.h>
+#include <setjmp.h>
+
 #include "safe_mm_checked.h"
+
+jmp_buf resume_context;  // to resume execution after seg fault or illegal instruction
 
 typedef struct data {
     uint64_t ID;
@@ -24,5 +30,21 @@ typedef struct {
     long long_val;
     char c;
 } Node;
+
+
+//
+// This signal handler resumes execution after a segmentation fault.
+void segv_handler(int sig) {
+    printf("Segmantation fault due to dereferencing a NULL pointer.\n");
+    longjmp(resume_context, 1);
+}
+
+//
+// This illegal instruction signal handler resumes execution
+// after a Use-After-Free is detected.
+void ill_handler(int sig) {
+    printf("A UAF bug was detected.\n");
+    longjmp(resume_context, 1);
+}
 
 #endif
