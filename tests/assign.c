@@ -7,7 +7,6 @@
 //
 // Testing assigning an MMSafe_ptr to another.
 void f0() {
-    signal(SIGILL, ill_handler);
     if (setjmp(resume_context) == 1) goto resume;
 
     mmsafe_ptr<Data> p0 = mmsafe_alloc<Data>(sizeof(Data));
@@ -34,7 +33,6 @@ resume:
 //
 // Test assigning NULL to an MMSafe_ptr.
 void f1() {
-    signal(SIGSEGV, segv_handler);
     if (setjmp(resume_context) == 1) goto resume;
 
     mmsafe_ptr<Data> p0 = NULL;
@@ -47,12 +45,19 @@ resume:
 
 // Test assigning NULL to an array of MMSafe_ptr.
 void f2() {
-    mmsafe_ptr<Data> p_arr[2] = { NULL };
+    if (setjmp(resume_context) == 1) goto resume;
 
-    // TODO: dereference one of the pointers.
+    mmsafe_ptr<Data> p_arr[2] = { NULL };
+    p_arr[1]->i = 10;  // segmentation fault
+
+resume:
+    printf("Finished testing assigning NULL to an array of MM_ptr.\n\n");
 }
 
 int main(int argc, char *argv[]) {
+    signal(SIGILL, ill_handler);
+    signal(SIGSEGV, segv_handler);
+
     printf("===== Begin testing assignment functionality. =====\n");
 
     f0();
