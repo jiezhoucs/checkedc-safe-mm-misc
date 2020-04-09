@@ -24,10 +24,11 @@ typedef struct data {
     double d;
 } Data;
 
-typedef struct {
+typedef struct node{
     uint64_t ID;
     int val;
-    long long_val;
+    long l;
+    mmsafe_ptr<struct node> next;
     char c;
 } Node;
 
@@ -45,6 +46,16 @@ void segv_handler(int sig) {
 void ill_handler(int sig) {
     printf("A UAF bug was detected.\n");
     longjmp(resume_context, 1);
+}
+
+//
+// Printing helper functions.
+void print_start(char *feature) {
+  printf("======= Beging testing %s. =======\n", feature);
+}
+
+void print_end(char *feature) {
+  printf("======= Finished testing %s. =======\n\n", feature);
 }
 
 #endif
