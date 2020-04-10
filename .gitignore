@@ -4,3 +4,8 @@
 *.out
 *.swp
 
+# binaries
+tests/hello
+tests/basic
+tests/dereference
+tests/assign
