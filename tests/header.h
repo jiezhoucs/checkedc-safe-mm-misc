@@ -51,11 +51,19 @@ void ill_handler(int sig) {
 //
 // Printing helper functions.
 void print_start(char *feature) {
-  printf("======= Beging testing %s. =======\n", feature);
+  printf("------- Beging testing %s.-------\n", feature);
 }
 
 void print_end(char *feature) {
-  printf("======= Finished testing %s. =======\n\n", feature);
+  printf("------- Finished testing %s.-------\n\n", feature);
+}
+
+void print_main_start(char *filename) {
+  printf("========Begin testing %s.========\n", filename);
+}
+
+void print_main_end(char *filename) {
+  printf("========Finished testing %s.========\n\n", filename);
 }
 
 #endif

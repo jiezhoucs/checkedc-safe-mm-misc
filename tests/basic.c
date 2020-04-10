@@ -48,38 +48,11 @@ resume:
     putchar('\n');
 }
 
-void f1() {
-    signal(SIGILL, ill_handler);
-    if (setjmp(resume_context) == 1) goto resume;
-
-    printf("Testing dereferencing an MM_ptr inside a struct.\n");
-    mmsafe_ptr<Node> p = mmsafe_alloc<Node>(sizeof(Node));
-    p->next = mmsafe_alloc<Node>(sizeof(Node));
-
-    p->next->val = 10;
-    p->next->l = 42;
-    p->next->c = 'a';
-
-    if (p->next->val != 10 || p->next->l != 42 || p->next->c != 'a') {
-        perror("ERROR: Dereferencing testing failed in function f1!\n");
-    }
-
-    printf("Testing freeing an MM_ptr inside a struct.\n");
-    mmsafe_free<Node>(p->next);
-
-    p->next->val = 10;    // should raise an illegal instruction.
-
-resume:
-    printf("Finished testing dereferencing & free an MM_Ptr inside a struct.\n\n");
-}
-
 int main() {
-    print_start("basic declaration and dereference of MM_ptr");
+    print_main_start(__FILE__);
 
     f0();
 
-    f1();
-
-    print_end("basic declaration and dereference of MM_ptr");
+    print_main_end(__FILE__);
     return 0;
 }

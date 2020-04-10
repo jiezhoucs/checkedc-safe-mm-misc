@@ -11,7 +11,7 @@ CFLAGS = $(OPT) -I../include
 #
 CC = $(LLVM_DIR)/clang $(CFLAGS)
 
-SRC = basic.c assign.c
+SRC = basic.c assign.c dereference.c
 OBJ = $(SRC:%.c=%.o)
 ASM = $(SRC:%.c=%.s)
 LL = $(SRC:%.l=$.ll)

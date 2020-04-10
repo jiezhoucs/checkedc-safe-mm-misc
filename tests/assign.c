@@ -29,30 +29,26 @@ resume:
     printf("Testing assignment between MMSafe_ptr succeeded.\n\n");
 }
 
-
 //
 // Test assigning NULL to an MMSafe_ptr.
 void f1() {
-    if (setjmp(resume_context) == 1) goto resume;
+    if (setjmp(resume_context) == 1) goto resume0;
 
     mmsafe_ptr<Data> p0 = NULL;
     p0->i = 10;  // should raise a segfault
 
-resume:
-    printf("Testing assigning NULL to an MMSafe_ptr succeeded.\n\n");
-}
+resume0:
+    printf("Finished testing assigning NULL to an MM_ptr.\n");
 
-
-// Test assigning NULL to an array of MMSafe_ptr.
-void f2() {
-    if (setjmp(resume_context) == 1) goto resume;
+    if (setjmp(resume_context) == 1) goto resume1;
 
     mmsafe_ptr<Data> p_arr[2] = { NULL };
     p_arr[1]->i = 10;  // segmentation fault
 
-resume:
-    printf("Finished testing assigning NULL to an array of MM_ptr.\n\n");
+resume1:
+    printf("Finished testing assigning NULL to an MM_ptr in an array.\n\n");
 }
+
 
 int main(int argc, char *argv[]) {
     signal(SIGILL, ill_handler);
@@ -64,7 +60,6 @@ int main(int argc, char *argv[]) {
 
     f1();
 
-    f2();
 
     printf("===== Finish testing assignment functionality. =====\n\n");
     return 0;
