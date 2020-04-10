@@ -5,17 +5,17 @@
  * */
 
 #include <stdbool.h>
-#include "header.h"
+#include "inc.h"
 
 
 //
-// Test the basic declaration and dereferences to a mmsafe_ptr.
+// Test the basic declaration and dereferences to a mm_ptr.
 //
 void f0() {
     signal(SIGILL, ill_handler);
     if (setjmp(resume_context) == 1) goto resume;
 
-    mmsafe_ptr<Node> node_ptr = mmsafe_alloc<Node>(sizeof(Node));
+    mm_ptr<Node> node_ptr = mm_alloc<Node>(sizeof(Node));
 
     // Test writing values to a struct.
     printf("Testing writing values to a struct's fields.\n");
@@ -40,7 +40,7 @@ void f0() {
 
     // Test Use-after-Free
     printf("Testing UAF of a MM_ptr.\n");
-    mmsafe_free<Node> (node_ptr);
+    mm_free<Node> (node_ptr);
     // There should be a "illegal instruction" core dump for the next line.
     printf("node's val = %d.\n", (*node_ptr).val);  // should abort
 

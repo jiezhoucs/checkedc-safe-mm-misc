@@ -2,26 +2,26 @@
  * Test assginment-related functionalities for MMSafe_ptr.
  * */
 
-#include "header.h"
+#include "inc.h"
 
 //
 // Testing assigning an MMSafe_ptr to another.
 void f0() {
     if (setjmp(resume_context) == 1) goto resume;
 
-    mmsafe_ptr<Data> p0 = mmsafe_alloc<Data>(sizeof(Data));
+    mm_ptr<Data> p0 = mm_alloc<Data>(sizeof(Data));
     p0->i = 1;
     p0->l = 100;
     p0->d = 4.2;
 
-    mmsafe_ptr<Data> p1 = p0;
+    mm_ptr<Data> p1 = p0;
 
     // Checked if the new pointer points to the correct memory object.
     if (p1->i != 1 || p1->l != 100 || p1->d != 4.2 || p1->f != p0->f) {
         perror("Assignment testing failed in function f0!\n");
     }
 
-    mmsafe_free<Data>(p1);
+    mm_free<Data>(p1);
 
     int i = p0->i;  // should raise an Illegal Instruction error.
 
@@ -34,7 +34,7 @@ resume:
 void f1() {
     if (setjmp(resume_context) == 1) goto resume0;
 
-    mmsafe_ptr<Data> p0 = NULL;
+    mm_ptr<Data> p0 = NULL;
     p0->i = 10;  // should raise a segfault
 
 resume0:
@@ -42,7 +42,7 @@ resume0:
 
     if (setjmp(resume_context) == 1) goto resume1;
 
-    mmsafe_ptr<Data> p_arr[2] = { NULL };
+    mm_ptr<Data> p_arr[2] = { NULL };
     p_arr[1]->i = 10;  // segmentation fault
 
 resume1:

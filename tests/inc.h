@@ -28,7 +28,7 @@ typedef struct node{
     uint64_t ID;
     int val;
     long l;
-    mmsafe_ptr<struct node> next;
+    mm_ptr<struct node> next;
     char c;
 } Node;
 

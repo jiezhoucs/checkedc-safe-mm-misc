@@ -2,7 +2,7 @@
  * More tests on pointer dereference.
  * */
 
-#include "header.h"
+#include "inc.h"
 
 //
 // Testing dereferencing an MM_ptr inside a struct.
@@ -13,8 +13,8 @@ void f0() {
     if (setjmp(resume_context) == 1) goto resume;
 
     printf("Testing dereferencing an MM_ptr inside a struct.\n");
-    mmsafe_ptr<Node> p = mmsafe_alloc<Node>(sizeof(Node));
-    p->next = mmsafe_alloc<Node>(sizeof(Node));
+    mm_ptr<Node> p = mm_alloc<Node>(sizeof(Node));
+    p->next = mm_alloc<Node>(sizeof(Node));
 
     p->next->val = 10;
     p->next->l = 42;
@@ -25,7 +25,7 @@ void f0() {
     }
 
     printf("Testing freeing an MM_ptr inside a struct.\n");
-    mmsafe_free<Node>(p->next);
+    mm_free<Node>(p->next);
 
     p->next->val = 10;    // should raise an illegal instruction.
 
@@ -40,13 +40,13 @@ void f1() {
     print_start("dereferencing an MM_ptr inside an array");
     if (setjmp(resume_context) == 1) goto resume;
 
-    mmsafe_ptr<Data> p_arr[5] = { NULL };
+    mm_ptr<Data> p_arr[5] = { NULL };
 
-    p_arr[1] = mmsafe_alloc<Data>(sizeof(Data));
+    p_arr[1] = mm_alloc<Data>(sizeof(Data));
     p_arr[1]->i = 10;
     p_arr[1]->d = 4.2;
 
-    mmsafe_ptr<Data> p1 = p_arr[1];
+    mm_ptr<Data> p1 = p_arr[1];
 
     if (p1->i != 10 || p_arr[1]->d != 4.2) {
         perror("ERROR: Testing dereferencing an MM_ptr inside an array failed\

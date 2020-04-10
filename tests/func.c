@@ -3,14 +3,14 @@
  * */
 
 #include <stdbool.h>
-#include "header.h"
+#include "inc.h"
 
 //
-// Test using a mmsafe_ptr of function parameter.
+// Test using a mm_ptr of function parameter.
 //
-void f0(mmsafe_ptr<Data> p, bool free_it) {
+void f0(mm_ptr<Data> p, bool free_it) {
     if (free_it) {
-        mmsafe_free<Data>(p);
+        mm_free<Data>(p);
         return;
     }
 
@@ -24,14 +24,14 @@ void f0(mmsafe_ptr<Data> p, bool free_it) {
 }
 
 //
-// Test passing mmsafe_ptr to a function and checking if the pointee's change
+// Test passing mm_ptr to a function and checking if the pointee's change
 // in the callee are visial in the caller.
 //
 void f1() {
     print_start("passing MM_ptr to a function");
     if (setjmp(resume_context) == 1) goto resume;
 
-    mmsafe_ptr<Data> p = mmsafe_alloc<Data>(sizeof(Data));
+    mm_ptr<Data> p = mm_alloc<Data>(sizeof(Data));
     f0(p, false);
 
     if (p->i != 10 || p->j != 20 || p->d != 3.14) {
@@ -49,7 +49,7 @@ resume:
 
 //
 // Test using multiple MM_ptr passed by function parameter.
-void f2(mmsafe_ptr<Data> p0, mmsafe_ptr<Data> p1) {
+void f2(mm_ptr<Data> p0, mm_ptr<Data> p1) {
     if (p0->i != p1->i || p0->l != p1->l || p0->d != p1->d) {
         perror("ERROR: Testing parameter passing failed in function f2().\n");
     }
@@ -60,8 +60,8 @@ void f2(mmsafe_ptr<Data> p0, mmsafe_ptr<Data> p1) {
 void f3() {
     print_start("passing multiple MM_ptr to a function");
 
-    mmsafe_ptr<Data> p = mmsafe_alloc<Data>(sizeof(Data));
-    mmsafe_ptr<Data> p1 = mmsafe_alloc<Data>(sizeof(Data));
+    mm_ptr<Data> p = mm_alloc<Data>(sizeof(Data));
+    mm_ptr<Data> p1 = mm_alloc<Data>(sizeof(Data));
 
     p->i = 10;
     p->l = 20;
@@ -83,8 +83,8 @@ void f3() {
 // current Checked C requires that
 // "function with no prototype cannot have a return type that is a checked type"
 //  We may need relex this restriction for MM_ptr.
-mmsafe_ptr<Data> f4(int i) {
-    mmsafe_ptr<Data> p = mmsafe_alloc<Data>(sizeof(Data));
+mm_ptr<Data> f4(int i) {
+    mm_ptr<Data> p = mm_alloc<Data>(sizeof(Data));
     p->i = 10;
     p->l = 20;
     p->d = 3.14;
@@ -95,7 +95,7 @@ mmsafe_ptr<Data> f4(int i) {
 void f5() {
     print_start("return an MM_ptr from a function");
 
-    mmsafe_ptr<Data> p = f4(0);
+    mm_ptr<Data> p = f4(0);
 
     if (p->i != 10 || p->l != 20 || p->d != 3.14) {
         perror("ERROR: Testing parameter passing failed in function f1().\n");
