@@ -6,7 +6,8 @@
 #define nt_array_ptr _Nt_array_ptr
 #define checked _Checked
 #define nt_checked _Nt_checked
-#define mm_ptr _MMSafe_ptr
+#define mm_ptr _MM_ptr
+#define mm_array_ptr _MM_array_ptr
 #define unchecked _Unchecked
 #define bounds_only _Bounds_only
 #define where _Where
