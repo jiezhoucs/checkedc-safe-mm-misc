@@ -9,3 +9,4 @@ tests/hello
 tests/basic
 tests/dereference
 tests/assign
+tests/func
