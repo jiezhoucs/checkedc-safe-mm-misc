@@ -4,10 +4,25 @@ This repository contains miscellaneous stuffs, small test programs,
 development experience, handy scripts, etc., about the Checked C
 temporal memory safety project.
 
-## Build Suggestion
+## Experiment Suggestions
 I suggest that you put all the related files about the project in one
 big directory so that the relative paths in the scripts would work
 for everyone.
+
+### Directory Organization
+Please organize your sub-directories in the Checked C project directory
+in the following hierarchy:
+
+```
+checkedc
+|-- build
+|-- llvm
+|-- safe-mm-misc
+|-- tests
+|   |-- build
+|   |-- test-suite  # LLVM test-suite: https://github.com/zhaishuang1/test-suite
+|   |-- results
+```
 
 ### Build the Compiler
 
