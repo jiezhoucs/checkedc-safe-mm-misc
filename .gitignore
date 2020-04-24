@@ -4,6 +4,8 @@
 *.out
 *.swp
 *.so
+*.a
+*.dylib
 
 # binaries
 tests/hello
