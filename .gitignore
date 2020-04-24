@@ -3,6 +3,7 @@
 *.ll
 *.out
 *.swp
+*.so
 
 # binaries
 tests/hello
