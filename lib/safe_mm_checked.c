@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define ID_SIZE 8
 
@@ -40,7 +41,7 @@ uint64_t key = 1;
 //
 __attribute__ ((noinline))
 for_any(T) mm_ptr<T> mm_alloc(unsigned long struct_size) {
-    void *raw_ptr = malloc(struct_size);
+    void *raw_ptr = malloc(struct_size + ID_SIZE);
 
     // Generate a random number as the ID.
     // FIXME: replace the naive rand() function with a robust random
@@ -51,7 +52,13 @@ for_any(T) mm_ptr<T> mm_alloc(unsigned long struct_size) {
     *((uint64_t *)(raw_ptr)) = new_ID;
 
     // Create a helper struct.
-    _MM_ptr_Rep safe_ptr = { .p = raw_ptr, .ID = new_ID };
+    // Note that in the initialization of the _MM_array_ptr_Rep, it adds
+    // ID_SIZE to raw_ptr whose type is "void *". Arithmetic on "void *"
+    // is undefined behavior by C's specification. For GCC or Clang,
+    // the "-pedantic-errors" flag would cause a program to fail compiling
+    // if it has such an undefined behavior.
+    // Related reading: https://stackoverflow.com/questions/3523145/pointer-arithmetic-for-void-pointer-in-c
+    _MM_ptr_Rep safe_ptr = { .p = raw_ptr + ID_SIZE, .ID = new_ID };
 
     mm_ptr<T> *mm_ptr_ptr = (mm_ptr<T> *)&safe_ptr;
     return *mm_ptr_ptr;
@@ -73,12 +80,6 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(unsigned long array_size) {
   uint64_t new_ID = key++;
   *((uint64_t *)(raw_ptr)) = new_ID;
 
-  // Note that in the initialization of the _MM_array_ptr_Rep, it adds
-  // ID_SIZE to raw_ptr whose type is "void *". Arithmetic on "void *"
-  // is undefined behavior by C's specification. For GCC or Clang,
-  // the "-pedantic-errors" flag would cause a program to fail compiling
-  // if it has such an undefined behavior.
-  // Related reading: https://stackoverflow.com/questions/3523145/pointer-arithmetic-for-void-pointer-in-c
   _MM_array_ptr_Rep safe_ptr = {
     .p = raw_ptr + ID_SIZE, .ID = new_ID, .p_ID = raw_ptr
   };
@@ -101,11 +102,13 @@ for_any(T) void mm_free(mm_ptr<T> p) {
   // statement.
   volatile _MM_ptr_Rep *mm_ptr_ptr = (_MM_ptr_Rep *)&p;
 
+  // Compute the real starting address of the allocated heap struct.
+  uint64_t *raw_ptr = (uint64_t *)(((uint64_t)(mm_ptr_ptr->p)) - 8);
   // This step may not be necessary in some cases. In some implementation,
   // free() zeros out all bytes of the memory region of the freed object.
-  *((uint64_t *)(mm_ptr_ptr->p)) = 0;
+  *raw_ptr = 0;
 
-  free(mm_ptr_ptr->p);
+  free(raw_ptr);
 }
 
 for_any(T) void mm_array_free(mm_array_ptr<T> p) {
