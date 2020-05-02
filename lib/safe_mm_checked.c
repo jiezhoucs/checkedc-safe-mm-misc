@@ -24,7 +24,7 @@ typedef struct {
 typedef struct {
   void *p;
   uint64_t ID;
-  void *p_ID;  // pointer to ID
+  uint64_t *p_ID;  // pointer to ID
 } _MM_array_ptr_Rep;
 
 
@@ -111,6 +111,16 @@ for_any(T) void mm_free(mm_ptr<T> p) {
   free(raw_ptr);
 }
 
+//
+// Function: mm_array_free()
+//
+// This is a customized memory deallocator to free heap arrays pointed by
+// mm_array_ptr<T>.
+//
+// @param p - a _MM_array_ptr whose pointee is going to be freed.
+//
 for_any(T) void mm_array_free(mm_array_ptr<T> p) {
-  // TODO
+    volatile _MM_array_ptr_Rep *mm_array_ptr_ptr = (_MM_array_ptr_Rep *)&p;
+    *(mm_array_ptr_ptr->p_ID) = 0;
+    free(mm_array_ptr_ptr->p_ID);
 }
