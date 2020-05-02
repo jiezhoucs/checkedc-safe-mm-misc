@@ -37,4 +37,4 @@ ll: $(LIB_SRC)
 	$(CC) -S -emit-llvm $^
 
 clean:
-	rm -rf *.o *.so *.a
+	rm -rf *.o *.so *.a *.ll
