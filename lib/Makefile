@@ -36,5 +36,13 @@ so: $(LIB_SRC)
 ll: $(LIB_SRC)
 	$(CC) -S -emit-llvm $^
 
+#
+# Compile libdebug
+debug: debug.c
+	$(CC) -c $^ -o $@.o
+	ar -rc libdebug.a $@.o
+	@ranlib libdebug.a
+	@rm -f $@.o
+
 clean:
 	rm -rf *.o *.so *.a *.ll
