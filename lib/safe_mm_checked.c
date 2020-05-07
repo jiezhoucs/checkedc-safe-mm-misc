@@ -103,7 +103,7 @@ for_any(T) void mm_free(mm_ptr<T> p) {
   volatile _MM_ptr_Rep *mm_ptr_ptr = (_MM_ptr_Rep *)&p;
 
   // Compute the real starting address of the allocated heap struct.
-  uint64_t *raw_ptr = (uint64_t *)(((uint64_t)(mm_ptr_ptr->p)) - 8);
+  uint64_t *raw_ptr = (uint64_t *)(((uint64_t)(mm_ptr_ptr->p)) - ID_SIZE);
   // This step may not be necessary in some cases. In some implementation,
   // free() zeros out all bytes of the memory region of the freed object.
   *raw_ptr = 0;
