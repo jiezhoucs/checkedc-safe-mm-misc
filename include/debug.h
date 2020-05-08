@@ -29,6 +29,9 @@ typedef struct node{
     char c;
 } Node;
 
+// to resume execution after seg fault or illegal instruction
+jmp_buf resume_context;  
+
 void segv_handler(int sig);
 
 void ill_handler(int sig);

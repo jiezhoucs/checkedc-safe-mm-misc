@@ -4,7 +4,6 @@
 
 #include "debug.h"
 
-jmp_buf resume_context;  // to resume execution after seg fault or illegal instruction
 
 //
 // This signal handler resumes execution after a segmentation fault.
