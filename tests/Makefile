@@ -6,7 +6,7 @@ CHECKEDC_MISC = ../lib
 
 OPT=-O0
 CFLAGS = $(OPT) -I../include
-LDFLAGS = -L../lib -lsafemm
+LDFLAGS = -L../lib -lsafemm -ldebug
 
 #
 # Checked-C Clang
@@ -37,6 +37,9 @@ o1: $(HELLO)
 
 o2: $(HELLO)
 	$(CC) -S -O2 -emit-llvm $^
+
+o3: $(HELLO)
+	$(CC) -S -O3 -emit-llvm $^
 
 
 #
