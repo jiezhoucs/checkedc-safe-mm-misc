@@ -5,7 +5,7 @@
  * */
 
 #include <stdbool.h>
-#include "inc.h"
+#include "debug.h"
 
 
 //
@@ -48,10 +48,36 @@ resume:
     putchar('\n');
 }
 
+//
+// Test basic declaration and dereferences to a mm_array_ptr.
+void f1() {
+    signal(SIGILL, ill_handler);
+    if (setjmp(resume_context) == 1) goto resume;
+
+    mm_array_ptr<int> p = mm_array_alloc<int>(sizeof(int) * 10);
+    printf("Testing writing and reading values to an array.\n");
+    for (int i = 0; i < 10; i++) p[i] = i;
+    for (int i = 0; i < 10; i++) {
+        if (p[i] != i)
+            print_error("basic.c::f1(): writing and reading test failed");
+    }
+
+    // Test UAF
+    printf("Testing UAF of a MM_array_ptr.\n");
+    mm_array_free<int>(p);
+    p[0] = 10;
+    print_error("basic.c::f1(): testing UAF failed");
+
+resume:
+    putchar('\n');
+}
+
 int main() {
     print_main_start(__FILE__);
 
     f0();
+
+    f1();
 
     print_main_end(__FILE__);
     return 0;
