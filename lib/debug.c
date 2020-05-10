@@ -37,3 +37,9 @@ void print_main_start(char *filename) {
 void print_main_end(char *filename) {
   printf("========Finished testing %s.========\n\n", filename);
 }
+
+// Print error message in RED color.
+void print_error(char *err) {
+    printf("%s%s.%s\n", RED, err, COLOR_RESET);
+    exit(-1);
+}

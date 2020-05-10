@@ -7,11 +7,15 @@
 
 #include <stdio.h>
 #include <stdint.h>
-
+#include <stdlib.h>
 #include <signal.h>
 #include <setjmp.h>
 
 #include "safe_mm_checked.h"
+
+// Print error message in red
+#define COLOR_RESET   "\033[0m"
+#define RED           "\033[31m"
 
 typedef struct data {
     int i;
@@ -30,7 +34,7 @@ typedef struct node{
 } Node;
 
 // to resume execution after seg fault or illegal instruction
-jmp_buf resume_context;  
+jmp_buf resume_context;
 
 void segv_handler(int sig);
 
@@ -40,5 +44,6 @@ void print_start(char *feature);
 void print_end(char *feature);
 void print_main_start(char *filename);
 void print_main_end(char *filename);
+void print_error(char *err);
 
 #endif
