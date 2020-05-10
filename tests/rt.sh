@@ -6,9 +6,10 @@
 
 
 SRC=(
+    "basic"
     "assign"
     "dereference"
-    # "funccall"
+    "func"
 )
 
 #
