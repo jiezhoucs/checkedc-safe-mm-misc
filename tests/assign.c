@@ -2,7 +2,7 @@
  * Test assginment-related functionalities for MMSafe_ptr.
  * */
 
-#include "inc.h"
+#include "debug.h"
 
 //
 // Testing assigning an MMSafe_ptr to another.
@@ -18,7 +18,7 @@ void f0() {
 
     // Checked if the new pointer points to the correct memory object.
     if (p1->i != 1 || p1->l != 100 || p1->d != 4.2 || p1->f != p0->f) {
-        perror("Assignment testing failed in function f0!\n");
+        print_error("Assignment testing failed in function f0");
     }
 
     mm_free<Data>(p1);
@@ -31,6 +31,7 @@ resume:
 
 //
 // Test assigning NULL to an MMSafe_ptr.
+//
 void f1() {
     if (setjmp(resume_context) == 1) goto resume0;
 
@@ -49,6 +50,46 @@ resume1:
     printf("Finished testing assigning NULL to an MM_ptr in an array.\n\n");
 }
 
+//
+// Test assigning an MM_array_ptr to another.
+//
+void f2() {
+    if (setjmp(resume_context) == 1) goto resume;
+
+    mm_array_ptr<int> p = mm_array_alloc<int>(sizeof(int) * 10);
+    for (int i = 0; i < 10; i++) p[i] = i + 20;
+    mm_array_ptr<int> p1 = p;
+    for (int i = 0; i < 10; i++) {
+        if (p[i] != p1[i])
+            print_error("assign.c::f2(): pointer assignment test failed");
+    }
+
+resume:
+    printf("Testing assignment between _MM_array_ptr succeeded.\n\n");
+}
+
+//
+// Test assigning NULL to an _MM_array_ptr and an array of _MM_array_ptr.
+//
+void f3() {
+    if (setjmp(resume_context) == 1) goto resume0;
+
+    mm_array_ptr<int> p0 = NULL;
+    p0[10] = 10;  // should raise a segfault
+    print_error("assign.c::f3(): assigning NULL ptr test failed");
+
+resume0:
+    print_end("assigning NULL to an _MM_array_ptr");
+
+    if (setjmp(resume_context) == 1) goto resume1;
+
+    mm_array_ptr<int> p_arr[2] = { NULL };
+    p_arr[1][1] = 10;  // segmentation fault
+    print_error("assign.c::f3(): assigning NULL ptr test failed");
+
+resume1:
+    print_end("assigning NULL to an _MM_array_ptr in an array");
+}
 
 int main(int argc, char *argv[]) {
     signal(SIGILL, ill_handler);
@@ -56,10 +97,15 @@ int main(int argc, char *argv[]) {
 
     printf("===== Begin testing assignment functionality. =====\n");
 
+    // _MM_ptr testing
     f0();
 
     f1();
 
+    // _MM_array_ptr testing
+    f2();
+
+    f3();
 
     printf("===== Finish testing assignment functionality. =====\n\n");
     return 0;
