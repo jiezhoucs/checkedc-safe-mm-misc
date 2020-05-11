@@ -2,7 +2,7 @@
  * More tests on pointer dereference.
  * */
 
-#include "inc.h"
+#include "debug.h"
 
 //
 // Testing dereferencing an MM_ptr inside a struct.
@@ -21,7 +21,7 @@ void f0() {
     p->next->c = 'a';
 
     if (p->next->val != 10 || p->next->l != 42 || p->next->c != 'a') {
-        perror("ERROR: Dereferencing testing failed in function f1!\n");
+        print_error("Dereferencing testing failed in function f1");
     }
 
     printf("Testing freeing an MM_ptr inside a struct.\n");
@@ -60,6 +60,32 @@ resume:
     print_end("dereferencing an MM_ptr inside an array");
 }
 
+//
+// Testing dereferencing an _MM_array_ptr to an array of structs.
+void f2() {
+    print_start("dereferencing an _MM_array_ptr to structs");
+
+    signal(SIGILL, ill_handler);
+    if (setjmp(resume_context) == 1) goto resume;
+
+    mm_array_ptr<Data> p = mm_array_alloc<Data>(sizeof(Data) * 10);
+    p[0].i = 10;
+    p[0].l = 42;
+    p[0].d = 3.14;
+
+    p[9] = p[0];
+    if (p[9].i != 10 || p[9].l != 42 || p[9].d != 3.14) {
+        print_error("dereference.c::f2(): testing dereference an array of structs");
+    }
+
+    mm_array_free<Data>(p);
+    p[0].i = 10;
+    print_error("dereference.c::f2(): UAF not caught");
+
+resume:
+    print_end("dereferencing an _MM_array_ptr to structs");
+}
+
 int main() {
     print_main_start(__FILE__);
     signal(SIGILL, ill_handler);
@@ -68,6 +94,8 @@ int main() {
     f0();
 
     f1();
+
+    f2();
 
     print_main_end(__FILE__);
     return 0;
