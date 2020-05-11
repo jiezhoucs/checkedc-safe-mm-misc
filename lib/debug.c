@@ -40,6 +40,6 @@ void print_main_end(char *filename) {
 
 // Print error message in RED color.
 void print_error(char *err) {
-    printf("%s%s.%s\n", RED, err, COLOR_RESET);
+    printf("%sERROR: %s.%s\n", RED, err, COLOR_RESET);
     exit(-1);
 }
