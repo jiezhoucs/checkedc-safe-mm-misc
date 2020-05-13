@@ -42,7 +42,6 @@ uint64_t key = 1;
 __attribute__ ((noinline))
 for_any(T) mm_ptr<T> mm_alloc(unsigned long struct_size) {
     void *raw_ptr = malloc(struct_size + ID_SIZE);
-    printf("raw_ptr = %p\n", raw_ptr);
 
     // Generate a random number as the ID.
     // FIXME: replace the naive rand() function with a robust random
