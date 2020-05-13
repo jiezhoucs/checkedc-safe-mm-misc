@@ -42,6 +42,7 @@ uint64_t key = 1;
 __attribute__ ((noinline))
 for_any(T) mm_ptr<T> mm_alloc(unsigned long struct_size) {
     void *raw_ptr = malloc(struct_size + ID_SIZE);
+    printf("raw_ptr = %p\n", raw_ptr);
 
     // Generate a random number as the ID.
     // FIXME: replace the naive rand() function with a robust random
@@ -123,4 +124,34 @@ for_any(T) void mm_array_free(mm_array_ptr<T> p) {
     volatile _MM_array_ptr_Rep *mm_array_ptr_ptr = (_MM_array_ptr_Rep *)&p;
     *(mm_array_ptr_ptr->p_ID) = 0;
     free(mm_array_ptr_ptr->p_ID);
+}
+
+
+//
+// Function: _getptr_mm()
+//
+// This function extracts the inner raw pointer to the start of a struct
+// from an mm_ptr<T>.
+// The motivation of creating this function is that some code tris to
+// cast an mm_ptr<T> to a raw pointer to another type of struct,
+// e.g., the loadtree() function in the bh benchmark of the Olden
+// benchmark suite.
+//
+// However, this is a danger operation. Unless a programmer is completely
+// sure that doing so is safe, this function should be avoided.
+//
+// Maybe we should implement this as a compiler intrinsic?
+//
+// @param p - the safe pointer whose inner raw pointer to be extracted.
+//
+for_any(T) void *_getptr_mm(mm_ptr<T> p) {
+    return ((_MM_ptr_Rep *)&p)->p;
+}
+
+//
+// This function extracts the inner raw pointer to the start of a struct
+// from an mm_array_ptr<T>.
+//
+for_any(T) void *_getpt_mm_array(mm_array_ptr<T> p) {
+    return ((_MM_array_ptr_Rep *)&p)->p;
 }
