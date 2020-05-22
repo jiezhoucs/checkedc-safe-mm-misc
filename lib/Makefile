@@ -3,7 +3,7 @@
 LLVM_DIR = ../../build/bin
 
 OPT=-O3
-CFLAGS = $(OPT) -I../include
+CFLAGS = $(OPT) -I../include -Wall
 
 #
 # Checked-C Clang

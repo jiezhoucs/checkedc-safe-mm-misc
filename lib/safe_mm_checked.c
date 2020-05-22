@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #define ID_SIZE 8
+#define HEAP_PADDING 8
 
 // A helper struct that has the "same" inner structure as a mm_ptr.
 // It is used to help create a _MM_ptr.
@@ -39,25 +40,26 @@ uint64_t key = 1;
 // the type of an implicit pointer to the type of a pointer to a _MM_ptr.
 // Finally it returns the dereference of the pointer to _MM_ptr.
 //
+// Note that arithmetic on "void *" is undefined behavior by C's specification.
+// For GCC or Clang, the "-pedantic-errors" flag would cause a program to fail
+// compiling if it has such an undefined behavior.
+// Related reading: https://stackoverflow.com/questions/3523145/pointer-arithmetic-for-void-pointer-in-c
 __attribute__ ((noinline))
 for_any(T) mm_ptr<T> mm_alloc(unsigned long struct_size) {
-    void *raw_ptr = malloc(struct_size + ID_SIZE);
+    // We need the HEAP_PADDING to ensure that mm_ptr inside a struct
+    // is aligned by 16 bytes.
+    // See this issue for the reason: https://github.com/jzhou76/checkedc-llvm/issues/2
+    void *raw_ptr = malloc(struct_size + HEAP_PADDING + ID_SIZE);
 
     // Generate a random number as the ID.
     // FIXME: replace the naive rand() function with a robust random
     // number generator which gives a good 64-bit random number.
     uint64_t new_ID = key++;
-    // We assume that ID is always the first field of a struct; so here
-    // we can set the ID without knowing the concrete structure of a struct.
+    // We assume that ID is located right before the first field of a struct.
+    raw_ptr += HEAP_PADDING;
     *((uint64_t *)(raw_ptr)) = new_ID;
 
     // Create a helper struct.
-    // Note that in the initialization of the _MM_array_ptr_Rep, it adds
-    // ID_SIZE to raw_ptr whose type is "void *". Arithmetic on "void *"
-    // is undefined behavior by C's specification. For GCC or Clang,
-    // the "-pedantic-errors" flag would cause a program to fail compiling
-    // if it has such an undefined behavior.
-    // Related reading: https://stackoverflow.com/questions/3523145/pointer-arithmetic-for-void-pointer-in-c
     _MM_ptr_Rep safe_ptr = { .p = raw_ptr + ID_SIZE, .ID = new_ID };
 
     mm_ptr<T> *mm_ptr_ptr = (mm_ptr<T> *)&safe_ptr;
@@ -75,9 +77,10 @@ for_any(T) mm_ptr<T> mm_alloc(unsigned long struct_size) {
 //
 __attribute__ ((noinline))
 for_any(T) mm_array_ptr<T> mm_array_alloc(unsigned long array_size) {
-  void *raw_ptr = malloc(array_size + ID_SIZE);
+  void *raw_ptr = malloc(array_size + ID_SIZE + HEAP_PADDING);
 
   uint64_t new_ID = key++;
+  raw_ptr += HEAP_PADDING;
   *((uint64_t *)(raw_ptr)) = new_ID;
 
   _MM_array_ptr_Rep safe_ptr = {
@@ -102,13 +105,12 @@ for_any(T) void mm_free(mm_ptr<T> p) {
   // statement.
   volatile _MM_ptr_Rep *mm_ptr_ptr = (_MM_ptr_Rep *)&p;
 
-  // Compute the real starting address of the allocated heap struct.
-  uint64_t *raw_ptr = (uint64_t *)(((uint64_t)(mm_ptr_ptr->p)) - ID_SIZE);
+  void *ID_ptr = mm_ptr_ptr->p - ID_SIZE;
   // This step may not be necessary in some cases. In some implementation,
   // free() zeros out all bytes of the memory region of the freed object.
-  *raw_ptr = 0;
+  *(uint64_t *)ID_ptr = 0;
 
-  free(raw_ptr);
+  free(ID_ptr - HEAP_PADDING);
 }
 
 //
@@ -122,7 +124,7 @@ for_any(T) void mm_free(mm_ptr<T> p) {
 for_any(T) void mm_array_free(mm_array_ptr<T> p) {
     volatile _MM_array_ptr_Rep *mm_array_ptr_ptr = (_MM_array_ptr_Rep *)&p;
     *(mm_array_ptr_ptr->p_ID) = 0;
-    free(mm_array_ptr_ptr->p_ID);
+    free((void *)(mm_array_ptr_ptr->p_ID) - HEAP_PADDING);
 }
 
 
