@@ -57,4 +57,4 @@ make clang -jn
 
 Here is Microsoft instructions on building the compiler: [Setting up your
 machine and building
-clang](https://github.com/Microsoft/checkedc-clang/blob/master/docs/checkedc/Setup-and-Build.md)
+clang](https://github.com/microsoft/checkedc-clang/blob/master/clang/docs/checkedc/Setup-and-Build.md)
