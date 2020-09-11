@@ -20,8 +20,7 @@ checkedc                # root directory for the whole project
 |-- misc                # the safe-mm-misc repo
 |-- tests
 |   |-- test-suite      # LLVM test-suite: https://github.com/zhaishuang1/test-suite
-|   |-- olden-build     # build directory of the Olden benchmark suite
-|   |-- ptrdist-build   # build directory of the Ptrdist benchmark suite
+|   |-- ts-build        # build directory of the LLVM test-suite.
 ```
 
 ### Build the Compiler

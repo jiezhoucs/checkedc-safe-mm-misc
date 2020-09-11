@@ -9,7 +9,7 @@
 
 #
 # Olden-specific paths
-BUILD_DIR="$TESTS_DIR/olden-build"
+BUILD_DIR="$TESTS_DIR/ts-build"
 DATA_DIR="$DATA_DIR/olden"
 BIN_DIR="$BUILD_DIR/MultiSource/Benchmarks/Olden"
 
