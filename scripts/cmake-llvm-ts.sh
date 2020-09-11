@@ -7,6 +7,8 @@
 # Load the common paths and variables.
 . common.sh
 
+# Go to the build directory. Create one if it does not exist.
+[[ -d $LLVM_TESTSUITE_BUILD_DIR ]] || mkdir -p $LLVM_TESTSUITE_BUILD_DIR
 cd "$LLVM_TESTSUITE_BUILD_DIR"
 rm -rf CMakeCache.txt
 
