@@ -4,16 +4,17 @@
 LLVM_DIR = ../../build/bin
 CHECKEDC_MISC = ../lib
 
-OPT=-O0
+OPT=-O3
 CFLAGS = $(OPT) -I../include
 LDFLAGS = -L../lib -lsafemm -ldebug
+PRINT_PASSES = -mllvm -opt-bisect-limit=-1
 
 #
 # Checked-C Clang
 #
 CC = $(LLVM_DIR)/clang $(CFLAGS)
 
-SRC = basic.c assign.c dereference.c func.c
+SRC = basic.c assign.c dereference.c func.c cast.c
 LIB = $(CHECKEDC_MISC)/lib-safemm.c
 OBJ = $(SRC:%.c=%.o)
 ASM = $(SRC:%.c=%.s)
@@ -32,6 +33,9 @@ hello: $(HELLO)
 ll: $(HELLO)
 	$(CC) -S -emit-llvm $^
 
+o0: $(HELLO)
+	$(CC) -S -O0 -emit-llvm $^
+
 o1: $(HELLO)
 	$(CC) -S -O1 -emit-llvm $^
 
@@ -49,6 +53,21 @@ rt: $(SRC)
 	for src in $(BIN) ; do \
 		$(CC) $$src.c $(LDFLAGS) -o $$src ; \
 	done
+
+basic: basic.c
+	$(CC) $(LDFLAGS) $^ -o basic
+
+assgin: assgin.c
+	$(CC) $(LDFLAGS) $^ -o assgin
+
+dereference: dereference.c
+	$(CC) $(LDFLAGS) $^ -o dereference
+
+func: func.c
+	$(CC) $(LDFLAGS) $^ -o func
+
+cast: cast.c
+	$(CC) $(LDFLAGS) $^ -o cast
 
 clean: $(SRC)
 	rm -f $(BIN) *.s *.o *.tmp *.ll hello a.out
