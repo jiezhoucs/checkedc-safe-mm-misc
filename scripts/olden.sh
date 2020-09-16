@@ -14,10 +14,16 @@ DATA_DIR="$DATA_DIR/olden"
 BIN_DIR="$BUILD_DIR/MultiSource/Benchmarks/Olden"
 
 PROGRAMS=(
-    # "bh"
+    "bh"
     "bisort"
-    # "em3d"
+    "em3d"
+    "health"
+    "mst"
+    "perimeter"
     "power"
+    "treeadd"
+    "tsp"
+    "voronoi"
 )
 
 cd $BUILD_DIR
