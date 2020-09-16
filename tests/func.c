@@ -193,7 +193,7 @@ mm_array_ptr<int> f10() {
 //
 // Test using mm_array_ptr as a function's return value.
 void f11() {
-    print_end("using mm_array_ptr from a function's return value");
+    print_start("using mm_array_ptr from a function's return value");
     mm_array_ptr<int> p = f10();
     for (int i = 0; i < 10; i++) {
         if (p[i] != i)
