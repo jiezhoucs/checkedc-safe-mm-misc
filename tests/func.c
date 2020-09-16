@@ -103,7 +103,9 @@ void f5() {
 
 //
 // Test using _MM_array_ptr as a function parameter.
+//
 void f6(mm_array_ptr<int> p, bool free_it) {
+    print_start("using a _MM_array_ptr as a function parameter");
     if (free_it) mm_array_free<int>(p);
 
     if (setjmp(resume_context) == 1) goto resume;
@@ -113,26 +115,75 @@ void f6(mm_array_ptr<int> p, bool free_it) {
     p[0] = 84;
 
 resume:
-    print_end("testing using a _MM_array_ptr as a function parameter");
+    print_end("using a _MM_array_ptr as a function parameter");
 }
 
 //
 // Test passing mm_array_ptr to a function and checking if the pointee's change
-// in the callee are visial in the caller.
+// in the callee are visibel in the caller.
+//
 void f7() {
+    print_start("passing an mm_array_ptr as a function argument "\
+            "and using it in the callee");
     mm_array_ptr<int> p = mm_array_alloc<int>(sizeof(int) * 10);
     p[0] = 42;
     f6(p, false);
     if (p[0] != 84)
         print_error("func.c::f7(): test passing mm_array_ptr to function failed");
 
-    p[0] = 42;
     f6(p, true);
+
+    print_end("passing an mm_array_ptr as a function argument "\
+            "and using it in the callee");
+}
+
+/*
+ * Test using multiple mm_array_ptr arguments.
+ * */
+void
+f8(mm_array_ptr<int> p0, mm_array_ptr<long> p1, bool free_p0, bool free_p1) {
+    if (setjmp(resume_context) == 1) goto resume;
+
+    print_start("using multiple _MM_array_ptr function arguments");
+    if (free_p0) mm_array_free<int>(p0);
+    if (free_p1) mm_array_free<long>(p1);
+
+    if (p0[1] != 42 || p1[2] != 84) {
+        print_error("func.c::f8(): test using mm_array_ptr function arguments failed");
+    }
+    p0[0] = p0[1];
+    p1[1] = p1[2];
+
+resume:
+    print_end("using multiple _MM_array_ptr function arguments");
+}
+
+/*
+ * Test passing multiple mm_array_ptr as function arguments and checking if
+ * the pointees' changes in the callee are visible to the caller.
+ * */
+void f9() {
+    print_start("passing multiple mm_array_ptr as function arguments "\
+            "and using them in the callee");
+    mm_array_ptr<int> p0 = mm_array_alloc<int>(sizeof(int) * 10);
+    mm_array_ptr<long> p1 = mm_array_alloc<long>(sizeof(long) * 10);
+    p0[1] = 42;
+    p1[2] = 84;
+    f8(p0, p1, false, false);
+
+    if (p0[0] != p0[1] || p1[1] != p1[2]) {
+        print_error("func.c::f9(): test passing multiple mm_array_ptr failed");
+    }
+
+    f8(p0, p1, false, true);
+    print_end("passing multiple mm_array_ptr as function arguments "\
+            "and using them in the callee");
 }
 
 //
 // Test returning an _MM_array_ptr from a function.
-mm_array_ptr<int> f8() {
+//
+mm_array_ptr<int> f10() {
     mm_array_ptr<int> p = mm_array_alloc<int>(sizeof(int) * 10);
     for (int i = 0; i < 10; i++) p[i] = i;
 
@@ -141,15 +192,16 @@ mm_array_ptr<int> f8() {
 
 //
 // Test using mm_array_ptr as a function's return value.
-void f9() {
-    mm_array_ptr<int> p = f8();
+void f11() {
+    print_end("using mm_array_ptr from a function's return value");
+    mm_array_ptr<int> p = f10();
     for (int i = 0; i < 10; i++) {
         if (p[i] != i)
-            print_error("func.c::f9(): test using an mm_array_ptr as a function's\
+            print_error("func.c::f11(): test using an mm_array_ptr as a function's\
                     return value failed");
     }
 
-    print_end("test using mm_array_ptr as a function's return value");
+    print_end("using mm_array_ptr from a function's return value");
 }
 
 int main(int argc, char *argv[]) {
@@ -165,6 +217,8 @@ int main(int argc, char *argv[]) {
     f7();
 
     f9();
+
+    f11();
 
     print_main_end(__FILE__);
     return 0;
