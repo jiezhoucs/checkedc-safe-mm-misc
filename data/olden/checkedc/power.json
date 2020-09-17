@@ -1,0 +1,33 @@
+{
+  "__version__": [
+    0, 
+    8, 
+    0
+  ], 
+  "elapsed": 0.6230809688568115, 
+  "tests": [
+    {
+      "code": "PASS", 
+      "elapsed": 0.5859551429748535, 
+      "metrics": {
+        "compile_time": 1.5394999999999999, 
+        "exec_time": 0.373, 
+        "hash": "269adb6424906cadf8ec022888f688c6", 
+        "link_time": 0.0441, 
+        "size": 17968, 
+        "size.__const": 216, 
+        "size.__cstring": 107, 
+        "size.__data": 600, 
+        "size.__got": 8, 
+        "size.__la_symbol_ptr": 32, 
+        "size.__nl_symbol_ptr": 8, 
+        "size.__stub_helper": 56, 
+        "size.__stubs": 24, 
+        "size.__text": 6697, 
+        "size.__unwind_info": 132
+      }, 
+      "name": "test-suite :: MultiSource/Benchmarks/Olden/power/power.test", 
+      "output": "\n/Users/Jie/projects/checkedc/tests/ts-build/tools/timeit-target --limit-core 0 --limit-cpu 7200 --timeout 7200 --limit-file-size 104857600 --limit-rss-size 838860800 --append-exitstatus --redirect-output /Users/Jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power/Output/power.test.out --redirect-input /dev/null --chdir /Users/Jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power --summary /Users/Jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power/Output/power.test.time /Users/Jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power/power\ncd /Users/Jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power ; /Users/Jie/projects/checkedc/tests/ts-build/tools/fpcmp-target -r 0.00001 /Users/Jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power/Output/power.test.out power.reference_output"
+    }
+  ]
+}
