@@ -153,6 +153,6 @@ for_any(T) void *_getptr_mm(mm_ptr<T> p) {
 // This function extracts the inner raw pointer to the start of a struct
 // from an mm_array_ptr<T>.
 //
-for_any(T) void *_getpt_mm_array(mm_array_ptr<T> p) {
+for_any(T) void *_getptr_mm_array(mm_array_ptr<T> p) {
     return ((_MM_array_ptr_Rep *)&p)->p;
 }
