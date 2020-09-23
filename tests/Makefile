@@ -60,7 +60,7 @@ basic: basic.c
 assgin: assgin.c
 	$(CC) $(LDFLAGS) $^ -o assgin
 
-dereference: dereference.c
+deref: dereference.c
 	$(CC) $(LDFLAGS) $^ -o dereference
 
 func: func.c

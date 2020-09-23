@@ -86,6 +86,76 @@ resume:
     print_end("dereferencing an _MM_array_ptr to structs");
 }
 
+/**
+ * Test dereferencing a _MM_array_ptr inside a struct.
+ * */
+typedef struct {
+    int i;
+    long l;
+    mm_array_ptr<Data> dp_arr;
+} DataWithPtrArr;
+
+void f3() {
+    print_start("dereferencing an _MM_array_ptr inside a struct");
+
+    signal(SIGILL, ill_handler);
+    if (setjmp(resume_context) == 1) goto resume;
+
+    mm_ptr<DataWithPtrArr> p = mm_alloc<DataWithPtrArr>(sizeof(DataWithPtrArr));
+    p->dp_arr = mm_array_alloc<Data>(sizeof(Data) * 10);
+    p->dp_arr[1].i = 10;
+    p->dp_arr[1].l = 42;
+    p->dp_arr[1].d = 3.14;
+    p->dp_arr[9] = p->dp_arr[1];
+
+    Data d = p->dp_arr[9];
+    if (d.i != 10 || d.l != 42 || d.d != 3.14) {
+        print_error("dereference.c::f3(): testing dereferencing an _MM_array_ptr"
+                " inside a struct");
+    }
+
+    mm_array_free<Data>(p->dp_arr);
+    p->dp_arr[0] = d;
+    print_error("dereference.c::f3(): UAF not caught");
+
+resume:
+    print_end("dereferencing an _MM_array_ptr inside a struct");
+}
+
+/**
+ * Test dereferencing an _MM_array_ptr inside an array of _MM_array_ptr.
+ * */
+void f4() {
+    print_start("dereferencing an _MM_array_ptr inside an array of _MM_array_ptr");
+
+    signal(SIGILL, ill_handler);
+    if (setjmp(resume_context) == 1) goto resume;
+
+    mm_array_ptr<mm_array_ptr<Data>> p =
+        mm_array_alloc<mm_array_ptr<Data>>(sizeof(mm_array_ptr<Data>) * 10);
+    p[0] = mm_array_alloc<Data>(sizeof(Data) * 10);
+    p[1] = mm_array_alloc<Data>(sizeof(Data) * 10);
+
+    for(int i = 0; i < 10; i++) {
+        p[0][i].i = i + 1;
+        p[1][i].i = i + 2;
+    }
+
+    for (int i = 0; i < 10; i++) {
+        if (p[0][i].i + 1 != p[1][i].i) {
+            print_error("dereference.c::f4(): dereferencing an _MM_array_ptr"
+                    "inside an array of _MM_array_ptr");
+        }
+    }
+
+    mm_array_free<Data>(p[1]);
+    p[1][1].i = 10;
+    print_error("dereference.c::f4(): UAF not caught");
+
+resume:
+    print_end("dereferencing an _MM_array_ptr inside an array of _MM_array_ptr");
+}
+
 int main() {
     print_main_start(__FILE__);
     signal(SIGILL, ill_handler);
@@ -96,6 +166,10 @@ int main() {
     f1();
 
     f2();
+
+    f3();
+
+    f4();
 
     print_main_end(__FILE__);
     return 0;
