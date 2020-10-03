@@ -11,6 +11,7 @@ SRC=(
     "dereference"
     "func"
     "cast"
+    "array"
 )
 
 #

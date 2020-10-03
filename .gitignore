@@ -13,3 +13,7 @@ tests/basic
 tests/dereference
 tests/assign
 tests/func
+tests/cast
+tests/array
+
+tests/hello.c
