@@ -14,7 +14,7 @@ PRINT_PASSES = -mllvm -opt-bisect-limit=-1
 #
 CC = $(LLVM_DIR)/clang $(CFLAGS)
 
-SRC = basic.c assign.c dereference.c func.c cast.c
+SRC = basic.c assign.c dereference.c func.c cast.c array.c
 LIB = $(CHECKEDC_MISC)/lib-safemm.c
 OBJ = $(SRC:%.c=%.o)
 ASM = $(SRC:%.c=%.s)
@@ -68,6 +68,9 @@ func: func.c
 
 cast: cast.c
 	$(CC) $(LDFLAGS) $^ -o cast
+
+array: array.c
+	$(CC) $(LDFLAGS) $^ -o array
 
 clean: $(SRC)
 	rm -f $(BIN) *.s *.o *.tmp *.ll hello a.out
