@@ -49,6 +49,18 @@ void f0() {
             print_error("array.c::f0(): pointer arithmetic");
     }
 
+    // Test ++/-- operators.
+    p0++;
+    ++p0;
+    if (p0[0] != 3) {
+        print_error("array.c::f0(): pointer subtraction");
+    }
+    p0--;
+    --p0;
+    if (p0[0] != 1) {
+        print_error("array.c::f0(): pointer subtraction");
+    }
+
     mm_array_free<int>(p0);
     p3[0] = 5;  // UAF; should raise an illegal instruction error.
 
