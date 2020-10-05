@@ -14,13 +14,15 @@ Please organize your sub-directories in the Checked C project directory
 in the following hierarchy:
 
 ```shell
-checkedc                # root directory for the whole project
-|-- build               # build directory of the LLVM compiler
-|-- llvm                # LLVM src
-|-- misc                # the safe-mm-misc repo
+checkedc                    # root directory for the whole project
+|-- build                   # build directory of the LLVM compiler
+|-- llvm                    # LLVM src
+|-- misc                    # the safe-mm-misc repo
 |-- tests
-|   |-- test-suite      # LLVM test-suite: https://github.com/zhaishuang1/test-suite
-|   |-- ts-build        # build directory of the LLVM test-suite.
+|   |-- test-suite          # modified Checked C LLVM test-suite
+|   |-- ts-build            # build directory of the modified LLVM test-suite.
+|   |-- test-suite-origin   # original LLVM test-suite code
+|   |-- ts-build-origin     # build directory of the original LLVM test-suite
 ```
 
 ### Build the Compiler
