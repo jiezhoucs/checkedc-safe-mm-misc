@@ -5,7 +5,7 @@ LLVM_DIR = ../../build/bin
 CHECKEDC_MISC = ../lib
 
 OPT=-O3
-CFLAGS = $(OPT) -I../include
+CFLAGS = $(OPT) -I../include --save-stats
 LDFLAGS = -L../lib -lsafemm -ldebug
 PRINT_PASSES = -mllvm -opt-bisect-limit=-1
 
@@ -73,4 +73,4 @@ array: array.c
 	$(CC) $(LDFLAGS) $^ -o array
 
 clean: $(SRC)
-	rm -f $(BIN) *.s *.o *.tmp *.ll hello a.out
+	rm -f $(BIN) *.s *.o *.tmp *.ll *.stats hello a.out
