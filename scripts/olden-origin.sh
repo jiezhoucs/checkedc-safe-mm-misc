@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# This scritps run the benchmarks of the modified Olden test suite.
+# This scritps run the benchmarks of the original Olden test suite.
 #
 
 # load common directory paths and variables
@@ -9,8 +9,8 @@
 
 #
 # Olden-specific paths
-BUILD_DIR="$TESTS_DIR/ts-build"
-DATA_DIR="$DATA_DIR/olden/checkedc"
+BUILD_DIR="$TESTS_DIR/ts-origin-build"
+DATA_DIR="$DATA_DIR/olden/origin"
 BIN_DIR="$BUILD_DIR/MultiSource/Benchmarks/Olden"
 
 PROGRAMS=(
