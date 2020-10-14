@@ -58,6 +58,16 @@ run_all() {
 }
 
 #
+# Clean all compiled binaries.
+#
+clean() {
+    for prog in ${PROGRAMS[@]}; do
+        cd "$BIN_DIR"
+        rm -f "$prog/$prog"
+    done
+}
+
+#
 # Print out usgae and exit.
 #
 usage() {
@@ -79,6 +89,8 @@ usage() {
 if [[ $# == 1 ]]; then
     if [[ $1 == "-h" || $1 == "--help" ]]; then
         usage
+    elif [[ $1 == "clean" ]]; then
+        clean
     else
         run_one $1
     fi
