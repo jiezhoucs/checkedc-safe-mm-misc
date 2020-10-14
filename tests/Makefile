@@ -5,7 +5,7 @@ LLVM_DIR = ../../build/bin
 CHECKEDC_MISC = ../lib
 
 OPT=-O3
-CFLAGS = $(OPT) -I../include --save-stats
+CFLAGS = $(OPT) -I../include
 LDFLAGS = -L../lib -lsafemm -ldebug
 PRINT_PASSES = -mllvm -opt-bisect-limit=-1
 

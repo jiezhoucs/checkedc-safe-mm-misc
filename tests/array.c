@@ -68,6 +68,33 @@ resume:
     print_end("pointer adding/subtracting a number");
 }
 
+/*
+ * Test *p++/-- and *++/--p
+ * */
+void f1() {
+    print_start("*p++/-- and *++/--p");
+
+    signal(SIGILL, ill_handler);
+    if (setjmp(resume_context) == 1) goto resume;
+
+    mm_array_ptr<int> p = mm_array_alloc<int>(sizeof(int) * 10);
+    for (int i = 0; i < 10; i++) p[i] = i + 1;
+
+    p += 5;
+
+    int a = *p++;
+    int b = *p--;
+    int c = *++p;
+    int d = *--p;
+
+    if (a != 6 || b != 7 || c != 7 || d != 6) {
+        print_error("array.c::f1(): *p++/-- and *++/--p");
+    }
+
+resume:
+    print_end("*p++/-- and *++/--p");
+}
+
 
 int main(int argc, char *argv[]) {
     print_main_start(__FILE__);
@@ -75,6 +102,8 @@ int main(int argc, char *argv[]) {
     signal(SIGSEGV, segv_handler);
 
     f0();
+
+    f1();
 
     print_main_end(__FILE__);
     return 0;
