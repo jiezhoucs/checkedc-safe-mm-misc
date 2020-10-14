@@ -124,7 +124,7 @@ for_any(T) void mm_free(mm_ptr<T> p) {
 for_any(T) void mm_array_free(mm_array_ptr<T> p) {
     volatile _MM_array_ptr_Rep *mm_array_ptr_ptr = (_MM_array_ptr_Rep *)&p;
     *(mm_array_ptr_ptr->p_ID) = 0;
-    free((void *)(mm_array_ptr_ptr->p_ID) - HEAP_PADDING);
+    free(mm_array_ptr_ptr->p - ID_SIZE - HEAP_PADDING);
 }
 
 
