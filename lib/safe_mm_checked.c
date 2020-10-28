@@ -9,14 +9,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define ID_SIZE 8
+#define LOCK_SIZE 8
 #define HEAP_PADDING 8
 
-// A helper struct that has the "same" inner structure as a mm_ptr.
-// It is used to help create a _MM_ptr.
+// A helper struct that has the same inner structure as an mm_ptr.
+// It is used to help create an mm_ptr.
 typedef struct {
   void *p;
-  uint64_t ID;
+  uint64_t key;
 } _MM_ptr_Rep;
 
 
@@ -24,8 +24,8 @@ typedef struct {
 // It is used to help create a _MM_array_ptr.
 typedef struct {
   void *p;
-  uint64_t ID;
-  uint64_t *p_ID;  // pointer to ID
+  uint64_t key;
+  uint64_t *lock_ptr;  // pointer to the lock.
 } _MM_array_ptr_Rep;
 
 
@@ -49,18 +49,18 @@ for_any(T) mm_ptr<T> mm_alloc(unsigned long struct_size) {
     // We need the HEAP_PADDING to ensure that mm_ptr inside a struct
     // is aligned by 16 bytes.
     // See this issue for the reason: https://github.com/jzhou76/checkedc-llvm/issues/2
-    void *raw_ptr = malloc(struct_size + HEAP_PADDING + ID_SIZE);
+    void *raw_ptr = malloc(struct_size + HEAP_PADDING + LOCK_SIZE);
 
-    // Generate a random number as the ID.
+    // Generate a random number as the key.
     // FIXME: replace the naive rand() function with a robust random
     // number generator which gives a good 64-bit random number.
-    uint64_t new_ID = key++;
-    // We assume that ID is located right before the first field of a struct.
+    uint64_t new_key = key++;
+    // We assume that key is located right before the first field of a struct.
     raw_ptr += HEAP_PADDING;
-    *((uint64_t *)(raw_ptr)) = new_ID;
+    *((uint64_t *)(raw_ptr)) = new_key;
 
     // Create a helper struct.
-    _MM_ptr_Rep safe_ptr = { .p = raw_ptr + ID_SIZE, .ID = new_ID };
+    _MM_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_SIZE, .key = new_key };
 
     mm_ptr<T> *mm_ptr_ptr = (mm_ptr<T> *)&safe_ptr;
     return *mm_ptr_ptr;
@@ -70,21 +70,21 @@ for_any(T) mm_ptr<T> mm_alloc(unsigned long struct_size) {
 // Function: mm_array_alloc()
 //
 // This is a customized memory allocator to allocator an array on the heap.
-// Because the allocated array has an ID attached right before the first
-// element of it, the allocator allocates 8 more bytes for the ID.
+// Because the allocated array has an lock attached right before the first
+// element of it, the allocator allocates 8 more bytes for the lock.
 // It returns a _MM_array_ptr that contains a pointer to the first element
-// and a pointer to the ID.
+// and a pointer to the lock.
 //
 __attribute__ ((noinline))
 for_any(T) mm_array_ptr<T> mm_array_alloc(unsigned long array_size) {
-  void *raw_ptr = malloc(array_size + ID_SIZE + HEAP_PADDING);
+  void *raw_ptr = malloc(array_size + LOCK_SIZE + HEAP_PADDING);
 
-  uint64_t new_ID = key++;
+  uint64_t new_key = key++;
   raw_ptr += HEAP_PADDING;
-  *((uint64_t *)(raw_ptr)) = new_ID;
+  *((uint64_t *)(raw_ptr)) = new_key;
 
   _MM_array_ptr_Rep safe_ptr = {
-    .p = raw_ptr + ID_SIZE, .ID = new_ID, .p_ID = raw_ptr
+    .p = raw_ptr + LOCK_SIZE, .key = new_key, .lock_ptr = raw_ptr
   };
 
   mm_array_ptr<T> *mm_array_ptr_ptr = (mm_array_ptr<T> *)&safe_ptr;
@@ -95,8 +95,9 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(unsigned long array_size) {
 //
 // Function: mm_free()
 //
-// This is a customized memory deallocator. It sets the ID of the struct to 0
-// and calls free() from the stdlib to free the struct.
+// This is a customized memory deallocator for mm_ptr.
+// It sets the lock of the singleton memory object to 0
+// and calls free() from the stdlib to free the whole memory object.
 //
 // @param p - a _MM_ptr whose pointee is going to be freed.
 //
@@ -105,12 +106,12 @@ for_any(T) void mm_free(mm_ptr<T> p) {
   // statement.
   volatile _MM_ptr_Rep *mm_ptr_ptr = (_MM_ptr_Rep *)&p;
 
-  void *ID_ptr = mm_ptr_ptr->p - ID_SIZE;
+  void *lock_ptr = mm_ptr_ptr->p - LOCK_SIZE;
   // This step may not be necessary in some cases. In some implementation,
   // free() zeros out all bytes of the memory region of the freed object.
-  *(uint64_t *)ID_ptr = 0;
+  *(uint64_t *)lock_ptr = 0;
 
-  free(ID_ptr - HEAP_PADDING);
+  free(lock_ptr - HEAP_PADDING);
 }
 
 //
@@ -123,8 +124,8 @@ for_any(T) void mm_free(mm_ptr<T> p) {
 //
 for_any(T) void mm_array_free(mm_array_ptr<T> p) {
     volatile _MM_array_ptr_Rep *mm_array_ptr_ptr = (_MM_array_ptr_Rep *)&p;
-    *(mm_array_ptr_ptr->p_ID) = 0;
-    free(mm_array_ptr_ptr->p - ID_SIZE - HEAP_PADDING);
+    *(mm_array_ptr_ptr->lock_ptr) = 0;
+    free(mm_array_ptr_ptr->p - LOCK_SIZE - HEAP_PADDING);
 }
 
 
