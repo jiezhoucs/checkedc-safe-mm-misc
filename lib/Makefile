@@ -20,10 +20,12 @@ libsafemm: a so
 #
 # Compile the lib to a static library.
 a: $(LIB_SRC)
+	make clean
 	$(CC) -c $(LIB_SRC) -o $(LIB_SAFEMM).o
 	ar -rc $(LIB_SAFEMM).a $(LIB_SAFEMM).o
 	@ranlib $(LIB_SAFEMM).a
 	@rm -f $(LIB_SAFEMM).o
+	@make debug
 
 #
 # Compile the lib to a shared libray. Note that on MacOS .dylib is the

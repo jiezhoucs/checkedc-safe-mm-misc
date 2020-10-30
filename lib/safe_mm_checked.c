@@ -1,6 +1,15 @@
 /*
- * This files provides a customized memory allocator and a deallocator
- * for struct objects pointed by a _MM_ptr<T>.
+ * This files defines customized memory allocators and deallocators
+ * for memory objects pointed by mm_ptr and mm_array_ptr.
+ *
+ * Note that the current implementation assumes we adopt a 32-32 key-offset
+ * metadata design for mm_ptr. In the paper we say that we support two
+ * key-offset schemes: 32-32 and 40-24. Also it is not totally clear to us
+ * which is faster key-offset or offset-key. For the 32-32 option it might
+ * be the same but the key-offset one might be a little faster for
+ * the 40-24 one because the constant used in an "and" instruction can be
+ * hardcoded in the instruction instead of loading from another register.
+ *
  * */
 
 #include "safe_mm_checked.h"
@@ -9,14 +18,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define LOCK_SIZE 8
+#define LOCK_SIZE 8  // It is actually 4 bytes in current implementation.
 #define HEAP_PADDING 8
 
 // A helper struct that has the same inner structure as an mm_ptr.
 // It is used to help create an mm_ptr.
 typedef struct {
   void *p;
-  uint64_t key;
+  uint64_t key_offset;
 } _MM_ptr_Rep;
 
 
@@ -29,7 +38,9 @@ typedef struct {
 } _MM_array_ptr_Rep;
 
 
-uint64_t key = 1;
+// Our current implementation uses a 32-bit key. We may need to change it
+// to 40-bit key later.
+uint32_t key = 1;
 
 //
 // Function: mm_alloc()
@@ -45,22 +56,24 @@ uint64_t key = 1;
 // compiling if it has such an undefined behavior.
 // Related reading: https://stackoverflow.com/questions/3523145/pointer-arithmetic-for-void-pointer-in-c
 __attribute__ ((noinline))
-for_any(T) mm_ptr<T> mm_alloc(unsigned long struct_size) {
+for_any(T) mm_ptr<T> mm_alloc(unsigned long size) {
     // We need the HEAP_PADDING to ensure that mm_ptr inside a struct
     // is aligned by 16 bytes.
     // See this issue for the reason: https://github.com/jzhou76/checkedc-llvm/issues/2
-    void *raw_ptr = malloc(struct_size + HEAP_PADDING + LOCK_SIZE);
+    void *raw_ptr = malloc(size + HEAP_PADDING + LOCK_SIZE);
 
     // Generate a random number as the key.
     // FIXME: replace the naive rand() function with a robust random
-    // number generator which gives a good 64-bit random number.
-    uint64_t new_key = key++;
-    // We assume that key is located right before the first field of a struct.
+    // number generator.
+    uint32_t new_key = key++;
+    // The lock is located right before the first field of the referent.
     raw_ptr += HEAP_PADDING;
-    *((uint64_t *)(raw_ptr)) = new_key;
+    *((uint32_t *)(raw_ptr)) = new_key;
 
     // Create a helper struct.
-    _MM_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_SIZE, .key = new_key };
+    _MM_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_SIZE, .key_offset = new_key };
+    // Move the key to the highest 32 bits and make the offset 0.
+    safe_ptr.key_offset <<= 32;
 
     mm_ptr<T> *mm_ptr_ptr = (mm_ptr<T> *)&safe_ptr;
     return *mm_ptr_ptr;
@@ -109,7 +122,7 @@ for_any(T) void mm_free(mm_ptr<T> p) {
   void *lock_ptr = mm_ptr_ptr->p - LOCK_SIZE;
   // This step may not be necessary in some cases. In some implementation,
   // free() zeros out all bytes of the memory region of the freed object.
-  *(uint64_t *)lock_ptr = 0;
+  *(uint32_t *)lock_ptr = 0;
 
   free(lock_ptr - HEAP_PADDING);
 }
