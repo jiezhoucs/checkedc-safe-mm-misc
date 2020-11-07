@@ -14,7 +14,7 @@ PRINT_PASSES = -mllvm -opt-bisect-limit=-1
 #
 CC = $(LLVM_DIR)/clang $(CFLAGS)
 
-SRC = basic.c assign.c dereference.c func.c cast.c array.c
+SRC = basic.c assign.c dereference.c func.c cast.c array.c addressof.c
 LIB = $(CHECKEDC_MISC)/lib-safemm.c
 OBJ = $(SRC:%.c=%.o)
 ASM = $(SRC:%.c=%.s)
@@ -71,6 +71,9 @@ cast: cast.c
 
 array: array.c
 	$(CC) $(LDFLAGS) $^ -o array
+
+addrof: addressof.c
+	$(CC) $(LDFLAGS) $^ -o addressof
 
 clean: $(SRC)
 	rm -f $(BIN) *.s *.o *.tmp *.ll *.stats hello a.out
