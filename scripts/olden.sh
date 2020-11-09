@@ -62,8 +62,9 @@ run_all() {
 #
 clean() {
     for prog in ${PROGRAMS[@]}; do
-        cd "$BIN_DIR"
-        rm -f "$prog/$prog"
+        cd "$BIN_DIR/$prog"
+        find . -name "*.o" -delete
+        rm -f "$prog"
     done
 }
 

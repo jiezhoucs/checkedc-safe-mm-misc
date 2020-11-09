@@ -9,7 +9,7 @@
 
 #
 # Olden-specific paths
-BUILD_DIR="$TESTS_DIR/ts-origin-build"
+BUILD_DIR="$TESTS_DIR/ts-build-origin"
 DATA_DIR="$DATA_DIR/olden/origin"
 BIN_DIR="$BUILD_DIR/MultiSource/Benchmarks/Olden"
 
@@ -62,8 +62,9 @@ run_all() {
 #
 clean() {
     for prog in ${PROGRAMS[@]}; do
-        cd "$BIN_DIR"
-        rm -f "$prog/$prog"
+        cd "$BIN_DIR/$prog"
+        find . -name "*.o" -delete
+        rm -f "$prog"
     done
 }
 
