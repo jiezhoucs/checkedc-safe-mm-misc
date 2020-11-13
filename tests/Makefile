@@ -6,7 +6,8 @@ CHECKEDC_MISC = ../lib
 
 OPT=-O3
 CFLAGS = $(OPT) -I../include
-LDFLAGS = -L../lib -lsafemm -ldebug
+LDFLAGS = -Xlinker -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk \
+		  -L../lib -lsafemm -ldebug
 PRINT_PASSES = -mllvm -opt-bisect-limit=-1
 
 #
@@ -57,8 +58,8 @@ rt: $(SRC)
 basic: basic.c
 	$(CC) $(LDFLAGS) $^ -o basic
 
-assgin: assgin.c
-	$(CC) $(LDFLAGS) $^ -o assgin
+assign: assign.c
+	$(CC) $(LDFLAGS) $^ -o assign
 
 deref: dereference.c
 	$(CC) $(LDFLAGS) $^ -o dereference
