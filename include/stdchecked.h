@@ -8,6 +8,7 @@
 #define nt_checked _Nt_checked
 #define mm_ptr _MM_ptr
 #define mm_array_ptr _MM_array_ptr
+#define mm_large_ptr _MM_large_ptr
 #define unchecked _Unchecked
 #define bounds_only _Bounds_only
 #define where _Where

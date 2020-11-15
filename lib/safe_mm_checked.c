@@ -28,14 +28,21 @@ typedef struct {
   uint64_t key_offset;
 } _MM_ptr_Rep;
 
+// A helper struct that has the same inner structure as an mm_array_ptr.
+// It is used to help create an mm_array_ptr.
+typedef struct {
+  void *p;
+  uint64_t key_offset;
+} _MM_array_ptr_Rep;
 
-// A helper struct that has the "same" inner structure as a mm_array_ptr.
-// It is used to help create a _MM_array_ptr.
+
+// A helper struct that has the same inner structure as a mm_large_ptr.
+// It is used to help create a _MM_large_ptr.
 typedef struct {
   void *p;
   uint64_t key;
   uint64_t *lock_ptr;  // pointer to the lock.
-} _MM_array_ptr_Rep;
+} _MM_large_ptr_Rep;
 
 
 // Our current implementation uses a 32-bit key. We may need to change it
@@ -92,18 +99,48 @@ __attribute__ ((noinline))
 for_any(T) mm_array_ptr<T> mm_array_alloc(unsigned long array_size) {
   void *raw_ptr = malloc(array_size + LOCK_SIZE + HEAP_PADDING);
 
-  uint64_t new_key = key++;
+  // Create a new key and initialize the lock.
+  uint32_t new_key = key++;
   raw_ptr += HEAP_PADDING;
-  *((uint64_t *)(raw_ptr)) = new_key;
+  *((uint32_t *)(raw_ptr)) = new_key;
 
+  // Create and initialize a helper struct for _MM_array_ptr.
   _MM_array_ptr_Rep safe_ptr = {
-    .p = raw_ptr + LOCK_SIZE, .key = new_key, .lock_ptr = raw_ptr
+    .p = raw_ptr + LOCK_SIZE, .key_offset = new_key
   };
+  safe_ptr.key_offset <<= 32;
 
   mm_array_ptr<T> *mm_array_ptr_ptr = (mm_array_ptr<T> *)&safe_ptr;
   return *mm_array_ptr_ptr;
 }
 
+//
+// Function: mm_large_alloc()
+//
+// This is a customized memory allocator to allocator large array (greater than
+// 4G) on the heap.
+// Because the allocated array has an lock attached right before the first
+// element of it, the allocator allocates 8 more bytes for the lock.
+// It returns a _MM_array_ptr that contains a pointer to the first element
+// and a pointer to the lock.
+//
+__attribute__ ((noinline))
+for_any(T) mm_large_ptr<T> mm_large_alloc(unsigned long array_size) {
+  void *raw_ptr = malloc(array_size + LOCK_SIZE + HEAP_PADDING);
+
+  // Create a new key and initialize the lock.
+  uint64_t new_key = key++;
+  raw_ptr += HEAP_PADDING;
+  *((uint64_t *)(raw_ptr)) = new_key;
+
+  // Create and initialize a helper struct for _MM_array_ptr.
+  _MM_large_ptr_Rep safe_ptr = {
+    .p = raw_ptr + LOCK_SIZE, .key = new_key, .lock_ptr = raw_ptr
+  };
+
+  mm_large_ptr<T> *mm_large_ptr_ptr = (mm_large_ptr<T> *)&safe_ptr;
+  return *mm_large_ptr_ptr;
+}
 
 //
 // Function: mm_free()
@@ -130,15 +167,32 @@ for_any(T) void mm_free(mm_ptr<T> p) {
 //
 // Function: mm_array_free()
 //
-// This is a customized memory deallocator to free heap arrays pointed by
-// mm_array_ptr<T>.
+// This is a customized memory deallocator for mm_array_ptr.
+// It sets the lock of the array memory object to 0
+// and calls free() from the stdlib to free the whole memory object.
 //
 // @param p - a _MM_array_ptr whose pointee is going to be freed.
 //
 for_any(T) void mm_array_free(mm_array_ptr<T> p) {
     volatile _MM_array_ptr_Rep *mm_array_ptr_ptr = (_MM_array_ptr_Rep *)&p;
-    *(mm_array_ptr_ptr->lock_ptr) = 0;
-    free(mm_array_ptr_ptr->p - LOCK_SIZE - HEAP_PADDING);
+    uint32_t offset = (uint32_t)(mm_array_ptr_ptr->key_offset);
+    void *lock_ptr = mm_array_ptr_ptr->p - offset - LOCK_SIZE;
+    *(uint32_t *)lock_ptr = 0;
+    free(lock_ptr - HEAP_PADDING);
+}
+
+//
+// Function: mm_large_free()
+//
+// This is a customized memory deallocator to free heap arrays pointed by
+// mm_large_ptr<T>.
+//
+// @param p - a _MM_large_ptr whose pointee is going to be freed.
+//
+for_any(T) void mm_large_free(mm_large_ptr<T> p) {
+    volatile _MM_large_ptr_Rep *mm_large_ptr_ptr = (_MM_large_ptr_Rep *)&p;
+    *(mm_large_ptr_ptr->lock_ptr) = 0;
+    free(mm_large_ptr_ptr->p - LOCK_SIZE - HEAP_PADDING);
 }
 
 
