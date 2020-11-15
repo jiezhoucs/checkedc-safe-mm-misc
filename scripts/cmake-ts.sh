@@ -14,7 +14,6 @@ cd "$TESTSUITE_BUILD_DIR"
 rm -rf CMakeCache.txt
 
 cmake -DCMAKE_C_COMPILER="$CC"                                                 \
-      -DCMAKE_C_FLAGS="--save-stats"                                           \
       -DCMAKE_PREFIX_PATH="$CHECKEDC_INC;$CHECKEDC_LIB"                        \
       -C"$TESTSUITE_DIR"/cmake/caches/O3.cmake                                 \
       "$TESTSUITE_DIR"
