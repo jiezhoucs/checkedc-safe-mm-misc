@@ -91,10 +91,12 @@ void f1() {
         print_error("array.c::f1(): *p++/-- and *++/--p");
     }
 
+    mm_array_free<int>(p - 5);
+    a = *p++;
+
 resume:
     print_end("*p++/-- and *++/--p");
 }
-
 
 int main(int argc, char *argv[]) {
     print_main_start(__FILE__);
