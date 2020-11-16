@@ -77,4 +77,4 @@ addrof: addressof.c
 	$(CC) $(LDFLAGS) $^ -o addressof
 
 clean: $(SRC)
-	rm -f $(BIN) *.s *.o *.tmp *.ll *.stats hello a.out
+	rm -f $(BIN) *.s *.o *.bc *.i *.tmp *.ll *.stats hello a.out
