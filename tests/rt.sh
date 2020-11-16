@@ -12,6 +12,7 @@ SRC=(
     "func"
     "cast"
     "array"
+    "addressof"
 )
 
 #
