@@ -69,7 +69,7 @@ resume:
 }
 
 /*
- * Test *p++/-- and *++/--p
+ * Test *p++/-- and *++/--p and directly dereferencing a pointer arithmetic.
  * */
 void f1() {
     print_start("*p++/-- and *++/--p");
@@ -89,6 +89,10 @@ void f1() {
 
     if (a != 6 || b != 7 || c != 7 || d != 6) {
         print_error("array.c::f1(): *p++/-- and *++/--p");
+    }
+
+    if (*(p - 5) != 1 || *(p + 1) != 7) {
+        print_error("array.c::f1(): direct dereferencing of pointer arithmetic");
     }
 
     mm_array_free<int>(p - 5);
