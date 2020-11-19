@@ -3,11 +3,16 @@
 #
 LLVM_DIR = ../../build/bin
 CHECKEDC_MISC = ../lib
+UNAME_S := $(shell uname -s)
 
 OPT=-O3
 CFLAGS = $(OPT) -I../include
-LDFLAGS = -Xlinker -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk \
-		  -L../lib -lsafemm -ldebug
+LDFLAGS = -L../lib -lsafemm -ldebug
+ifeq ($(UNAME_S), Darwin)
+	LDFLAGS += -Xlinker -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
+else ifeq ($(UNAME_S), Linux)
+	LDFLAGS += -Wl,-rpath,../lib
+endif
 PRINT_PASSES = -mllvm -opt-bisect-limit=-1
 
 #
