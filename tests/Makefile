@@ -36,6 +36,9 @@ hello: $(HELLO)
 	$(CC) $^ $(LDFLAGS) -o hello
 	objdump -d hello > hello.s
 
+debug: $(HELLO)
+	$(CC) -g -O0 $^ $(LDFLAGS) -o hello
+
 ll: $(HELLO)
 	$(CC) -S -emit-llvm $^
 
@@ -82,4 +85,4 @@ addrof: addressof.c
 	$(CC) $(LDFLAGS) $^ -o addressof
 
 clean: $(SRC)
-	rm -f $(BIN) *.s *.o *.bc *.i *.tmp *.ll *.stats hello a.out
+	rm -rf $(BIN) *.s *.o *.bc *.i *.tmp *.ll *.stats hello a.out *.dSYM
