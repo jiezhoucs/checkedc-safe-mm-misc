@@ -1,0 +1,32 @@
+{
+  "__version__": [
+    0, 
+    8, 
+    0
+  ], 
+  "elapsed": 0.44823288917541504, 
+  "tests": [
+    {
+      "code": "PASS", 
+      "elapsed": 0.4069039821624756, 
+      "metrics": {
+        "compile_time": 0.3861, 
+        "exec_time": 0.2244, 
+        "hash": "a0d145f5f54f3bdb30648210bc96b845", 
+        "link_time": 0.0393, 
+        "size": 33344, 
+        "size.__common": 4, 
+        "size.__cstring": 113, 
+        "size.__got": 8, 
+        "size.__la_symbol_ptr": 40, 
+        "size.__nl_symbol_ptr": 8, 
+        "size.__stub_helper": 66, 
+        "size.__stubs": 30, 
+        "size.__text": 379, 
+        "size.__unwind_info": 88
+      }, 
+      "name": "test-suite :: MultiSource/Benchmarks/Olden/treeadd/treeadd.test", 
+      "output": "\n/Users/Jie/projects/checkedc/tests/ts-build-origin/tools/timeit-target --limit-core 0 --limit-cpu 7200 --timeout 7200 --limit-file-size 104857600 --limit-rss-size 838860800 --append-exitstatus --redirect-output /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/treeadd/Output/treeadd.test.out --redirect-input /dev/null --chdir /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/treeadd --summary /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/treeadd/Output/treeadd.test.time /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/treeadd/treeadd 22\ncd /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/treeadd ; /Users/Jie/projects/checkedc/tests/ts-build-origin/tools/fpcmp-target /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/treeadd/Output/treeadd.test.out treeadd.reference_output"
+    }
+  ]
+}

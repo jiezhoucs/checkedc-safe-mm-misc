@@ -1,0 +1,34 @@
+{
+  "__version__": [
+    0, 
+    8, 
+    0
+  ], 
+  "elapsed": 0.5433628559112549, 
+  "tests": [
+    {
+      "code": "PASS", 
+      "elapsed": 0.5079498291015625, 
+      "metrics": {
+        "compile_time": 3.3855999999999997, 
+        "exec_time": 0.1522, 
+        "hash": "e9825463228d1786d373ff8c1df05279", 
+        "link_time": 0.05, 
+        "size": 36480, 
+        "size.__common": 144, 
+        "size.__const": 64, 
+        "size.__cstring": 381, 
+        "size.__data": 8, 
+        "size.__got": 8, 
+        "size.__la_symbol_ptr": 64, 
+        "size.__nl_symbol_ptr": 8, 
+        "size.__stub_helper": 96, 
+        "size.__stubs": 48, 
+        "size.__text": 11568, 
+        "size.__unwind_info": 192
+      }, 
+      "name": "test-suite :: MultiSource/Benchmarks/Olden/voronoi/voronoi.test", 
+      "output": "\n/Users/Jie/projects/checkedc/tests/ts-build-origin/tools/timeit-target --limit-core 0 --limit-cpu 7200 --timeout 7200 --limit-file-size 104857600 --limit-rss-size 838860800 --append-exitstatus --redirect-output /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/voronoi/Output/voronoi.test.out --redirect-input /dev/null --chdir /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/voronoi --summary /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/voronoi/Output/voronoi.test.time /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/voronoi/voronoi 100000 20 32 7\ncd /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/voronoi ; /Users/Jie/projects/checkedc/tests/ts-build-origin/tools/HashProgramOutput.sh /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/voronoi/Output/voronoi.test.out\ncd /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/voronoi ; /Users/Jie/projects/checkedc/tests/ts-build-origin/tools/fpcmp-target /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/voronoi/Output/voronoi.test.out voronoi.reference_output"
+    }
+  ]
+}

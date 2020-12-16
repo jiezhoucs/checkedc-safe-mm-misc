@@ -1,0 +1,33 @@
+{
+  "__version__": [
+    0, 
+    8, 
+    0
+  ], 
+  "elapsed": 0.23028898239135742, 
+  "tests": [
+    {
+      "code": "PASS", 
+      "elapsed": 0.2017230987548828, 
+      "metrics": {
+        "compile_time": 1.2244, 
+        "exec_time": 0.0458, 
+        "hash": "b14a3f3d7151dee82e4b8cbc625cff44", 
+        "link_time": 0.0397, 
+        "size": 33792, 
+        "size.__bss": 28, 
+        "size.__cstring": 233, 
+        "size.__data": 4, 
+        "size.__got": 8, 
+        "size.__la_symbol_ptr": 56, 
+        "size.__nl_symbol_ptr": 8, 
+        "size.__stub_helper": 86, 
+        "size.__stubs": 42, 
+        "size.__text": 2325, 
+        "size.__unwind_info": 120
+      }, 
+      "name": "test-suite :: MultiSource/Benchmarks/Olden/mst/mst.test", 
+      "output": "\n/Users/Jie/projects/checkedc/tests/ts-build-origin/tools/timeit-target --limit-core 0 --limit-cpu 7200 --timeout 7200 --limit-file-size 104857600 --limit-rss-size 838860800 --append-exitstatus --redirect-output /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/mst/Output/mst.test.out --redirect-input /dev/null --chdir /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/mst --summary /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/mst/Output/mst.test.time /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/mst/mst 1000\ncd /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/mst ; /Users/Jie/projects/checkedc/tests/ts-build-origin/tools/fpcmp-target /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/mst/Output/mst.test.out mst.reference_output"
+    }
+  ]
+}

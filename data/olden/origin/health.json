@@ -1,0 +1,33 @@
+{
+  "__version__": [
+    0, 
+    8, 
+    0
+  ], 
+  "elapsed": 0.41756510734558105, 
+  "tests": [
+    {
+      "code": "PASS", 
+      "elapsed": 0.3657228946685791, 
+      "metrics": {
+        "compile_time": 1.4261, 
+        "exec_time": 0.1924, 
+        "hash": "54663d23ab3bfd60199ff658ba06cdda", 
+        "link_time": 0.05, 
+        "size": 34096, 
+        "size.__common": 24, 
+        "size.__const": 64, 
+        "size.__cstring": 260, 
+        "size.__got": 16, 
+        "size.__la_symbol_ptr": 56, 
+        "size.__nl_symbol_ptr": 8, 
+        "size.__stub_helper": 86, 
+        "size.__stubs": 42, 
+        "size.__text": 3134, 
+        "size.__unwind_info": 124
+      }, 
+      "name": "test-suite :: MultiSource/Benchmarks/Olden/health/health.test", 
+      "output": "\n/Users/Jie/projects/checkedc/tests/ts-build-origin/tools/timeit-target --limit-core 0 --limit-cpu 7200 --timeout 7200 --limit-file-size 104857600 --limit-rss-size 838860800 --append-exitstatus --redirect-output /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/health/Output/health.test.out --redirect-input /dev/null --chdir /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/health --summary /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/health/Output/health.test.time /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/health/health 9 20 1\ncd /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/health ; /Users/Jie/projects/checkedc/tests/ts-build-origin/tools/fpcmp-target -r 0.001 /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/health/Output/health.test.out health.reference_output"
+    }
+  ]
+}

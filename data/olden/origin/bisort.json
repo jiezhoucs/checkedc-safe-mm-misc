@@ -1,0 +1,33 @@
+{
+  "__version__": [
+    0, 
+    8, 
+    0
+  ], 
+  "elapsed": 0.6233980655670166, 
+  "tests": [
+    {
+      "code": "PASS", 
+      "elapsed": 0.5274360179901123, 
+      "metrics": {
+        "compile_time": 0.6503, 
+        "exec_time": 0.3067, 
+        "hash": "2a4acd7c12654c3d87b56bf4e7ecd29e", 
+        "link_time": 0.0501, 
+        "size": 33832, 
+        "size.__bss": 1, 
+        "size.__common": 16, 
+        "size.__cstring": 136, 
+        "size.__got": 8, 
+        "size.__la_symbol_ptr": 32, 
+        "size.__nl_symbol_ptr": 8, 
+        "size.__stub_helper": 56, 
+        "size.__stubs": 24, 
+        "size.__text": 1908, 
+        "size.__unwind_info": 116
+      }, 
+      "name": "test-suite :: MultiSource/Benchmarks/Olden/bisort/bisort.test", 
+      "output": "\n/Users/Jie/projects/checkedc/tests/ts-build-origin/tools/timeit-target --limit-core 0 --limit-cpu 7200 --timeout 7200 --limit-file-size 104857600 --limit-rss-size 838860800 --append-exitstatus --redirect-output /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/bisort/Output/bisort.test.out --redirect-input /dev/null --chdir /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/bisort --summary /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/bisort/Output/bisort.test.time /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/bisort/bisort 700000\ncd /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/bisort ; /Users/Jie/projects/checkedc/tests/ts-build-origin/tools/fpcmp-target /Users/Jie/projects/checkedc/tests/ts-build-origin/MultiSource/Benchmarks/Olden/bisort/Output/bisort.test.out bisort.reference_output"
+    }
+  ]
+}
