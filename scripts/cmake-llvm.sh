@@ -4,8 +4,15 @@ LLVM_SRC=../llvm
 
 rm -rf CMakeCache.txt
 
-cmake -G "Unix Makefiles" \
-      -DLLVM_TARGETS_TO_BUILD="X86" \
-      -DCMAKE_BUILD_TYPE=Debug \
-      -DLLVM_OPTIMIZED_TABLEGEN=ON \
+Build_Type="Debug"
+if [[`uname` == "Linux" ]];
+    Debug_Type="Release"
+
+cmake -G "Unix Makefiles"                    \
+      -DCMAKE_C_COMPILER="clang"             \
+      -DCMAKE_CXX_COMPILER="clang++"         \
+      -DLLVM_TARGETS_TO_BUILD="X86"          \
+      -DCMAKE_BUILD_TYPE="$Build_Type"       \
+      -DLLVM_ENABLE_ASSERTIONS=ON            \
+      -DLLVM_OPTIMIZED_TABLEGEN=ON           \
       "$LLVM_SRC"
