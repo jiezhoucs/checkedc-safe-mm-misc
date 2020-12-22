@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python3
 
 #
 # This script runs olden benchmarks multiple times and collect data.
@@ -20,7 +20,8 @@ benchmarks = [
     "bisort",
     "em3d",
     "health",
-    "power"
+    "power",
+    "tsp",
 ]
 
 exec_time_checked = { }
@@ -44,6 +45,7 @@ def run(version):
         exec_time = exec_time_checked
 
     # Init
+    os.chdir(SCRIPT_DIR)
     sp.run([script, "clean"])
     for benchmark in benchmarks:
         exec_time[benchmark] = 0
