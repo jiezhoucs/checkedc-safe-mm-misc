@@ -12,7 +12,7 @@ TESTSUITE_ORIGIN_DIR="$TESTS_DIR/test-suite-origin"
 TESTSUITE_ORIGIN_BUILD_DIR="$TESTS_DIR/ts-build-origin"
 
 # Go to the build directory. Create one if it does not exist.
-[[ -d $TESTSUITE_ORIGIN_BUILD_DIR ]] || mkdir -p $TESTSUITE_BUILD_DIR
+[[ -d $TESTSUITE_ORIGIN_BUILD_DIR ]] || mkdir -p $TESTSUITE_ORIGIN_BUILD_DIR
 cd "$TESTSUITE_ORIGIN_BUILD_DIR"
 rm -rf CMakeCache.txt
 
