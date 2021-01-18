@@ -17,3 +17,6 @@ tests/cast
 tests/array
 
 tests/hello.c
+
+data/olden/checkedc
+data/olden/origin
