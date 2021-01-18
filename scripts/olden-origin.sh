@@ -61,7 +61,9 @@ run_all() {
 # Clean all compiled binaries.
 #
 clean() {
+    echo "Cleaning all original Olden benchmark binaries..."
     for prog in ${PROGRAMS[@]}; do
+        echo "Cleaning $prog"
         cd "$BIN_DIR/$prog"
         find . -name "*.o" -delete
         rm -f "$prog"

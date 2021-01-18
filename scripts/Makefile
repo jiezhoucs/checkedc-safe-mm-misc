@@ -2,6 +2,9 @@
 
 OLDEN = ./olden.sh
 
+olden:
+	$(OLDEN)
+
 bh:
 	$(OLDEN) bh
 
@@ -22,3 +25,4 @@ tsp:
 
 clean:
 	./olden.sh clean
+	./olden-origin.sh clean
