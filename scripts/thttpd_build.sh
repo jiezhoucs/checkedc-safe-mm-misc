@@ -28,6 +28,9 @@ configure() {
 
     export CC="$CC"
 
+    if [[ -f "$BUILD_DIR" ]]; then
+        mkdir -p "$BUILD_DIR"
+    fi
     ./configure --prefix="$BUILD_DIR"
 }
 
