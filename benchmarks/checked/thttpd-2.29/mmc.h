@@ -28,6 +28,8 @@
 #ifndef _MMC_H_
 #define _MMC_H_
 
+#include "safe_mm_checked.h"
+
 /* Returns an mmap()ed area for the given file, or (void*) 0 on errors.
 ** If you have a stat buffer on the file, pass it in, otherwise pass 0.
 ** Same for the current time.

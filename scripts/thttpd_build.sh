@@ -32,6 +32,11 @@ configure() {
         mkdir -p "$BUILD_DIR"
     fi
     ./configure --prefix="$BUILD_DIR"
+
+    # link the mm_safe library
+    if [[ $1 != "baseline"]]; then
+        sed -i "s|^LDFLAGS =|& \-L../../../lib -lsafemm|g" Makefile
+    fi
 }
 
 #
