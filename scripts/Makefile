@@ -1,4 +1,5 @@
-# This Makefile is an debugging helper.
+# This Makefile is a debugging helper. It facilitates compiling and running
+# Olden benchmarks.
 
 OLDEN = ./olden.sh
 
@@ -17,8 +18,14 @@ em3d:
 health:
 	$(OLDEN) health
 
+perimeter:
+	$(OLDEN) $@
+
 power:
 	$(OLDEN) power
+
+treeadd:
+	$(OLDEN) $@
 
 tsp:
 	$(OLDEN) tsp
