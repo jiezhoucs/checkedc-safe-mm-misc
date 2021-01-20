@@ -18,11 +18,17 @@ checkedc                    # root directory for the whole project
 |-- build                   # build directory of the LLVM compiler
 |-- llvm                    # LLVM src
 |-- misc                    # the safe-mm-misc repo
+|   |-- scripts             # scripts that build programs and compute results
+|   |-- benchmarks          # non-llvm-test-suite applications
+|   |-- data                # experimental results
+|   |-- include             # Checked C header files
+|   |-- lib                 # our own Checked C libraries
 |-- tests
 |   |-- test-suite          # modified Checked C LLVM test-suite
 |   |-- ts-build            # build directory of the modified LLVM test-suite.
 |   |-- test-suite-origin   # original LLVM test-suite code
 |   |-- ts-build-origin     # build directory of the original LLVM test-suite
+|-- benchmark-build         # build directories for non-llvm-test-suite apps
 ```
 
 ### Build the Compiler
