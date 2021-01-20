@@ -20,3 +20,9 @@ tests/hello.c
 
 data/olden/checkedc
 data/olden/origin
+
+# benchmark related files
+benchmarks/**/*.cache
+benchmarks/**/*.log
+benchmarks/**/*.status
+benchmarks/**/Makefile
