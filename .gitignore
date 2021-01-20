@@ -6,6 +6,8 @@
 *.so
 *.a
 *.dylib
+*.o
+*.s
 
 # binaries
 tests/hello
