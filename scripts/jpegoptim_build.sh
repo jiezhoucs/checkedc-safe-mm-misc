@@ -37,11 +37,20 @@ configure() {
         LIBJPEG_DIR=$(dirname `ldconfig -p | grep libjpeg | cut -d '>' -f2`)
     fi
 
+    # Create a builder directory if not existed
     if [[ ! -f "$BUILD_DIR" ]]; then
         mkdir -p "$BUILD_DIR"
     fi
+
     ./configure --prefix="$BUILD_DIR"                                          \
                 --with-libjpeg="$LIBJPEG_DIR"
+
+    # Include the Checked C header files and link the safemm library
+    if [[ $1 != "baseline" ]]; then
+        sed -i "s|\$(DEFS)$|& \-I../../../include|g" Makefile
+        sed -i "s|^LDFLAGS   = |&\-L../../../lib |g" Makefile
+        sed -i "s|\-ljpeg $|&\-lsafemm|g" Makefile
+    fi
 }
 
 #
