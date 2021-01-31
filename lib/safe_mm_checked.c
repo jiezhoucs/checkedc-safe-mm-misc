@@ -127,6 +127,10 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, unsigned long siz
         return p;
     }
 
+    // The new object is placed in a different location and the old one
+    // is freed. The old object's lock needs to be invalidated.
+    *((uint64_t *)(old_raw_ptr + HEAP_PADDING)) = 0;
+
     // Use a new key for the new object.
     uint64_t new_key = key++;
     new_raw_ptr += HEAP_PADDING;
