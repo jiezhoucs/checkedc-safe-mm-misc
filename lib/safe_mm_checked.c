@@ -104,6 +104,41 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(unsigned long array_size) {
   return *mm_array_ptr_ptr;
 }
 
+//
+// Function: mm_array_realloc()
+//
+// This is the mm-safe version of realloc() for arrays.
+//
+// Note:
+// Now we assume that if the re-allocated "new" object starts from the
+// same starting address of the "old" object, then they are the same object
+// and hence the "new" object uses the same lock as the "old" one.
+// If the new object is really re-allocated and starts from somewhere else,
+// the old one would be freed and we need create a new lock for the new object.
+//
+__attribute__ ((noinline))
+for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, unsigned long size) {
+    // Get the original raw pointer.
+    void * old_raw_ptr = ((_MM_array_ptr_Rep *)&p)->p;
+    old_raw_ptr = old_raw_ptr - LOCK_SIZE - HEAP_PADDING;
+
+    void *new_raw_ptr = realloc(old_raw_ptr, size);
+    if (new_raw_ptr == old_raw_ptr) {
+        return p;
+    }
+
+    // Use a new key for the new object.
+    uint64_t new_key = key++;
+    new_raw_ptr += HEAP_PADDING;
+    *((uint64_t *)new_raw_ptr) = new_key;
+
+    _MM_array_ptr_Rep safe_ptr = {
+        .p = new_raw_ptr + LOCK_SIZE, .key = new_key, .lock_ptr = new_raw_ptr
+    };
+
+    mm_array_ptr<T> *mm_array_ptr_ptr = (mm_array_ptr<T> *)&safe_ptr;
+    return *mm_array_ptr_ptr;
+}
 
 //
 // Function: mm_free()
