@@ -56,7 +56,7 @@ uint32_t key = 1;
 // compiling if it has such an undefined behavior.
 // Related reading: https://stackoverflow.com/questions/3523145/pointer-arithmetic-for-void-pointer-in-c
 __attribute__ ((noinline))
-for_any(T) mm_ptr<T> mm_alloc(unsigned long size) {
+for_any(T) mm_ptr<T> mm_alloc(size_t size) {
     // We need the HEAP_PADDING to ensure that mm_ptr inside a struct
     // is aligned by 16 bytes.
     // See this issue for the reason: https://github.com/jzhou76/checkedc-llvm/issues/2
@@ -89,7 +89,7 @@ for_any(T) mm_ptr<T> mm_alloc(unsigned long size) {
 // and a pointer to the lock.
 //
 __attribute__ ((noinline))
-for_any(T) mm_array_ptr<T> mm_array_alloc(unsigned long array_size) {
+for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
   void *raw_ptr = malloc(array_size + LOCK_SIZE + HEAP_PADDING);
 
   uint64_t new_key = key++;
@@ -117,7 +117,7 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(unsigned long array_size) {
 // the old one would be freed and we need create a new lock for the new object.
 //
 __attribute__ ((noinline))
-for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, unsigned long size) {
+for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     // Get the original raw pointer.
     void * old_raw_ptr = ((_MM_array_ptr_Rep *)&p)->p;
     old_raw_ptr = old_raw_ptr - LOCK_SIZE - HEAP_PADDING;
