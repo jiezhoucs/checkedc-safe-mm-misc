@@ -26,6 +26,12 @@ extern "C" {
 #include <sys/stat.h>
 #include <jpeglib.h>
 
+/*
+ * Checked C related
+ */
+#include "safe_mm_checked.h"
+#define SAFE_MM
+
 #ifdef BROKEN_METHODDEF
 #undef METHODDEF
 #define METHODDEF(x) static x
@@ -75,7 +81,12 @@ void warn(const char *format, ...);
 
 
 /* jpegdest.c */
+#ifndef SAFE_MM
 void jpeg_memory_dest (j_compress_ptr cinfo, unsigned char **bufptr, size_t *bufsizeptr, size_t incsize);
+#else
+void jpeg_memory_dest (j_compress_ptr cinfo, mm_array_ptr<unsigned char> *bufptr,
+                       size_t *bufsizeptr, size_t incsize);
+#endif
 
 
 

@@ -47,6 +47,18 @@
     buf=NULL;							\
   }
 
+/*
+ * Function: mm_free_line_buf()
+ *
+ * This is the mm-safe version of the macro FREE_LINE_BUF.
+ *
+ * */
+__attribute__((always_inline))
+void mm_free_line_buf(mm_array_ptr<JSAMPROW> buf, JDIMENSION lines) {
+    for (int j = 0; j < lines; j++) free(buf[j]);
+    mm_array_free<JSAMPROW>(buf);
+}
+
 #define STRNCPY(dest,src,n) { strncpy(dest,src,n); dest[n-1]=0; }
 
 struct my_error_mgr {
@@ -302,7 +314,11 @@ int main(int argc, char **argv)
   struct jpeg_decompress_struct dinfo;
   struct jpeg_compress_struct cinfo;
   struct my_error_mgr jcerr,jderr;
+#ifndef SAFE_MM
   JSAMPARRAY buf = NULL;
+#else
+  mm_array_ptr<JSAMPROW> mm_buf = NULL;
+#endif
   jvirt_barray_ptr *coef_arrays = NULL;
   char marker_str[256];
   char tmpfilename[MAXPATHLEN],tmpdir[MAXPATHLEN];
@@ -316,6 +332,7 @@ int main(int argc, char **argv)
   struct stat file_stat;
   jpeg_saved_marker_ptr cmarker; 
   unsigned char *outbuffer = NULL;
+  mm_array_ptr<unsigned char> mm_outbuffer = NULL;
   size_t outbuffersize;
   char *outfname = NULL;
   FILE *infile = NULL, *outfile = NULL;
@@ -324,7 +341,6 @@ int main(int argc, char **argv)
   int decompress_err_count = 0;
   long average_count = 0;
   double average_rate = 0.0, total_save = 0.0;
-
 
   if (rcsid)
   ; /* so compiler won't complain about "unused" rcsid string */
@@ -540,7 +556,11 @@ int main(int argc, char **argv)
      /* error handler for decompress */
      jpeg_abort_decompress(&dinfo);
      fclose(infile);
+#ifndef SAFE_MM
      if (buf) FREE_LINE_BUF(buf,dinfo.output_height);
+#else
+     if (mm_buf) mm_free_line_buf(mm_buf, dinfo.output_height);
+#endif
      if (!quiet_mode || csv) 
        fprintf(LOG_FH,csv ? ",,,,,error\n" : " [ERROR]\n");
      decompress_err_count++;
@@ -618,17 +638,33 @@ int main(int argc, char **argv)
      jpeg_start_decompress(&dinfo);
 
      /* allocate line buffer to store the decompressed image */
+#ifndef SAFE_MM
      buf = malloc(sizeof(JSAMPROW)*dinfo.output_height);
      if (!buf) fatal("not enough memory");
+#else
+     mm_buf = mm_array_alloc<JSAMPROW>(sizeof(JSAMPROW) * dinfo.output_height);
+     if (!mm_buf) fatal("not enough memory");
+#endif
      for (j=0;j<dinfo.output_height;j++) {
+#ifndef SAFE_MM
        buf[j]=malloc(sizeof(JSAMPLE)*dinfo.output_width*
 		     dinfo.out_color_components);
        if (!buf[j]) fatal("not enough memory");
+#else
+       mm_buf[j]=malloc(sizeof(JSAMPLE)*dinfo.output_width*
+		     dinfo.out_color_components);
+       if (!mm_buf[j]) fatal("not enough memory");
+#endif
      }
 
      while (dinfo.output_scanline < dinfo.output_height) {
+#ifndef SAFE_MM
        jpeg_read_scanlines(&dinfo,&buf[dinfo.output_scanline],
 			   dinfo.output_height-dinfo.output_scanline);
+#else
+       jpeg_read_scanlines(&dinfo, _getptr_mm_array<JSAMPROW>(mm_buf + dinfo.output_scanline),
+			   dinfo.output_height-dinfo.output_scanline);
+#endif
      }
    } else {
      coef_arrays = jpeg_read_coefficients(&dinfo);
@@ -647,7 +683,12 @@ int main(int argc, char **argv)
        warn("target file already exists: %s\n",newname);
        jpeg_abort_decompress(&dinfo);
        fclose(infile);
+#ifndef SAFE_MM
        if (buf) FREE_LINE_BUF(buf,dinfo.output_height);
+#else
+       printf("[679]: Freeing...\n");
+       if (mm_buf) mm_free_line_buf(mm_buf, dinfo.output_height);
+#endif
        continue;
      }
    }
@@ -660,7 +701,11 @@ int main(int argc, char **argv)
      jpeg_abort_decompress(&dinfo);
      fclose(infile);
      if (!quiet_mode) fprintf(LOG_FH," [Compress ERROR]\n");
+#ifndef SAFE_MM
      if (buf) FREE_LINE_BUF(buf,dinfo.output_height);
+#else
+     if (mm_buf) mm_free_line_buf(mm_buf, dinfo.output_height);
+#endif
      compress_err_count++;
      jcerr.jump_set=0;
      continue;
@@ -679,13 +724,26 @@ int main(int argc, char **argv)
   binary_search_loop:
 
    /* allocate memory buffer that should be large enough to store the output JPEG... */
+#ifndef SAFE_MM
    if (outbuffer) free(outbuffer);
+#else
+   if (mm_outbuffer) mm_array_free<unsigned char>(mm_outbuffer);
+#endif
    outbuffersize=insize + 32768;
+#ifndef SAFE_MM
    outbuffer=malloc(outbuffersize);
    if (!outbuffer) fatal("not enough memory");
+#else
+   mm_outbuffer = mm_array_alloc<unsigned char>(outbuffersize);
+   if (!mm_outbuffer) fatal("not enough memory");
+#endif
 
    /* setup custom "destination manager" for libjpeg to write to our buffer */
+#ifndef SAFE_MM
    jpeg_memory_dest(&cinfo, &outbuffer, &outbuffersize, 65536);
+#else
+   jpeg_memory_dest(&cinfo, &mm_outbuffer, &outbuffersize, 65536);
+#endif
 
    if (quality>=0 && !retry) {
      /* lossy "optimization" ... */
@@ -712,8 +770,13 @@ int main(int argc, char **argv)
 
      /* write image */
      while (cinfo.next_scanline < cinfo.image_height) {
+#ifndef SAFE_MM
        jpeg_write_scanlines(&cinfo,&buf[cinfo.next_scanline],
 			    dinfo.output_height);
+#else
+       jpeg_write_scanlines(&cinfo, _getptr_mm_array<JSAMPROW>(mm_buf + cinfo.next_scanline),
+			    dinfo.output_height);
+#endif
      }
 
    } else {
@@ -785,7 +848,11 @@ int main(int argc, char **argv)
      }
    } 
 
+#ifndef SAFE_MM
    if (buf) FREE_LINE_BUF(buf,dinfo.output_height);
+#else
+   if (mm_buf) mm_free_line_buf(mm_buf, dinfo.output_height);
+#endif
    jpeg_finish_decompress(&dinfo);
    fclose(infile);
 
@@ -811,7 +878,11 @@ int main(int argc, char **argv)
 	if (stdout_mode) {
 	  outfname=NULL;
 	  set_filemode_binary(stdout);
-	  if (fwrite(outbuffer,outbuffersize,1,stdout) != 1)
+#ifdef SAFE_MM
+	  if (fwrite(_getptr_mm_array<unsigned char>(mm_outbuffer), outbuffersize,1,stdout) != 1)
+#else
+	  if (fwrite(outbuffer, outbuffersize,1,stdout) != 1)
+#endif
 	    fatal("%s, write failed to stdout",(stdin_mode?"stdin":argv[i]));
 	} else {
 	  if (preserve_perms && !dest) {
@@ -848,7 +919,11 @@ int main(int argc, char **argv)
 	  if (verbose_mode > 1 && !quiet_mode) 
 	    fprintf(LOG_FH,"writing %lu bytes to file: %s\n",
 		    (long unsigned int)outbuffersize, outfname);
+#ifdef SAFE_MM
+	  if (fwrite(_getptr_mm_array<unsigned char>(mm_outbuffer), outbuffersize,1,outfile) != 1)
+#else
 	  if (fwrite(outbuffer,outbuffersize,1,outfile) != 1)
+#endif
 	    fatal("write failed to file: %s", outfname);
 	  fclose(outfile);
 	}
@@ -899,7 +974,11 @@ int main(int argc, char **argv)
 	    average_count, average_rate/average_count, total_save);
   jpeg_destroy_decompress(&dinfo);
   jpeg_destroy_compress(&cinfo);
+#ifdef SAFE_MM
+  mm_array_free<unsigned char>(mm_outbuffer);
+#else
   free(outbuffer);
+#endif
 
   return (decompress_err_count > 0 || compress_err_count > 0 ? 1 : 0);;
 }
