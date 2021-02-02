@@ -10,14 +10,16 @@
 # load common directory paths and variables
 . common.sh
 
+BUILD_DIR=$ROOT_DIR/benchmark-build/thttpd
+
 #
-# Decide if it's for the baseline or the checked version.
+# Check if it's for the baseline or the checked version.
 if [[ $1 == "baseline" ]]; then
     SRC_DIR=$MISC_DIR/benchmarks/baseline/thttpd-2.29
-    BUILD_DIR=$ROOT_DIR/benchmark-build/baseline/thttpd
+    BUILD_DIR=$BUILD_DIR/baseline
 else
     SRC_DIR=$MISC_DIR/benchmarks/checked/thttpd-2.29
-    BUILD_DIR=$ROOT_DIR/benchmark-build/checked/thttpd
+    BUILD_DIR=$BUILD_DIR/checked
 fi
 
 #
@@ -28,13 +30,13 @@ configure() {
 
     export CC="$CC"
 
-    if [[ -f "$BUILD_DIR" ]]; then
+    if [[ ! -f "$BUILD_DIR" ]]; then
         mkdir -p "$BUILD_DIR"
     fi
     ./configure --prefix="$BUILD_DIR"
 
     # link the mm_safe library
-    if [[ $1 != "baseline"]]; then
+    if [[ $1 != "baseline" ]]; then
         sed -i "s|^LDFLAGS =|& \-L../../../lib -lsafemm|g" Makefile
     fi
 }

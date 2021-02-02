@@ -10,16 +10,17 @@
 # load common directory paths and variables
 . common.sh
 
+BUILD_DIR=$ROOT_DIR/benchmark-build/jpegoptim
 
 #
 # Decide if it's for the baseline or the checked version.
 #
 if [[ $1 == "baseline" ]]; then
     SRC_DIR=$MISC_DIR/benchmarks/baseline/jpegoptim
-    BUILD_DIR=$ROOT_DIR/benchmark-build/baseline/jpegoptim
+    BUILD_DIR=$BUILD_DIR/baseline
 else
     SRC_DIR=$MISC_DIR/benchmarks/checked/jpegoptim
-    BUILD_DIR=$ROOT_DIR/benchmark-build/checked/jpegoptim
+    BUILD_DIR=$BUILD_DIR/checked
 fi
 
 #
