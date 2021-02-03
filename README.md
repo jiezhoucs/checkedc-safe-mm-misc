@@ -20,7 +20,9 @@ checkedc                    # root directory for the whole project
 |-- misc                    # the safe-mm-misc repo
 |   |-- scripts             # scripts that build programs and compute results
 |   |-- benchmarks          # non-llvm-test-suite applications
-|   |-- data                # experimental results
+|   |-- eval                # for evaluation
+|       |-- scripts         # scripts that run experiements
+|       |-- data            # evalaution data
 |   |-- include             # Checked C header files
 |   |-- lib                 # our own Checked C libraries
 |-- tests
