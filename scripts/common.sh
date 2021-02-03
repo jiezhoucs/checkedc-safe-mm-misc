@@ -5,6 +5,7 @@
 #
 ROOT_DIR=`realpath ../../`
 MISC_DIR="$ROOT_DIR/misc"
+LLVM_SRC="$ROOT_DIR/llvm"
 LLVM_BIN_DIR="$ROOT_DIR/build/bin"
 LLVM_RELEASE_BIN_DIR="$ROOT_DIR/build-release/bin"
 LIT="$LLVM_BIN_DIR/llvm-lit"

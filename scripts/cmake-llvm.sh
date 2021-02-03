@@ -1,12 +1,13 @@
 #!/bin/bash
 
-LLVM_SRC=../llvm
+./common.sh
 
 rm -rf CMakeCache.txt
 
 Build_Type="Debug"
 if [[`uname` == "Linux" ]];
     Debug_Type="Release"
+fi
 
 cmake -G "Unix Makefiles"                    \
       -DCMAKE_C_COMPILER="clang"             \
