@@ -8,5 +8,6 @@
 *.status
 mime_encodings.h
 mime_types.h
+cscope.out
 
 *.swp
