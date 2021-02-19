@@ -37,7 +37,8 @@ configure() {
 
     # link the mm_safe library
     if [[ $1 != "baseline" ]]; then
-        sed -i "s|^LDFLAGS =|& \-L../../../lib -lsafemm|g" Makefile
+        sed -i "s|^LDFLAGS =|& \-L../../../lib|g" Makefile
+        sed -i "s|\-lcrypt $|& \-lsafemm|g" Makefile
     fi
 }
 
