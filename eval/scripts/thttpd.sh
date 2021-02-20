@@ -47,7 +47,7 @@ init() {
     ./sbin/thttpd -p 8080
     # Wait a while to let the server fully start, otherwise we might get
     # the "apr_socket_recv: Connection reset by peer (104)" error.
-    sleep 0.5
+    sleep 0.7
 }
 
 #
