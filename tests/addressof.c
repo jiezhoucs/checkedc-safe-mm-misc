@@ -27,7 +27,7 @@ typedef struct {
  * Test '&' on an inner object inside a struct.
  * */
 void f0() {
-    print_start("address-of operator '&'");
+    print_start("address-of operator '&' on an field of a struct");
 
     signal(SIGILL, ill_handler);
     if (setjmp(resume_context) == 1) goto resume1;
@@ -108,14 +108,59 @@ resume5:
     p->o.n.val = 42;
     mm_ptr<int> p4 = &p->o.n.val;
     if (*p4 != 42) {
-        printf("addressof.c::f0: getting the address of a field of a struct "
-                "inside another struct inside another struct");
+        print_error("addressof.c::f0: getting the address of a field of a struct "
+                    "inside another struct inside another struct");
     }
     mm_free<NewNode>(p);
     printf("%d\n", *p4);
 
 resume:
-    print_end("address-of operator '&'");
+    print_end("address-of operator '&' on an field of a struct");
+}
+
+/*
+ * Test '&' on an item of an array pointed by an mm_array_ptr.
+ * */
+void f1() {
+    print_start("address-of operator '&' on an item of an array");
+
+    signal(SIGILL, ill_handler);
+    if (setjmp(resume_context) == 1) goto resume1;
+
+    mm_array_ptr<NewNode> p = mm_array_alloc<NewNode>(sizeof(NewNode) * 10);
+    p[3].l = 42;
+    p[3].o.j = 84;
+    mm_ptr<NewNode> p1 = &p[3];
+    if (p1->l != 42 || p1->o.j != 84) {
+        print_error("addressof.c::f1: getting the address of a struct item of "
+                    "an array of such struct");
+    }
+    mm_free<NewNode>(p);
+    printf("%ld\n", p1->l);  // UAF
+
+resume1:
+    if (setjmp(resume_context) == 1) goto resume;
+
+    p = mm_array_alloc<NewNode>(sizeof(NewNode) * 10);
+    p[2].arr[4].j = 42;
+    mm_ptr<Obj> p2 = &p[2].arr[4];
+    if (p2->j != 42) {
+        print_error("addressof.c::f1: getting the address of an item of an "
+                    "array inside a struct item of an array of such struct");
+    }
+
+    p++;
+    p[2].arr[4].f = 3.14;
+    mm_ptr<float> p3 = &p[2].arr[4].f;
+    if (*p3 != 3.14f) {
+        print_error("addressof.c::f1: getting the address of an item of an "
+                    "array inside a struct item of an array of such struct");
+    }
+    mm_array_free<NewNode>(--p);  // UAF
+    printf("%f\n", *p3);
+
+resume:
+    print_end("address-of operator '&' on an item of an array");
 }
 
 int main() {
@@ -124,6 +169,8 @@ int main() {
     signal(SIGSEGV, segv_handler);
 
     f0();
+
+    f1();
 
     print_main_end(__FILE__);
     return 0;
