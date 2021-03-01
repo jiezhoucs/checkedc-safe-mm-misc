@@ -68,6 +68,8 @@
 typedef long long int64_t;
 #endif
 
+// Checked C
+#define SAFEMM
 
 static char* argv0;
 static int debug;
@@ -118,9 +120,15 @@ typedef struct {
     off_t end_byte_index;
     off_t next_byte_index;
     } connecttab;
-static connecttab* connects;
 static int num_connects, max_connects, first_free_connect;
 static int httpd_conn_count;
+
+static connecttab* connects;
+#ifdef SAFEMM
+static mm_array_ptr<connecttab> mm_connects = NULL;
+#else
+static connecttab* connects;
+#endif
 
 /* The connection states. */
 #define CNST_FREE 0
@@ -130,7 +138,7 @@ static int httpd_conn_count;
 #define CNST_LINGERING 4
 
 
-static httpd_server* hs = (httpd_server*) 0;
+static httpd_server* hs = NULL;
 int terminate = 0;
 time_t start_time, stats_time;
 long stats_connections;
@@ -224,7 +232,7 @@ handle_chld( int sig )
 	** activity, the count will be lower than it should be, and therefore
 	** more CGIs will be allowed than should be.
 	*/
-	if ( hs != (httpd_server*) 0 )
+	if ( hs != NULL )
 	    {
 	    --hs->cgi_count;
 	    if ( hs->cgi_count < 0 )
@@ -354,6 +362,7 @@ re_open_logfile( void )
 int
 main( int argc, char** argv )
     {
+      printf("[DEBUG]: Starting executing thttpd ...\n");
     char* cp;
     struct passwd* pwd;
     uid_t uid = 32767;
@@ -716,24 +725,43 @@ main( int argc, char** argv )
 	}
 
     /* Initialize our connections table. */
-    connects = NEW( connecttab, max_connects );
-    if ( connects == (connecttab*) 0 )
+#ifdef SAFEMM
+    mm_connects = MM_ARRAY_NEW(connecttab, max_connects);
+    if ( mm_connects == NULL )
 	{
 	syslog( LOG_CRIT, "out of memory allocating a connecttab" );
 	exit( 1 );
 	}
+#else
+    connects = NEW( connecttab, max_connects );
+    if ( connects == NULL )
+	{
+	syslog( LOG_CRIT, "out of memory allocating a connecttab" );
+	exit( 1 );
+	}
+#endif
+#ifdef SAFEMM
+    for (cnum = 0; cnum < max_connects; ++cnum) {
+      mm_connects[cnum].conn_state = CNST_FREE;
+      mm_connects[cnum].next_free_connect = cnum + 1;
+      mm_connects[cnum].hc = NULL;
+    }
+    mm_connects[max_connects - 1].next_free_connect = -1;	/* end of link list */
+    connects = _getptr_mm_array<connecttab>(mm_connects);
+#else
     for ( cnum = 0; cnum < max_connects; ++cnum )
 	{
 	connects[cnum].conn_state = CNST_FREE;
 	connects[cnum].next_free_connect = cnum + 1;
-	connects[cnum].hc = (httpd_conn*) 0;
+	connects[cnum].hc = NULL;
 	}
     connects[max_connects - 1].next_free_connect = -1;	/* end of link list */
+#endif
     first_free_connect = 0;
     num_connects = 0;
     httpd_conn_count = 0;
 
-    if ( hs != (httpd_server*) 0 )
+    if ( hs != NULL )
 	{
 	if ( hs->listen4_fd != -1 )
 	    fdwatch_add_fd( hs->listen4_fd, (void*) 0, FDW_READ );
@@ -1464,7 +1492,18 @@ shut_down( void )
     logstats( &tv );
     for ( cnum = 0; cnum < max_connects; ++cnum )
 	{
-	if ( connects[cnum].conn_state != CNST_FREE )
+#ifdef SAFEMM
+	if ( mm_connects[cnum].conn_state != CNST_FREE )
+	    httpd_close_conn( mm_connects[cnum].hc, &tv );
+	if ( mm_connects[cnum].hc != NULL )
+	    {
+	    httpd_destroy_conn(mm_connects[cnum].hc );
+	    free( (void*) mm_connects[cnum].hc );
+	    --httpd_conn_count;
+	    mm_connects[cnum].hc = (httpd_conn*) 0;
+	    }
+#else
+    if ( connects[cnum].conn_state != CNST_FREE )
 	    httpd_close_conn( connects[cnum].hc, &tv );
 	if ( connects[cnum].hc != (httpd_conn*) 0 )
 	    {
@@ -1472,7 +1511,7 @@ shut_down( void )
 	    free( (void*) connects[cnum].hc );
 	    --httpd_conn_count;
 	    connects[cnum].hc = (httpd_conn*) 0;
-	    }
+#endif
 	}
     if ( hs != (httpd_server*) 0 )
 	{
@@ -1486,7 +1525,11 @@ shut_down( void )
 	}
     mmc_term();
     tmr_term();
+#ifdef SAFEMM
+    mm_array_free<connecttab>(mm_connects);
+#else
     free( (void*) connects );
+#endif
     if ( throttles != (throttletab*) 0 )
 	free( (void*) throttles );
     }
@@ -1495,7 +1538,11 @@ shut_down( void )
 static int
 handle_newconnect( struct timeval* tvP, int listen_fd )
     {
+#ifdef SAFEMM
+      mm_ptr<connecttab> mm_c = NULL;
+#else
     connecttab* c;
+#endif
     ClientData client_data;
 
     /* This loops until the accept() fails, trying to start new
@@ -1516,11 +1563,63 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 	    return 0;
 	    }
 	/* Get the first free connection entry off the free list. */
+#ifdef SAFEMM
+    if (first_free_connect == -1 || mm_connects[first_free_connect].conn_state !=CNST_FREE)
+#else
 	if ( first_free_connect == -1 || connects[first_free_connect].conn_state != CNST_FREE )
+#endif
 	    {
 	    syslog( LOG_CRIT, "the connects free list is messed up" );
 	    exit( 1 );
 	    }
+#ifdef SAFEMM
+	mm_c = &mm_connects[first_free_connect];
+	/* Make the httpd_conn if necessary. */
+	if ( mm_c->hc == NULL )
+	    {
+        // TO-DO: replace NEW; update the type of connecttab.hc
+	    mm_c->hc = NEW( httpd_conn, 1 );
+	    if ( mm_c->hc == NULL )
+		{
+		syslog( LOG_CRIT, "out of memory allocating an httpd_conn" );
+		exit( 1 );
+		}
+	    mm_c->hc->initialized = 0;
+	    ++httpd_conn_count;
+	    }
+
+    // TO-DO: refactor httpd_get_conn
+	/* Get the connection. */
+	switch ( httpd_get_conn( hs, listen_fd, mm_c->hc ) )
+	    {
+	    /* Some error happened.  Run the timers, then the
+	    ** existing connections.  Maybe the error will clear.
+	    */
+	    case GC_FAIL:
+	    tmr_run( tvP );
+	    return 0;
+
+	    /* No more connections to accept for now. */
+	    case GC_NO_MORE:
+	    return 1;
+	    }
+	mm_c->conn_state = CNST_READING;
+	/* Pop it off the free list. */
+	first_free_connect = mm_c->next_free_connect;
+	mm_c->next_free_connect = -1;
+	++num_connects;
+	client_data.p = _getptr_mm<connecttab>(mm_c);   // TO-DO
+	mm_c->active_at = tvP->tv_sec;
+	mm_c->wakeup_timer = (Timer*) 0;
+	mm_c->linger_timer = (Timer*) 0;
+	mm_c->next_byte_index = 0;
+	mm_c->numtnums = 0;
+
+	/* Set the connection file descriptor to no-delay mode. */
+	httpd_set_ndelay( mm_c->hc->conn_fd );
+
+	fdwatch_add_fd( mm_c->hc->conn_fd, _getptr_mm<connecttab>(mm_c), FDW_READ );
+#else
 	c = &connects[first_free_connect];
 	/* Make the httpd_conn if necessary. */
 	if ( c->hc == (httpd_conn*) 0 )
@@ -1565,6 +1664,7 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 	httpd_set_ndelay( c->hc->conn_fd );
 
 	fdwatch_add_fd( c->hc->conn_fd, c, FDW_READ );
+#endif
 
 	++stats_connections;
 	if ( num_connects > stats_simultaneous )
@@ -1925,7 +2025,11 @@ update_throttles( ClientData client_data, struct timeval* nowP )
     {
     int tnum, tind;
     int cnum;
+#ifdef SAFEMM
+    mm_ptr<connecttab> mm_c = NULL;
+#else
     connecttab* c;
+#endif
     long l;
 
     /* Update the average sending rate for each throttle.  This is only used
@@ -1954,6 +2058,22 @@ update_throttles( ClientData client_data, struct timeval* nowP )
     */
     for ( cnum = 0; cnum < max_connects; ++cnum )
 	{
+#ifdef SAFEMM
+    mm_c = &mm_connects[cnum];
+    if ( mm_c->conn_state == CNST_SENDING || mm_c->conn_state == CNST_PAUSING )
+	    {
+	    mm_c->max_limit = THROTTLE_NOLIMIT;
+	    for ( tind = 0; tind < mm_c->numtnums; ++tind )
+		{
+		tnum = mm_c->tnums[tind];
+		l = throttles[tnum].max_limit / throttles[tnum].num_sending;
+		if ( mm_c->max_limit == THROTTLE_NOLIMIT )
+		    mm_c->max_limit = l;
+		else
+		    mm_c->max_limit = MIN( mm_c->max_limit, l );
+		}
+        }
+#else
 	c = &connects[cnum];
 	if ( c->conn_state == CNST_SENDING || c->conn_state == CNST_PAUSING )
 	    {
@@ -1968,6 +2088,7 @@ update_throttles( ClientData client_data, struct timeval* nowP )
 		    c->max_limit = MIN( c->max_limit, l );
 		}
 	    }
+#endif
 	}
     }
 
@@ -2059,10 +2180,41 @@ static void
 idle( ClientData client_data, struct timeval* nowP )
     {
     int cnum;
+#ifdef SAFEMM
+    mm_ptr<connecttab> mm_c = NULL;
+#else
     connecttab* c;
+#endif
 
     for ( cnum = 0; cnum < max_connects; ++cnum )
 	{
+#ifdef SAFEMM
+    mm_c = &mm_connects[cnum];
+	switch ( mm_c->conn_state )
+	    {
+	    case CNST_READING:
+	    if ( nowP->tv_sec - mm_c->active_at >= IDLE_READ_TIMELIMIT )
+		{
+		syslog( LOG_INFO,
+		    "%.80s connection timed out reading",
+		    httpd_ntoa( &mm_c->hc->client_addr ) );
+		httpd_send_err(
+		    mm_c->hc, 408, httpd_err408title, "", httpd_err408form, "" );
+		finish_connection(_getptr_mm<connecttab>(mm_c), nowP );
+		}
+	    break;
+	    case CNST_SENDING:
+	    case CNST_PAUSING:
+	    if ( nowP->tv_sec - mm_c->active_at >= IDLE_SEND_TIMELIMIT )
+		{
+		syslog( LOG_INFO,
+		    "%.80s connection timed out sending",
+		    httpd_ntoa( &mm_c->hc->client_addr ) );
+		clear_connection( _getptr_mm<connecttab>(mm_c), nowP );
+		}
+	    break;
+        }
+#else
 	c = &connects[cnum];
 	switch ( c->conn_state )
 	    {
@@ -2088,6 +2240,7 @@ idle( ClientData client_data, struct timeval* nowP )
 		}
 	    break;
 	    }
+#endif
 	}
     }
 

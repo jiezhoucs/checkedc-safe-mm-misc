@@ -36,6 +36,8 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#include "safe_mm_checked.h"
+
 #if defined(AF_INET6) && defined(IN6_IS_ADDR_V4MAPPED)
 #define USE_IPV6
 #endif
@@ -51,6 +53,10 @@
 #endif
 #define NEW(t,n) ((t*) malloc( sizeof(t) * (n) ))
 #define RENEW(o,t,n) ((t*) realloc( (void*) o, sizeof(t) * (n) ))
+
+/* Checked C */
+#define MM_ARRAY_NEW(t, n) mm_array_alloc<t>(sizeof(t) * n)
+#define MM_ARRAY_RENEW(o, t, n) mm_array_realloc<t>(o, sizeof(t) * n)
 
 /* Do overlapping strcpy safely, by using memmove. */
 #define ol_strcpy(dst,src) memmove(dst,src,strlen(src)+1)
