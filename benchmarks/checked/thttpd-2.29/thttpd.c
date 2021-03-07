@@ -68,9 +68,6 @@
 typedef long long int64_t;
 #endif
 
-// Checked C
-#define SAFEMM
-
 static char* argv0;
 static int debug;
 static unsigned short port;
@@ -108,6 +105,9 @@ static int numthrottles, maxthrottles;
 typedef struct {
     int conn_state;
     int next_free_connect;
+#ifdef SAFEMM
+    mm_ptr<httpd_conn> mm_hc;
+#endif
     httpd_conn* hc;
     int tnums[MAXTHROTTLENUMS];         /* throttle indexes */
     int numtnums;
@@ -732,6 +732,15 @@ main( int argc, char** argv )
 	syslog( LOG_CRIT, "out of memory allocating a connecttab" );
 	exit( 1 );
 	}
+    for (cnum = 0; cnum < max_connects; ++cnum) {
+      mm_connects[cnum].conn_state = CNST_FREE;
+      mm_connects[cnum].next_free_connect = cnum + 1;
+      mm_connects[cnum].mm_hc = NULL;
+      mm_connects[cnum].hc = NULL;
+    }
+    mm_connects[max_connects - 1].next_free_connect = -1;	/* end of link list */
+    // TODO: remove the next line after all "connects" become "mm_connects".
+    connects = _getptr_mm_array<connecttab>(mm_connects);
 #else
     connects = NEW( connecttab, max_connects );
     if ( connects == NULL )
@@ -739,16 +748,6 @@ main( int argc, char** argv )
 	syslog( LOG_CRIT, "out of memory allocating a connecttab" );
 	exit( 1 );
 	}
-#endif
-#ifdef SAFEMM
-    for (cnum = 0; cnum < max_connects; ++cnum) {
-      mm_connects[cnum].conn_state = CNST_FREE;
-      mm_connects[cnum].next_free_connect = cnum + 1;
-      mm_connects[cnum].hc = NULL;
-    }
-    mm_connects[max_connects - 1].next_free_connect = -1;	/* end of link list */
-    connects = _getptr_mm_array<connecttab>(mm_connects);
-#else
     for ( cnum = 0; cnum < max_connects; ++cnum )
 	{
 	connects[cnum].conn_state = CNST_FREE;
@@ -1538,10 +1537,9 @@ shut_down( void )
 static int
 handle_newconnect( struct timeval* tvP, int listen_fd )
     {
+    connecttab* c;
 #ifdef SAFEMM
       mm_ptr<connecttab> mm_c = NULL;
-#else
-    connecttab* c;
 #endif
     ClientData client_data;
 
@@ -1573,24 +1571,25 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 	    exit( 1 );
 	    }
 #ifdef SAFEMM
-	mm_c = &mm_connects[first_free_connect];
+    mm_c = &mm_connects[first_free_connect];
 	/* Make the httpd_conn if necessary. */
-	if ( mm_c->hc == NULL )
+	if ( mm_c->mm_hc == NULL )
 	    {
         // TO-DO: replace NEW; update the type of connecttab.hc
-	    mm_c->hc = NEW( httpd_conn, 1 );
-	    if ( mm_c->hc == NULL )
+        mm_c->mm_hc = MM_NEW(httpd_conn);
+        mm_c->hc = _getptr_mm<httpd_conn>(mm_c->mm_hc);
+	    if ( mm_c->mm_hc == NULL )
 		{
 		syslog( LOG_CRIT, "out of memory allocating an httpd_conn" );
 		exit( 1 );
 		}
-	    mm_c->hc->initialized = 0;
+        mm_c->mm_hc->initialized = 0;
 	    ++httpd_conn_count;
 	    }
 
     // TO-DO: refactor httpd_get_conn
 	/* Get the connection. */
-	switch ( httpd_get_conn( hs, listen_fd, mm_c->hc ) )
+	switch ( httpd_get_conn( hs, listen_fd, mm_c->mm_hc ) )
 	    {
 	    /* Some error happened.  Run the timers, then the
 	    ** existing connections.  Maybe the error will clear.
@@ -1610,15 +1609,18 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 	++num_connects;
 	client_data.p = _getptr_mm<connecttab>(mm_c);   // TO-DO
 	mm_c->active_at = tvP->tv_sec;
-	mm_c->wakeup_timer = (Timer*) 0;
-	mm_c->linger_timer = (Timer*) 0;
+	mm_c->wakeup_timer = NULL;
+	mm_c->linger_timer = NULL;
 	mm_c->next_byte_index = 0;
 	mm_c->numtnums = 0;
 
-	/* Set the connection file descriptor to no-delay mode. */
-	httpd_set_ndelay( mm_c->hc->conn_fd );
+    c = _getptr_mm<connecttab>(mm_c);
 
-	fdwatch_add_fd( mm_c->hc->conn_fd, _getptr_mm<connecttab>(mm_c), FDW_READ );
+	/* Set the connection file descriptor to no-delay mode. */
+	httpd_set_ndelay( mm_c->mm_hc->conn_fd );
+
+    // TODO: rewrite fdwatch_add_fd.
+	fdwatch_add_fd( mm_c->mm_hc->conn_fd, c, FDW_READ );
 #else
 	c = &connects[first_free_connect];
 	/* Make the httpd_conn if necessary. */

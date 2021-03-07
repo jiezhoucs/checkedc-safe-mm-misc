@@ -55,11 +55,15 @@
 #define RENEW(o,t,n) ((t*) realloc( (void*) o, sizeof(t) * (n) ))
 
 /* Checked C */
+#define MM_NEW(t) mm_alloc<t>(sizeof(t))
 #define MM_ARRAY_NEW(t, n) mm_array_alloc<t>(sizeof(t) * n)
 #define MM_ARRAY_RENEW(o, t, n) mm_array_realloc<t>(o, sizeof(t) * n)
 
 /* Do overlapping strcpy safely, by using memmove. */
 #define ol_strcpy(dst,src) memmove(dst,src,strlen(src)+1)
+
+// Checked C
+#define SAFEMM
 
 
 /* The httpd structs. */
@@ -153,6 +157,62 @@ typedef struct {
     char* file_address;
     } httpd_conn;
 
+// An mmsafe version of connection
+typedef struct {
+    int initialized;
+    httpd_server* hs;
+    httpd_sockaddr client_addr;
+    mm_array_ptr<char> read_buf;
+    size_t read_size, read_idx, checked_idx;
+    int checked_state;
+    int method;
+    int status;
+    off_t bytes_to_send;
+    off_t bytes_sent;
+    mm_array_ptr<char> encodedurl;
+    mm_array_ptr<char> decodedurl;
+    mm_array_ptr<char> protocol;
+    mm_array_ptr<char> origfilename;
+    mm_array_ptr<char> expnfilename;
+    mm_array_ptr<char> encodings;
+    mm_array_ptr<char> pathinfo;
+    mm_array_ptr<char> query;
+    mm_array_ptr<char> referrer;
+    mm_array_ptr<char> useragent;
+    mm_array_ptr<char> accept;
+    mm_array_ptr<char> accepte;
+    mm_array_ptr<char> acceptl;
+    mm_array_ptr<char> cookie;
+    mm_array_ptr<char> contenttype;
+    mm_array_ptr<char> reqhost;
+    mm_array_ptr<char> hdrhost;
+    mm_array_ptr<char> hostdir;
+    mm_array_ptr<char> authorization;
+    mm_array_ptr<char> remoteuser;
+    mm_array_ptr<char> response;
+    size_t maxdecodedurl, maxorigfilename, maxexpnfilename, maxencodings,
+	maxpathinfo, maxquery, maxaccept, maxaccepte, maxreqhost, maxhostdir,
+	maxremoteuser, maxresponse;
+#ifdef TILDE_MAP_2
+    mm_array_ptr<char> altdir;
+    size_t maxaltdir;
+#endif /* TILDE_MAP_2 */
+    size_t responselen;
+    time_t if_modified_since, range_if;
+    size_t contentlength;
+    mm_array_ptr<char> type;		/* not malloc()ed */
+    mm_array_ptr<char> hostname;	/* not malloc()ed */
+    int mime_flag;
+    int one_one;	/* HTTP/1.1 or better */
+    int got_range;
+    int tildemapped;	/* this connection got tilde-mapped */
+    off_t first_byte_index, last_byte_index;
+    int keep_alive;
+    int should_linger;
+    struct stat sb;
+    int conn_fd;
+} mm_httpd_conn;
+
 /* Methods. */
 #define METHOD_UNKNOWN 0
 #define METHOD_GET 1
@@ -207,7 +267,11 @@ void httpd_terminate( httpd_server* hs );
 ** The caller is also responsible for setting initialized to zero before the
 ** first call using each different httpd_conn.
 */
+#ifdef SAFEMM
+int httpd_get_conn( httpd_server* hs, int listen_fd, mm_ptr<httpd_conn> hc);
+#else
 int httpd_get_conn( httpd_server* hs, int listen_fd, httpd_conn* hc );
+#endif
 #define GC_FAIL 0
 #define GC_OK 1
 #define GC_NO_MORE 2
