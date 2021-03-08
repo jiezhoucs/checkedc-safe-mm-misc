@@ -8,7 +8,8 @@ EVAL_DIR=`realpath ../`
 DATA_DIR=$EVAL_DIR/data/thttpd
 BUILD_DIR=$EVAL_DIR/../../benchmark-build/thttpd
 
-ITERS=100
+ITERS=1000
+CONS=8
 HOST=http://127.0.0.1
 PORT=8080
 FILES=$HOST:$PORT/files
@@ -45,9 +46,18 @@ init() {
     pkill thttpd
     cd $BUILD_DIR
     ./sbin/thttpd -p 8080
+
+    # Check if the server started successfully
+    if [[ `pgrep "thttpd"` ]]; then
+        echo "thttpd is running ..."
+    else
+        echo "thttpd start failed"
+        exit
+    fi
+
     # Wait a while to let the server fully start, otherwise we might get
     # the "apr_socket_recv: Connection reset by peer (104)" error.
-    sleep 0.7
+    sleep 1
 }
 
 #
@@ -62,7 +72,7 @@ init() {
 #
 debug() {
     echo "Testing ......"
-    ab -n $ITERS $FILES/file-1024
+    ab -c $CONS -n $ITERS $FILES/file-1024
 }
 
 #
