@@ -84,5 +84,8 @@ array: array.c
 addrof: addressof.c
 	$(CC) $(LDFLAGS) $^ -o addressof
 
+opt: opt.c
+	$(CC) -S -O1 -emit-llvm $^
+
 clean: $(SRC)
 	rm -rf $(BIN) *.s *.o *.bc *.i *.tmp *.ll *.stats hello a.out *.dSYM
