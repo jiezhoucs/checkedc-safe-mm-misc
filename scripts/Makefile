@@ -18,6 +18,9 @@ em3d:
 health:
 	$(OLDEN) health
 
+mst:
+	$(OLDEN) mst
+
 perimeter:
 	$(OLDEN) $@
 
