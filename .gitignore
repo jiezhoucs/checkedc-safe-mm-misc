@@ -20,8 +20,10 @@ tests/array
 
 tests/hello.c
 
-data/olden/checkedc
-data/olden/origin
+# evaluation related
+data/
+eval/data/olden/checkedc
+eval/data/olden/origin
 
 # benchmark related files
 benchmarks/**/*.cache
