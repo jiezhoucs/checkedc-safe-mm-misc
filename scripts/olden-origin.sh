@@ -66,7 +66,7 @@ clean() {
         echo "Cleaning $prog"
         cd "$BIN_DIR/$prog"
         find . -name "*.o" -delete
-        rm -f "$prog"
+        rm -f "$prog" "$prog.stripped"
     done
 }
 
