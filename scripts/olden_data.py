@@ -20,6 +20,7 @@ benchmarks = [
     "bisort",
     "em3d",
     "health",
+    "perimeter",
     "power",
     "tsp",
 ]
