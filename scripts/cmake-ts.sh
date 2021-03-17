@@ -16,4 +16,5 @@ rm -rf CMakeCache.txt
 cmake -DCMAKE_C_COMPILER="$CC"                                                 \
       -DCMAKE_PREFIX_PATH="$CHECKEDC_INC;$CHECKEDC_LIB"                        \
       -C"$TESTSUITE_DIR"/cmake/caches/O3.cmake                                 \
+      -DLARGE_PROBLEM_SIZE=1                                                   \
       "$TESTSUITE_DIR"

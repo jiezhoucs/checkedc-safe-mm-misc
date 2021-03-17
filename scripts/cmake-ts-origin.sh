@@ -18,4 +18,5 @@ rm -rf CMakeCache.txt
 
 cmake -DCMAKE_C_COMPILER="$CC"                                                 \
       -C"$TESTSUITE_ORIGIN_DIR"/cmake/caches/O3.cmake                          \
+      -DLARGE_PROBLEM_SIZE=1                                                   \
       "$TESTSUITE_ORIGIN_DIR"
