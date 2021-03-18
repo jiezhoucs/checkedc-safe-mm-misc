@@ -209,3 +209,23 @@ for_any(T) void *_getptr_mm(mm_ptr<T> p) {
 for_any(T) void *_getptr_mm_array(mm_array_ptr<T> p) {
     return ((_MM_array_ptr_Rep *)&p)->p;
 }
+
+
+/*
+ * Function: create_invalid_mm_ptr()
+ *
+ * This function creates an invalid mm_ptr with the raw pointer value
+ * set to the argument ptr_val.
+ *
+ * The motivation of having such a function is that sometimes a function
+ * with a return type of pointer may want to return different
+ * invalid pointers for different erroneous situations. One example is the
+ * fdwatch_get_next_client_data() function of thttpd. It returns "(void *)0"
+ * and "(void *)-1" for different errors.
+ * */
+for_any(T) mm_ptr<T> create_invalid_mm_ptr(uint64_t ptr_val) {
+  _MM_ptr_Rep mmptr;
+  mmptr.p = (void *)ptr_val;
+  mm_ptr<T> *mm_ptr_ptr = (mm_ptr<T> *)&mmptr;
+  return *mm_ptr_ptr;
+}
