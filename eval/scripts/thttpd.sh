@@ -57,7 +57,7 @@ init() {
 
     # Wait a while to let the server fully start, otherwise we might get
     # the "apr_socket_recv: Connection reset by peer (104)" error.
-    sleep 1
+    sleep 1.5
 }
 
 #
