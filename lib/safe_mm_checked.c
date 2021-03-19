@@ -20,6 +20,7 @@
 
 #define LOCK_SIZE 8  // It is actually 4 bytes in current implementation.
 #define HEAP_PADDING 8
+#define HIGH32BITS_MASK 0x00000000ffffffff
 
 // A helper struct that has the same inner structure as an mm_ptr.
 // It is used to help create an mm_ptr.
@@ -228,4 +229,46 @@ for_any(T) mm_ptr<T> create_invalid_mm_ptr(uint64_t ptr_val) {
   mmptr.p = (void *)ptr_val;
   mm_ptr<T> *mm_ptr_ptr = (mm_ptr<T> *)&mmptr;
   return *mm_ptr_ptr;
+}
+
+/**
+ * Function: mmptr_to_mmarrayptr()
+ *
+ * This function converts an mmptr to an mm_array_ptr. Our design generates
+ * an mm_ptr for the address-of operator on an item of an array pointed
+ * by an mm_array_ptr (https://github.com/jzhou76/checkedc-clang/commit/471fa1e721c8e72640c81c7c21b0c09a74af7346).
+ * However, sometimes the result pointer may be used to do pointer arithmetic.
+ * For example, function really_clear_connection() of thttpd computes the
+ * inteval between the element pointed by an mm_ptr and the beginning of the
+ * array that contains the element (https://github.com/jzhou76/checkedc-safe-mm-misc/blob/master/benchmarks/baseline/thttpd-2.29/thttpd.c#L2053)
+ *
+ * */
+for_any(T) mm_array_ptr<T> mmptr_to_mmarrayptr(mm_ptr<T> p) {
+    _MM_ptr_Rep *mmptr_ptr = (_MM_ptr_Rep *)&p;
+    _MM_array_ptr_Rep mmarrayptr;
+    mmarrayptr.p = mmptr_ptr->p;
+    mmarrayptr.key = (mmptr_ptr->key_offset >> 32) & HIGH32BITS_MASK;
+    mmarrayptr.lock_ptr = mmptr_ptr->p -
+        (mmptr_ptr->key_offset & HIGH32BITS_MASK) - LOCK_SIZE;
+    mm_array_ptr<T> *mmarrayptr_ptr = (mm_array_ptr<T> *)&mmarrayptr;
+    return *mmarrayptr_ptr;
+}
+
+/*
+ * Function: mmarrayptr_to_mmptr()
+ *
+ * This function converts an mm_array_ptr to an mm_ptr. This function handles
+ * the situation when a program uses the "->" operator to dereference
+ * an mm_array_ptr.
+ *
+ * */
+for_any(T) mm_ptr<T> mmarrayptr_to_mmptr(mm_array_ptr<T> p) {
+    _MM_array_ptr_Rep *mmarrayptr_ptr = (_MM_array_ptr_Rep *)&p;
+    _MM_ptr_Rep mmptr;
+    mmptr.p = mmarrayptr_ptr->p;
+    uint64_t key = mmarrayptr_ptr->key;
+    uint64_t offset = mmarrayptr_ptr->p - (void *)mmarrayptr_ptr->lock_ptr + LOCK_SIZE;
+    mmptr.key_offset = (key << 32) & offset;
+    mm_ptr<T> *mmptr_ptr = (mm_ptr<T> *)&mmptr;
+    return *mmptr_ptr;
 }
