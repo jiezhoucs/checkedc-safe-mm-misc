@@ -60,6 +60,9 @@
 #include "timers.h"
 #include "match.h"
 
+// Checked C
+#include "debug.h"
+
 #ifndef SHUT_WR
 #define SHUT_WR 1
 #endif
@@ -159,15 +162,15 @@ static void lookup_hostname( httpd_sockaddr* sa4P, size_t sa4_len, int* gotv4P, 
 static void read_throttlefile( char* tf );
 static void shut_down( void );
 static int handle_newconnect( struct timeval* tvP, int listen_fd );
-static void handle_read( connecttab* c, struct timeval* tvP );
-static void handle_send( connecttab* c, struct timeval* tvP );
-static void handle_linger( connecttab* c, struct timeval* tvP );
-static int check_throttles( connecttab* c );
-static void clear_throttles( connecttab* c, struct timeval* tvP );
+static void handle_read(mm_ptr<connecttab> c, struct timeval* tvP );
+static void handle_send(mm_ptr<connecttab> c, struct timeval* tvP );
+static void handle_linger(mm_ptr<connecttab> c, struct timeval* tvP );
+static int check_throttles(mm_ptr<connecttab> c );
+static void clear_throttles(mm_ptr<connecttab> c, struct timeval* tvP );
 static void update_throttles( ClientData client_data, struct timeval* nowP );
-static void finish_connection( connecttab* c, struct timeval* tvP );
-static void clear_connection( connecttab* c, struct timeval* tvP );
-static void really_clear_connection( connecttab* c, struct timeval* tvP );
+static void finish_connection(mm_ptr<connecttab> c, struct timeval* tvP );
+static void clear_connection(mm_ptr<connecttab> c, struct timeval* tvP );
+static void really_clear_connection(mm_ptr<connecttab> c, struct timeval* tvP );
 static void idle( ClientData client_data, struct timeval* nowP );
 static void wakeup_connection( ClientData client_data, struct timeval* nowP );
 static void linger_clear_connection( ClientData client_data, struct timeval* nowP );
@@ -358,11 +361,9 @@ re_open_logfile( void )
 	}
     }
 
-
 int
 main( int argc, char** argv )
     {
-      printf("[DEBUG]: Starting executing thttpd ...\n");
     char* cp;
     struct passwd* pwd;
     uid_t uid = 32767;
@@ -371,6 +372,9 @@ main( int argc, char** argv )
     FILE* logfp;
     int num_ready;
     int cnum;
+#ifdef SAFEMM
+    mm_ptr<connecttab> mm_c = NULL;
+#endif
     connecttab* c;
     httpd_conn* hc;
     httpd_sockaddr sa4;
@@ -760,6 +764,15 @@ main( int argc, char** argv )
     num_connects = 0;
     httpd_conn_count = 0;
 
+#ifdef SAFEMM
+    if ( hs != NULL )
+	{
+	if ( hs->listen4_fd != -1 )
+	    fdwatch_add_fd( hs->listen4_fd, NULL, FDW_READ );
+	if ( hs->listen6_fd != -1 )
+	    fdwatch_add_fd( hs->listen6_fd, NULL, FDW_READ );
+	}
+#else
     if ( hs != NULL )
 	{
 	if ( hs->listen4_fd != -1 )
@@ -767,6 +780,7 @@ main( int argc, char** argv )
 	if ( hs->listen6_fd != -1 )
 	    fdwatch_add_fd( hs->listen6_fd, (void*) 0, FDW_READ );
 	}
+#endif
 
     /* Main loop. */
     (void) gettimeofday( &tv, (struct timezone*) 0 );
@@ -820,6 +834,24 @@ main( int argc, char** argv )
 	    }
 
 	/* Find the connections that need servicing. */
+#ifdef SAFEMM
+    while ( ( mm_c = (mm_ptr<connecttab>)fdwatch_get_next_client_data() ) !=
+            create_invalid_mm_ptr<connecttab>(-1) )
+	    {
+	    if (mm_c == NULL )
+		continue;
+	    hc = mm_c->hc;
+	    if ( ! fdwatch_check_fd( hc->conn_fd ) )
+		/* Something went wrong. */
+		clear_connection(mm_c, &tv );
+	    else
+		switch (mm_c->conn_state ) {
+		    case CNST_READING: handle_read(mm_c, &tv ); break;
+		    case CNST_SENDING: handle_send(mm_c, &tv ); break;
+		    case CNST_LINGERING: handle_linger(mm_c, &tv ); break;
+        }
+        }
+#else
 	while ( ( c = (connecttab*) fdwatch_get_next_client_data() ) != (connecttab*) -1 )
 	    {
 	    if ( c == (connecttab*) 0 )
@@ -836,6 +868,7 @@ main( int argc, char** argv )
 		    case CNST_LINGERING: handle_linger( c, &tv ); break;
 		    }
 	    }
+#endif
 	tmr_run( &tv );
 
 	if ( got_usr1 && ! terminate )
@@ -1577,13 +1610,13 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 	    {
         // TO-DO: replace NEW; update the type of connecttab.hc
         mm_c->mm_hc = MM_NEW(httpd_conn);
-        mm_c->hc = _getptr_mm<httpd_conn>(mm_c->mm_hc);
 	    if ( mm_c->mm_hc == NULL )
 		{
 		syslog( LOG_CRIT, "out of memory allocating an httpd_conn" );
 		exit( 1 );
 		}
         mm_c->mm_hc->initialized = 0;
+        mm_c->hc = _getptr_mm<httpd_conn>(mm_c->mm_hc);
 	    ++httpd_conn_count;
 	    }
 
@@ -1607,7 +1640,7 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 	first_free_connect = mm_c->next_free_connect;
 	mm_c->next_free_connect = -1;
 	++num_connects;
-	client_data.p = _getptr_mm<connecttab>(mm_c);   // TO-DO
+	client_data.p = (mm_ptr<void>)mm_c;
 	mm_c->active_at = tvP->tv_sec;
 	mm_c->wakeup_timer = NULL;
 	mm_c->linger_timer = NULL;
@@ -1619,8 +1652,7 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 	/* Set the connection file descriptor to no-delay mode. */
 	httpd_set_ndelay( mm_c->mm_hc->conn_fd );
 
-    // TODO: rewrite fdwatch_add_fd.
-	fdwatch_add_fd( mm_c->mm_hc->conn_fd, c, FDW_READ );
+	fdwatch_add_fd( mm_c->mm_hc->conn_fd, (mm_ptr<void>)mm_c, FDW_READ );
 #else
 	c = &connects[first_free_connect];
 	/* Make the httpd_conn if necessary. */
@@ -1676,7 +1708,7 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 
 
 static void
-handle_read( connecttab* c, struct timeval* tvP )
+handle_read(mm_ptr<connecttab> c, struct timeval* tvP )
     {
     int sz;
     ClientData client_data;
@@ -1688,7 +1720,7 @@ handle_read( connecttab* c, struct timeval* tvP )
 	if ( hc->read_size > 5000 )
 	    {
 	    httpd_send_err( hc, 400, httpd_err400title, "", httpd_err400form, "" );
-	    finish_connection( c, tvP );
+	    finish_connection(c, tvP );
 	    return;
 	    }
 	httpd_realloc_str(
@@ -1702,7 +1734,7 @@ handle_read( connecttab* c, struct timeval* tvP )
     if ( sz == 0 )
 	{
 	httpd_send_err( hc, 400, httpd_err400title, "", httpd_err400form, "" );
-	finish_connection( c, tvP );
+	finish_connection(c, tvP );
 	return;
 	}
     if ( sz < 0 )
@@ -1790,15 +1822,15 @@ handle_read( connecttab* c, struct timeval* tvP )
     c->conn_state = CNST_SENDING;
     c->started_at = tvP->tv_sec;
     c->wouldblock_delay = 0;
-    client_data.p = c;
+    client_data.p = (mm_ptr<void>)c;
 
     fdwatch_del_fd( hc->conn_fd );
-    fdwatch_add_fd( hc->conn_fd, c, FDW_WRITE );
+    fdwatch_add_fd( hc->conn_fd, (mm_ptr<void>)c, FDW_WRITE );
     }
 
 
 static void
-handle_send( connecttab* c, struct timeval* tvP )
+handle_send(mm_ptr<connecttab> c, struct timeval* tvP )
     {
     size_t max_bytes;
     int sz, coast;
@@ -1853,7 +1885,7 @@ handle_send( connecttab* c, struct timeval* tvP )
 	c->wouldblock_delay += MIN_WOULDBLOCK_DELAY;
 	c->conn_state = CNST_PAUSING;
 	fdwatch_del_fd( hc->conn_fd );
-	client_data.p = c;
+	client_data.p = (mm_ptr<void>)c;
 	if ( c->wakeup_timer != (Timer*) 0 )
 	    syslog( LOG_ERR, "replacing non-null wakeup_timer!" );
 	c->wakeup_timer = tmr_create(
@@ -1938,7 +1970,8 @@ handle_send( connecttab* c, struct timeval* tvP )
 	    ** than a second (integer math rounding), use 1/2 second.
 	    */
 	    coast = c->hc->bytes_sent / c->max_limit - elapsed;
-	    client_data.p = c;
+        // TODO: refactor struct ClientData
+	    client_data.p = (mm_ptr<void>)c;
 	    if ( c->wakeup_timer != (Timer*) 0 )
 		syslog( LOG_ERR, "replacing non-null wakeup_timer!" );
 	    c->wakeup_timer = tmr_create(
@@ -1956,7 +1989,7 @@ handle_send( connecttab* c, struct timeval* tvP )
 
 
 static void
-handle_linger( connecttab* c, struct timeval* tvP )
+handle_linger(mm_ptr<connecttab> c, struct timeval* tvP )
     {
     char buf[4096];
     int r;
@@ -1973,8 +2006,7 @@ handle_linger( connecttab* c, struct timeval* tvP )
 
 
 static int
-check_throttles( connecttab* c )
-    {
+check_throttles(mm_ptr<connecttab> c ) {
     int tnum;
     long l;
 
@@ -2013,7 +2045,7 @@ check_throttles( connecttab* c )
 
 
 static void
-clear_throttles( connecttab* c, struct timeval* tvP )
+clear_throttles(mm_ptr<connecttab> c, struct timeval* tvP )
     {
     int tind;
 
@@ -2096,18 +2128,18 @@ update_throttles( ClientData client_data, struct timeval* nowP )
 
 
 static void
-finish_connection( connecttab* c, struct timeval* tvP )
+finish_connection(mm_ptr<connecttab> c, struct timeval* tvP )
     {
     /* If we haven't actually sent the buffered response yet, do so now. */
     httpd_write_response( c->hc );
 
     /* And clear. */
-    clear_connection( c, tvP );
+    clear_connection(c, tvP );
     }
 
 
 static void
-clear_connection( connecttab* c, struct timeval* tvP )
+clear_connection(mm_ptr<connecttab> c, struct timeval* tvP )
     {
     ClientData client_data;
 
@@ -2141,8 +2173,8 @@ clear_connection( connecttab* c, struct timeval* tvP )
 	    fdwatch_del_fd( c->hc->conn_fd );
 	c->conn_state = CNST_LINGERING;
 	shutdown( c->hc->conn_fd, SHUT_WR );
-	fdwatch_add_fd( c->hc->conn_fd, c, FDW_READ );
-	client_data.p = c;
+	fdwatch_add_fd( c->hc->conn_fd, (mm_ptr<void>)c, FDW_READ );
+	client_data.p = (mm_ptr<void>)c;
 	if ( c->linger_timer != (Timer*) 0 )
 	    syslog( LOG_ERR, "replacing non-null linger_timer!" );
 	c->linger_timer = tmr_create(
@@ -2159,7 +2191,7 @@ clear_connection( connecttab* c, struct timeval* tvP )
 
 
 static void
-really_clear_connection( connecttab* c, struct timeval* tvP )
+really_clear_connection(mm_ptr<connecttab> c, struct timeval* tvP )
     {
     stats_bytes += c->hc->bytes_sent;
     if ( c->conn_state != CNST_PAUSING )
@@ -2173,7 +2205,7 @@ really_clear_connection( connecttab* c, struct timeval* tvP )
 	}
     c->conn_state = CNST_FREE;
     c->next_free_connect = first_free_connect;
-    first_free_connect = c - connects;	/* division by sizeof is implied */
+    first_free_connect = mmptr_to_mmarrayptr<connecttab>(c) - mm_connects;	/* division by sizeof is implied */
     --num_connects;
     }
 
@@ -2202,7 +2234,7 @@ idle( ClientData client_data, struct timeval* nowP )
 		    httpd_ntoa( &mm_c->hc->client_addr ) );
 		httpd_send_err(
 		    mm_c->hc, 408, httpd_err408title, "", httpd_err408form, "" );
-		finish_connection(_getptr_mm<connecttab>(mm_c), nowP );
+		finish_connection(mm_c, nowP );
 		}
 	    break;
 	    case CNST_SENDING:
@@ -2212,7 +2244,7 @@ idle( ClientData client_data, struct timeval* nowP )
 		syslog( LOG_INFO,
 		    "%.80s connection timed out sending",
 		    httpd_ntoa( &mm_c->hc->client_addr ) );
-		clear_connection( _getptr_mm<connecttab>(mm_c), nowP );
+		clear_connection(mm_c, nowP );
 		}
 	    break;
         }
@@ -2250,24 +2282,29 @@ idle( ClientData client_data, struct timeval* nowP )
 static void
 wakeup_connection( ClientData client_data, struct timeval* nowP )
     {
+#ifdef SAFEMM
+    mm_ptr<connecttab> c = (mm_ptr<connecttab>)client_data.p;
+#else
     connecttab* c;
-
     c = (connecttab*) client_data.p;
-    c->wakeup_timer = (Timer*) 0;
+#endif
+    c->wakeup_timer = NULL;
     if ( c->conn_state == CNST_PAUSING )
 	{
 	c->conn_state = CNST_SENDING;
+#ifdef SAFEMM
+	fdwatch_add_fd( c->hc->conn_fd, (mm_ptr<void>)c, FDW_WRITE );
+#else
 	fdwatch_add_fd( c->hc->conn_fd, c, FDW_WRITE );
+#endif
 	}
     }
 
 static void
 linger_clear_connection( ClientData client_data, struct timeval* nowP )
     {
-    connecttab* c;
-
-    c = (connecttab*) client_data.p;
-    c->linger_timer = (Timer*) 0;
+    mm_ptr<connecttab> c = (mm_ptr<connecttab>)client_data.p;
+    c->linger_timer = NULL;
     really_clear_connection( c, nowP );
     }
 

@@ -62,10 +62,6 @@
 /* Do overlapping strcpy safely, by using memmove. */
 #define ol_strcpy(dst,src) memmove(dst,src,strlen(src)+1)
 
-// Checked C
-#define SAFEMM
-
-
 /* The httpd structs. */
 
 /* A multi-family sockaddr. */

@@ -54,13 +54,27 @@
 #define INFTIM -1
 #endif /* INFTIM */
 
+#include "safe_mm_checked.h"
+
 /* Figure out how many file descriptors the system allows, and
 ** initialize the fdwatch data structures.  Returns -1 on failure.
 */
 int fdwatch_get_nfiles( void );
 
+
+// Checked C
+#ifdef SAFEMM
 /* Add a descriptor to the watch list.  rw is either FDW_READ or FDW_WRITE.  */
+void fdwatch_add_fd(int fd, mm_ptr<void> client_data, int rw);
+
+/* Get the client data for the next returned event.  Returns -1 when there
+** are no more events.
+*/
+mm_ptr<void> fdwatch_get_next_client_data(void);
+#else
 void fdwatch_add_fd( int fd, void* client_data, int rw );
+void* fdwatch_get_next_client_data( void );
+#endif
 
 /* Delete a descriptor from the watch list. */
 void fdwatch_del_fd( int fd );
@@ -73,11 +87,6 @@ int fdwatch( long timeout_msecs );
 
 /* Check if a descriptor was ready. */
 int fdwatch_check_fd( int fd );
-
-/* Get the client data for the next returned event.  Returns -1 when there
-** are no more events.
-*/
-void* fdwatch_get_next_client_data( void );
 
 /* Generate debugging statistics syslog message. */
 void fdwatch_logstats( long secs );

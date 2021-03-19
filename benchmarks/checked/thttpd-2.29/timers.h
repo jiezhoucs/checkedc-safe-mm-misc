@@ -34,12 +34,15 @@
 #define INFTIM -1
 #endif /* INFTIM */
 
+#include "safe_mm_checked.h"
+
 /* ClientData is a random value that tags along with a timer.  The client
 ** can use it for whatever, and it gets passed to the callback when the
 ** timer triggers.
 */
 typedef union {
-    void* p;
+    /* void* p; */
+    mm_ptr<void> p;
     int i;
     long l;
     } ClientData;

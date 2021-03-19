@@ -6,7 +6,11 @@
 #ifndef _SAFE_MM_CHECKED_H
 #define _SAFE_MM_CHECKED_H
 
+// Checked C
+#define SAFEMM
+
 #include "stdchecked.h"
+#include <stdint.h>
 
 for_any(T) mm_ptr<T> mm_alloc(unsigned long size);
 for_any(T) void mm_free(mm_ptr<T> p);
@@ -18,4 +22,7 @@ for_any(T) void mm_array_free(mm_array_ptr<T> p);
 for_any(T) void *_getptr_mm(mm_ptr<T> p);
 for_any(T) void *_getptr_mm_array(mm_array_ptr<T> p);
 
+for_any(T) mm_ptr<T> create_invalid_mm_ptr(uint64_t val);
+
+for_any(T) mm_array_ptr<T> mmptr_to_mmarrayptr(mm_ptr<T> p);
 #endif

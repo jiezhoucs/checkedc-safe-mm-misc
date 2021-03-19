@@ -76,6 +76,11 @@ static int* fd_rw;
 static void** fd_data;
 static int nreturned, next_ridx;
 
+#ifdef SAFEMM
+static mm_array_ptr<int> mm_fd_rw;
+static mm_array_ptr<mm_ptr<void>> mm_fd_data;
+#endif
+
 #ifdef HAVE_KQUEUE
 
 #define WHICH                  "kevent"
@@ -189,12 +194,20 @@ fdwatch_get_nfiles( void )
 
     /* Initialize the fdwatch data structures. */
     nwatches = 0;
+#ifdef SAFEMM
+    mm_fd_rw = mm_array_alloc<int>(sizeof(int) * nfiles);
+    mm_fd_data = mm_array_alloc<mm_ptr<void>>(sizeof(mm_ptr<void>) * nfiles);
+    if (mm_fd_rw == NULL || mm_fd_data == NULL) return -1;
+    for ( i = 0; i < nfiles; ++i )
+	mm_fd_rw[i] = -1;
+#else
     fd_rw = (int*) malloc( sizeof(int) * nfiles );
     fd_data = (void**) malloc( sizeof(void*) * nfiles );
     if ( fd_rw == (int*) 0 || fd_data == (void**) 0 )
 	return -1;
     for ( i = 0; i < nfiles; ++i )
 	fd_rw[i] = -1;
+#endif
     if ( INIT( nfiles ) == -1 )
 	return -1;
 
@@ -203,6 +216,18 @@ fdwatch_get_nfiles( void )
 
 
 /* Add a descriptor to the watch list.  rw is either FDW_READ or FDW_WRITE.  */
+#ifdef SAFEMM
+void fdwatch_add_fd(int fd, mm_ptr<void> client_data, int rw) {
+    if ( fd < 0 || fd >= nfiles || mm_fd_rw[fd] != -1 )
+	{
+	syslog( LOG_ERR, "bad fd (%d) passed to fdwatch_add_fd!", fd );
+	return;
+	}
+    ADD_FD( fd, rw );
+    mm_fd_rw[fd] = rw;
+    mm_fd_data[fd] = client_data;
+}
+#else
 void
 fdwatch_add_fd( int fd, void* client_data, int rw )
     {
@@ -215,12 +240,22 @@ fdwatch_add_fd( int fd, void* client_data, int rw )
     fd_rw[fd] = rw;
     fd_data[fd] = client_data;
     }
+#endif
 
 
 /* Remove a descriptor from the watch list. */
 void
-fdwatch_del_fd( int fd )
-    {
+fdwatch_del_fd( int fd ) {
+#ifdef SAFEMM
+    if ( fd < 0 || fd >= nfiles || mm_fd_rw[fd] == -1 )
+	{
+	syslog( LOG_ERR, "bad fd (%d) passed to fdwatch_del_fd!", fd );
+	return;
+	}
+    DEL_FD( fd );
+    mm_fd_rw[fd] = -1;
+    mm_fd_data[fd] = NULL;
+#else
     if ( fd < 0 || fd >= nfiles || fd_rw[fd] == -1 )
 	{
 	syslog( LOG_ERR, "bad fd (%d) passed to fdwatch_del_fd!", fd );
@@ -229,6 +264,7 @@ fdwatch_del_fd( int fd )
     DEL_FD( fd );
     fd_rw[fd] = -1;
     fd_data[fd] = (void*) 0;
+#endif
     }
 
 /* Do the watch.  Return value is the number of descriptors that are ready,
@@ -247,17 +283,38 @@ fdwatch( long timeout_msecs )
 
 /* Check if a descriptor was ready. */
 int
-fdwatch_check_fd( int fd )
-    {
+fdwatch_check_fd( int fd ) {
+#ifdef SAFEMM
+    if ( fd < 0 || fd >= nfiles || mm_fd_rw[fd] == -1 )
+	{
+	syslog( LOG_ERR, "bad fd (%d) passed to fdwatch_check_fd!", fd );
+	return 0;
+	}
+    return CHECK_FD( fd );
+#else
     if ( fd < 0 || fd >= nfiles || fd_rw[fd] == -1 )
 	{
 	syslog( LOG_ERR, "bad fd (%d) passed to fdwatch_check_fd!", fd );
 	return 0;
 	}
     return CHECK_FD( fd );
+#endif
+}
+
+
+#ifdef SAFEMM
+mm_ptr<void> fdwatch_get_next_client_data( void )
+{
+    int fd;
+
+    if ( next_ridx >= nreturned )
+        return create_invalid_mm_ptr<void>(-1);
+    fd = GET_FD( next_ridx++ );
+    if ( fd < 0 || fd >= nfiles )
+	return NULL;
+    return mm_fd_data[fd];
     }
-
-
+#else
 void*
 fdwatch_get_next_client_data( void )
     {
@@ -270,6 +327,7 @@ fdwatch_get_next_client_data( void )
 	return (void*) 0;
     return fd_data[fd];
     }
+#endif
 
 
 /* Generate debugging statistics syslog message. */
@@ -343,7 +401,11 @@ kqueue_del_fd( int fd )
 	}
     kqevents[nkqevents].ident = fd;
     kqevents[nkqevents].flags = EV_DELETE;
+#ifdef SAFEMM
+    switch (mm_fd_rw[fd])
+#else
     switch ( fd_rw[fd] )
+#endif
 	{
 	case FDW_READ: kqevents[nkqevents].filter = EVFILT_READ; break;
 	case FDW_WRITE: kqevents[nkqevents].filter = EVFILT_WRITE; break;
@@ -394,7 +456,11 @@ kqueue_check_fd( int fd )
 	return 0;
     if ( kqrevents[ridx].flags & EV_ERROR )
 	return 0;
+#ifdef SAFEMM
+    switch ( mm_fd_rw[fd] )
+#else
     switch ( fd_rw[fd] )
+#endif
 	{
 	case FDW_READ: return kqrevents[ridx].filter == EVFILT_READ;
 	case FDW_WRITE: return kqrevents[ridx].filter == EVFILT_WRITE;
@@ -521,7 +587,11 @@ devpoll_check_fd( int fd )
 	return 0;
     if ( dprevents[ridx].revents & POLLERR )
 	return 0;
+#ifdef SAFEMM
+    switch ( mm_fd_rw[fd] )
+#else
     switch ( fd_rw[fd] )
+#endif
 	{
 	case FDW_READ: return dprevents[ridx].revents & ( POLLIN | POLLHUP | POLLNVAL );
 	case FDW_WRITE: return dprevents[ridx].revents & ( POLLOUT | POLLHUP | POLLNVAL );
@@ -643,7 +713,11 @@ poll_check_fd( int fd )
 	}
     if ( pollfds[fdidx].revents & POLLERR )
 	return 0;
+#ifdef SAFEMM
+    switch (mm_fd_rw[fd] )
+#else
     switch ( fd_rw[fd] )
+#endif
 	{
 	case FDW_READ: return pollfds[fdidx].revents & ( POLLIN | POLLHUP | POLLNVAL );
 	case FDW_WRITE: return pollfds[fdidx].revents & ( POLLOUT | POLLHUP | POLLNVAL );
@@ -803,9 +877,12 @@ select_watch( long timeout_msecs )
 
 
 static int
-select_check_fd( int fd )
-    {
+select_check_fd( int fd ) {
+#ifdef SAFEMM
+    switch ( mm_fd_rw[fd] )
+#else
     switch ( fd_rw[fd] )
+#endif
 	{
 	case FDW_READ: return FD_ISSET( fd, &working_rfdset );
 	case FDW_WRITE: return FD_ISSET( fd, &working_wfdset );
