@@ -10,12 +10,15 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <setjmp.h>
+#include <execinfo.h>
 
 #include "safe_mm_checked.h"
 
 // Print error message in red
 #define COLOR_RESET   "\033[0m"
 #define RED           "\033[31m"
+
+#define CALL_STACK_DEPTH 1024
 
 typedef struct data {
     int i;
@@ -45,5 +48,8 @@ void print_end(char *feature);
 void print_main_start(char *filename);
 void print_main_end(char *filename);
 void print_error(char *err);
+
+// Dump the call stack
+void print_callstack(void);
 
 #endif

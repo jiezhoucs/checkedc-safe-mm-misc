@@ -43,3 +43,27 @@ void print_error(char *err) {
     printf("%sERROR: %s.%s\n", RED, err, COLOR_RESET);
     exit(-1);
 }
+
+//
+// Dump the call stack
+//
+// Copy & paste from https://www.gnu.org/software/libc/manual/html_node/Backtraces.html
+//
+void print_callstack(void)
+{
+  void *array[CALL_STACK_DEPTH];
+  char **strings;
+  int size, i;
+
+  size = backtrace (array, CALL_STACK_DEPTH);
+  strings = backtrace_symbols (array, size);
+  if (strings != NULL)
+  {
+
+    printf ("Obtained %d stack frames.\n", size);
+    for (i = 0; i < size; i++)
+      printf ("%s\n", strings[i]);
+  }
+
+  free (strings);
+}
