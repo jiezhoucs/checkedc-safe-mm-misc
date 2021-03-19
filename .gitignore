@@ -17,6 +17,7 @@ tests/assign
 tests/func
 tests/cast
 tests/array
+tests/addrof
 
 tests/hello.c
 
