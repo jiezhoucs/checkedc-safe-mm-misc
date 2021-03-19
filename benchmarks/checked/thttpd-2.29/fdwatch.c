@@ -344,6 +344,9 @@ fdwatch_logstats( long secs )
 
 #ifdef HAVE_KQUEUE
 
+// There is no need to use mmsafe pointers for kqevents, kqrevents, and kqrfdidx
+// because these three pointer never escape from this source file and they
+// are never freed.
 static int maxkqevents;
 static struct kevent* kqevents;
 static int nkqevents;
