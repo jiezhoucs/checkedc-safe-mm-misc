@@ -23,7 +23,7 @@ PROGRAMS=(
     "power"
     "treeadd"
     "tsp"
-    "voronoi"
+    # "voronoi"
 )
 
 cd $BUILD_DIR
