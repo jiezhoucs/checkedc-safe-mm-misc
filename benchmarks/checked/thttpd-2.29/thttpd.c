@@ -99,7 +99,7 @@ typedef struct {
     off_t bytes_since_avg;
     int num_sending;
     } throttletab;
-static throttletab* throttles;
+static mm_array_ptr<throttletab> throttles;
 static int numthrottles, maxthrottles;
 
 #define THROTTLE_NOLIMIT -1
@@ -409,7 +409,7 @@ main( int argc, char** argv )
     /* Throttle file. */
     numthrottles = 0;
     maxthrottles = 0;
-    throttles = (throttletab*) 0;
+    throttles = NULL;
     if ( throttlefile != (char*) 0 )
 	read_throttlefile( throttlefile );
 
@@ -1483,14 +1483,14 @@ read_throttlefile( char* tf )
 	    if ( maxthrottles == 0 )
 		{
 		maxthrottles = 100;     /* arbitrary */
-		throttles = NEW( throttletab, maxthrottles );
+        throttles = MM_ARRAY_NEW(throttletab, maxthrottles);
 		}
 	    else
 		{
 		maxthrottles *= 2;
-		throttles = RENEW( throttles, throttletab, maxthrottles );
+		throttles = MM_ARRAY_RENEW( throttles, throttletab, maxthrottles );
 		}
-	    if ( throttles == (throttletab*) 0 )
+	    if ( throttles == NULL )
 		{
 		syslog( LOG_CRIT, "out of memory allocating a throttletab" );
 		(void) fprintf(
@@ -1562,8 +1562,8 @@ shut_down( void )
 #else
     free( (void*) connects );
 #endif
-    if ( throttles != (throttletab*) 0 )
-	free( (void*) throttles );
+    if ( throttles != NULL )
+    mm_array_free<throttletab>(throttles);
     }
 
 

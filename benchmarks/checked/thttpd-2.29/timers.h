@@ -41,7 +41,6 @@
 ** timer triggers.
 */
 typedef union {
-    /* void* p; */
     mm_ptr<void> p;
     int i;
     long l;
