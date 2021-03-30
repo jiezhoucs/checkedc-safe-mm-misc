@@ -118,7 +118,7 @@ typedef int socklen_t;
 
 /* Forwards. */
 static void check_options( void );
-static void free_httpd_server( httpd_server* hs );
+static void free_httpd_server( mm_ptr<httpd_server> hs );
 static int initialize_listen_socket( httpd_sockaddr* saP );
 static void add_response( httpd_conn* hc, char* str );
 static void send_mime( httpd_conn* hc, int status, char* title, char* encodings, char* extraheads, char* type, off_t length, time_t mod );
@@ -204,8 +204,8 @@ check_options( void )
 
 
 static void
-free_httpd_server( httpd_server* hs )
-    {
+free_httpd_server( mm_ptr<httpd_server> hs ) {
+    // All the to-be-freed objects except hs were allocated by strdup.
     if ( hs->binding_hostname != (char*) 0 )
 	free( (void*) hs->binding_hostname );
     if ( hs->cwd != (char*) 0 )
@@ -220,11 +220,11 @@ free_httpd_server( httpd_server* hs )
 	free( (void*) hs->url_pattern );
     if ( hs->local_pattern != (char*) 0 )
 	free( (void*) hs->local_pattern );
-    free( (void*) hs );
+    mm_free<httpd_server>(hs);
     }
 
 
-httpd_server*
+mm_ptr<httpd_server>
 httpd_initialize(
     char* hostname, httpd_sockaddr* sa4P, httpd_sockaddr* sa6P,
     unsigned short port, char* cgi_pattern, int cgi_limit, char* charset,
@@ -232,26 +232,28 @@ httpd_initialize(
     int no_symlink_check, int vhost, int global_passwd, char* url_pattern,
     char* local_pattern, int no_empty_referrers )
     {
-    httpd_server* hs;
+    mm_ptr<httpd_server> hs = NULL;
     static char ghnbuf[256];
     char* cp;
 
     check_options();
 
-    hs = NEW( httpd_server, 1 );
-    if ( hs == (httpd_server*) 0 )
+    hs = MM_NEW(httpd_server);
+
+    if ( hs == NULL )
 	{
 	syslog( LOG_CRIT, "out of memory allocating an httpd_server" );
-	return (httpd_server*) 0;
+	return NULL;
 	}
 
     if ( hostname != (char*) 0 )
 	{
+        // Should we do something about strdup?
 	hs->binding_hostname = strdup( hostname );
 	if ( hs->binding_hostname == (char*) 0 )
 	    {
 	    syslog( LOG_CRIT, "out of memory copying hostname" );
-	    return (httpd_server*) 0;
+	    return NULL;
 	    }
 	hs->server_hostname = hs->binding_hostname;
 	}
@@ -288,7 +290,7 @@ httpd_initialize(
 	if ( hs->cgi_pattern == (char*) 0 )
 	    {
 	    syslog( LOG_CRIT, "out of memory copying cgi_pattern" );
-	    return (httpd_server*) 0;
+	    return NULL;
 	    }
 	/* Nuke any leading slashes in the cgi pattern. */
 	while ( ( cp = strstr( hs->cgi_pattern, "|/" ) ) != (char*) 0 )
@@ -303,7 +305,7 @@ httpd_initialize(
     if ( hs->cwd == (char*) 0 )
 	{
 	syslog( LOG_CRIT, "out of memory copying cwd" );
-	return (httpd_server*) 0;
+	return NULL;
 	}
     if ( url_pattern == (char*) 0 )
 	hs->url_pattern = (char*) 0;
@@ -313,7 +315,7 @@ httpd_initialize(
 	if ( hs->url_pattern == (char*) 0 )
 	    {
 	    syslog( LOG_CRIT, "out of memory copying url_pattern" );
-	    return (httpd_server*) 0;
+	    return NULL;
 	    }
 	}
     if ( local_pattern == (char*) 0 )
@@ -324,7 +326,7 @@ httpd_initialize(
 	if ( hs->local_pattern == (char*) 0 )
 	    {
 	    syslog( LOG_CRIT, "out of memory copying local_pattern" );
-	    return (httpd_server*) 0;
+	    return NULL;
 	    }
 	}
     hs->no_log = no_log;
@@ -351,7 +353,7 @@ httpd_initialize(
     if ( hs->listen4_fd == -1 && hs->listen6_fd == -1 )
 	{
 	free_httpd_server( hs );
-	return (httpd_server*) 0;
+	return NULL;
 	}
 
     init_mime();
@@ -452,7 +454,7 @@ initialize_listen_socket( httpd_sockaddr* saP )
 
 
 void
-httpd_set_logfp( httpd_server* hs, FILE* logfp )
+httpd_set_logfp(mm_ptr<httpd_server> hs, FILE* logfp )
     {
     if ( hs->logfp != (FILE*) 0 )
 	(void) fclose( hs->logfp );
@@ -461,9 +463,9 @@ httpd_set_logfp( httpd_server* hs, FILE* logfp )
 
 
 void
-httpd_terminate( httpd_server* hs )
+httpd_terminate( mm_ptr<httpd_server> hs )
     {
-    httpd_unlisten( hs );
+    httpd_unlisten( _getptr_mm<httpd_server>(hs) );
     if ( hs->logfp != (FILE*) 0 )
 	(void) fclose( hs->logfp );
     free_httpd_server( hs );
@@ -1704,7 +1706,7 @@ expand_symlinks( char* path, char** restP, int no_symlink_check, int tildemapped
 
 
 #ifdef SAFEMM
-int httpd_get_conn( httpd_server* hs, int listen_fd, mm_ptr<httpd_conn> hc) {
+int httpd_get_conn(mm_ptr<httpd_server> hs, int listen_fd, mm_ptr<httpd_conn> hc) {
     httpd_sockaddr sa;
     socklen_t sz;
 
@@ -1761,7 +1763,7 @@ int httpd_get_conn( httpd_server* hs, int listen_fd, mm_ptr<httpd_conn> hc) {
 	return GC_FAIL;
 	}
     (void) fcntl( hc->conn_fd, F_SETFD, 1 );
-    hc->hs = hs;
+    hc->hs = _getptr_mm<httpd_server>(hs);
     (void) memset(_getptr_mm<httpd_sockaddr>(&hc->client_addr), 0, sizeof(hc->client_addr) );
     (void) memmove(_getptr_mm<httpd_sockaddr>(&hc->client_addr), &sa, sockaddr_len( &sa ) );
     hc->read_idx = 0;

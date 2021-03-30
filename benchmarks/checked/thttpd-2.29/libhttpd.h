@@ -76,8 +76,8 @@ typedef union {
 
 /* A server. */
 typedef struct {
-    char* binding_hostname;
-    char* server_hostname;
+    char* binding_hostname;  // no need to be mmsafe ptr
+    char* server_hostname;   // no need to be mmsafe ptr
     unsigned short port;
     char* cgi_pattern;
     int cgi_limit, cgi_count;
@@ -237,7 +237,7 @@ typedef struct {
 ** httpd_server* which includes a socket fd that you can select() on.
 ** Return (httpd_server*) 0 on error.
 */
-httpd_server* httpd_initialize(
+mm_ptr<httpd_server> httpd_initialize(
     char* hostname, httpd_sockaddr* sa4P, httpd_sockaddr* sa6P,
     unsigned short port, char* cgi_pattern, int cgi_limit, char* charset,
     char* p3p, int max_age, char* cwd, int no_log, FILE* logfp,
@@ -245,13 +245,13 @@ httpd_server* httpd_initialize(
     char* local_pattern, int no_empty_referrers );
 
 /* Change the log file. */
-void httpd_set_logfp( httpd_server* hs, FILE* logfp );
+void httpd_set_logfp( mm_ptr<httpd_server> hs, FILE* logfp );
 
 /* Call to unlisten/close socket(s) listening for new connections. */
 void httpd_unlisten( httpd_server* hs );
 
 /* Call to shut down. */
-void httpd_terminate( httpd_server* hs );
+void httpd_terminate( mm_ptr<httpd_server> hs );
 
 
 /* When a listen fd is ready to read, call this.  It does the accept() and
@@ -264,7 +264,7 @@ void httpd_terminate( httpd_server* hs );
 ** first call using each different httpd_conn.
 */
 #ifdef SAFEMM
-int httpd_get_conn( httpd_server* hs, int listen_fd, mm_ptr<httpd_conn> hc);
+int httpd_get_conn(mm_ptr<httpd_server> hs, int listen_fd, mm_ptr<httpd_conn> hc);
 #else
 int httpd_get_conn( httpd_server* hs, int listen_fd, httpd_conn* hc );
 #endif

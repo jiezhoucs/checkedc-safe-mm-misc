@@ -141,7 +141,7 @@ static connecttab* connects;
 #define CNST_LINGERING 4
 
 
-static httpd_server* hs = NULL;
+static mm_ptr<httpd_server> hs = NULL;
 int terminate = 0;
 time_t start_time, stats_time;
 long stats_connections;
@@ -343,7 +343,7 @@ re_open_logfile( void )
     {
     FILE* logfp;
 
-    if ( no_log || hs == (httpd_server*) 0 )
+    if ( no_log || hs == NULL )
 	return;
 
     /* Re-open the log file. */
@@ -656,7 +656,7 @@ main( int argc, char** argv )
 	port, cgi_pattern, cgi_limit, charset, p3p, max_age, cwd, no_log, logfp,
 	no_symlink_check, do_vhost, do_global_passwd, url_pattern,
 	local_pattern, no_empty_referrers );
-    if ( hs == (httpd_server*) 0 )
+    if ( hs == NULL )
 	exit( 1 );
 
     /* Set up the occasional timer. */
@@ -812,7 +812,7 @@ main( int argc, char** argv )
 	    }
 
 	/* Is it a new connection? */
-	if ( hs != (httpd_server*) 0 && hs->listen6_fd != -1 &&
+	if ( hs != NULL && hs->listen6_fd != -1 &&
 	     fdwatch_check_fd( hs->listen6_fd ) )
 	    {
 	    if ( handle_newconnect( &tv, hs->listen6_fd ) )
@@ -822,7 +822,7 @@ main( int argc, char** argv )
 		*/
 		continue;
 	    }
-	if ( hs != (httpd_server*) 0 && hs->listen4_fd != -1 &&
+	if ( hs != NULL && hs->listen4_fd != -1 &&
 	     fdwatch_check_fd( hs->listen4_fd ) )
 	    {
 	    if ( handle_newconnect( &tv, hs->listen4_fd ) )
@@ -874,13 +874,13 @@ main( int argc, char** argv )
 	if ( got_usr1 && ! terminate )
 	    {
 	    terminate = 1;
-	    if ( hs != (httpd_server*) 0 )
+	    if ( hs != NULL )
 		{
 		if ( hs->listen4_fd != -1 )
 		    fdwatch_del_fd( hs->listen4_fd );
 		if ( hs->listen6_fd != -1 )
 		    fdwatch_del_fd( hs->listen6_fd );
-		httpd_unlisten( hs );
+		httpd_unlisten( _getptr_mm<httpd_server>(hs) );
 		}
 	    }
 	}
@@ -1545,10 +1545,10 @@ shut_down( void )
 	    connects[cnum].hc = (httpd_conn*) 0;
 #endif
 	}
-    if ( hs != (httpd_server*) 0 )
+    if ( hs != NULL )
 	{
-	httpd_server* ths = hs;
-	hs = (httpd_server*) 0;
+	mm_ptr<httpd_server> ths = hs;
+	hs = NULL;
 	if ( ths->listen4_fd != -1 )
 	    fdwatch_del_fd( ths->listen4_fd );
 	if ( ths->listen6_fd != -1 )
