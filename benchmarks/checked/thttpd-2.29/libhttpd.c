@@ -164,7 +164,7 @@ static char* build_env( char* fmt, char* arg );
 static char* hostname_map( char* hostname );
 #endif /* SERVER_NAME_LIST */
 static char** make_envp( httpd_conn* hc );
-static char** make_argp( httpd_conn* hc );
+static mm_array_ptr<char *> make_argp( httpd_conn* hc );
 static void cgi_interpose_input( httpd_conn* hc, int wfd );
 static void post_post_garbage_hack( httpd_conn* hc );
 static void cgi_interpose_output( httpd_conn* hc, int rfd );
@@ -2855,6 +2855,8 @@ ls( httpd_conn* hc )
     int namlen;
     static int maxnames = 0;
     int nnames;
+    // DISCUSS: no need to make it and namesptr mmsafe as they're static
+    // and they never escape.
     static char* names;
     static char** nameptrs;
     static char* name;
@@ -3226,6 +3228,8 @@ make_envp( httpd_conn* hc )
 	size_t l;
 	envp[envn++] = build_env( "PATH_INFO=/%s", hc->pathinfo );
 	l = strlen( hc->hs->cwd ) + strlen( hc->pathinfo ) + 1;
+    // DISCUSS: No need to make cp2 an mmsafeptr as it is only passed to
+    // my_snprintf which is basically a wrapper of two library functions.
 	cp2 = NEW( char, l );
 	if ( cp2 != (char*) 0 )
 	    {
@@ -3283,10 +3287,10 @@ make_envp( httpd_conn* hc )
 ** since we're a sub-process.  This gets done after make_envp() because we
 ** scribble on hc->query.
 */
-static char**
+mm_array_ptr<char *>
 make_argp( httpd_conn* hc )
     {
-    char** argp;
+    mm_array_ptr<char *> argp = NULL;
     int argn;
     char* cp1;
     char* cp2;
@@ -3295,9 +3299,9 @@ make_argp( httpd_conn* hc )
     ** one for the filename and one for the NULL, we are guaranteed to
     ** have enough.  We could actually use strlen/2.
     */
-    argp = NEW( char*, strlen( hc->query ) + 2 );
-    if ( argp == (char**) 0 )
-	return (char**) 0;
+    argp = MM_ARRAY_NEW(char*, strlen(hc->query) + 2);
+    if ( argp == NULL )
+	return NULL;
 
     argp[0] = strrchr( hc->expnfilename, '/' );
     if ( argp[0] != (char*) 0 )
@@ -3521,7 +3525,7 @@ static void
 cgi_child( httpd_conn* hc )
     {
     int r;
-    char** argp;
+    mm_array_ptr<char *> argp = NULL;
     char** envp;
     char* binary;
     char* directory;
@@ -3705,7 +3709,7 @@ cgi_child( httpd_conn* hc )
 #endif /* HAVE_SIGSET */
 
     /* Run the program. */
-    (void) execve( binary, argp, envp );
+    (void) execve( binary, _getptr_mm_array<char *>(argp), envp );
 
     /* Something went wrong. */
     syslog( LOG_ERR, "execve %.80s - %m", hc->expnfilename );
