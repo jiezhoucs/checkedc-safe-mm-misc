@@ -20,7 +20,7 @@ typedef struct {
     Obj o;
     mm_ptr<Obj> p1;
     Obj arr[10];
-    Obj *rp;
+    Obj *op;
 } NewNode;
 
 /*
@@ -163,6 +163,51 @@ resume:
     print_end("address-of operator '&' on an item of an array");
 }
 
+//
+// More tests.
+//
+void f2() {
+    print_start("more tests on the address-of operator '&'");
+
+    signal(SIGILL, ill_handler);
+    if (setjmp(resume_context) == 1) goto resume;
+
+    // Test deferencing through a raw pointer inside a struct pointed by an mmsafe ptr.
+    mm_ptr<NewNode> p = mm_alloc<NewNode>(sizeof(NewNode));
+    p->op = malloc(sizeof(Obj));
+    p->op->i = 42;
+    int *ip = &p->op->i;
+    if (*ip != 42) {
+        print_error("addressof.c::f2: dereferencing through a raw pointer "
+                    "inside a struct pointed by an mmptr");
+    }
+
+    // Test using '[]' to dereference a raw pointer inside a struct pointed by an mmsafe ptr.
+    p->op = malloc(sizeof(Obj) * 30);
+    p->op[10].i = 42;
+    ip = &p->op[10].i;
+    if (*ip != 42) {
+        print_error("addressof.c::f2: using '[]' to dereference through a raw pointer "
+                    "inside a struct pointed by an mmptr");
+    }
+
+    // Test derefencing through an mmsafe ptr inside a struct pointed by an mmsafe ptr.
+    p->p0 = mm_array_alloc<int>(sizeof(int) * 10);
+    for (int i = 0; i < 10; i++) {
+        p->p0[i] = i + 10;
+    }
+    mm_ptr<int> pi = &p->p0[5];
+    if (*pi != 15) {
+        print_error("addressof.c::f2: dereferencing through an mmarrayptr "
+                    "inside a struct pointed by an mmptr");
+    }
+    mm_array_free<int>(p->p0);
+    *pi = 20;  // UAF
+
+resume:
+    print_end("more tests on the address-of operator '&'");
+}
+
 int main() {
     print_main_start(__FILE__);
     signal(SIGILL, ill_handler);
@@ -171,6 +216,8 @@ int main() {
     f0();
 
     f1();
+
+    f2();
 
     print_main_end(__FILE__);
     return 0;
