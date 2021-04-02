@@ -62,6 +62,7 @@ for_any(T) mm_ptr<T> mm_alloc(size_t size) {
     // is aligned by 16 bytes.
     // See this issue for the reason: https://github.com/jzhou76/checkedc-llvm/issues/2
     void *raw_ptr = malloc(size + HEAP_PADDING + LOCK_SIZE);
+    if (raw_ptr == NULL) return NULL;
 
     // Generate a random number as the key.
     // FIXME: replace the naive rand() function with a robust random
@@ -92,6 +93,7 @@ for_any(T) mm_ptr<T> mm_alloc(size_t size) {
 __attribute__ ((noinline))
 for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
   void *raw_ptr = malloc(array_size + LOCK_SIZE + HEAP_PADDING);
+  if (raw_ptr == NULL) return NULL;
 
   uint64_t new_key = key++;
   raw_ptr += HEAP_PADDING;
