@@ -96,6 +96,7 @@ typedef struct {
     int no_empty_referrers;
     } httpd_server;
 
+#if 0
 /* A connection. */
 typedef struct {
     int initialized;
@@ -152,6 +153,7 @@ typedef struct {
     int conn_fd;
     char* file_address;
     } httpd_conn;
+#endif
 
 // An mmsafe version of connection
 typedef struct {
@@ -165,27 +167,37 @@ typedef struct {
     int status;
     off_t bytes_to_send;
     off_t bytes_sent;
-    mm_array_ptr<char> encodedurl;
+    /* mm_array_ptr<char> encodedurl; */
+    char *encodedurl;
     mm_array_ptr<char> decodedurl;
-    mm_array_ptr<char> protocol;
+    /* mm_array_ptr<char> protocol; */
+    char *protocol;
     mm_array_ptr<char> origfilename;
     mm_array_ptr<char> expnfilename;
     mm_array_ptr<char> encodings;
     mm_array_ptr<char> pathinfo;
     mm_array_ptr<char> query;
-    mm_array_ptr<char> referrer;
-    mm_array_ptr<char> useragent;
+    /* mm_array_ptr<char> referrer; */
+    char *referrer;
+    /* mm_array_ptr<char> useragent; */
+    char *useragent;
     mm_array_ptr<char> accept;
     mm_array_ptr<char> accepte;
-    mm_array_ptr<char> acceptl;
-    mm_array_ptr<char> cookie;
-    mm_array_ptr<char> contenttype;
+    /* mm_array_ptr<char> acceptl; */
+    char *acceptl;
+    /* mm_array_ptr<char> cookie; */
+    char *cookie;
+    /* mm_array_ptr<char> contenttype; */
+    char *contenttype;
     mm_array_ptr<char> reqhost;
-    mm_array_ptr<char> hdrhost;
+    /* mm_array_ptr<char> hdrhost; */
+    char *hdrhost;
     mm_array_ptr<char> hostdir;
-    mm_array_ptr<char> authorization;
+    /* mm_array_ptr<char> authorization; */
+    char *authorization;
     mm_array_ptr<char> remoteuser;
-    mm_array_ptr<char> response;
+    /* mm_array_ptr<char> response; */
+    char *response;  // TODO: use mm_array_ptr<char> for response
     size_t maxdecodedurl, maxorigfilename, maxexpnfilename, maxencodings,
 	maxpathinfo, maxquery, maxaccept, maxaccepte, maxreqhost, maxhostdir,
 	maxremoteuser, maxresponse;
@@ -196,8 +208,9 @@ typedef struct {
     size_t responselen;
     time_t if_modified_since, range_if;
     size_t contentlength;
-    mm_array_ptr<char> type;		/* not malloc()ed */
-    mm_array_ptr<char> hostname;	/* not malloc()ed */
+    char *type;		/* not malloc()ed */
+    char *hostname;	/* not malloc()ed */
+    /* mm_array_ptr<char> hostname;  // no malloc() but assigned to be sth malloc()ed */
     int mime_flag;
     int one_one;	/* HTTP/1.1 or better */
     int got_range;
@@ -207,7 +220,8 @@ typedef struct {
     int should_linger;
     struct stat sb;
     int conn_fd;
-} mm_httpd_conn;
+    char* file_address;
+} httpd_conn;
 
 /* Methods. */
 #define METHOD_UNKNOWN 0
@@ -335,9 +349,10 @@ char* httpd_method_str( int method );
 
 /* Reallocate a string. */
 void httpd_realloc_str( char** strP, size_t* maxsizeP, size_t size );
+void mm_httpd_realloc_str(mm_ptr<mm_array_ptr<char>> strP, mm_ptr<size_t> maxsizeP, size_t size);
 
 /* Format a network socket to a string representation. */
-char* httpd_ntoa( httpd_sockaddr* saP );
+char *httpd_ntoa( httpd_sockaddr* saP );
 
 /* Set NDELAY mode on a socket. */
 void httpd_set_ndelay( int fd );
@@ -349,7 +364,8 @@ void httpd_clear_ndelay( int fd );
 int httpd_read_fully( int fd, void* buf, size_t nbytes );
 
 /* Write the requested buffer completely, accounting for interruptions. */
-int httpd_write_fully( int fd, const char* buf, size_t nbytes );
+int httpd_write_fully( int fd, const char *buf, size_t nbytes );
+int mm_httpd_write_fully( int fd, const mm_array_ptr<char> buf, size_t nbytes);
 
 /* Generate debugging statistics syslog message. */
 void httpd_logstats( long secs );

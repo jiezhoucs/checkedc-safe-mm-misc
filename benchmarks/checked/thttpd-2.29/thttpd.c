@@ -108,10 +108,7 @@ static int numthrottles, maxthrottles;
 typedef struct {
     int conn_state;
     int next_free_connect;
-#ifdef SAFEMM
-    mm_ptr<httpd_conn> mm_hc;
-#endif
-    httpd_conn* hc;
+    mm_ptr<httpd_conn> hc;
     int tnums[MAXTHROTTLENUMS];         /* throttle indexes */
     int numtnums;
     long max_limit, min_limit;
@@ -376,7 +373,7 @@ main( int argc, char** argv )
     mm_ptr<connecttab> mm_c = NULL;
 #endif
     connecttab* c;
-    httpd_conn* hc;
+    mm_ptr<httpd_conn> hc = NULL;
     httpd_sockaddr sa4;
     httpd_sockaddr sa6;
     int gotv4, gotv6;
@@ -739,7 +736,7 @@ main( int argc, char** argv )
     for (cnum = 0; cnum < max_connects; ++cnum) {
       mm_connects[cnum].conn_state = CNST_FREE;
       mm_connects[cnum].next_free_connect = cnum + 1;
-      mm_connects[cnum].mm_hc = NULL;
+      mm_connects[cnum].hc = NULL;
       mm_connects[cnum].hc = NULL;
     }
     mm_connects[max_connects - 1].next_free_connect = -1;	/* end of link list */
@@ -833,6 +830,7 @@ main( int argc, char** argv )
 		continue;
 	    }
 
+
 	/* Find the connections that need servicing. */
 #ifdef SAFEMM
     while ( ( mm_c = (mm_ptr<connecttab>)fdwatch_get_next_client_data() ) !=
@@ -841,14 +839,15 @@ main( int argc, char** argv )
 	    if (mm_c == NULL )
 		continue;
 	    hc = mm_c->hc;
-	    if ( ! fdwatch_check_fd( hc->conn_fd ) )
-		/* Something went wrong. */
-		clear_connection(mm_c, &tv );
-	    else
-		switch (mm_c->conn_state ) {
-		    case CNST_READING: handle_read(mm_c, &tv ); break;
-		    case CNST_SENDING: handle_send(mm_c, &tv ); break;
-		    case CNST_LINGERING: handle_linger(mm_c, &tv ); break;
+	    if ( ! fdwatch_check_fd( hc->conn_fd ) ) {
+            /* Something went wrong. */
+            clear_connection(mm_c, &tv );
+        } else {
+            switch (mm_c->conn_state ) {
+                case CNST_READING: handle_read(mm_c, &tv ); break;
+                case CNST_SENDING: handle_send(mm_c, &tv ); break;
+                case CNST_LINGERING: handle_linger(mm_c, &tv ); break;
+            }
         }
         }
 #else
@@ -880,6 +879,7 @@ main( int argc, char** argv )
 		    fdwatch_del_fd( hs->listen4_fd );
 		if ( hs->listen6_fd != -1 )
 		    fdwatch_del_fd( hs->listen6_fd );
+        // TODO: refactor httpd_unlisten()
 		httpd_unlisten( _getptr_mm<httpd_server>(hs) );
 		}
 	    }
@@ -1526,13 +1526,15 @@ shut_down( void )
 	{
 #ifdef SAFEMM
 	if ( mm_connects[cnum].conn_state != CNST_FREE )
-	    httpd_close_conn( mm_connects[cnum].hc, &tv );
+      // TODO: refactor httpd_close_conn()
+	    httpd_close_conn( _getptr_mm<httpd_conn>(mm_connects[cnum].hc), &tv );
 	if ( mm_connects[cnum].hc != NULL )
 	    {
-	    httpd_destroy_conn(mm_connects[cnum].hc );
-	    free( (void*) mm_connects[cnum].hc );
+      // TODO: refactor httpd_destroy_conn()
+	    httpd_destroy_conn(_getptr_mm<httpd_conn>(mm_connects[cnum].hc) );
+        mm_free<httpd_conn>(mm_connects[cnum].hc);
 	    --httpd_conn_count;
-	    mm_connects[cnum].hc = (httpd_conn*) 0;
+	    mm_connects[cnum].hc = NULL;
 	    }
 #else
     if ( connects[cnum].conn_state != CNST_FREE )
@@ -1606,23 +1608,22 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 #ifdef SAFEMM
     mm_c = &mm_connects[first_free_connect];
 	/* Make the httpd_conn if necessary. */
-	if ( mm_c->mm_hc == NULL )
+	if ( mm_c->hc == NULL )
 	    {
         // TO-DO: replace NEW; update the type of connecttab.hc
-        mm_c->mm_hc = MM_NEW(httpd_conn);
-	    if ( mm_c->mm_hc == NULL )
+        mm_c->hc = MM_NEW(httpd_conn);
+	    if ( mm_c->hc == NULL )
 		{
 		syslog( LOG_CRIT, "out of memory allocating an httpd_conn" );
 		exit( 1 );
 		}
-        mm_c->mm_hc->initialized = 0;
-        mm_c->hc = _getptr_mm<httpd_conn>(mm_c->mm_hc);
+        mm_c->hc->initialized = 0;
 	    ++httpd_conn_count;
 	    }
 
     // TO-DO: refactor httpd_get_conn
 	/* Get the connection. */
-	switch ( httpd_get_conn( hs, listen_fd, mm_c->mm_hc ) )
+	switch ( httpd_get_conn( hs, listen_fd, mm_c->hc ) )
 	    {
 	    /* Some error happened.  Run the timers, then the
 	    ** existing connections.  Maybe the error will clear.
@@ -1647,12 +1648,10 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 	mm_c->next_byte_index = 0;
 	mm_c->numtnums = 0;
 
-    c = _getptr_mm<connecttab>(mm_c);
-
 	/* Set the connection file descriptor to no-delay mode. */
-	httpd_set_ndelay( mm_c->mm_hc->conn_fd );
+	httpd_set_ndelay( mm_c->hc->conn_fd );
 
-	fdwatch_add_fd( mm_c->mm_hc->conn_fd, (mm_ptr<void>)mm_c, FDW_READ );
+	fdwatch_add_fd( mm_c->hc->conn_fd, (mm_ptr<void>)mm_c, FDW_READ );
 #else
 	c = &connects[first_free_connect];
 	/* Make the httpd_conn if necessary. */
@@ -1712,28 +1711,30 @@ handle_read(mm_ptr<connecttab> c, struct timeval* tvP )
     {
     int sz;
     ClientData client_data;
-    httpd_conn* hc = c->hc;
+    mm_ptr<httpd_conn> hc = c->hc;
 
     /* Is there room in our buffer to read more bytes? */
     if ( hc->read_idx >= hc->read_size )
 	{
 	if ( hc->read_size > 5000 )
 	    {
-	    httpd_send_err( hc, 400, httpd_err400title, "", httpd_err400form, "" );
+          // TODO: refactor httpd_send_err()
+	    httpd_send_err(_getptr_mm<httpd_conn>(hc), 400, httpd_err400title, "", httpd_err400form, "" );
 	    finish_connection(c, tvP );
 	    return;
 	    }
-	httpd_realloc_str(
+	mm_httpd_realloc_str(
 	    &hc->read_buf, &hc->read_size, hc->read_size + 1000 );
 	}
 
     /* Read some more bytes. */
     sz = read(
-	hc->conn_fd, &(hc->read_buf[hc->read_idx]),
+	hc->conn_fd, _getptr_mm<char>(&(hc->read_buf[hc->read_idx])),
 	hc->read_size - hc->read_idx );
     if ( sz == 0 )
 	{
-	httpd_send_err( hc, 400, httpd_err400title, "", httpd_err400form, "" );
+      // TODO: refactor httpd_send_err
+	httpd_send_err(_getptr_mm<httpd_conn>(hc), 400, httpd_err400title, "", httpd_err400form, "" );
 	finish_connection(c, tvP );
 	return;
 	}
@@ -1746,8 +1747,9 @@ handle_read(mm_ptr<connecttab> c, struct timeval* tvP )
 	*/
 	if ( errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK )
 	    return;
+    // TODO: refactor httpd_send_err()
 	httpd_send_err(
-	    hc, 400, httpd_err400title, "", httpd_err400form, "" );
+	    _getptr_mm<httpd_conn>(hc), 400, httpd_err400title, "", httpd_err400form, "" );
 	finish_connection( c, tvP );
 	return;
 	}
@@ -1755,18 +1757,18 @@ handle_read(mm_ptr<connecttab> c, struct timeval* tvP )
     c->active_at = tvP->tv_sec;
 
     /* Do we have a complete request yet? */
-    switch ( httpd_got_request( hc ) )
+    switch ( httpd_got_request( _getptr_mm<httpd_conn>(hc) ) )
 	{
 	case GR_NO_REQUEST:
 	return;
 	case GR_BAD_REQUEST:
-	httpd_send_err( hc, 400, httpd_err400title, "", httpd_err400form, "" );
+	httpd_send_err( _getptr_mm<httpd_conn>(hc), 400, httpd_err400title, "", httpd_err400form, "" );
 	finish_connection( c, tvP );
 	return;
 	}
 
     /* Yes.  Try parsing and resolving it. */
-    if ( httpd_parse_request( hc ) < 0 )
+    if ( httpd_parse_request( _getptr_mm<httpd_conn>(hc) ) < 0 )
 	{
 	finish_connection( c, tvP );
 	return;
@@ -1775,14 +1777,15 @@ handle_read(mm_ptr<connecttab> c, struct timeval* tvP )
     /* Check the throttle table */
     if ( ! check_throttles( c ) )
 	{
+      // TODO: refactor httpd_send_err()
 	httpd_send_err(
-	    hc, 503, httpd_err503title, "", httpd_err503form, hc->encodedurl );
+	    _getptr_mm<httpd_conn>(hc), 503, httpd_err503title, "", httpd_err503form, hc->encodedurl );
 	finish_connection( c, tvP );
 	return;
 	}
 
     /* Start the connection going. */
-    if ( httpd_start_request( hc, tvP ) < 0 )
+    if ( httpd_start_request( _getptr_mm<httpd_conn>(hc), tvP ) < 0 )
 	{
 	/* Something went wrong.  Close down the connection. */
 	finish_connection( c, tvP );
@@ -1836,7 +1839,7 @@ handle_send(mm_ptr<connecttab> c, struct timeval* tvP )
     int sz, coast;
     ClientData client_data;
     time_t elapsed;
-    httpd_conn* hc = c->hc;
+    mm_ptr<httpd_conn> hc = c->hc;
     int tind;
 
     if ( c->max_limit == THROTTLE_NOLIMIT )
@@ -1859,6 +1862,7 @@ handle_send(mm_ptr<connecttab> c, struct timeval* tvP )
 	*/
 	struct iovec iv[2];
 
+	/* iv[0].iov_base = _getptr_mm_array<char>(hc->response); */
 	iv[0].iov_base = hc->response;
 	iv[0].iov_len = hc->responselen;
 	iv[1].iov_base = &(hc->file_address[c->next_byte_index]);
@@ -1927,7 +1931,8 @@ handle_send(mm_ptr<connecttab> c, struct timeval* tvP )
 	    {
 	    /* Yes; move the unwritten part to the front of the buffer. */
 	    int newlen = hc->responselen - sz;
-	    (void) memmove( hc->response, &(hc->response[sz]), newlen );
+	    /* (void) memmove(_getptr_mm_array<char>(hc->response), _getptr_mm<char>(&(hc->response[sz])), newlen ); */
+	    (void) memmove(hc->response, &(hc->response[sz]), newlen );
 	    hc->responselen = newlen;
 	    sz = 0;
 	    }
@@ -2014,7 +2019,8 @@ check_throttles(mm_ptr<connecttab> c ) {
     c->max_limit = c->min_limit = THROTTLE_NOLIMIT;
     for ( tnum = 0; tnum < numthrottles && c->numtnums < MAXTHROTTLENUMS;
 	  ++tnum )
-	if ( match( throttles[tnum].pattern, c->hc->expnfilename ) )
+      // TODO: write a mm version of match
+	if ( match( throttles[tnum].pattern, _getptr_mm_array<char>(c->hc->expnfilename)))
 	    {
 	    /* If we're way over the limit, don't even start. */
 	    if ( throttles[tnum].rate > throttles[tnum].max_limit * 2 )
@@ -2131,7 +2137,8 @@ static void
 finish_connection(mm_ptr<connecttab> c, struct timeval* tvP )
     {
     /* If we haven't actually sent the buffered response yet, do so now. */
-    httpd_write_response( c->hc );
+      // TODO: refactor httpd_write_response()
+    httpd_write_response( _getptr_mm<httpd_conn>(c->hc) );
 
     /* And clear. */
     clear_connection(c, tvP );
@@ -2196,7 +2203,8 @@ really_clear_connection(mm_ptr<connecttab> c, struct timeval* tvP )
     stats_bytes += c->hc->bytes_sent;
     if ( c->conn_state != CNST_PAUSING )
 	fdwatch_del_fd( c->hc->conn_fd );
-    httpd_close_conn( c->hc, tvP );
+    // TODO: refactor httpd_close_conn()
+    httpd_close_conn(_getptr_mm<httpd_conn>(c->hc), tvP );
     clear_throttles( c, tvP );
     if ( c->linger_timer != (Timer*) 0 )
 	{
@@ -2231,9 +2239,11 @@ idle( ClientData client_data, struct timeval* nowP )
 		{
 		syslog( LOG_INFO,
 		    "%.80s connection timed out reading",
-		    httpd_ntoa( &mm_c->hc->client_addr ) );
+            // TODO: refactor httpd_ntoa()
+		    httpd_ntoa( _getptr_mm<httpd_sockaddr>(&mm_c->hc->client_addr )) );
+        // TODO: refactor httpd_send_err()
 		httpd_send_err(
-		    mm_c->hc, 408, httpd_err408title, "", httpd_err408form, "" );
+		    _getptr_mm<httpd_conn>(mm_c->hc), 408, httpd_err408title, "", httpd_err408form, "" );
 		finish_connection(mm_c, nowP );
 		}
 	    break;
@@ -2243,7 +2253,7 @@ idle( ClientData client_data, struct timeval* nowP )
 		{
 		syslog( LOG_INFO,
 		    "%.80s connection timed out sending",
-		    httpd_ntoa( &mm_c->hc->client_addr ) );
+		    httpd_ntoa( _getptr_mm<httpd_sockaddr>(&mm_c->hc->client_addr )) );
 		clear_connection(mm_c, nowP );
 		}
 	    break;
