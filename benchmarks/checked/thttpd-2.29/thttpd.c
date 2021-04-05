@@ -879,8 +879,7 @@ main( int argc, char** argv )
 		    fdwatch_del_fd( hs->listen4_fd );
 		if ( hs->listen6_fd != -1 )
 		    fdwatch_del_fd( hs->listen6_fd );
-        // TODO: refactor httpd_unlisten()
-		httpd_unlisten( _getptr_mm<httpd_server>(hs) );
+		httpd_unlisten(hs);
 		}
 	    }
 	}

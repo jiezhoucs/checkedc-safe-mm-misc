@@ -466,7 +466,7 @@ httpd_set_logfp(mm_ptr<httpd_server> hs, FILE* logfp )
 void
 httpd_terminate( mm_ptr<httpd_server> hs )
     {
-    httpd_unlisten( _getptr_mm<httpd_server>(hs) );
+    httpd_unlisten(hs);
     if ( hs->logfp != (FILE*) 0 )
 	(void) fclose( hs->logfp );
     free_httpd_server( hs );
@@ -474,7 +474,7 @@ httpd_terminate( mm_ptr<httpd_server> hs )
 
 
 void
-httpd_unlisten( httpd_server* hs )
+httpd_unlisten( mm_ptr<httpd_server> hs )
     {
     if ( hs->listen4_fd != -1 )
 	{
@@ -1770,7 +1770,7 @@ int httpd_get_conn(mm_ptr<httpd_server> hs, int listen_fd, mm_ptr<httpd_conn> hc
 	return GC_FAIL;
 	}
     (void) fcntl( hc->conn_fd, F_SETFD, 1 );
-    hc->hs = _getptr_mm<httpd_server>(hs);
+    hc->hs = hs;
     (void) memset(_getptr_mm<httpd_sockaddr>(&hc->client_addr), 0, sizeof(hc->client_addr) );
     (void) memmove(_getptr_mm<httpd_sockaddr>(&hc->client_addr), &sa, sockaddr_len( &sa ) );
     hc->read_idx = 0;
@@ -4239,7 +4239,7 @@ check_referrer( httpd_conn* hc )
 static int
 really_check_referrer( httpd_conn* hc )
     {
-    httpd_server* hs;
+    mm_ptr<httpd_server> hs = NULL;
     char* cp1;
     char* cp2;
     char* cp3;

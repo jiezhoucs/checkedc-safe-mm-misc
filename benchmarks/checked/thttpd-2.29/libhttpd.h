@@ -158,7 +158,7 @@ typedef struct {
 // An mmsafe version of connection
 typedef struct {
     int initialized;
-    httpd_server* hs;
+    mm_ptr<httpd_server> hs;
     httpd_sockaddr client_addr;
     mm_array_ptr<char> read_buf;
     size_t read_size, read_idx, checked_idx;
@@ -262,7 +262,7 @@ mm_ptr<httpd_server> httpd_initialize(
 void httpd_set_logfp( mm_ptr<httpd_server> hs, FILE* logfp );
 
 /* Call to unlisten/close socket(s) listening for new connections. */
-void httpd_unlisten( httpd_server* hs );
+void httpd_unlisten( mm_ptr<httpd_server> hs );
 
 /* Call to shut down. */
 void httpd_terminate( mm_ptr<httpd_server> hs );
