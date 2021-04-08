@@ -4,6 +4,13 @@
 
 #include "debug.h"
 
+typedef union {
+    int i;
+    long l;
+    unsigned long ul;
+    long long ll;
+} Integer;
+
 typedef struct {
     int i;
     long j;
@@ -19,9 +26,15 @@ typedef struct {
     Obj o0;
     Obj o;
     mm_ptr<Obj> p1;
+    mm_ptr<Integer> p2;
     Obj arr[10];
     Obj *op;
 } NewNode;
+
+typedef union {
+    Node N;
+    NewNode NN;
+} node;
 
 /*
  * Test '&' on an inner object inside a struct.
@@ -208,6 +221,90 @@ resume:
     print_end("more tests on the address-of operator '&'");
 }
 
+//
+// Tests on address-of expressions involving an mmsafe ptr to a union.
+//
+void f3() {
+    print_start("tests on address-of expressions involving an mmsafe ptr to a union");
+
+    signal(SIGILL, ill_handler);
+    if (setjmp(resume_context) == 1) goto resume1;
+
+    mm_ptr<node> p = mm_alloc<node>(sizeof(node));
+
+    // Test getting the address of a struct field or a struct's struct field's field.
+    p->NN.i = 42;
+    p->NN.o.j = 84;
+    mm_ptr<NewNode> pNN = &p->NN;
+    mm_ptr<Obj> pO = &p->NN.o;
+    if (pNN->i != 42 || pO->j != 84) {
+        print_error("addressof.c::f3: getting the address of a struct field"
+                     "or a struct's struct field's field");
+    }
+    mm_free<node>(p);
+    pO->j = 10;  // UAF
+
+resume1:
+    if (setjmp(resume_context) == 1) goto resume2;
+
+    // Test '&' on an element of an array of a struct.
+    p = mm_alloc<node>(sizeof(node));
+    p->NN.arr[5].j = 42;
+    pO = &p->NN.arr[5];
+    if (pO->j != 42) {
+        print_error("addressof.c:f3: getting the address of an item of an array"
+                    " of a struct");
+    }
+    mm_free<node>(p);
+    pO->j = 10;  // UAF
+
+resume2:
+    if (setjmp(resume_context) == 1) goto resume3;
+
+    // Test '&' on a union member pointed by mm_ptr inside a struct which is
+    // a union member.
+    p = mm_alloc<node>(sizeof(node));
+    p->NN.p2 = mm_alloc<Integer>(sizeof(Integer));
+    p->NN.p2->ll = 43;
+    mm_ptr<long long> p1 = &p->NN.p2->ll;
+    if (*p1 != 43) {
+        printf("addressof.c:f3: getting the address of union member pointed by"
+               " an mm_ptr inside a struct pointed by another mm_ptr");
+    }
+    mm_free<Integer>(p->NN.p2);
+    *p1 = 44;  // UAF
+
+resume3:
+    if (setjmp(resume_context) == 1) goto resume4;
+
+    // Test "&(*p).o"
+    p = mm_alloc<node>(sizeof(node));
+    p->NN.o.j = 42;
+    pO = &(*p).NN.o;
+    if (pO->j != 42) {
+        print_error("addressof.c:f3: &(*p).o");
+    }
+    mm_free<node>(p);
+    pO->j = 43;  // UAF
+
+resume4:
+    if (setjmp(resume_context) == 1) goto resume;
+
+    // Test '&' on an field of a struct inside a struct.
+    p = mm_alloc<node>(sizeof(node));
+    p->NN.o.n.val = 42;
+    mm_ptr<int> p2 = &p->NN.o.n.val;
+    if (*p2 != 42) {
+        print_error("addressof.c:f3: getting the address of a field of a struct"
+                    "inside another struct inside another struct pointed by an mm_ptr");
+    }
+    mm_free<node>(p);
+    *p2 = 43;
+
+resume:
+    print_end("tests on address-of expressions involving an mmsafe ptr to a union");
+}
+
 int main() {
     print_main_start(__FILE__);
     signal(SIGILL, ill_handler);
@@ -218,6 +315,8 @@ int main() {
     f1();
 
     f2();
+
+    f3();
 
     print_main_end(__FILE__);
     return 0;
