@@ -44,6 +44,7 @@ init() {
 
     # Start the server
     pkill thttpd
+    sleep 0.1
     cd $BUILD_DIR
     ./sbin/thttpd -p 8080
 
