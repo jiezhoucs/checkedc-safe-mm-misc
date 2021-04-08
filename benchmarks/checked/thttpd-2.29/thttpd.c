@@ -1526,7 +1526,7 @@ shut_down( void )
 #ifdef SAFEMM
 	if ( mm_connects[cnum].conn_state != CNST_FREE )
       // TODO: refactor httpd_close_conn()
-	    httpd_close_conn( _getptr_mm<httpd_conn>(mm_connects[cnum].hc), &tv );
+	    httpd_close_conn( mm_connects[cnum].hc, &tv );
 	if ( mm_connects[cnum].hc != NULL )
 	    {
       // TODO: refactor httpd_destroy_conn()
@@ -2203,7 +2203,7 @@ really_clear_connection(mm_ptr<connecttab> c, struct timeval* tvP )
     if ( c->conn_state != CNST_PAUSING )
 	fdwatch_del_fd( c->hc->conn_fd );
     // TODO: refactor httpd_close_conn()
-    httpd_close_conn(_getptr_mm<httpd_conn>(c->hc), tvP );
+    httpd_close_conn(c->hc, tvP );
     clear_throttles( c, tvP );
     if ( c->linger_timer != (Timer*) 0 )
 	{
@@ -2238,8 +2238,7 @@ idle( ClientData client_data, struct timeval* nowP )
 		{
 		syslog( LOG_INFO,
 		    "%.80s connection timed out reading",
-            // TODO: refactor httpd_ntoa()
-		    httpd_ntoa( _getptr_mm<httpd_sockaddr>(&mm_c->hc->client_addr )) );
+		    mm_httpd_ntoa( &mm_c->hc->client_addr ) );
         // TODO: refactor httpd_send_err()
 		httpd_send_err(
 		    _getptr_mm<httpd_conn>(mm_c->hc), 408, httpd_err408title, "", httpd_err408form, "" );
@@ -2252,7 +2251,7 @@ idle( ClientData client_data, struct timeval* nowP )
 		{
 		syslog( LOG_INFO,
 		    "%.80s connection timed out sending",
-		    httpd_ntoa( _getptr_mm<httpd_sockaddr>(&mm_c->hc->client_addr )) );
+		    mm_httpd_ntoa( &mm_c->hc->client_addr ) );
 		clear_connection(mm_c, nowP );
 		}
 	    break;
@@ -2266,7 +2265,7 @@ idle( ClientData client_data, struct timeval* nowP )
 		{
 		syslog( LOG_INFO,
 		    "%.80s connection timed out reading",
-		    httpd_ntoa( &c->hc->client_addr ) );
+		    mm_httpd_ntoa( &c->hc->client_addr ) );
 		httpd_send_err(
 		    c->hc, 408, httpd_err408title, "", httpd_err408form, "" );
 		finish_connection( c, nowP );

@@ -323,7 +323,7 @@ void httpd_write_response( httpd_conn* hc );
 ** parent process - the connection will stay open in the child.
 ** If you don't have a current timeval handy just pass in 0.
 */
-void httpd_close_conn( httpd_conn* hc, struct timeval* nowP );
+void httpd_close_conn( mm_ptr<httpd_conn> hc, struct timeval* nowP );
 
 /* Call this to de-initialize a connection struct and *really* free the
 ** mallocced strings.
@@ -352,7 +352,8 @@ void httpd_realloc_str( char** strP, size_t* maxsizeP, size_t size );
 void mm_httpd_realloc_str(mm_ptr<mm_array_ptr<char>> strP, mm_ptr<size_t> maxsizeP, size_t size);
 
 /* Format a network socket to a string representation. */
-char *httpd_ntoa( httpd_sockaddr* saP );
+char *mm_httpd_ntoa( mm_ptr<httpd_sockaddr> saP );
+char *httpd_ntoa( httpd_sockaddr *saP );
 
 /* Set NDELAY mode on a socket. */
 void httpd_set_ndelay( int fd );

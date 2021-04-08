@@ -172,11 +172,12 @@ static void cgi_interpose_output( httpd_conn* hc, int rfd );
 static void cgi_child( httpd_conn* hc );
 static int cgi( httpd_conn* hc );
 static int really_start_request( httpd_conn* hc, struct timeval* nowP );
-static void make_log_entry( httpd_conn* hc, struct timeval* nowP );
+static void make_log_entry( mm_ptr<httpd_conn> hc, struct timeval* nowP );
 static int check_referrer( httpd_conn* hc );
 static int really_check_referrer( httpd_conn* hc );
 static int sockaddr_check( httpd_sockaddr* saP );
 static size_t sockaddr_len( httpd_sockaddr* saP );
+static size_t mm_sockaddr_len( mm_ptr<httpd_sockaddr> saP );
 static int my_snprintf( char* str, size_t size, const char* format, ... );
 #ifndef HAVE_ATOLL
 static long long atoll( const char* str );
@@ -1143,6 +1144,7 @@ auth_check2( httpd_conn* hc, char* dirname  )
 	/* The file exists but we can't open it?  Disallow access. */
 	syslog(
 	    LOG_ERR, "%.80s auth file %.80s could not be opened - %m",
+        // TODO: use mm_httpd_ntoa
 	    httpd_ntoa( &hc->client_addr ), authpath );
 	httpd_send_err(
 	    hc, 403, err403title, "",
@@ -2630,7 +2632,7 @@ de_dotdot( mm_array_ptr<char> mm_file )
 
 
 void
-httpd_close_conn( httpd_conn* hc, struct timeval* nowP )
+httpd_close_conn( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     {
     make_log_entry( hc, nowP );
 
@@ -4106,7 +4108,7 @@ httpd_start_request( httpd_conn* hc, struct timeval* nowP )
 
 
 static void
-make_log_entry( httpd_conn* hc, struct timeval* nowP )
+make_log_entry( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     {
     char* ru;
     char url[305];
@@ -4186,7 +4188,7 @@ make_log_entry( httpd_conn* hc, struct timeval* nowP )
 	/* And write the log entry. */
 	(void) fprintf( hc->hs->logfp,
 	    "%.80s - %.80s [%s] \"%.80s %.300s %.80s\" %d %s \"%.200s\" \"%.200s\"\n",
-	    httpd_ntoa( &hc->client_addr ), ru, date,
+	    mm_httpd_ntoa( &hc->client_addr ), ru, date,
 	    httpd_method_str( hc->method ), url, hc->protocol,
 	    hc->status, bytes, hc->referrer, hc->useragent );
 #ifdef FLUSH_LOG_EVERY_TIME
@@ -4196,7 +4198,7 @@ make_log_entry( httpd_conn* hc, struct timeval* nowP )
     else
 	syslog( LOG_INFO,
 	    "%.80s - %.80s \"%.80s %.200s %.80s\" %d %s \"%.200s\" \"%.200s\"",
-	    httpd_ntoa( &hc->client_addr ), ru,
+	    mm_httpd_ntoa( &hc->client_addr ), ru,
 	    httpd_method_str( hc->method ), url, hc->protocol,
 	    hc->status, bytes, hc->referrer, hc->useragent );
     }
@@ -4311,7 +4313,7 @@ really_check_referrer( httpd_conn* hc )
 
 
 char *
-httpd_ntoa( httpd_sockaddr* saP )
+httpd_ntoa( httpd_sockaddr *saP )
     {
 #ifdef USE_IPV6
     static char str[200];
@@ -4333,6 +4335,32 @@ httpd_ntoa( httpd_sockaddr* saP )
 
 #endif /* USE_IPV6 */
     }
+
+char *
+mm_httpd_ntoa( mm_ptr<httpd_sockaddr> saP )
+    {
+#ifdef USE_IPV6
+    static char str[200];
+
+    if ( getnameinfo( _getptr_mm<struct sockaddr>(&saP->sa), mm_sockaddr_len( saP ),
+                str, sizeof(str), 0, 0, NI_NUMERICHOST ) != 0 )
+	{
+	str[0] = '?';
+	str[1] = '\0';
+	}
+    else if ( IN6_IS_ADDR_V4MAPPED( _getptr_mm<struct in6_addr>(&saP->sa_in6.sin6_addr) ) && strncmp( str, "::ffff:", 7 ) == 0 )
+	/* Elide IPv6ish prefix for IPv4 addresses. */
+	(void) ol_strcpy( str, &str[7] );
+
+    return str;
+
+#else /* USE_IPV6 */
+
+    return inet_ntoa( saP->sa_in.sin_addr );
+
+#endif /* USE_IPV6 */
+    }
+
 
 
 static int
@@ -4363,6 +4391,21 @@ sockaddr_len( httpd_sockaddr* saP )
 	return 0;	/* shouldn't happen */
 	}
     }
+
+static size_t
+mm_sockaddr_len( mm_ptr<httpd_sockaddr> saP )
+    {
+    switch ( saP->sa.sa_family )
+	{
+	case AF_INET: return sizeof(struct sockaddr_in);
+#ifdef USE_IPV6
+	case AF_INET6: return sizeof(struct sockaddr_in6);
+#endif /* USE_IPV6 */
+	default:
+	return 0;	/* shouldn't happen */
+	}
+    }
+
 
 
 /* Some systems don't have snprintf(), so we make our own that uses

@@ -28,6 +28,8 @@
 #ifndef _MMC_H_
 #define _MMC_H_
 
+#include "libhttpd.h"
+
 /* Returns an mmap()ed area for the given file, or (void*) 0 on errors.
 ** If you have a stat buffer on the file, pass it in, otherwise pass 0.
 ** Same for the current time.
@@ -38,7 +40,7 @@ void* mmc_map( char* filename, struct stat* sbP, struct timeval* nowP );
 ** If you have a stat buffer on the file, pass it in, otherwise pass 0.
 ** Same for the current time.
 */
-void mmc_unmap( void* addr, struct stat* sbP, struct timeval* nowP );
+void mmc_unmap( void* addr, mm_ptr<struct stat> sbP, struct timeval* nowP );
 
 /* Clean up the mmc package, freeing any unused storage.
 ** This should be called periodically, say every five minutes.

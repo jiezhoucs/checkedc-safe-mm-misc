@@ -43,7 +43,6 @@
 #endif /* HAVE_MMAP */
 
 #include "mmc.h"
-#include "libhttpd.h"
 
 #ifndef HAVE_INT64T
 typedef long long int64_t;
@@ -268,12 +267,12 @@ mmc_map( char* filename, struct stat* sbP, struct timeval* nowP )
 
 
 void
-mmc_unmap( void* addr, struct stat* sbP, struct timeval* nowP )
+mmc_unmap( void* addr, mm_ptr<struct stat> sbP, struct timeval* nowP )
     {
     Map* m = (Map*) 0;
 
     /* Find the Map entry for this address.  First try a hash. */
-    if ( sbP != (struct stat*) 0 )
+    if ( sbP != NULL )
 	{
 	m = find_hash( sbP->st_ino, sbP->st_dev, sbP->st_size, sbP->st_ctime );
 	if ( m != (Map*) 0 && m->addr != addr )
