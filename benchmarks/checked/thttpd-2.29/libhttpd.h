@@ -303,7 +303,7 @@ int httpd_got_request( httpd_conn* hc );
 **
 ** Returns -1 on error.
 */
-int httpd_parse_request( httpd_conn* hc );
+int httpd_parse_request( mm_ptr<httpd_conn> hc );
 
 /* Starts sending data back to the client.  In some cases (directories,
 ** CGI programs), finishes sending by itself - in those cases, hc->file_fd
@@ -313,10 +313,10 @@ int httpd_parse_request( httpd_conn* hc );
 **
 ** Returns -1 on error.
 */
-int httpd_start_request( httpd_conn* hc, struct timeval* nowP );
+int httpd_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP );
 
 /* Actually sends any buffered response text. */
-void httpd_write_response( httpd_conn* hc );
+void httpd_write_response( mm_ptr<httpd_conn> hc );
 
 /* Call this to close down a connection and free the data.  A fine point,
 ** if you fork() with a connection open you should still call this in the
@@ -328,12 +328,12 @@ void httpd_close_conn( mm_ptr<httpd_conn> hc, struct timeval* nowP );
 /* Call this to de-initialize a connection struct and *really* free the
 ** mallocced strings.
 */
-void httpd_destroy_conn( httpd_conn* hc );
+void httpd_destroy_conn( mm_ptr<httpd_conn> hc );
 
 
 /* Send an error message back to the client. */
 void httpd_send_err(
-    httpd_conn* hc, int status, char* title, char* extraheads, char* form,
+    mm_ptr<httpd_conn> hc, int status, char* title, char* extraheads, char* form,
     char* arg );
 
 /* Some error messages. */

@@ -120,21 +120,21 @@ typedef int socklen_t;
 static void check_options( void );
 static void free_httpd_server( mm_ptr<httpd_server> hs );
 static int initialize_listen_socket( httpd_sockaddr* saP );
-static void add_response( httpd_conn* hc, char* str );
-static void send_mime( httpd_conn* hc, int status, char* title, char* encodings, char* extraheads, char* type, off_t length, time_t mod );
-static void send_response( httpd_conn* hc, int status, char* title, char* extraheads, char* form, char* arg );
-static void send_response_tail( httpd_conn* hc );
+static void add_response( mm_ptr<httpd_conn> hc, char* str );
+static void send_mime( mm_ptr<httpd_conn> hc, int status, char* title, char* encodings, char* extraheads, char* type, off_t length, time_t mod );
+static void send_response( mm_ptr<httpd_conn> hc, int status, char* title, char* extraheads, char* form, char* arg );
+static void send_response_tail( mm_ptr<httpd_conn> hc );
 static void defang( char* str, char* dfstr, int dfsize );
 #ifdef ERR_DIR
-static int send_err_file( httpd_conn* hc, int status, char* title, char* extraheads, char* filename );
+static int send_err_file( mm_ptr<httpd_conn> hc, int status, char* title, char* extraheads, char* filename );
 #endif /* ERR_DIR */
 #ifdef AUTH_FILE
-static void send_authenticate( httpd_conn* hc, char* realm );
+static void send_authenticate( mm_ptr<httpd_conn> hc, char* realm );
 static int b64_decode( const char* str, unsigned char* space, int size );
-static int auth_check( httpd_conn* hc, char* dirname  );
-static int auth_check2( httpd_conn* hc, char* dirname  );
+static int auth_check( mm_ptr<httpd_conn> hc, char* dirname  );
+static int auth_check2( mm_ptr<httpd_conn> hc, char* dirname  );
 #endif /* AUTH_FILE */
-static void send_dirredirect( httpd_conn* hc );
+static void send_dirredirect( mm_ptr<httpd_conn> hc );
 static int hexit( char c );
 static void strdecode( char* to, char* from );
 #ifdef GENERATE_INDEXES
@@ -146,35 +146,35 @@ static int tilde_map_1( httpd_conn* hc );
 #ifdef TILDE_MAP_2
 static int tilde_map_2( httpd_conn* hc );
 #endif /* TILDE_MAP_2 */
-static int vhost_map( httpd_conn* hc );
+static int vhost_map( mm_ptr<httpd_conn> hc );
 static char* expand_symlinks( char* path, char** restP, int no_symlink_check, int tildemapped );
-static char* bufgets( httpd_conn* hc );
+static char* bufgets( mm_ptr<httpd_conn> hc );
 static void de_dotdot( mm_array_ptr<char> mm_file );
 static void init_mime( void );
-static void figure_mime( httpd_conn* hc );
+static void figure_mime( mm_ptr<httpd_conn> hc );
 #ifdef CGI_TIMELIMIT
 static void cgi_kill2( ClientData client_data, struct timeval* nowP );
 static void cgi_kill( ClientData client_data, struct timeval* nowP );
 #endif /* CGI_TIMELIMIT */
 #ifdef GENERATE_INDEXES
-static int ls( httpd_conn* hc );
+static int ls( mm_ptr<httpd_conn> hc );
 #endif /* GENERATE_INDEXES */
 static char* build_env( char* fmt, char* arg );
 static char *mm_build_env(char *fmt, mm_array_ptr<char> mm_arg);
 #ifdef SERVER_NAME_LIST
 static char* hostname_map( char* hostname );
 #endif /* SERVER_NAME_LIST */
-static char** make_envp( httpd_conn* hc );
-static mm_array_ptr<char *> make_argp( httpd_conn* hc );
-static void cgi_interpose_input( httpd_conn* hc, int wfd );
-static void post_post_garbage_hack( httpd_conn* hc );
-static void cgi_interpose_output( httpd_conn* hc, int rfd );
-static void cgi_child( httpd_conn* hc );
-static int cgi( httpd_conn* hc );
-static int really_start_request( httpd_conn* hc, struct timeval* nowP );
+static char** make_envp( mm_ptr<httpd_conn> hc );
+static mm_array_ptr<char *> make_argp( mm_ptr<httpd_conn> hc );
+static void cgi_interpose_input( mm_ptr<httpd_conn> hc, int wfd );
+static void post_post_garbage_hack( mm_ptr<httpd_conn> hc );
+static void cgi_interpose_output( mm_ptr<httpd_conn> hc, int rfd );
+static void cgi_child( mm_ptr<httpd_conn> hc );
+static int cgi( mm_ptr<httpd_conn> hc );
+static int really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP );
 static void make_log_entry( mm_ptr<httpd_conn> hc, struct timeval* nowP );
-static int check_referrer( httpd_conn* hc );
-static int really_check_referrer( httpd_conn* hc );
+static int check_referrer( mm_ptr<httpd_conn> hc );
+static int really_check_referrer( mm_ptr<httpd_conn> hc );
 static int sockaddr_check( httpd_sockaddr* saP );
 static size_t sockaddr_len( httpd_sockaddr* saP );
 static size_t mm_sockaddr_len( mm_ptr<httpd_sockaddr> saP );
@@ -553,13 +553,14 @@ char* httpd_err503form =
 
 /* Append a string to the buffer waiting to be sent as response. */
 static void
-add_response( httpd_conn* hc, char* str )
+add_response( mm_ptr<httpd_conn> hc, char* str )
     {
     size_t len;
 
     len = strlen( str );
-    // TODO
-    httpd_realloc_str( &hc->response, &hc->maxresponse, hc->responselen + len );
+    // TODO: refactor httpd_realloc_str
+    httpd_realloc_str(_getptr_mm<char *>(&hc->response),
+            _getptr_mm<size_t>(&hc->maxresponse), hc->responselen + len );
     /* (void) memmove( _getptr_mm<char>(&(hc->response[hc->responselen])), str, len ); */
     (void) memmove( &(hc->response[hc->responselen]), str, len );
     hc->responselen += len;
@@ -567,7 +568,7 @@ add_response( httpd_conn* hc, char* str )
 
 /* Send the buffered response. */
 void
-httpd_write_response( httpd_conn* hc )
+httpd_write_response( mm_ptr<httpd_conn> hc )
     {
     /* If we are in a sub-process, turn off no-delay mode. */
     if ( sub_process )
@@ -615,7 +616,7 @@ httpd_clear_ndelay( int fd )
 
 
 static void
-send_mime( httpd_conn* hc, int status, char* title, char* encodings, char* extraheads, char* type, off_t length, time_t mod )
+send_mime( mm_ptr<httpd_conn> hc, int status, char* title, char* encodings, char* extraheads, char* type, off_t length, time_t mod )
     {
     time_t now, expires;
     const char* rfc1123fmt = "%a, %d %b %Y %H:%M:%S GMT";
@@ -773,7 +774,7 @@ mm_httpd_realloc_str(mm_ptr<mm_array_ptr<char>> strP, mm_ptr<size_t> maxsizeP, s
 
 
 static void
-send_response( httpd_conn* hc, int status, char* title, char* extraheads, char* form, char* arg )
+send_response( mm_ptr<httpd_conn> hc, int status, char* title, char* extraheads, char* form, char* arg )
     {
     char defanged_arg[1000], buf[2000];
 
@@ -811,7 +812,7 @@ send_response( httpd_conn* hc, int status, char* title, char* extraheads, char* 
 
 
 static void
-send_response_tail( httpd_conn* hc )
+send_response_tail( mm_ptr<httpd_conn> hc )
     {
     char buf[1000];
 
@@ -862,7 +863,7 @@ defang( char* str, char* dfstr, int dfsize )
 
 
 void
-httpd_send_err( httpd_conn* hc, int status, char* title, char* extraheads, char* form, char* arg )
+httpd_send_err( mm_ptr<httpd_conn> hc, int status, char* title, char* extraheads, char* form, char* arg )
     {
 #ifdef ERR_DIR
 
@@ -896,7 +897,7 @@ httpd_send_err( httpd_conn* hc, int status, char* title, char* extraheads, char*
 
 #ifdef ERR_DIR
 static int
-send_err_file( httpd_conn* hc, int status, char* title, char* extraheads, char* filename )
+send_err_file( mm_ptr<httpd_conn> hc, int status, char* title, char* extraheads, char* filename )
     {
     FILE* fp;
     char buf[1000];
@@ -930,7 +931,7 @@ send_err_file( httpd_conn* hc, int status, char* title, char* extraheads, char* 
 #ifdef AUTH_FILE
 
 static void
-send_authenticate( httpd_conn* hc, char* realm )
+send_authenticate( mm_ptr<httpd_conn> hc, char* realm )
     {
     static char* header;
     static size_t maxheader = 0;
@@ -1031,7 +1032,7 @@ b64_decode( const char* str, unsigned char* space, int size )
 
 /* Returns -1 == unauthorized, 0 == no auth file, 1 = authorized. */
 static int
-auth_check( httpd_conn* hc, char* dirname  )
+auth_check( mm_ptr<httpd_conn> hc, char* dirname  )
     {
     if ( hc->hs->global_passwd )
 	{
@@ -1040,7 +1041,6 @@ auth_check( httpd_conn* hc, char* dirname  )
 	    topdir = _getptr_mm_array<char>(hc->hostdir);
 	else
 	    topdir = ".";
-    // TODO: refactor auth_check2()
 	switch ( auth_check2( hc, topdir) )
 	    {
 	    case -1:
@@ -1055,7 +1055,7 @@ auth_check( httpd_conn* hc, char* dirname  )
 
 /* Returns -1 == unauthorized, 0 == no auth file, 1 = authorized. */
 static int
-auth_check2( httpd_conn* hc, char* dirname  )
+auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
     {
     static char* authpath;
     static size_t maxauthpath = 0;
@@ -1123,9 +1123,8 @@ auth_check2( httpd_conn* hc, char* dirname  )
 	if ( strcmp( crypt( authpass, prevcryp ), prevcryp ) == 0 )
 	    {
 	    /* Ok! */
-            // TODO:
-	    httpd_realloc_str(
-		(char **)&hc->remoteuser, &hc->maxremoteuser, strlen( authinfo ) );
+            // TODO: refactor httpd_realloc_str
+	    mm_httpd_realloc_str( &hc->remoteuser, &hc->maxremoteuser, strlen( authinfo ) );
 	    (void) strcpy(_getptr_mm_array<char>(hc->remoteuser), authinfo );
 	    return 1;
 	    }
@@ -1144,8 +1143,7 @@ auth_check2( httpd_conn* hc, char* dirname  )
 	/* The file exists but we can't open it?  Disallow access. */
 	syslog(
 	    LOG_ERR, "%.80s auth file %.80s could not be opened - %m",
-        // TODO: use mm_httpd_ntoa
-	    httpd_ntoa( &hc->client_addr ), authpath );
+	    mm_httpd_ntoa( &hc->client_addr ), authpath );
 	httpd_send_err(
 	    hc, 403, err403title, "",
 	    ERROR_FORM( err403form, "The requested URL '%.80s' is protected by an authentication file, but the authentication file cannot be opened.\n" ),
@@ -1175,8 +1173,8 @@ auth_check2( httpd_conn* hc, char* dirname  )
 		{
 		/* Ok! */
             // TODO
-		httpd_realloc_str(
-		    (char **)&hc->remoteuser, &hc->maxremoteuser, strlen( line ) );
+		mm_httpd_realloc_str(
+		    &hc->remoteuser, &hc->maxremoteuser, strlen( line ) );
 		(void) strcpy( _getptr_mm_array<char>(hc->remoteuser), line );
 		/* And cache this user's info for next time. */
 		httpd_realloc_str(
@@ -1209,7 +1207,7 @@ auth_check2( httpd_conn* hc, char* dirname  )
 
 
 static void
-send_dirredirect( httpd_conn* hc )
+send_dirredirect( mm_ptr<httpd_conn> hc )
     {
     static char* location;
     static char* header;
@@ -1401,7 +1399,7 @@ tilde_map_2( httpd_conn* hc )
 
 /* Virtual host mapping. */
 static int
-vhost_map( httpd_conn* hc )
+vhost_map( mm_ptr<httpd_conn> hc )
     {
     httpd_sockaddr sa;
     socklen_t sz;
@@ -1468,7 +1466,7 @@ vhost_map( httpd_conn* hc )
     (void) strcpy( cp2, hc->hostname );
 #else /* VHOST_DIRLEVELS */
     // TODO
-    httpd_realloc_str( (char **)&hc->hostdir, &hc->maxhostdir, strlen( hc->hostname ) );
+    mm_httpd_realloc_str(&hc->hostdir, &hc->maxhostdir, strlen( hc->hostname ) );
     (void) strcpy(_getptr_mm_array<char>(hc->hostdir), hc->hostname );
 #endif /* VHOST_DIRLEVELS */
 
@@ -1477,8 +1475,7 @@ vhost_map( httpd_conn* hc )
     httpd_realloc_str( &tempfilename, &maxtempfilename, len );
     (void) strcpy( tempfilename, _getptr_mm_array<char>(hc->expnfilename));
     // TODO
-    httpd_realloc_str(
-	(char **)&hc->expnfilename, &hc->maxexpnfilename,
+    mm_httpd_realloc_str( &hc->expnfilename, &hc->maxexpnfilename,
 	strlen(_getptr_mm_array<char>(hc->hostdir)) + 1 + len );
     (void) strcpy( _getptr_mm_array<char>(hc->expnfilename), _getptr_mm_array<char>(hc->hostdir));
     (void) strcat( _getptr_mm_array<char>(hc->expnfilename), "/" );
@@ -2105,7 +2102,7 @@ httpd_got_request( httpd_conn* hc )
 
 
 int
-httpd_parse_request( httpd_conn* hc )
+httpd_parse_request( mm_ptr<httpd_conn> hc )
     {
     char* buf;
     char* method_str;
@@ -2168,7 +2165,7 @@ httpd_parse_request( httpd_conn* hc )
 	    httpd_send_err( hc, 400, httpd_err400title, "", httpd_err400form, "" );
 	    return -1;
 	    }
-	httpd_realloc_str( (char **)&hc->reqhost, &hc->maxreqhost, strlen( reqhost ) );
+	mm_httpd_realloc_str(&hc->reqhost, &hc->maxreqhost, strlen( reqhost ) );
 	(void) strcpy( _getptr_mm_array<char>(hc->reqhost), reqhost );
 	*url = '/';
 	}
@@ -2198,14 +2195,13 @@ httpd_parse_request( httpd_conn* hc )
 	}
 
     hc->encodedurl = url;
-    // TODO: use mmsafe hc
-    httpd_realloc_str(
-	(char **)&hc->decodedurl, &hc->maxdecodedurl, strlen( hc->encodedurl ) );
+    mm_httpd_realloc_str(
+	&hc->decodedurl, &hc->maxdecodedurl, strlen( hc->encodedurl ) );
     strdecode( _getptr_mm_array<char>(hc->decodedurl), hc->encodedurl );
 
     // TODO
-    httpd_realloc_str(
-	(char **)&hc->origfilename, &hc->maxorigfilename, strlen( _getptr_mm_array<char>(hc->decodedurl)) );
+    mm_httpd_realloc_str(
+	&hc->origfilename, &hc->maxorigfilename, strlen( _getptr_mm_array<char>(hc->decodedurl)) );
     (void) strcpy( _getptr_mm_array<char>(hc->origfilename), _getptr_mm<char>(&hc->decodedurl[1]));
     /* Special case for top-level URL. */
     if ( hc->origfilename[0] == '\0' )
@@ -2216,7 +2212,7 @@ httpd_parse_request( httpd_conn* hc )
     if ( cp != (char*) 0 )
 	{
 	++cp;
-	httpd_realloc_str((char **)&hc->query, &hc->maxquery, strlen( cp ) );
+	mm_httpd_realloc_str(&hc->query, &hc->maxquery, strlen( cp ) );
 	(void) strcpy( _getptr_mm_array<char>(hc->query), cp );
 	/* Remove query from (decoded) origfilename. */
 	cp = strchr( _getptr_mm_array<char>(hc->origfilename), '?' );
@@ -2224,7 +2220,6 @@ httpd_parse_request( httpd_conn* hc )
 	    *cp = '\0';
 	}
 
-    // TODO
     de_dotdot( hc->origfilename );
     if ( hc->origfilename[0] == '/' ||
 	 ( hc->origfilename[0] == '.' && hc->origfilename[1] == '.' &&
@@ -2283,19 +2278,18 @@ httpd_parse_request( httpd_conn* hc )
 			{
 			syslog(
 			    LOG_ERR, "%.80s way too much Accept: data",
-			    httpd_ntoa( &hc->client_addr ) );
+			    mm_httpd_ntoa( &hc->client_addr ) );
 			continue;
 			}
             // TODO
-		    httpd_realloc_str(
-			(char **)&hc->accept, &hc->maxaccept,
+		    mm_httpd_realloc_str( &hc->accept, &hc->maxaccept,
 			strlen( _getptr_mm_array<char>(hc->accept)) + 2 + strlen( cp ) );
 		    (void) strcat( _getptr_mm_array<char>(hc->accept), ", " );
 		    }
 		else
             // TODO
-		    httpd_realloc_str(
-			(char **)&hc->accept, &hc->maxaccept, strlen( cp ) );
+		    mm_httpd_realloc_str(
+			&hc->accept, &hc->maxaccept, strlen( cp ) );
 		(void) strcat( _getptr_mm_array<char>(hc->accept), cp );
 		}
 	    else if ( strncasecmp( buf, "Accept-Encoding:", 16 ) == 0 )
@@ -2308,19 +2302,17 @@ httpd_parse_request( httpd_conn* hc )
 			{
 			syslog(
 			    LOG_ERR, "%.80s way too much Accept-Encoding: data",
-			    httpd_ntoa( &hc->client_addr ) );
+			    mm_httpd_ntoa( &hc->client_addr ) );
 			continue;
 			}
             // TODO
-		    httpd_realloc_str(
-			(char **)&hc->accepte, &hc->maxaccepte,
+		    mm_httpd_realloc_str( &hc->accepte, &hc->maxaccepte,
 			strlen( _getptr_mm_array<char>(hc->accepte)) + 2 + strlen( cp ) );
 		    (void) strcat(_getptr_mm_array<char>(hc->accepte), ", " );
 		    }
 		else
             // TODO
-		    httpd_realloc_str(
-			(char **)&hc->accepte, &hc->maxaccepte, strlen( cp ) );
+		    mm_httpd_realloc_str( &hc->accepte, &hc->maxaccepte, strlen( cp ) );
 		(void) strcpy( _getptr_mm_array<char>(hc->accepte), cp );
 		}
 	    else if ( strncasecmp( buf, "Accept-Language:", 16 ) == 0 )
@@ -2463,8 +2455,8 @@ httpd_parse_request( httpd_conn* hc )
 
     /* Copy original filename to expanded filename. */
     // TODO
-    httpd_realloc_str(
-	(char **)&hc->expnfilename, &hc->maxexpnfilename, strlen( _getptr_mm_array<char>(hc->origfilename)) );
+    mm_httpd_realloc_str(
+	&hc->expnfilename, &hc->maxexpnfilename, strlen( _getptr_mm_array<char>(hc->origfilename)) );
     (void) strcpy( _getptr_mm_array<char>(hc->expnfilename), _getptr_mm_array<char>(hc->origfilename));
 
     /* Tilde mapping. */
@@ -2505,9 +2497,9 @@ httpd_parse_request( httpd_conn* hc )
 	return -1;
 	}
     // TODO
-    httpd_realloc_str( (char **)&hc->expnfilename, &hc->maxexpnfilename, strlen( cp ) );
+    mm_httpd_realloc_str( &hc->expnfilename, &hc->maxexpnfilename, strlen( cp ) );
     (void) strcpy( _getptr_mm_array<char>(hc->expnfilename), cp );
-    httpd_realloc_str((char **) &hc->pathinfo, &hc->maxpathinfo, strlen( pi ) );
+    mm_httpd_realloc_str(&hc->pathinfo, &hc->maxpathinfo, strlen( pi ) );
     (void) strcpy( _getptr_mm_array<char>(hc->pathinfo), pi );
 
     /* Remove pathinfo stuff from the original filename too. */
@@ -2544,7 +2536,7 @@ httpd_parse_request( httpd_conn* hc )
 	    {
 	    syslog(
 		LOG_NOTICE, "%.80s URL \"%.80s\" goes outside the web tree",
-		httpd_ntoa( &hc->client_addr ), hc->encodedurl );
+		mm_httpd_ntoa( &hc->client_addr ), hc->encodedurl );
 	    httpd_send_err(
 		hc, 403, err403title, "",
 		ERROR_FORM( err403form, "The requested URL '%.80s' resolves to a file outside the permitted web server directory tree.\n" ),
@@ -2557,7 +2549,7 @@ httpd_parse_request( httpd_conn* hc )
 
 
 static char*
-bufgets( httpd_conn* hc )
+bufgets( mm_ptr<httpd_conn> hc )
     {
     int i;
     char c;
@@ -2649,7 +2641,7 @@ httpd_close_conn( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     }
 
 void
-httpd_destroy_conn( httpd_conn* hc )
+httpd_destroy_conn( mm_ptr<httpd_conn> hc )
     {
     if ( hc->initialized )
 	{
@@ -2731,7 +2723,7 @@ init_mime( void )
 ** which they were applied to the file.
 */
 static void
-figure_mime( httpd_conn* hc )
+figure_mime( mm_ptr<httpd_conn> hc )
     {
     char* prev_dot;
     char* dot;
@@ -2812,8 +2804,7 @@ figure_mime( httpd_conn* hc )
     for ( i = n_me_indexes - 1; i >= 0; --i )
 	{
         // TODO
-	httpd_realloc_str(
-	    (char **)&hc->encodings, &hc->maxencodings,
+	mm_httpd_realloc_str( &hc->encodings, &hc->maxencodings,
 	    encodings_len + enc_tab[me_indexes[i]].val_len + 1 );
 	if ( hc->encodings[0] != '\0' )
 	    {
@@ -2871,7 +2862,7 @@ name_compare( const void* v1, const void* v2 )
 
 
 static int
-ls( httpd_conn* hc )
+ls( mm_ptr<httpd_conn> hc )
     {
     DIR* dirp;
     struct dirent* de;
@@ -3239,7 +3230,7 @@ hostname_map( char* hostname )
 ** to worry about freeing stuff since we're a sub-process.
 */
 static char**
-make_envp( httpd_conn* hc )
+make_envp( mm_ptr<httpd_conn> hc )
     {
     static char* envp[50];
     int envn;
@@ -3291,7 +3282,7 @@ make_envp( httpd_conn* hc )
 	envp[envn++] = mm_build_env( "QUERY_STRING=%s", hc->query);
     // TODO: refactor httpd_ntoa
     envp[envn++] = build_env(
-	"REMOTE_ADDR=%s", httpd_ntoa(&hc->client_addr) );
+	"REMOTE_ADDR=%s", mm_httpd_ntoa(&hc->client_addr) );
     if ( hc->referrer[0] != '\0' )
 	{
 	envp[envn++] = build_env( "HTTP_REFERER=%s", hc->referrer );
@@ -3336,7 +3327,7 @@ make_envp( httpd_conn* hc )
 ** scribble on hc->query.
 */
 mm_array_ptr<char *>
-make_argp( httpd_conn* hc )
+make_argp( mm_ptr<httpd_conn> hc )
     {
     mm_array_ptr<char *> argp = NULL;
     int argn;
@@ -3395,7 +3386,7 @@ make_argp( httpd_conn* hc )
 ** buffer.
 */
 static void
-cgi_interpose_input( httpd_conn* hc, int wfd )
+cgi_interpose_input( mm_ptr<httpd_conn> hc, int wfd )
     {
     size_t c;
     ssize_t r;
@@ -3434,7 +3425,7 @@ cgi_interpose_input( httpd_conn* hc, int wfd )
 ** gets integrated into the main loop as a tasklet instead of a process.
 */
 static void
-post_post_garbage_hack( httpd_conn* hc )
+post_post_garbage_hack( mm_ptr<httpd_conn> hc )
     {
     char buf[2];
 
@@ -3456,7 +3447,7 @@ post_post_garbage_hack( httpd_conn* hc )
 ** out the saved headers and proceed to echo the rest of the response.
 */
 static void
-cgi_interpose_output( httpd_conn* hc, int rfd )
+cgi_interpose_output( mm_ptr<httpd_conn> hc, int rfd )
     {
     int r;
     char buf[1024];
@@ -3571,7 +3562,7 @@ cgi_interpose_output( httpd_conn* hc, int rfd )
 
 /* CGI child process. */
 static void
-cgi_child( httpd_conn* hc )
+cgi_child( mm_ptr<httpd_conn> hc )
     {
     int r;
     mm_array_ptr<char *> argp = NULL;
@@ -3770,7 +3761,7 @@ cgi_child( httpd_conn* hc )
 
 
 static int
-cgi( httpd_conn* hc )
+cgi( mm_ptr<httpd_conn> hc )
     {
     int r;
     ClientData client_data;
@@ -3820,7 +3811,7 @@ cgi( httpd_conn* hc )
 
 
 static int
-really_start_request( httpd_conn* hc, struct timeval* nowP )
+really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     {
     static char* indexname;
     static size_t maxindexname = 0;
@@ -3837,7 +3828,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
     expnlen = strlen(_getptr_mm_array<char>(hc->expnfilename));
 
     /* Stat the file. */
-    if ( stat( _getptr_mm_array<char>(hc->expnfilename), &hc->sb ) < 0 )
+    if ( stat( _getptr_mm_array<char>(hc->expnfilename), _getptr_mm<struct stat>(&hc->sb)) < 0 )
 	{
 	httpd_send_err( hc, 500, err500title, "", err500form, hc->encodedurl );
 	return -1;
@@ -3853,7 +3844,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 	syslog(
 	    LOG_INFO,
 	    "%.80s URL \"%.80s\" resolves to a non world-readable file",
-	    httpd_ntoa( &hc->client_addr ), hc->encodedurl );
+	    mm_httpd_ntoa( &hc->client_addr ), hc->encodedurl );
 	httpd_send_err(
 	    hc, 403, err403title, "",
 	    ERROR_FORM( err403form, "The requested URL '%.80s' resolves to a file that is not world-readable.\n" ),
@@ -3896,7 +3887,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 	    if ( strcmp( indexname, "./" ) == 0 )
 		indexname[0] = '\0';
 	    (void) strcat( indexname, index_names[i] );
-	    if ( stat( indexname, &hc->sb ) >= 0 )
+	    if ( stat( indexname, _getptr_mm<struct stat>(&hc->sb)) >= 0 )
 		goto got_one;
 	    }
 
@@ -3908,7 +3899,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 	    syslog(
 		LOG_INFO,
 		"%.80s URL \"%.80s\" tried to index a directory with indexing disabled",
-		httpd_ntoa( &hc->client_addr ), hc->encodedurl );
+		mm_httpd_ntoa( &hc->client_addr ), hc->encodedurl );
 	    httpd_send_err(
 		hc, 403, err403title, "",
 		ERROR_FORM( err403form, "The requested URL '%.80s' resolves to a directory that has indexing disabled.\n" ),
@@ -3947,7 +3938,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 	    return -1;
 	    }
 	expnlen = strlen( cp );
-	httpd_realloc_str( (char **)&hc->expnfilename, &hc->maxexpnfilename, expnlen );
+	mm_httpd_realloc_str(&hc->expnfilename, &hc->maxexpnfilename, expnlen );
 	(void) strcpy(_getptr_mm_array<char>(hc->expnfilename), cp );
 
 	/* Now, is the index version world-readable or world-executable? */
@@ -3956,7 +3947,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 	    syslog(
 		LOG_INFO,
 		"%.80s URL \"%.80s\" resolves to a non-world-readable index file",
-		httpd_ntoa( &hc->client_addr ), hc->encodedurl );
+		mm_httpd_ntoa( &hc->client_addr ), hc->encodedurl );
 	    httpd_send_err(
 		hc, 403, err403title, "",
 		ERROR_FORM( err403form, "The requested URL '%.80s' resolves to an index file that is not world-readable.\n" ),
@@ -3985,7 +3976,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 	    syslog(
 		LOG_NOTICE,
 		"%.80s URL \"%.80s\" tried to retrieve an auth file",
-		httpd_ntoa( &hc->client_addr ), hc->encodedurl );
+		mm_httpd_ntoa( &hc->client_addr ), hc->encodedurl );
 	    httpd_send_err(
 		hc, 403, err403title, "",
 		ERROR_FORM( err403form, "The requested URL '%.80s' is an authorization file, retrieving it is not permitted.\n" ),
@@ -4000,7 +3991,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 	syslog(
 	    LOG_NOTICE,
 	    "%.80s URL \"%.80s\" tried to retrieve an auth file",
-	    httpd_ntoa( &hc->client_addr ), hc->encodedurl );
+	    mm_httpd_ntoa( &hc->client_addr ), hc->encodedurl );
 	httpd_send_err(
 	    hc, 403, err403title, "",
 	    ERROR_FORM( err403form, "The requested URL '%.80s' is an authorization file, retrieving it is not permitted.\n" ),
@@ -4027,7 +4018,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 	{
 	syslog(
 	    LOG_NOTICE, "%.80s URL \"%.80s\" is executable but isn't CGI",
-	    httpd_ntoa( &hc->client_addr ), hc->encodedurl );
+	    mm_httpd_ntoa( &hc->client_addr ), hc->encodedurl );
 	httpd_send_err(
 	    hc, 403, err403title, "",
 	    ERROR_FORM( err403form, "The requested URL '%.80s' resolves to a file which is marked executable but is not a CGI file; retrieving it is forbidden.\n" ),
@@ -4038,7 +4029,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 	{
 	syslog(
 	    LOG_INFO, "%.80s URL \"%.80s\" has pathinfo but isn't CGI",
-	    httpd_ntoa( &hc->client_addr ), hc->encodedurl );
+	    mm_httpd_ntoa( &hc->client_addr ), hc->encodedurl );
 	httpd_send_err(
 	    hc, 403, err403title, "",
 	    ERROR_FORM( err403form, "The requested URL '%.80s' resolves to a file plus CGI-style pathinfo, but the file is not a valid CGI file.\n" ),
@@ -4062,7 +4053,6 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 
     if ( hc->method == METHOD_HEAD )
 	{
-        // TODO: refactor send_mime
 	send_mime(
 	    hc, 200, ok200title, _getptr_mm_array<char>(hc->encodings), "", hc->type, hc->sb.st_size,
 	    hc->sb.st_mtime );
@@ -4070,21 +4060,19 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
     else if ( hc->if_modified_since != (time_t) -1 &&
 	 hc->if_modified_since >= hc->sb.st_mtime )
 	{
-        // TODO: refactor send_mime
 	send_mime(
 	    hc, 304, err304title, _getptr_mm_array<char>(hc->encodings), "", hc->type, (off_t) -1,
 	    hc->sb.st_mtime );
 	}
     else
 	{
-        // TODO: refactor mmc_map
-	hc->file_address = mmc_map( _getptr_mm_array<char>(hc->expnfilename), &(hc->sb), nowP );
+	hc->file_address = mmc_map( _getptr_mm_array<char>(hc->expnfilename),
+            _getptr_mm<struct stat>(&(hc->sb)), nowP );
 	if ( hc->file_address == (char*) 0 )
 	    {
 	    httpd_send_err( hc, 500, err500title, "", err500form, hc->encodedurl );
 	    return -1;
 	    }
-        // TODO: refactor send_mime
 	send_mime(
 	    hc, 200, ok200title, _getptr_mm_array<char>(hc->encodings), "", hc->type, hc->sb.st_size,
 	    hc->sb.st_mtime );
@@ -4095,7 +4083,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 
 
 int
-httpd_start_request( httpd_conn* hc, struct timeval* nowP )
+httpd_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     {
     int r;
 
@@ -4125,7 +4113,7 @@ make_log_entry( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 
     /* Format remote user. */
     if ( hc->remoteuser[0] != '\0' )
-        // TODO: ru MO ptr
+        // TODO: ru is an MO ptr
 	ru = _getptr_mm_array<char>(hc->remoteuser);
     else
 	ru = "-";
@@ -4206,7 +4194,7 @@ make_log_entry( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 
 /* Returns 1 if ok to serve the url, 0 if not. */
 static int
-check_referrer( httpd_conn* hc )
+check_referrer( mm_ptr<httpd_conn> hc )
     {
     int r;
     char* cp;
@@ -4227,7 +4215,7 @@ check_referrer( httpd_conn* hc )
 	    cp = "";
 	syslog(
 	    LOG_INFO, "%.80s non-local referrer \"%.80s%.80s\" \"%.80s\"",
-	    httpd_ntoa( &hc->client_addr ), cp, hc->encodedurl, hc->referrer );
+	    mm_httpd_ntoa( &hc->client_addr ), cp, hc->encodedurl, hc->referrer );
 	httpd_send_err(
 	    hc, 403, err403title, "",
 	    ERROR_FORM( err403form, "You must supply a local referrer to get URL '%.80s' from this server.\n" ),
@@ -4239,7 +4227,7 @@ check_referrer( httpd_conn* hc )
 
 /* Returns 1 if ok to serve the url, 0 if not. */
 static int
-really_check_referrer( httpd_conn* hc )
+really_check_referrer( mm_ptr<httpd_conn> hc )
     {
     mm_ptr<httpd_server> hs = NULL;
     char* cp1;
