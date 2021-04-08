@@ -60,9 +60,6 @@
 #include "timers.h"
 #include "match.h"
 
-// Checked C
-#include "debug.h"
-
 #ifndef SHUT_WR
 #define SHUT_WR 1
 #endif
@@ -1729,8 +1726,7 @@ handle_send(mm_ptr<connecttab> c, struct timeval* tvP )
 	*/
 	struct iovec iv[2];
 
-	/* iv[0].iov_base = _getptr_mm_array<char>(hc->response); */
-	iv[0].iov_base = hc->response;
+	iv[0].iov_base = _getptr_mm_array<char>(hc->response);
 	iv[0].iov_len = hc->responselen;
 	iv[1].iov_base = &(hc->file_address[c->next_byte_index]);
 	iv[1].iov_len = MIN( c->end_byte_index - c->next_byte_index, max_bytes );
@@ -1798,8 +1794,7 @@ handle_send(mm_ptr<connecttab> c, struct timeval* tvP )
 	    {
 	    /* Yes; move the unwritten part to the front of the buffer. */
 	    int newlen = hc->responselen - sz;
-	    /* (void) memmove(_getptr_mm_array<char>(hc->response), _getptr_mm<char>(&(hc->response[sz])), newlen ); */
-	    (void) memmove(hc->response, &(hc->response[sz]), newlen );
+	    (void) memmove(_getptr_mm_array<char>(hc->response), _getptr_mm<char>(&(hc->response[sz])), newlen );
 	    hc->responselen = newlen;
 	    sz = 0;
 	    }

@@ -558,11 +558,9 @@ add_response( mm_ptr<httpd_conn> hc, char* str )
     size_t len;
 
     len = strlen( str );
-    // TODO: refactor httpd_realloc_str
-    httpd_realloc_str(_getptr_mm<char *>(&hc->response),
-            _getptr_mm<size_t>(&hc->maxresponse), hc->responselen + len );
-    /* (void) memmove( _getptr_mm<char>(&(hc->response[hc->responselen])), str, len ); */
-    (void) memmove( &(hc->response[hc->responselen]), str, len );
+    // TODO:
+    mm_httpd_realloc_str(&hc->response, &hc->maxresponse, hc->responselen + len );
+    (void) memmove( _getptr_mm<char>(&(hc->response[hc->responselen])), str, len );
     hc->responselen += len;
     }
 
@@ -576,8 +574,7 @@ httpd_write_response( mm_ptr<httpd_conn> hc )
     /* Send the response, if necessary. */
     if ( hc->responselen > 0 )
 	{
-	/* (void) mm_httpd_write_fully( hc->conn_fd, hc->response, hc->responselen ); */
-	(void) httpd_write_fully( hc->conn_fd, hc->response, hc->responselen );
+	(void) mm_httpd_write_fully( hc->conn_fd, hc->response, hc->responselen );
 	hc->responselen = 0;
 	}
     }
@@ -933,6 +930,7 @@ send_err_file( mm_ptr<httpd_conn> hc, int status, char* title, char* extraheads,
 static void
 send_authenticate( mm_ptr<httpd_conn> hc, char* realm )
     {
+        // TODO: use mmsafe ptr for header
     static char* header;
     static size_t maxheader = 0;
     static char headstr[] = "WWW-Authenticate: Basic realm=\"";
@@ -1057,6 +1055,7 @@ auth_check( mm_ptr<httpd_conn> hc, char* dirname  )
 static int
 auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
     {
+        // TODO: use mmsafe ptr for authpath
     static char* authpath;
     static size_t maxauthpath = 0;
     struct stat sb;
@@ -1067,12 +1066,12 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
     FILE* fp;
     char line[500];
     char* cryp;
-    static char* prevauthpath;
+    static char* prevauthpath;  // TODO: use mmsafe
     static size_t maxprevauthpath = 0;
     static time_t prevmtime;
-    static char* prevuser;
+    static char* prevuser;  // TODO: mmsafe
     static size_t maxprevuser = 0;
-    static char* prevcryp;
+    static char* prevcryp;  // TODO: mmsafe
     static size_t maxprevcryp = 0;
 
     /* Construct auth filename. */
@@ -1123,7 +1122,7 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
 	if ( strcmp( crypt( authpass, prevcryp ), prevcryp ) == 0 )
 	    {
 	    /* Ok! */
-            // TODO: refactor httpd_realloc_str
+            // TODO
 	    mm_httpd_realloc_str( &hc->remoteuser, &hc->maxremoteuser, strlen( authinfo ) );
 	    (void) strcpy(_getptr_mm_array<char>(hc->remoteuser), authinfo );
 	    return 1;
@@ -1209,8 +1208,8 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
 static void
 send_dirredirect( mm_ptr<httpd_conn> hc )
     {
-    static char* location;
-    static char* header;
+    static char* location;  // TODO: mmsafe
+    static char* header;    // TODO: mmsafe
     static size_t maxlocation = 0, maxheader = 0;
     static char headstr[] = "Location: ";
 
@@ -1321,7 +1320,7 @@ strencode( char* to, int tosize, char* from )
 static int
 tilde_map_1( httpd_conn* hc )
     {
-    static char* temp;
+    static char* temp;   // TODO: mmsafe
     static size_t maxtemp = 0;
     int len;
     static char* prefix = TILDE_MAP_1;
@@ -1329,7 +1328,7 @@ tilde_map_1( httpd_conn* hc )
     len = strlen( hc->expnfilename ) - 1;
     httpd_realloc_str( &temp, &maxtemp, len );
     (void) strcpy( temp, &hc->expnfilename[1] );
-    httpd_realloc_str(
+    mm_httpd_realloc_str(
 	&hc->expnfilename, &hc->maxexpnfilename, strlen( prefix ) + 1 + len );
     (void) strcpy( hc->expnfilename, prefix );
     if ( prefix[0] != '\0' )
@@ -1367,27 +1366,26 @@ tilde_map_2( httpd_conn* hc )
 	return 0;
 
     /* Set up altdir. */
-    httpd_realloc_str(
+    mm_httpd_realloc_str(
 	&hc->altdir, &hc->maxaltdir,
 	strlen( pw->pw_dir ) + 1 + strlen( postfix ) );
-    (void) strcpy( hc->altdir, pw->pw_dir );
+    (void) strcpy( _getptr_array_mm<char>(hc->altdir), pw->pw_dir );
     if ( postfix[0] != '\0' )
 	{
-	(void) strcat( hc->altdir, "/" );
-	(void) strcat( hc->altdir, postfix );
+	(void) strcat( (char*)hc->altdir, "/" );
+	(void) strcat( (char*)hc->altdir, postfix );
 	}
     alt = expand_symlinks( hc->altdir, &rest, 0, 1 );
     if ( rest[0] != '\0' )
 	return 0;
-    httpd_realloc_str( &hc->altdir, &hc->maxaltdir, strlen( alt ) );
-    (void) strcpy( hc->altdir, alt );
+    mm_httpd_realloc_str( &hc->altdir, &hc->maxaltdir, strlen( alt ) );
+    (void) strcpy( (char*)hc->altdir, alt );
 
     /* And the filename becomes altdir plus the post-~ part of the original. */
-    httpd_realloc_str(
-	&hc->expnfilename, &hc->maxexpnfilename,
-	strlen( hc->altdir ) + 1 + strlen( cp ) );
+    mm_httpd_realloc_str( &hc->expnfilename, &hc->maxexpnfilename,
+	strlen( (char*) hc->altdir ) + 1 + strlen( cp ) );
     (void) my_snprintf( hc->expnfilename, hc->maxexpnfilename,
-	"%s/%s", hc->altdir, cp );
+	"%s/%s", (char *)hc->altdir, cp );
 
     /* For this type of tilde mapping, we want to defeat vhost mapping. */
     hc->tildemapped = 1;
@@ -1403,7 +1401,7 @@ vhost_map( mm_ptr<httpd_conn> hc )
     {
     httpd_sockaddr sa;
     socklen_t sz;
-    static char* tempfilename;
+    static char* tempfilename;   // TODO: mmsafe
     static size_t maxtempfilename = 0;
     char* cp1;
     int len;
@@ -1438,7 +1436,7 @@ vhost_map( mm_ptr<httpd_conn> hc )
 
     /* Figure out the host directory. */
 #ifdef VHOST_DIRLEVELS
-    httpd_realloc_str(
+    mm_httpd_realloc_str(
 	&hc->hostdir, &hc->maxhostdir,
 	strlen( hc->hostname ) + 2 * VHOST_DIRLEVELS );
     if ( strncmp( hc->hostname, "www.", 4 ) == 0 )
@@ -1495,8 +1493,8 @@ vhost_map( mm_ptr<httpd_conn> hc )
 static char*
 expand_symlinks( char* path, char** restP, int no_symlink_check, int tildemapped )
     {
-    static char* checked;
-    static char* rest;
+    static char* checked;  // TODO: mmsafe
+    static char* rest;     // TODO: mmsafe
     char lnk[5000];
     static size_t maxchecked = 0, maxrest = 0;
     size_t checkedlen, restlen, linklen, prevcheckedlen, prevrestlen;
@@ -1738,8 +1736,7 @@ int httpd_get_conn(mm_ptr<httpd_server> hs, int listen_fd, mm_ptr<httpd_conn> hc
 	mm_httpd_realloc_str( &hc->reqhost, &hc->maxreqhost, 0 );
 	mm_httpd_realloc_str( &hc->hostdir, &hc->maxhostdir, 0 );
 	mm_httpd_realloc_str( &hc->remoteuser, &hc->maxremoteuser, 0 );
-    // TODO
-	httpd_realloc_str( _getptr_mm<char>(&hc->response), _getptr_mm<size_t>(&hc->maxresponse), 0 );
+	mm_httpd_realloc_str( &hc->response, &hc->maxresponse, 0 );
 #ifdef TILDE_MAP_2
 	mm_httpd_realloc_str( &hc->altdir, &hc->maxaltdir, 0 );
 #endif /* TILDE_MAP_2 */
@@ -2545,8 +2542,7 @@ httpd_destroy_conn( mm_ptr<httpd_conn> hc )
 	mm_array_free<char>(hc->reqhost );
 	mm_array_free<char>(hc->hostdir );
 	mm_array_free<char>(hc->remoteuser );
-	/* mm_array_free<char>(hc->response ); */
-    free(hc->response);
+	mm_array_free<char>(hc->response );
 #ifdef TILDE_MAP_2
 	mm_array_free<char>(hc->altdir );
 #endif /* TILDE_MAP_2 */
@@ -2759,13 +2755,13 @@ ls( mm_ptr<httpd_conn> hc )
     int nnames;
     // DISCUSS: no need to make it and namesptr mmsafe as they're static
     // and they never escape.
-    static char* names;
+    static char* names;  // TODO: mmsafe
     static char** nameptrs;
-    static char* name;
+    static char* name;   // TODO: mmsafe
     static size_t maxname = 0;
-    static char* rname;
+    static char* rname;  // TODO: mmsafe
     static size_t maxrname = 0;
-    static char* encrname;
+    static char* encrname;  // TODO: mmsafe
     static size_t maxencrname = 0;
     FILE* fp;
     int i, r;
@@ -3057,7 +3053,7 @@ build_env( char* fmt, char* arg )
     {
     char* cp;
     size_t size;
-    static char* buf;
+    static char* buf;  // TODO: mmsafe
     static size_t maxbuf = 0;
 
     size = strlen( fmt ) + strlen( arg );
@@ -3077,7 +3073,7 @@ static char*
 mm_build_env(char *fmt, mm_array_ptr<char> mm_arg) {
     char* cp;
     size_t size;
-    static char* buf;
+    static char* buf;   // TODO: mmsafe
     static size_t maxbuf = 0;
 
     char *arg = _getptr_mm_array<char>(mm_arg);
@@ -3340,7 +3336,7 @@ cgi_interpose_output( mm_ptr<httpd_conn> hc, int rfd )
     int r;
     char buf[1024];
     size_t headers_size, headers_len;
-    char* headers;
+    char* headers;   // TODO: mmsafe
     char* br;
     int status;
     char* title;
@@ -3701,12 +3697,12 @@ cgi( mm_ptr<httpd_conn> hc )
 static int
 really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     {
-    static char* indexname;
+    static char* indexname;  //TODO: mmsafe
     static size_t maxindexname = 0;
     static const char* index_names[] = { INDEX_NAMES };
     int i;
 #ifdef AUTH_FILE
-    static char* dirname;
+    static char* dirname;   // TODO: mmsafe
     static size_t maxdirname = 0;
 #endif /* AUTH_FILE */
     size_t expnlen, indxlen;
@@ -4121,7 +4117,7 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
     char* cp1;
     char* cp2;
     char* cp3;
-    static char* refhost = (char*) 0;
+    static char* refhost = (char*) 0;  // TODO: mmsafe
     static size_t refhost_size = 0;
     char *lp;
 

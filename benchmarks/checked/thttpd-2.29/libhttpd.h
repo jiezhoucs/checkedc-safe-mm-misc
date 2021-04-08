@@ -96,65 +96,6 @@ typedef struct {
     int no_empty_referrers;
     } httpd_server;
 
-#if 0
-/* A connection. */
-typedef struct {
-    int initialized;
-    httpd_server* hs;
-    httpd_sockaddr client_addr;
-    char* read_buf;
-    size_t read_size, read_idx, checked_idx;
-    int checked_state;
-    int method;
-    int status;
-    off_t bytes_to_send;
-    off_t bytes_sent;
-    char* encodedurl;
-    char* decodedurl;
-    char* protocol;
-    char* origfilename;
-    char* expnfilename;
-    char* encodings;
-    char* pathinfo;
-    char* query;
-    char* referrer;
-    char* useragent;
-    char* accept;
-    char* accepte;
-    char* acceptl;
-    char* cookie;
-    char* contenttype;
-    char* reqhost;
-    char* hdrhost;
-    char* hostdir;
-    char* authorization;
-    char* remoteuser;
-    char* response;
-    size_t maxdecodedurl, maxorigfilename, maxexpnfilename, maxencodings,
-	maxpathinfo, maxquery, maxaccept, maxaccepte, maxreqhost, maxhostdir,
-	maxremoteuser, maxresponse;
-#ifdef TILDE_MAP_2
-    char* altdir;
-    size_t maxaltdir;
-#endif /* TILDE_MAP_2 */
-    size_t responselen;
-    time_t if_modified_since, range_if;
-    size_t contentlength;
-    char* type;		/* not malloc()ed */
-    char* hostname;	/* not malloc()ed */
-    int mime_flag;
-    int one_one;	/* HTTP/1.1 or better */
-    int got_range;
-    int tildemapped;	/* this connection got tilde-mapped */
-    off_t first_byte_index, last_byte_index;
-    int keep_alive;
-    int should_linger;
-    struct stat sb;
-    int conn_fd;
-    char* file_address;
-    } httpd_conn;
-#endif
-
 // An mmsafe version of connection
 typedef struct {
     int initialized;
@@ -167,37 +108,27 @@ typedef struct {
     int status;
     off_t bytes_to_send;
     off_t bytes_sent;
-    /* mm_array_ptr<char> encodedurl; */
     char *encodedurl;
     mm_array_ptr<char> decodedurl;
-    /* mm_array_ptr<char> protocol; */
     char *protocol;
     mm_array_ptr<char> origfilename;
     mm_array_ptr<char> expnfilename;
     mm_array_ptr<char> encodings;
     mm_array_ptr<char> pathinfo;
     mm_array_ptr<char> query;
-    /* mm_array_ptr<char> referrer; */
     char *referrer;
-    /* mm_array_ptr<char> useragent; */
     char *useragent;
     mm_array_ptr<char> accept;
     mm_array_ptr<char> accepte;
-    /* mm_array_ptr<char> acceptl; */
     char *acceptl;
-    /* mm_array_ptr<char> cookie; */
     char *cookie;
-    /* mm_array_ptr<char> contenttype; */
     char *contenttype;
     mm_array_ptr<char> reqhost;
-    /* mm_array_ptr<char> hdrhost; */
     char *hdrhost;
     mm_array_ptr<char> hostdir;
-    /* mm_array_ptr<char> authorization; */
     char *authorization;
     mm_array_ptr<char> remoteuser;
-    /* mm_array_ptr<char> response; */
-    char *response;  // TODO: use mm_array_ptr<char> for response
+    mm_array_ptr<char> response;
     size_t maxdecodedurl, maxorigfilename, maxexpnfilename, maxencodings,
 	maxpathinfo, maxquery, maxaccept, maxaccepte, maxreqhost, maxhostdir,
 	maxremoteuser, maxresponse;
