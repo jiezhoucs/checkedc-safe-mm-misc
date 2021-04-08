@@ -62,8 +62,6 @@
 int fdwatch_get_nfiles( void );
 
 
-// Checked C
-#ifdef SAFEMM
 /* Add a descriptor to the watch list.  rw is either FDW_READ or FDW_WRITE.  */
 void fdwatch_add_fd(int fd, mm_ptr<void> client_data, int rw);
 
@@ -71,10 +69,6 @@ void fdwatch_add_fd(int fd, mm_ptr<void> client_data, int rw);
 ** are no more events.
 */
 mm_ptr<void> fdwatch_get_next_client_data(void);
-#else
-void fdwatch_add_fd( int fd, void* client_data, int rw );
-void* fdwatch_get_next_client_data( void );
-#endif
 
 /* Delete a descriptor from the watch list. */
 void fdwatch_del_fd( int fd );

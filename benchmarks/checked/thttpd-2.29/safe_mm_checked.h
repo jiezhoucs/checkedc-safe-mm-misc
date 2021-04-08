@@ -6,9 +6,6 @@
 #ifndef _SAFE_MM_CHECKED_H
 #define _SAFE_MM_CHECKED_H
 
-// Checked C
-#define SAFEMM
-
 #include "stdchecked.h"
 #include <stdint.h>
 

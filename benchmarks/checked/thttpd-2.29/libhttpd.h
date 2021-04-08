@@ -277,11 +277,7 @@ void httpd_terminate( mm_ptr<httpd_server> hs );
 ** The caller is also responsible for setting initialized to zero before the
 ** first call using each different httpd_conn.
 */
-#ifdef SAFEMM
 int httpd_get_conn(mm_ptr<httpd_server> hs, int listen_fd, mm_ptr<httpd_conn> hc);
-#else
-int httpd_get_conn( httpd_server* hs, int listen_fd, httpd_conn* hc );
-#endif
 #define GC_FAIL 0
 #define GC_OK 1
 #define GC_NO_MORE 2
