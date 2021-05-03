@@ -20,7 +20,7 @@ PRINT_PASSES = -mllvm -opt-bisect-limit=-1
 #
 CC = $(LLVM_DIR)/clang $(CFLAGS)
 
-SRC = basic.c assign.c dereference.c func.c cast.c array.c addressof.c
+SRC = basic.c assign.c dereference.c func.c cast.c array.c addressof.c multiple.c
 LIB = $(CHECKEDC_MISC)/lib-safemm.c
 OBJ = $(SRC:%.c=%.o)
 ASM = $(SRC:%.c=%.s)
@@ -83,6 +83,9 @@ array: array.c
 
 addrof: addressof.c
 	$(CC) $(LDFLAGS) $^ -o addressof
+
+mul: multiple.c
+	$(CC) $(LDFLAGS) $^ -o multiple
 
 opt: opt.c
 	$(CC) -S -O1 -emit-llvm $^
