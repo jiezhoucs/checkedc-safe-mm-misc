@@ -260,7 +260,7 @@ void httpd_destroy_conn( mm_ptr<httpd_conn> hc );
 
 /* Send an error message back to the client. */
 void httpd_send_err(
-    mm_ptr<httpd_conn> hc, int status, char* title, char* extraheads, char* form,
+    mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char> extraheads, char* form,
     char* arg );
 
 /* Some error messages. */

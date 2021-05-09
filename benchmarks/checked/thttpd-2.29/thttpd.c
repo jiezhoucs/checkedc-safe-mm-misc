@@ -1526,7 +1526,6 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 	/* Make the httpd_conn if necessary. */
 	if ( c->hc == NULL )
 	    {
-        // TO-DO: replace NEW; update the type of connecttab.hc
         c->hc = MM_NEW(httpd_conn);
 	    if ( c->hc == NULL )
 		{
@@ -1537,7 +1536,6 @@ handle_newconnect( struct timeval* tvP, int listen_fd )
 	    ++httpd_conn_count;
 	    }
 
-    // TO-DO: refactor httpd_get_conn
 	/* Get the connection. */
 	switch ( httpd_get_conn( hs, listen_fd, c->hc ) )
 	    {
