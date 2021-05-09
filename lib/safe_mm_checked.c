@@ -41,7 +41,7 @@ typedef struct {
 
 // Our current implementation uses a 32-bit key. We may need to change it
 // to 40-bit key later.
-uint32_t key = 1;
+uint32_t key = 3;
 
 //
 // Function: mm_alloc()
