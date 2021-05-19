@@ -25,6 +25,14 @@ CHECKEDC_INC=$MISC_DIR/include
 CHECKEDC_LIB=$MISC_DIR/lib
 CC_RELEASE="$LLVM_RELEASE_BIN_DIR/clang"
 
+# CETS related
+CETS_ROOT=$ROOT_DIR/cets
+CETS_BIN=$CETS_ROOT/build/bin
+CETS_TS_BUILD=$CETS_ROOT/ts-build
+CETS_LIB=$CETS_ROOT/lib
+CETS_CC=$CETS_BIN/clang
+# CETS_CXX=$CETS_BIN/clang++  // not supported
+
 #
 # Others
 #
