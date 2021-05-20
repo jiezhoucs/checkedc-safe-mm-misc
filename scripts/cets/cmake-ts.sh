@@ -10,8 +10,9 @@ cd ..
 . common.sh
 
 TESTSUITE_DIR="$TESTS_DIR/test-suite-origin"
-CFLAGS="-mllvm -enable-softboundcets -mllvm -softboundcets_disable_spatial_safety"
-LDFLAGS="$CETS_LIB/libsoftboundcets_rt.a -L$CETS_LIB -lm -lrt"
+CFLAGS="-O3 -mllvm -enable-softboundcets -mllvm -softboundcets_disable_spatial_safety"
+LIBS="-lm -lrt -lsoftboundcets_rt"
+LDFLAGS="-L$CETS_LIB -Wl,-rpath,$CETS_LIB $LIBS"
 
 # Go to the build directory. Create one if it does not exist.
 [[ -d $CETS_TS_BUILD ]] || mkdir -p $CETS_TS_BUILD
