@@ -15,10 +15,10 @@ BIN_DIR="$BUILD_DIR/MultiSource/Benchmarks/Ptrdist"
 
 PROGRAMS=(
     "anagram"
-    # "bc"
-    # "ft"
-    # "ks"
-    # "yacr2"
+    "bc"
+    "ft"
+    "ks"
+    "yacr2"
 )
 
 cd $BUILD_DIR

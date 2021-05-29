@@ -2,6 +2,7 @@
 # Olden benchmarks.
 
 OLDEN = ./olden.sh
+PTRDIST = ./ptrdist.sh
 
 olden:
 	$(OLDEN)
@@ -33,6 +34,14 @@ treeadd:
 tsp:
 	$(OLDEN) tsp
 
+# Ptrdist benchmarks
+anagram:
+	$(PTRDIST) $@
+
+ks:
+	$(PTRDIST) $@
+
 clean:
 	./olden.sh clean
 	./olden-origin.sh clean
+	./ptrdist.sh clean
