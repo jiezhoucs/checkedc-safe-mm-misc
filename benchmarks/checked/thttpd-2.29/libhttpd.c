@@ -2748,7 +2748,7 @@ ls( mm_ptr<httpd_conn> hc )
     int namlen;
     static int maxnames = 0;
     int nnames;
-    // DISCUSS: no need to make it and namesptr mmsafe as they're static
+    // DISCUSS: no need to make names and namesptr mmsafe as they're static
     // and they never escape.
     static char* names;  // TODO: mmsafe
     static char** nameptrs;
