@@ -5,7 +5,7 @@
 rm -rf CMakeCache.txt
 
 Build_Type="Debug"
-if [[`uname` == "Linux" ]];
+if [[`uname` == "Linux" ]]; then
     Debug_Type="Release"
 fi
 
