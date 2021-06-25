@@ -21,7 +21,7 @@ PROGRAMS=(
     "mst"
     "perimeter"
     "power"
-    # "treeadd"
+    "treeadd"
     "tsp"
     # "voronoi"
 )
