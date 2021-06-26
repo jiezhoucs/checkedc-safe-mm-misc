@@ -40,6 +40,10 @@
 #define STREQ(A, B) ((A) && (B) ? strcmp((A), (B)) == 0 : 0)
 #define EPSILON 0.000001
 
+/* Checked C related */
+#undef COUNTED_MALLOC
+#define DEBUG(m) printf("[DEBUG]: %d %s\n", __LINE__, m);
+
 void test_suite_1(void); /* Test 3 files from json.org + serialization*/
 void test_suite_2(JSON_Value *value); /* Test correctness of parsed values */
 void test_suite_2_no_comments(void);
@@ -62,8 +66,10 @@ void serialization_example(void);
 static const char *tests_path = "tests";
 
 static int malloc_count = 0;
+#ifdef COUNTED_MALLOC
 static void *counted_malloc(size_t size);
 static void counted_free(void *ptr);
+#endif
 
 static char * read_file(const char * filename);
 const char* get_file_path(const char *filename);
@@ -83,7 +89,9 @@ int main(int argc, char *argv[]) {
         tests_path = "tests";
     }
 
+#ifdef COUNTED_MALLOC
     json_set_allocation_functions(counted_malloc, counted_free);
+#endif
     test_suite_1();
     test_suite_2_no_comments();
     test_suite_2_with_comments();
@@ -712,6 +720,7 @@ const char* get_file_path(const char *filename) {
     return path_buf;
 }
 
+#ifdef COUNTED_MALLOC
 static void *counted_malloc(size_t size) {
     void *res = malloc(size);
     if (res != NULL) {
@@ -726,3 +735,4 @@ static void counted_free(void *ptr) {
     }
     free(ptr);
 }
+#endif

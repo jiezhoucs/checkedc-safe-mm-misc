@@ -64,6 +64,11 @@
 static JSON_Malloc_Function parson_malloc = malloc;
 static JSON_Free_Function parson_free = free;
 
+#define MM_ALLOC(T) mm_alloc<T>(sizeof(T))
+#define MM_ARRAY_ALLOC(T, n) mm_array_alloc<T>(sizeof(T) * n)
+#define MM_FREE(T, p) mm_free<T>(p)
+#define MM_ARRAY_FREE(T, p) mm_array_ptr<T>(p)
+
 static int parson_escape_slashes = 1;
 
 #define IS_CONT(b) (((unsigned char)(b) & 0xC0) == 0x80) /* is utf-8 continuation byte */
