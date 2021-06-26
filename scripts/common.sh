@@ -31,6 +31,7 @@ CETS_BIN=$CETS_ROOT/build/bin
 CETS_TS_BUILD=$CETS_ROOT/ts-build
 CETS_LIB=$CETS_ROOT/llvm/libsoftboundcets
 CETS_CC=$CETS_BIN/clang
+CETS_LINKER=$CETS_BIN/lld
 CETS_LIT="$CETS_BIN/llvm-lit"
 # CETS_CXX=$CETS_BIN/clang++  // not supported
 
