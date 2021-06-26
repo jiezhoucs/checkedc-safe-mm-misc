@@ -67,7 +67,7 @@ static JSON_Free_Function parson_free = free;
 #define MM_ALLOC(T) mm_alloc<T>(sizeof(T))
 #define MM_ARRAY_ALLOC(T, n) mm_array_alloc<T>(sizeof(T) * n)
 #define MM_FREE(T, p) mm_free<T>(p)
-#define MM_ARRAY_FREE(T, p) mm_array_ptr<T>(p)
+#define MM_ARRAY_FREE(T, p) mm_array_free<T>(p)
 
 static int parson_escape_slashes = 1;
 
@@ -110,7 +110,7 @@ struct json_array_t {
 };
 
 /* Various */
-static char * read_file(const char *filename);
+static mm_array_ptr<char> read_file(const char *filename);
 static void   remove_comments(char *string, const char *start_token, const char *end_token);
 static char * parson_strndup(const char *string, size_t n);
 static char * parson_strdup(const char *string);
@@ -287,12 +287,12 @@ static int is_decimal(const char *string, size_t length) {
     return 1;
 }
 
-static char * read_file(const char * filename) {
+static mm_array_ptr<char> read_file(const char * filename) {
     FILE *fp = fopen(filename, "r");
     size_t size_to_read = 0;
     size_t size_read = 0;
     long pos;
-    char *file_contents;
+    mm_array_ptr<char> file_contents = NULL;
     if (!fp) {
         return NULL;
     }
@@ -304,15 +304,15 @@ static char * read_file(const char * filename) {
     }
     size_to_read = pos;
     rewind(fp);
-    file_contents = (char*)parson_malloc(sizeof(char) * (size_to_read + 1));
+    file_contents = MM_ARRAY_ALLOC(char, size_to_read + 1);
     if (!file_contents) {
         fclose(fp);
         return NULL;
     }
-    size_read = fread(file_contents, 1, size_to_read, fp);
+    size_read = fread(_getptr_mm_array<char>(file_contents), 1, size_to_read, fp);
     if (size_read == 0 || ferror(fp)) {
         fclose(fp);
-        parson_free(file_contents);
+        MM_ARRAY_FREE(char, file_contents);
         return NULL;
     }
     fclose(fp);
@@ -1126,24 +1126,26 @@ static int append_string(char *buf, const char *string) {
 
 /* Parser API */
 JSON_Value * json_parse_file(const char *filename) {
-    char *file_contents = read_file(filename);
+    mm_array_ptr<char> file_contents = read_file(filename);
     JSON_Value *output_value = NULL;
     if (file_contents == NULL) {
         return NULL;
     }
-    output_value = json_parse_string(file_contents);
-    parson_free(file_contents);
+    /* TODO */
+    output_value = json_parse_string(_getptr_mm_array<char>(file_contents));
+    MM_ARRAY_FREE(char, file_contents);
     return output_value;
 }
 
 JSON_Value * json_parse_file_with_comments(const char *filename) {
-    char *file_contents = read_file(filename);
+    mm_array_ptr<char> file_contents = read_file(filename);
     JSON_Value *output_value = NULL;
     if (file_contents == NULL) {
         return NULL;
     }
-    output_value = json_parse_string_with_comments(file_contents);
-    parson_free(file_contents);
+    /* TODO */
+    output_value = json_parse_string_with_comments(_getptr_mm_array<char>(file_contents));
+    MM_ARRAY_FREE(char, file_contents);
     return output_value;
 }
 
