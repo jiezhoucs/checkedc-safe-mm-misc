@@ -1,7 +1,8 @@
-//
-// Header file for the two customized memory allocators for heap struct and
-// ararays pointer to by our new mm-safe pointers.
-// pointer
+/*
+ * Header file for the two customized memory allocators for heap struct and
+ * ararays pointer to by our new mm-safe pointers.
+ * pointer
+ */
 
 #ifndef _SAFE_MM_CHECKED_H
 #define _SAFE_MM_CHECKED_H
