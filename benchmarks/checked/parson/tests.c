@@ -34,6 +34,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "safe_mm_checked.h"
+
 #define TEST(A) printf("%d %-72s-", __LINE__, #A);\
                 if(A){puts(" OK");tests_passed++;}\
                 else{puts(" FAIL");tests_failed++;}
@@ -100,13 +102,11 @@ int main(int argc, char *argv[]) {
     test_suite_5();
     test_suite_6();
     test_suite_7();
-#if 0
     test_suite_8();
     test_suite_9();
     test_suite_10();
     test_suite_11();
     test_memory_leaks();
-#endif
 
     printf("Tests failed: %d\n", tests_failed);
     printf("Tests passed: %d\n", tests_passed);
@@ -510,13 +510,12 @@ void test_suite_7(void) {
     TEST(json_validate(schema, val_from_file) == JSONFailure);
 }
 
-#if 0
 void test_suite_8(void) {
     const char *filename = "test_2.txt";
     const char *temp_filename = "test_2_serialized.txt";
     JSON_Value *a = NULL;
     JSON_Value *b = NULL;
-    char *buf = NULL;
+    mm_array_ptr<char> buf = NULL;
     size_t serialization_size = 0;
     a = json_parse_file(get_file_path(filename));
     TEST(json_serialize_to_file(a, get_file_path(temp_filename)) == JSONSuccess);
@@ -525,14 +524,14 @@ void test_suite_8(void) {
     remove(temp_filename);
     serialization_size = json_serialization_size(a);
     buf = json_serialize_to_string(a);
-    TEST((strlen(buf)+1) == serialization_size);
+    TEST((strlen(_getptr_mm_array<char>(buf))+1) == serialization_size);
 }
 
 void test_suite_9(void) {
     const char *filename = "test_2_pretty.txt";
     const char *temp_filename = "test_2_serialized_pretty.txt";
     char *file_contents = NULL;
-    char *serialized = NULL;
+    mm_array_ptr<char> serialized = NULL;
     JSON_Value *a = NULL;
     JSON_Value *b = NULL;
     size_t serialization_size = 0;
@@ -543,16 +542,16 @@ void test_suite_9(void) {
     remove(temp_filename);
     serialization_size = json_serialization_size_pretty(a);
     serialized = json_serialize_to_string_pretty(a);
-    TEST((strlen(serialized)+1) == serialization_size);
+    TEST((strlen(_getptr_mm_array<char>(serialized))+1) == serialization_size);
 
     file_contents = read_file(get_file_path(filename));
 
-    TEST(STREQ(file_contents, serialized));
+    TEST(STREQ(file_contents, _GETARRAYPTR(char, serialized)));
 }
 
 void test_suite_10(void) {
     JSON_Value *val;
-    char *serialized;
+    mm_array_ptr<char> serialized = NULL;
 
     malloc_count = 0;
 
@@ -564,7 +563,7 @@ void test_suite_10(void) {
 
     val = json_parse_file(get_file_path("test_2.txt"));
     serialized = json_serialize_to_string_pretty(val);
-    json_free_serialized_string(serialized);
+    mm_json_free_serialized_string(serialized);
     json_value_free(val);
 
     val = json_parse_file(get_file_path("test_2_pretty.txt"));
@@ -574,21 +573,21 @@ void test_suite_10(void) {
 }
 
 void test_suite_11() {
-    const char * array_with_slashes = "[\"a/b/c\"]";
+    mm_array_ptr<const char> array_with_slashes = "[\"a/b/c\"]";
     const char * array_with_escaped_slashes = "[\"a\\/b\\/c\"]";
-    char *serialized = NULL;
+    mm_array_ptr<char> serialized = NULL;
     JSON_Value *value = json_parse_string(array_with_slashes);
 
     serialized = json_serialize_to_string(value);
-    TEST(STREQ(array_with_escaped_slashes, serialized));
+    TEST(STREQ(array_with_escaped_slashes, _GETARRAYPTR(char, serialized)));
 
     json_set_escape_slashes(0);
     serialized = json_serialize_to_string(value);
-    TEST(STREQ(array_with_slashes, serialized));
+    TEST(STREQ(_GETARRAYPTR(char, array_with_slashes), _GETARRAYPTR(char, serialized)));
 
     json_set_escape_slashes(1);
     serialized = json_serialize_to_string(value);
-    TEST(STREQ(array_with_escaped_slashes, serialized));
+    TEST(STREQ(array_with_escaped_slashes, _GETARRAYPTR(char, serialized)));
 }
 
 void test_memory_leaks() {
@@ -603,7 +602,6 @@ void test_memory_leaks() {
 
     TEST(malloc_count == 0);
 }
-#endif
 
 void print_commits_info(const char *username, const char *repo) {
     JSON_Value *root_value;
