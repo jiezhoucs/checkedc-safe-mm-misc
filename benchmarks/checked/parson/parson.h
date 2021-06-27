@@ -76,25 +76,26 @@ JSON_Value * json_parse_file(const char *filename);
 JSON_Value * json_parse_file_with_comments(const char *filename);
 
 /*  Parses first JSON value in a string, returns NULL in case of error */
-JSON_Value * json_parse_string(const char *string);
+JSON_Value * json_parse_string(mm_array_ptr<const char> string);
 
 /*  Parses first JSON value in a string and ignores comments (/ * * / and //),
     returns NULL in case of error */
-JSON_Value * json_parse_string_with_comments(const char *string);
+JSON_Value * json_parse_string_with_comments(mm_array_ptr<const char> string);
 
 /* Serialization */
 size_t      json_serialization_size(const JSON_Value *value); /* returns 0 on fail */
 JSON_Status json_serialize_to_buffer(const JSON_Value *value, char *buf, size_t buf_size_in_bytes);
 JSON_Status json_serialize_to_file(const JSON_Value *value, const char *filename);
-char *      json_serialize_to_string(const JSON_Value *value);
+mm_array_ptr<char> json_serialize_to_string(const JSON_Value *value);
 
 /* Pretty serialization */
 size_t      json_serialization_size_pretty(const JSON_Value *value); /* returns 0 on fail */
 JSON_Status json_serialize_to_buffer_pretty(const JSON_Value *value, char *buf, size_t buf_size_in_bytes);
 JSON_Status json_serialize_to_file_pretty(const JSON_Value *value, const char *filename);
-char *      json_serialize_to_string_pretty(const JSON_Value *value);
+mm_array_ptr<char>  json_serialize_to_string_pretty(const JSON_Value *value);
 
 void        json_free_serialized_string(char *string); /* frees string from json_serialize_to_string and json_serialize_to_string_pretty */
+void mm_json_free_serialized_string(mm_array_ptr<char> string);
 
 /* Comparing */
 int  json_value_equals(const JSON_Value *a, const JSON_Value *b);

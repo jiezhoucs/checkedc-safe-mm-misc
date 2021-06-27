@@ -1131,8 +1131,7 @@ JSON_Value * json_parse_file(const char *filename) {
     if (file_contents == NULL) {
         return NULL;
     }
-    /* TODO */
-    output_value = json_parse_string(_getptr_mm_array<char>(file_contents));
+    output_value = json_parse_string(file_contents);
     MM_ARRAY_FREE(char, file_contents);
     return output_value;
 }
@@ -1143,26 +1142,28 @@ JSON_Value * json_parse_file_with_comments(const char *filename) {
     if (file_contents == NULL) {
         return NULL;
     }
-    /* TODO */
-    output_value = json_parse_string_with_comments(_getptr_mm_array<char>(file_contents));
+    output_value = json_parse_string_with_comments(file_contents);
     MM_ARRAY_FREE(char, file_contents);
     return output_value;
 }
 
-JSON_Value * json_parse_string(const char *string) {
+JSON_Value * json_parse_string(mm_array_ptr<const char> string) {
     if (string == NULL) {
         return NULL;
     }
     if (string[0] == '\xEF' && string[1] == '\xBB' && string[2] == '\xBF') {
         string = string + 3; /* Support for UTF-8 BOM */
     }
-    return parse_value((const char**)&string, 0);
+    /* TODO: refactor parse_value() */
+    char *string_raw = _getptr_mm_array<char>(string);
+    return parse_value((const char**)&string_raw, 0);
 }
 
-JSON_Value * json_parse_string_with_comments(const char *string) {
+JSON_Value * json_parse_string_with_comments(mm_array_ptr<const char> string) {
     JSON_Value *result = NULL;
     char *string_mutable_copy = NULL, *string_mutable_copy_ptr = NULL;
-    string_mutable_copy = parson_strdup(string);
+    /* TODO: refactor parson_strdup */
+    string_mutable_copy = parson_strdup(_getptr_mm_array<char>(string));
     if (string_mutable_copy == NULL) {
         return NULL;
     }
@@ -1571,39 +1572,43 @@ JSON_Status json_serialize_to_buffer(const JSON_Value *value, char *buf, size_t 
 JSON_Status json_serialize_to_file(const JSON_Value *value, const char *filename) {
     JSON_Status return_code = JSONSuccess;
     FILE *fp = NULL;
-    char *serialized_string = json_serialize_to_string(value);
+    mm_array_ptr<char> serialized_string = json_serialize_to_string(value);
     if (serialized_string == NULL) {
         return JSONFailure;
     }
     fp = fopen(filename, "w");
     if (fp == NULL) {
-        json_free_serialized_string(serialized_string);
+        mm_json_free_serialized_string(serialized_string);
         return JSONFailure;
     }
-    if (fputs(serialized_string, fp) == EOF) {
+    if (fputs(_getptr_mm_array<char>(serialized_string), fp) == EOF) {
         return_code = JSONFailure;
     }
     if (fclose(fp) == EOF) {
         return_code = JSONFailure;
     }
-    json_free_serialized_string(serialized_string);
+    mm_json_free_serialized_string(serialized_string);
     return return_code;
 }
 
-char * json_serialize_to_string(const JSON_Value *value) {
+mm_array_ptr<char> json_serialize_to_string(const JSON_Value *value) {
     JSON_Status serialization_result = JSONFailure;
     size_t buf_size_bytes = json_serialization_size(value);
-    char *buf = NULL;
+    /* char *buf = NULL; */
+    mm_array_ptr<char> buf = NULL;
     if (buf_size_bytes == 0) {
         return NULL;
     }
-    buf = (char*)parson_malloc(buf_size_bytes);
+    /* buf = (char*)parson_malloc(buf_size_bytes); */
+    buf = MM_ARRAY_ALLOC(char, buf_size_bytes);
     if (buf == NULL) {
         return NULL;
     }
-    serialization_result = json_serialize_to_buffer(value, buf, buf_size_bytes);
+    /* TODO: refactor json_serialize_to_buffer */
+    serialization_result = json_serialize_to_buffer(value,
+            _getptr_mm_array<char>(buf), buf_size_bytes);
     if (serialization_result == JSONFailure) {
-        json_free_serialized_string(buf);
+        mm_json_free_serialized_string(buf);
         return NULL;
     }
     return buf;
@@ -1631,39 +1636,41 @@ JSON_Status json_serialize_to_buffer_pretty(const JSON_Value *value, char *buf, 
 JSON_Status json_serialize_to_file_pretty(const JSON_Value *value, const char *filename) {
     JSON_Status return_code = JSONSuccess;
     FILE *fp = NULL;
-    char *serialized_string = json_serialize_to_string_pretty(value);
+    mm_array_ptr<char> serialized_string = json_serialize_to_string_pretty(value);
     if (serialized_string == NULL) {
         return JSONFailure;
     }
     fp = fopen(filename, "w");
     if (fp == NULL) {
-        json_free_serialized_string(serialized_string);
+        mm_json_free_serialized_string(serialized_string);
         return JSONFailure;
     }
-    if (fputs(serialized_string, fp) == EOF) {
+    if (fputs(_getptr_mm_array<char>(serialized_string), fp) == EOF) {
         return_code = JSONFailure;
     }
     if (fclose(fp) == EOF) {
         return_code = JSONFailure;
     }
-    json_free_serialized_string(serialized_string);
+    mm_json_free_serialized_string(serialized_string);
     return return_code;
 }
 
-char * json_serialize_to_string_pretty(const JSON_Value *value) {
+mm_array_ptr<char> json_serialize_to_string_pretty(const JSON_Value *value) {
     JSON_Status serialization_result = JSONFailure;
     size_t buf_size_bytes = json_serialization_size_pretty(value);
-    char *buf = NULL;
+    mm_array_ptr<char> buf = NULL;
     if (buf_size_bytes == 0) {
         return NULL;
     }
-    buf = (char*)parson_malloc(buf_size_bytes);
+    buf = MM_ARRAY_ALLOC(char, buf_size_bytes);
     if (buf == NULL) {
         return NULL;
     }
-    serialization_result = json_serialize_to_buffer_pretty(value, buf, buf_size_bytes);
+    /* TODO: refactor json_serialize_to_buffer_pretty */
+    serialization_result = json_serialize_to_buffer_pretty(value,
+            _getptr_mm_array<char>(buf), buf_size_bytes);
     if (serialization_result == JSONFailure) {
-        json_free_serialized_string(buf);
+        mm_json_free_serialized_string(buf);
         return NULL;
     }
     return buf;
@@ -1671,6 +1678,10 @@ char * json_serialize_to_string_pretty(const JSON_Value *value) {
 
 void json_free_serialized_string(char *string) {
     parson_free(string);
+}
+
+void mm_json_free_serialized_string(mm_array_ptr<char> string) {
+    MM_ARRAY_FREE(char, string);
 }
 
 JSON_Status json_array_remove(JSON_Array *array, size_t ix) {
