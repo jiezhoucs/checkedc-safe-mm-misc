@@ -156,6 +156,46 @@ resume:
     print_end("dereferencing an _MM_array_ptr inside an array of _MM_array_ptr");
 }
 
+/**
+ * Test directly dereferencing an mmsafeptr pointed by another pointer
+ * via "**", e.g., **p.
+ * */
+void f5(mm_array_ptr<int> *p, mm_ptr<mm_ptr<Node>> p1) {
+    print_start("dereferencing an mmsafeptr pointed by another pointer");
+
+    signal(SIGILL, ill_handler);
+    if (setjmp(resume_context) == 1) goto resume1;
+
+    if (**p != 10 || (**p1).val != 42) {
+        print_error("dereference.c::f6(): dereferencing an mmsafeptr pointer "
+                    "by another pointer");
+    }
+
+    mm_array_free<int>(*p);
+    printf("%d\n", **p);   // UAF
+
+resume1:
+    if (setjmp(resume_context) == 1) goto resume;
+    mm_free<Node>(*p1);
+    printf("%d\n", (**p1).val);   // UAF
+
+resume:
+    print_end("dereferencing an mmsafeptr pointed by another pointer");
+}
+
+/* This function calls f5() */
+void f6() {
+    mm_array_ptr<int> p = mm_array_alloc<int>(sizeof(int) * 10);
+    for (int i = 0; i < 10; i++) p[i] = i + 10;
+
+    mm_ptr<Node> pN = mm_alloc<Node>(sizeof(Node));
+    pN->val = 42;
+    mm_ptr<mm_ptr<Node>> ppN = mm_alloc<mm_ptr<Node>>(sizeof(mm_ptr<Node>));
+    *ppN = pN;
+
+    f5(&p, ppN);
+}
+
 int main() {
     print_main_start(__FILE__);
     signal(SIGILL, ill_handler);
@@ -170,6 +210,8 @@ int main() {
     f3();
 
     f4();
+
+    f6();
 
     print_main_end(__FILE__);
     return 0;
