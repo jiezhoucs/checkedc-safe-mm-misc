@@ -160,7 +160,7 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
 //
 // @param p - a _MM_ptr whose pointee is going to be freed.
 //
-for_any(T) void mm_free(mm_ptr<T> p) {
+for_any(T) void mm_free(mm_ptr<const T> const p) {
   // Without the "volatile" keyword, Clang may optimize away the next
   // statement.
   volatile _MM_ptr_Rep *mm_ptr_ptr = (_MM_ptr_Rep *)&p;
@@ -181,7 +181,7 @@ for_any(T) void mm_free(mm_ptr<T> p) {
 //
 // @param p - a _MM_array_ptr whose pointee is going to be freed.
 //
-for_any(T) void mm_array_free(mm_array_ptr<T> p) {
+for_any(T) void mm_array_free(mm_array_ptr<const T> const p) {
     volatile _MM_array_ptr_Rep *mm_array_ptr_ptr = (_MM_array_ptr_Rep *)&p;
     *(mm_array_ptr_ptr->lock_ptr) = 0;
     free(mm_array_ptr_ptr->p - LOCK_SIZE - HEAP_PADDING);
@@ -205,7 +205,7 @@ for_any(T) void mm_array_free(mm_array_ptr<T> p) {
 //
 // @param p - the safe pointer whose inner raw pointer to be extracted.
 //
-for_any(T) void *_getptr_mm(mm_ptr<T> p) {
+for_any(T) void *_getptr_mm(mm_ptr<const T> const p) {
     return ((_MM_ptr_Rep *)&p)->p;
 }
 
@@ -213,7 +213,7 @@ for_any(T) void *_getptr_mm(mm_ptr<T> p) {
 // This function extracts the inner raw pointer to the start of a struct
 // from an mm_array_ptr<T>.
 //
-for_any(T) void *_getptr_mm_array(mm_array_ptr<T> p) {
+for_any(T) void *_getptr_mm_array(mm_array_ptr<const T> const p) {
     return ((_MM_array_ptr_Rep *)&p)->p;
 }
 
