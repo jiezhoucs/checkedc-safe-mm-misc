@@ -113,7 +113,8 @@ struct json_array_t {
 static mm_array_ptr<char> read_file(const char *filename);
 static void   remove_comments(char *string, const char *start_token, const char *end_token);
 static char * parson_strndup(const char *string, size_t n);
-static char * parson_strdup(const char *string);
+static mm_array_ptr<char> mm_parson_strndup(mm_array_ptr<const char> string, size_t n);
+static mm_array_ptr<char> parson_strdup(mm_array_ptr<const char> string);
 static int    hex_char_to_int(char c);
 static int    parse_utf16_hex(const char *string, unsigned int *result);
 static int    num_bytes_in_utf8_sequence(unsigned char c);
@@ -142,17 +143,17 @@ static JSON_Value * json_value_init_string_no_copy(char *string, size_t length);
 static const JSON_String * json_value_get_string_desc(const JSON_Value *value);
 
 /* Parser */
-static JSON_Status  skip_quotes(const char **string);
+static JSON_Status  skip_quotes(mm_array_ptr<const char> *string);
 static int          parse_utf16(const char **unprocessed, char **processed);
 static char *       process_string(const char *input, size_t input_len, size_t *output_len);
-static char *       get_quoted_string(const char **string, size_t *output_string_len);
-static JSON_Value * parse_object_value(const char **string, size_t nesting);
-static JSON_Value * parse_array_value(const char **string, size_t nesting);
-static JSON_Value * parse_string_value(const char **string);
-static JSON_Value * parse_boolean_value(const char **string);
-static JSON_Value * parse_number_value(const char **string);
-static JSON_Value * parse_null_value(const char **string);
-static JSON_Value * parse_value(const char **string, size_t nesting);
+static char *       get_quoted_string(mm_array_ptr<const char> *string, size_t *output_string_len);
+static JSON_Value * parse_object_value(mm_array_ptr<const char> *string, size_t nesting);
+static JSON_Value * parse_array_value(mm_array_ptr<const char> *string, size_t nesting);
+static JSON_Value * parse_string_value(mm_array_ptr<const char> *string);
+static JSON_Value * parse_boolean_value(mm_array_ptr<const char> *string);
+static JSON_Value * parse_number_value(mm_array_ptr<const char> *string);
+static JSON_Value * parse_null_value(mm_array_ptr<const char> *string);
+static JSON_Value * parse_value(mm_array_ptr<const char> *string, size_t nesting);
 
 /* Serialization */
 static int    json_serialize_to_buffer_r(const JSON_Value *value, char *buf, int level, int is_pretty, char *num_buf);
@@ -172,8 +173,19 @@ static char * parson_strndup(const char *string, size_t n) {
     return output_string;
 }
 
-static char * parson_strdup(const char *string) {
-    return parson_strndup(string, strlen(string));
+static mm_array_ptr<char> mm_parson_strndup(mm_array_ptr<const char> string, size_t n) {
+    /* We expect the caller has validated that 'n' fits within the input buffer. */
+    mm_array_ptr<char> output_string = MM_ARRAY_ALLOC(char, n + 1);
+    if (!output_string) {
+        return NULL;
+    }
+    output_string[n] = '\0';
+    memcpy(_GETARRAYPTR(char, output_string), _GETARRAYPTR(char, string), n);
+    return output_string;
+}
+
+static mm_array_ptr<char> parson_strdup(mm_array_ptr<const char> string) {
+    return mm_parson_strndup(string, strlen(_GETARRAYPTR(char, string)));
 }
 
 static int hex_char_to_int(char c) {
@@ -272,6 +284,7 @@ static int is_valid_utf8(const char *string, size_t string_len) {
     return 1;
 }
 
+/* No need to refactor is_decimal() as its argument never escapes. */
 static int is_decimal(const char *string, size_t length) {
     if (length > 1 && string[0] == '0' && string[1] != '.') {
         return 0;
@@ -561,7 +574,7 @@ static JSON_Value * json_value_init_string_no_copy(char *string, size_t length) 
 }
 
 /* Parser */
-static JSON_Status skip_quotes(const char **string) {
+static JSON_Status skip_quotes(mm_array_ptr<const char> *string) {
     if (**string != '\"') {
         return JSONFailure;
     }
@@ -687,18 +700,19 @@ error:
 
 /* Return processed contents of a string between quotes and
    skips passed argument to a matching quote. */
-static char * get_quoted_string(const char **string, size_t *output_string_len) {
-    const char *string_start = *string;
+static char * get_quoted_string(mm_array_ptr<const char> *string, size_t *output_string_len) {
+    mm_array_ptr<const char> string_start = *string;
     size_t input_string_len = 0;
     JSON_Status status = skip_quotes(string);
     if (status != JSONSuccess) {
         return NULL;
     }
     input_string_len = *string - string_start - 2; /* length without quotes */
-    return process_string(string_start + 1, input_string_len, output_string_len);
+    /* TODO */
+    return process_string(_GETARRAYPTR(char, string_start + 1), input_string_len, output_string_len);
 }
 
-static JSON_Value * parse_value(const char **string, size_t nesting) {
+static JSON_Value * parse_value(mm_array_ptr<const char> *string, size_t nesting) {
     if (nesting > MAX_NESTING) {
         return NULL;
     }
@@ -723,7 +737,7 @@ static JSON_Value * parse_value(const char **string, size_t nesting) {
     }
 }
 
-static JSON_Value * parse_object_value(const char **string, size_t nesting) {
+static JSON_Value * parse_object_value(mm_array_ptr<const char> *string, size_t nesting) {
     JSON_Value *output_value = NULL, *new_value = NULL;
     JSON_Object *output_object = NULL;
     char *new_key = NULL;
@@ -790,7 +804,7 @@ static JSON_Value * parse_object_value(const char **string, size_t nesting) {
     return output_value;
 }
 
-static JSON_Value * parse_array_value(const char **string, size_t nesting) {
+static JSON_Value * parse_array_value(mm_array_ptr<const char> *string, size_t nesting) {
     JSON_Value *output_value = NULL, *new_array_value = NULL;
     JSON_Array *output_array = NULL;
     output_value = json_value_init_array();
@@ -836,7 +850,7 @@ static JSON_Value * parse_array_value(const char **string, size_t nesting) {
     return output_value;
 }
 
-static JSON_Value * parse_string_value(const char **string) {
+static JSON_Value * parse_string_value(mm_array_ptr<const char> *string) {
     JSON_Value *value = NULL;
     size_t new_string_len = 0;
     char *new_string = get_quoted_string(string, &new_string_len);
@@ -851,37 +865,42 @@ static JSON_Value * parse_string_value(const char **string) {
     return value;
 }
 
-static JSON_Value * parse_boolean_value(const char **string) {
+static JSON_Value * parse_boolean_value(mm_array_ptr<const char> *string) {
     size_t true_token_size = SIZEOF_TOKEN("true");
     size_t false_token_size = SIZEOF_TOKEN("false");
-    if (strncmp("true", *string, true_token_size) == 0) {
+    if (strncmp("true", _GETARRAYPTR(char, *string), true_token_size) == 0) {
         *string += true_token_size;
         return json_value_init_boolean(1);
-    } else if (strncmp("false", *string, false_token_size) == 0) {
+    } else if (strncmp("false", _GETARRAYPTR(char, *string), false_token_size) == 0) {
         *string += false_token_size;
         return json_value_init_boolean(0);
     }
     return NULL;
 }
 
-static JSON_Value * parse_number_value(const char **string) {
+static JSON_Value * parse_number_value(mm_array_ptr<const char> *string) {
     char *end;
     double number = 0;
     errno = 0;
-    number = strtod(*string, &end);
+    number = strtod(_GETARRAYPTR(char, *string), &end);
     if (errno == ERANGE && (number == -HUGE_VAL || number == HUGE_VAL)) {
         return NULL;
     }
-    if ((errno && errno != ERANGE) || !is_decimal(*string, end - *string)) {
+    if ((errno && errno != ERANGE) ||
+         !is_decimal((char *)(_GETARRAYPTR(char, *string)),
+             end - (char *)(_GETARRAYPTR(char, *string)))) {
         return NULL;
     }
-    *string = end;
+    /* TODO: In our new design, mm_array_ptr has an offset instead of an individual
+     * lock address; and therefore the next line requires to update the offset */
+    /* *string = end; */
+    _setptr_mm_array<char>(string, end);
     return json_value_init_number(number);
 }
 
-static JSON_Value * parse_null_value(const char **string) {
+static JSON_Value * parse_null_value(mm_array_ptr<const char> *string) {
     size_t token_size = SIZEOF_TOKEN("null");
-    if (strncmp("null", *string, token_size) == 0) {
+    if (strncmp("null", _GETARRAYPTR(char, *string), token_size) == 0) {
         *string += token_size;
         return json_value_init_null();
     }
@@ -1154,24 +1173,22 @@ JSON_Value * json_parse_string(mm_array_ptr<const char> string) {
     if (string[0] == '\xEF' && string[1] == '\xBB' && string[2] == '\xBF') {
         string = string + 3; /* Support for UTF-8 BOM */
     }
-    /* TODO: refactor parse_value() */
-    char *string_raw = _getptr_mm_array<char>(string);
-    return parse_value((const char**)&string_raw, 0);
+    return parse_value(&string, 0);
 }
 
 JSON_Value * json_parse_string_with_comments(mm_array_ptr<const char> string) {
     JSON_Value *result = NULL;
-    char *string_mutable_copy = NULL, *string_mutable_copy_ptr = NULL;
-    /* TODO: refactor parson_strdup */
-    string_mutable_copy = parson_strdup(_getptr_mm_array<char>(string));
+    mm_array_ptr<const char> string_mutable_copy = NULL, string_mutable_copy_ptr = NULL;
+    string_mutable_copy = parson_strdup(string);
     if (string_mutable_copy == NULL) {
         return NULL;
     }
-    remove_comments(string_mutable_copy, "/*", "*/");
-    remove_comments(string_mutable_copy, "//", "\n");
+    /* TODO: refactor remove_comments */
+    remove_comments(_GETARRAYPTR(char, string_mutable_copy), "/*", "*/");
+    remove_comments(_GETARRAYPTR(char, string_mutable_copy), "//", "\n");
     string_mutable_copy_ptr = string_mutable_copy;
-    result = parse_value((const char**)&string_mutable_copy_ptr, 0);
-    parson_free(string_mutable_copy);
+    result = parse_value(&string_mutable_copy_ptr, 0);
+    MM_ARRAY_FREE(char, string_mutable_copy);
     return result;
 }
 
