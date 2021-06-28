@@ -30,4 +30,6 @@ for_any(T) mm_ptr<T> create_invalid_mm_ptr(uint64_t val);
 
 for_any(T) mm_array_ptr<T> mmptr_to_mmarrayptr(mm_ptr<T> p);
 for_any(T) mm_ptr<T> mmarrayptr_to_mmptr(mm_array_ptr<T> p);
+
+for_any(T) void _setptr_mm_array(mm_array_ptr<const T> *p, char *new_p);
 #endif

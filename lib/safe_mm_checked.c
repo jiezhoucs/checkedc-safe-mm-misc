@@ -95,6 +95,10 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
   void *raw_ptr = malloc(array_size + LOCK_SIZE + HEAP_PADDING);
   if (raw_ptr == NULL) return NULL;
 
+#ifdef DEBUG
+  printf("[DEBUG] Allocated: %p\n", raw_ptr);
+#endif
+
   uint64_t new_key = key++;
   raw_ptr += HEAP_PADDING;
   *((uint64_t *)(raw_ptr)) = new_key;
@@ -189,7 +193,7 @@ for_any(T) void mm_array_free(mm_array_ptr<T> p) {
 //
 // This function extracts the inner raw pointer to the start of a struct
 // from an mm_ptr<T>.
-// The motivation of creating this function is that some code tris to
+// The motivation of creating this function is that some code tries to
 // cast an mm_ptr<T> to a raw pointer to another type of struct,
 // e.g., the loadtree() function in the bh benchmark of the Olden
 // benchmark suite.
@@ -273,4 +277,38 @@ for_any(T) mm_ptr<T> mmarrayptr_to_mmptr(mm_array_ptr<T> p) {
     mmptr.key_offset = (key << 32) & offset;
     mm_ptr<T> *mmptr_ptr = (mm_ptr<T> *)&mmptr;
     return *mmptr_ptr;
+}
+
+
+#if 0
+/*
+ * Function: _setptr_mm()
+ *
+ * Do we need this function?
+ *
+ * */
+for_any(T) void _setptr_mm(mm_ptr<const T> *p, char *new_p) {
+}
+#endif
+
+/*
+ * Function: _setptr_mm_array()
+ *
+ * This function updates an mm_array_ptr with a provided raw C pointer.
+ * This is a very dangerous behavior but it is needed for interacting with
+ * certain library code. For example, a program may call strtod() and then
+ * use the endptr to update an existing pointer. (The parse_number_value()
+ * function of parson (https://github.com/kgabis/parson/blob/master/parson.c#L862)
+ * shows such an example.)
+ * If the to-be-updated pointer is an mm_array_ptr and we would like to keep it
+ * as a checked pointer, then we need this function.
+ *
+ * FIXME: The current implementation of mm_array_ptr has an individual
+ * lock_addr field and thus the update of its raw C pointer does not require
+ * updating any metadata. But in our new design the mm_array_ptr has an offset
+ * subfield and it needs to be updated based on the new raw pointer.
+ *
+ * */
+for_any(T) void _setptr_mm_array(mm_array_ptr<const T> *p, char *new_p) {
+    *((char **)p) = new_p;
 }
