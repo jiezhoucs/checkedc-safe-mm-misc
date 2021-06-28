@@ -144,8 +144,8 @@ static const JSON_String * json_value_get_string_desc(const JSON_Value *value);
 
 /* Parser */
 static JSON_Status  skip_quotes(mm_array_ptr<const char> *string);
-static int          parse_utf16(const char **unprocessed, char **processed);
-static char *       process_string(const char *input, size_t input_len, size_t *output_len);
+static int          parse_utf16(mm_array_ptr<const char> *unprocessed, char **processed);
+static char *       process_string(mm_array_ptr<const char> input, size_t input_len, size_t *output_len);
 static char *       get_quoted_string(mm_array_ptr<const char> *string, size_t *output_string_len);
 static JSON_Value * parse_object_value(mm_array_ptr<const char> *string, size_t nesting);
 static JSON_Value * parse_array_value(mm_array_ptr<const char> *string, size_t nesting);
@@ -199,6 +199,7 @@ static int hex_char_to_int(char c) {
     return -1;
 }
 
+/* There is no need to refactor parse_utf16_hex() to use mm_array_ptr */
 static int parse_utf16_hex(const char *s, unsigned int *result) {
     int x1, x2, x3, x4;
     if (s[0] == '\0' || s[1] == '\0' || s[2] == '\0' || s[3] == '\0') {
@@ -594,13 +595,13 @@ static JSON_Status skip_quotes(mm_array_ptr<const char> *string) {
     return JSONSuccess;
 }
 
-static int parse_utf16(const char **unprocessed, char **processed) {
+static int parse_utf16(mm_array_ptr<const char> *unprocessed, char **processed) {
     unsigned int cp, lead, trail;
     int parse_succeeded = 0;
     char *processed_ptr = *processed;
-    const char *unprocessed_ptr = *unprocessed;
+    mm_array_ptr<const char> unprocessed_ptr = *unprocessed;
     unprocessed_ptr++; /* skips u */
-    parse_succeeded = parse_utf16_hex(unprocessed_ptr, &cp);
+    parse_succeeded = parse_utf16_hex(_GETARRAYPTR(char, unprocessed_ptr), &cp);
     if (!parse_succeeded) {
         return JSONFailure;
     }
@@ -621,7 +622,7 @@ static int parse_utf16(const char **unprocessed, char **processed) {
         if (*unprocessed_ptr++ != '\\' || *unprocessed_ptr++ != 'u') {
             return JSONFailure;
         }
-        parse_succeeded = parse_utf16_hex(unprocessed_ptr, &trail);
+        parse_succeeded = parse_utf16_hex(_GETARRAYPTR(char, unprocessed_ptr), &trail);
         if (!parse_succeeded || trail < 0xDC00 || trail > 0xDFFF) { /* valid trail surrogate? (0xDC00..0xDFFF) */
             return JSONFailure;
         }
@@ -643,8 +644,8 @@ static int parse_utf16(const char **unprocessed, char **processed) {
 
 /* Copies and processes passed string up to supplied length.
 Example: "\u006Corem ipsum" -> lorem ipsum */
-static char* process_string(const char *input, size_t input_len, size_t *output_len) {
-    const char *input_ptr = input;
+static char* process_string(mm_array_ptr<const char> input, size_t input_len, size_t *output_len) {
+    mm_array_ptr<const char> input_ptr = input;
     size_t initial_size = (input_len + 1) * sizeof(char);
     size_t final_size = 0;
     char *output = NULL, *output_ptr = NULL, *resized_output = NULL;
@@ -708,8 +709,7 @@ static char * get_quoted_string(mm_array_ptr<const char> *string, size_t *output
         return NULL;
     }
     input_string_len = *string - string_start - 2; /* length without quotes */
-    /* TODO */
-    return process_string(_GETARRAYPTR(char, string_start + 1), input_string_len, output_string_len);
+    return process_string(string_start + 1, input_string_len, output_string_len);
 }
 
 static JSON_Value * parse_value(mm_array_ptr<const char> *string, size_t nesting) {
