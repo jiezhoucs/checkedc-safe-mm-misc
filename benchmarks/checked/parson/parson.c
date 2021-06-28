@@ -334,6 +334,7 @@ static mm_array_ptr<char> read_file(const char * filename) {
     return file_contents;
 }
 
+/* There is no need to refactor remove_comments() */
 static void remove_comments(char *string, const char *start_token, const char *end_token) {
     int in_string = 0, escaped = 0;
     size_t i;
@@ -891,9 +892,6 @@ static JSON_Value * parse_number_value(mm_array_ptr<const char> *string) {
              end - (char *)(_GETARRAYPTR(char, *string)))) {
         return NULL;
     }
-    /* TODO: In our new design, mm_array_ptr has an offset instead of an individual
-     * lock address; and therefore the next line requires to update the offset */
-    /* *string = end; */
     _setptr_mm_array<char>(string, end);
     return json_value_init_number(number);
 }
@@ -1183,7 +1181,7 @@ JSON_Value * json_parse_string_with_comments(mm_array_ptr<const char> string) {
     if (string_mutable_copy == NULL) {
         return NULL;
     }
-    /* TODO: refactor remove_comments */
+    /* No need to refactor remove_comments */
     remove_comments(_GETARRAYPTR(char, string_mutable_copy), "/*", "*/");
     remove_comments(_GETARRAYPTR(char, string_mutable_copy), "//", "\n");
     string_mutable_copy_ptr = string_mutable_copy;
