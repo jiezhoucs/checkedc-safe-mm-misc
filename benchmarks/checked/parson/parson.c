@@ -156,9 +156,10 @@ static JSON_Value * parse_null_value(mm_array_ptr<const char> *string);
 static JSON_Value * parse_value(mm_array_ptr<const char> *string, size_t nesting);
 
 /* Serialization */
-static int    json_serialize_to_buffer_r(const JSON_Value *value, char *buf, int level, int is_pretty, char *num_buf);
-static int    json_serialize_string(const char *string, size_t len, char *buf);
-static int    append_indent(char *buf, int level);
+static int    json_serialize_to_buffer_r(const JSON_Value *value,
+        mm_array_ptr<char> buf, int level, int is_pretty, mm_array_ptr<char> num_buf);
+static int    json_serialize_string(const char *string, size_t len, mm_array_ptr<char> buf);
+static int    append_indent(mm_array_ptr<char> buf, int level);
 static int    append_string(char *buf, const char *string);
 
 /* Various */
@@ -906,7 +907,7 @@ static JSON_Value * parse_null_value(mm_array_ptr<const char> *string) {
 }
 
 /* Serialization */
-#define APPEND_STRING(str) do { written = append_string(buf, (str));\
+#define APPEND_STRING(str) do { written = append_string(_GETARRAYPTR(char, buf), (str));\
                                 if (written < 0) { return -1; }\
                                 if (buf != NULL) { buf += written; }\
                                 written_total += written; } while(0)
@@ -916,7 +917,8 @@ static JSON_Value * parse_null_value(mm_array_ptr<const char> *string) {
                                   if (buf != NULL) { buf += written; }\
                                   written_total += written; } while(0)
 
-static int json_serialize_to_buffer_r(const JSON_Value *value, char *buf, int level, int is_pretty, char *num_buf)
+static int json_serialize_to_buffer_r(const JSON_Value *value,
+        mm_array_ptr<char> buf, int level, int is_pretty, mm_array_ptr<char> num_buf)
 {
     const char *key = NULL, *string = NULL;
     JSON_Value *temp_value = NULL;
@@ -1036,7 +1038,7 @@ static int json_serialize_to_buffer_r(const JSON_Value *value, char *buf, int le
             if (buf != NULL) {
                 num_buf = buf;
             }
-            written = sprintf(num_buf, FLOAT_FORMAT, num);
+            written = sprintf(_GETARRAYPTR(char, num_buf), FLOAT_FORMAT, num);
             if (written < 0) {
                 return -1;
             }
@@ -1055,7 +1057,7 @@ static int json_serialize_to_buffer_r(const JSON_Value *value, char *buf, int le
     }
 }
 
-static int json_serialize_string(const char *string, size_t len, char *buf) {
+static int json_serialize_string(const char *string, size_t len, mm_array_ptr<char> buf) {
     size_t i = 0;
     char c = '\0';
     int written = -1, written_total = 0;
@@ -1122,7 +1124,7 @@ static int json_serialize_string(const char *string, size_t len, char *buf) {
     return written_total;
 }
 
-static int append_indent(char *buf, int level) {
+static int append_indent(mm_array_ptr<char> buf, int level) {
     int i;
     int written = -1, written_total = 0;
     for (i = 0; i < level; i++) {
@@ -1566,12 +1568,14 @@ JSON_Value * json_value_deep_copy(const JSON_Value *value) {
 }
 
 size_t json_serialization_size(const JSON_Value *value) {
-    char num_buf[NUM_BUF_SIZE]; /* recursively allocating buffer on stack is a bad idea, so let's do it only once */
+    /* recursively allocating buffer on stack is a bad idea, so let's do it only once */
+    _multiple char num_buf[NUM_BUF_SIZE];
     int res = json_serialize_to_buffer_r(value, NULL, 0, 0, num_buf);
     return res < 0 ? 0 : (size_t)(res) + 1;
 }
 
-JSON_Status json_serialize_to_buffer(const JSON_Value *value, char *buf, size_t buf_size_in_bytes) {
+JSON_Status json_serialize_to_buffer(const JSON_Value *value,
+        mm_array_ptr<char> buf, size_t buf_size_in_bytes) {
     int written = -1;
     size_t needed_size_in_bytes = json_serialization_size(value);
     if (needed_size_in_bytes == 0 || buf_size_in_bytes < needed_size_in_bytes) {
@@ -1609,19 +1613,15 @@ JSON_Status json_serialize_to_file(const JSON_Value *value, const char *filename
 mm_array_ptr<char> json_serialize_to_string(const JSON_Value *value) {
     JSON_Status serialization_result = JSONFailure;
     size_t buf_size_bytes = json_serialization_size(value);
-    /* char *buf = NULL; */
     mm_array_ptr<char> buf = NULL;
     if (buf_size_bytes == 0) {
         return NULL;
     }
-    /* buf = (char*)parson_malloc(buf_size_bytes); */
     buf = MM_ARRAY_ALLOC(char, buf_size_bytes);
     if (buf == NULL) {
         return NULL;
     }
-    /* TODO: refactor json_serialize_to_buffer */
-    serialization_result = json_serialize_to_buffer(value,
-            _getptr_mm_array<char>(buf), buf_size_bytes);
+    serialization_result = json_serialize_to_buffer(value, buf, buf_size_bytes);
     if (serialization_result == JSONFailure) {
         mm_json_free_serialized_string(buf);
         return NULL;
@@ -1630,12 +1630,14 @@ mm_array_ptr<char> json_serialize_to_string(const JSON_Value *value) {
 }
 
 size_t json_serialization_size_pretty(const JSON_Value *value) {
-    char num_buf[NUM_BUF_SIZE]; /* recursively allocating buffer on stack is a bad idea, so let's do it only once */
+    /* recursively allocating buffer on stack is a bad idea, so let's do it only once */
+    _multiple char num_buf[NUM_BUF_SIZE];
     int res = json_serialize_to_buffer_r(value, NULL, 0, 1, num_buf);
     return res < 0 ? 0 : (size_t)(res) + 1;
 }
 
-JSON_Status json_serialize_to_buffer_pretty(const JSON_Value *value, char *buf, size_t buf_size_in_bytes) {
+JSON_Status json_serialize_to_buffer_pretty(const JSON_Value *value,
+        mm_array_ptr<char> buf, size_t buf_size_in_bytes) {
     int written = -1;
     size_t needed_size_in_bytes = json_serialization_size_pretty(value);
     if (needed_size_in_bytes == 0 || buf_size_in_bytes < needed_size_in_bytes) {
@@ -1681,9 +1683,7 @@ mm_array_ptr<char> json_serialize_to_string_pretty(const JSON_Value *value) {
     if (buf == NULL) {
         return NULL;
     }
-    /* TODO: refactor json_serialize_to_buffer_pretty */
-    serialization_result = json_serialize_to_buffer_pretty(value,
-            _getptr_mm_array<char>(buf), buf_size_bytes);
+    serialization_result = json_serialize_to_buffer_pretty(value, buf, buf_size_bytes);
     if (serialization_result == JSONFailure) {
         mm_json_free_serialized_string(buf);
         return NULL;

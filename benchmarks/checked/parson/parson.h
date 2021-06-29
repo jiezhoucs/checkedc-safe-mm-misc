@@ -84,13 +84,15 @@ JSON_Value * json_parse_string_with_comments(mm_array_ptr<const char> string);
 
 /* Serialization */
 size_t      json_serialization_size(const JSON_Value *value); /* returns 0 on fail */
-JSON_Status json_serialize_to_buffer(const JSON_Value *value, char *buf, size_t buf_size_in_bytes);
+JSON_Status json_serialize_to_buffer(const JSON_Value *value,
+    mm_array_ptr<char> buf, size_t buf_size_in_bytes);
 JSON_Status json_serialize_to_file(const JSON_Value *value, const char *filename);
 mm_array_ptr<char> json_serialize_to_string(const JSON_Value *value);
 
 /* Pretty serialization */
 size_t      json_serialization_size_pretty(const JSON_Value *value); /* returns 0 on fail */
-JSON_Status json_serialize_to_buffer_pretty(const JSON_Value *value, char *buf, size_t buf_size_in_bytes);
+JSON_Status json_serialize_to_buffer_pretty(const JSON_Value *value,
+    mm_array_ptr<char> buf, size_t buf_size_in_bytes);
 JSON_Status json_serialize_to_file_pretty(const JSON_Value *value, const char *filename);
 mm_array_ptr<char>  json_serialize_to_string_pretty(const JSON_Value *value);
 
