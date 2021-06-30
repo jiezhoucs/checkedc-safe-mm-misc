@@ -95,10 +95,6 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
   void *raw_ptr = malloc(array_size + LOCK_SIZE + HEAP_PADDING);
   if (raw_ptr == NULL) return NULL;
 
-#ifdef DEBUG
-  printf("[DEBUG] Allocated: %p\n", raw_ptr);
-#endif
-
   uint64_t new_key = key++;
   raw_ptr += HEAP_PADDING;
   *((uint64_t *)(raw_ptr)) = new_key;
