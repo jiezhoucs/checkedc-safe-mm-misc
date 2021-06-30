@@ -161,16 +161,19 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
 // @param p - a _MM_ptr whose pointee is going to be freed.
 //
 for_any(T) void mm_free(mm_ptr<const T> const p) {
-  // Without the "volatile" keyword, Clang may optimize away the next
-  // statement.
-  volatile _MM_ptr_Rep *mm_ptr_ptr = (_MM_ptr_Rep *)&p;
+    // free() allows freeing a null ptr, in which case nothing is performed.
+    if (p == NULL) return;
 
-  void *lock_ptr = mm_ptr_ptr->p - LOCK_SIZE;
-  // This step may not be necessary in some cases. In some implementation,
-  // free() zeros out all bytes of the memory region of the freed object.
-  *(uint32_t *)lock_ptr = 0;
+    // Without the "volatile" keyword, Clang may optimize away the next
+    // statement.
+    volatile _MM_ptr_Rep *mm_ptr_ptr = (_MM_ptr_Rep *)&p;
 
-  free(lock_ptr - HEAP_PADDING);
+    void *lock_ptr = mm_ptr_ptr->p - LOCK_SIZE;
+    // This step may not be necessary in some cases. In some implementation,
+    // free() zeros out all bytes of the memory region of the freed object.
+    *(uint32_t *)lock_ptr = 0;
+
+    free(lock_ptr - HEAP_PADDING);
 }
 
 //
@@ -182,6 +185,8 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
 // @param p - a _MM_array_ptr whose pointee is going to be freed.
 //
 for_any(T) void mm_array_free(mm_array_ptr<const T> const p) {
+    if (p == NULL) return;
+
     volatile _MM_array_ptr_Rep *mm_array_ptr_ptr = (_MM_array_ptr_Rep *)&p;
     *(mm_array_ptr_ptr->lock_ptr) = 0;
     free(mm_array_ptr_ptr->p - LOCK_SIZE - HEAP_PADDING);
