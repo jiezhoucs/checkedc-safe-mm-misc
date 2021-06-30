@@ -15,6 +15,9 @@
 #define _GETPTR(T, p) _getptr_mm<T>(p)
 #define _GETARRAYPTR(T, p) _getptr_mm_array<T>(p)
 
+/* For debugging */
+#define DEBUG(m) printf("[DEBUG][%4d][%s]: %s", __LINE__, __func__, m)
+
 for_any(T) mm_ptr<T> mm_alloc(size_t size);
 for_any(T) void mm_free(mm_ptr<const T> const p);
 

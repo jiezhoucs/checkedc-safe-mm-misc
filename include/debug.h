@@ -2,8 +2,8 @@
  * This header file defines a few structs used for testing.
  * */
 
-#ifndef _HEADER_H
-#define _HEADER_H
+#ifndef DEBUG_HEADER_H
+#define DEBUG_HEADER_H
 
 #include <stdio.h>
 #include <stdint.h>
