@@ -14,6 +14,9 @@
 
 #include "safe_mm_checked.h"
 
+/* For debugging */
+#define DEBUG(m) printf("[DEBUG][%4d][%s]: %s", __LINE__, __func__, m)
+
 // Print error message in red
 #define COLOR_RESET   "\033[0m"
 #define RED           "\033[31m"
