@@ -46,5 +46,8 @@ debug: debug.c
 	@ranlib libdebug.a
 	@rm -f $@.o
 
+debugso: debug.c
+	$(CC) -shared -fPIC -o libdebug.so $^
+
 clean:
 	rm -rf *.o *.so *.a *.ll
