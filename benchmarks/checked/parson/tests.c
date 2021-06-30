@@ -40,11 +40,12 @@
                 if(A){puts(" OK");tests_passed++;}\
                 else{puts(" FAIL");tests_failed++;}
 #define STREQ(A, B) ((A) && (B) ? strcmp((A), (B)) == 0 : 0)
+#define MM_STREQ(A, B) ((A) && (B) ? strcmp((_GETARRAYPTR(char, A)), \
+      (_GETARRAYPTR(char, B))) == 0 : 0)
 #define EPSILON 0.000001
 
 /* Checked C related */
 #undef COUNTED_MALLOC
-#define DEBUG(m) printf("[DEBUG]: %d %s\n", __LINE__, m);
 
 void test_suite_1(void); /* Test 3 files from json.org + serialization*/
 void test_suite_2(JSON_Value *value); /* Test correctness of parsed values */
@@ -182,14 +183,14 @@ void test_suite_2(JSON_Value *root_value) {
     TEST(json_object_dothas_value_of_type(root_object, "object.nested null", JSONNull));
     TEST(!json_object_dothas_value_of_type(root_object, "object.nested object", JSONNull));
 
-    TEST(STREQ(json_object_get_string(root_object, "string"), "lorem ipsum"));
-    TEST(STREQ(json_object_get_string(root_object, "utf string"), "lorem ipsum"));
-    TEST(STREQ(json_object_get_string(root_object, "utf-8 string"), "あいうえお"));
-    TEST(STREQ(json_object_get_string(root_object, "surrogate string"), "lorem𝄞ipsum𝍧lorem"));
+    TEST(MM_STREQ(json_object_get_string(root_object, "string"), "lorem ipsum"));
+    TEST(MM_STREQ(json_object_get_string(root_object, "utf string"), "lorem ipsum"));
+    TEST(MM_STREQ(json_object_get_string(root_object, "utf-8 string"), "あいうえお"));
+    TEST(MM_STREQ(json_object_get_string(root_object, "surrogate string"), "lorem𝄞ipsum𝍧lorem"));
 
     len = json_object_get_string_len(root_object, "string with null");
     TEST(len == 7);
-    TEST(memcmp(json_object_get_string(root_object, "string with null"), "abc\0def", len) == 0);
+    TEST(memcmp(_GETARRAYPTR(char, json_object_get_string(root_object, "string with null")), "abc\0def", len) == 0);
 
     TEST(json_object_get_number(root_object, "positive one") == 1.0);
     TEST(json_object_get_number(root_object, "negative one") == -1.0);
@@ -200,8 +201,8 @@ void test_suite_2(JSON_Value *root_value) {
 
     array = json_object_get_array(root_object, "string array");
     if (array != NULL && json_array_get_count(array) > 1) {
-        TEST(STREQ(json_array_get_string(array, 0), "lorem"));
-        TEST(STREQ(json_array_get_string(array, 1), "ipsum"));
+        TEST(MM_STREQ(json_array_get_string(array, 0), "lorem"));
+        TEST(MM_STREQ(json_array_get_string(array, 1), "ipsum"));
     } else {
         tests_failed++;
     }
@@ -216,7 +217,7 @@ void test_suite_2(JSON_Value *root_value) {
     }
 
     TEST(json_object_get_array(root_object, "non existent array") == NULL);
-    TEST(STREQ(json_object_dotget_string(root_object, "object.nested string"), "str"));
+    TEST(MM_STREQ(json_object_dotget_string(root_object, "object.nested string"), "str"));
     TEST(json_object_dotget_boolean(root_object, "object.nested true") == 1);
     TEST(json_object_dotget_boolean(root_object, "object.nested false") == 0);
     TEST(json_object_dotget_value(root_object, "object.nested null") != NULL);
@@ -231,15 +232,15 @@ void test_suite_2(JSON_Value *root_value) {
     TEST(array != NULL);
     TEST(json_array_get_count(array) > 1);
     if (array != NULL && json_array_get_count(array) > 1) {
-        TEST(STREQ(json_array_get_string(array, 0), "lorem"));
-        TEST(STREQ(json_array_get_string(array, 1), "ipsum"));
+        TEST(MM_STREQ(json_array_get_string(array, 0), "lorem"));
+        TEST(MM_STREQ(json_array_get_string(array, 1), "ipsum"));
     }
     TEST(json_object_dotget_boolean(root_object, "object.nested true") == 1);
 
-    TEST(STREQ(json_object_get_string(root_object, "/**/"), "comment"));
-    TEST(STREQ(json_object_get_string(root_object, "//"), "comment"));
-    TEST(STREQ(json_object_get_string(root_object, "url"), "https://www.example.com/search?q=12345"));
-    TEST(STREQ(json_object_get_string(root_object, "escaped chars"), "\" \\ /"));
+    TEST(MM_STREQ(json_object_get_string(root_object, "/**/"), "comment"));
+    TEST(MM_STREQ(json_object_get_string(root_object, "//"), "comment"));
+    TEST(MM_STREQ(json_object_get_string(root_object, "url"), "https://www.example.com/search?q=12345"));
+    TEST(MM_STREQ(json_object_get_string(root_object, "escaped chars"), "\" \\ /"));
 
     TEST(json_object_get_object(root_object, "empty object") != NULL);
     TEST(json_object_get_array(root_object, "empty array") != NULL);
@@ -283,10 +284,10 @@ void test_suite_3(void) {
     TEST(json_parse_string("123") != NULL);
 
     puts("Test UTF-16 parsing:");
-    TEST(STREQ(json_string(json_parse_string("\"\\u0024x\"")), "$x"));
-    TEST(STREQ(json_string(json_parse_string("\"\\u00A2x\"")), "¢x"));
-    TEST(STREQ(json_string(json_parse_string("\"\\u20ACx\"")), "€x"));
-    TEST(STREQ(json_string(json_parse_string("\"\\uD801\\uDC37x\"")), "𐐷x"));
+    TEST(MM_STREQ(json_string(json_parse_string("\"\\u0024x\"")), "$x"));
+    TEST(MM_STREQ(json_string(json_parse_string("\"\\u00A2x\"")), "¢x"));
+    TEST(MM_STREQ(json_string(json_parse_string("\"\\u20ACx\"")), "€x"));
+    TEST(MM_STREQ(json_string(json_parse_string("\"\\uD801\\uDC37x\"")), "𐐷x"));
 
     puts("Testing invalid strings:");
     malloc_count = 0;
@@ -603,6 +604,7 @@ void test_memory_leaks() {
     TEST(malloc_count == 0);
 }
 
+#if 0
 void print_commits_info(const char *username, const char *repo) {
     JSON_Value *root_value;
     JSON_Array *commits;
@@ -642,12 +644,13 @@ void print_commits_info(const char *username, const char *repo) {
     json_value_free(root_value);
     system(cleanup_command);
 }
+#endif
 
 void persistence_example(void) {
     JSON_Value *schema = json_parse_string("{\"name\":\"\"}");
     JSON_Value *user_data = json_parse_file(get_file_path("user_data.json"));
-    char buf[256];
-    const char *name = NULL;
+    _multiple char buf[256];
+    mm_array_ptr<const char> name = NULL;
     if (user_data == NULL || json_validate(schema, user_data) != JSONSuccess) {
         puts("Enter your name:");
         scanf("%s", buf);
@@ -656,7 +659,7 @@ void persistence_example(void) {
         json_serialize_to_file(user_data, "user_data.json");
     }
     name = json_object_get_string(json_object(user_data), "name");
-    printf("Hello, %s.", name);
+    printf("Hello, %s.", _GETARRAYPTR(char, name));
     json_value_free(schema);
     json_value_free(user_data);
     return;
