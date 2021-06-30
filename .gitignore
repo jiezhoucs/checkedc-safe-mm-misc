@@ -30,4 +30,3 @@ eval/data/olden/origin
 benchmarks/**/*.cache
 benchmarks/**/*.log
 benchmarks/**/*.status
-benchmarks/**/Makefile
