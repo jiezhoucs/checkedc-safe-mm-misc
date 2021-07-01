@@ -144,7 +144,7 @@ void test_suite_1(void) {
 }
 
 void test_suite_2(JSON_Value *root_value) {
-    JSON_Object *root_object;
+    mm_ptr<JSON_Object> root_object = NULL;
     JSON_Array *array;
     JSON_Value *array_value;
     size_t len;
@@ -355,7 +355,7 @@ void test_suite_5(void) {
     JSON_Value *val_from_file = json_parse_file(get_file_path("test_5.txt"));
 
     JSON_Value *val = NULL, *val_parent;
-    JSON_Object *obj = NULL;
+    mm_ptr<JSON_Object> obj = NULL;
     JSON_Array *interests_arr = NULL;
 
     JSON_Value *remove_test_val = NULL;
@@ -497,7 +497,7 @@ void test_suite_6(void) {
 void test_suite_7(void) {
     JSON_Value *val_from_file = json_parse_file(get_file_path("test_5.txt"));
     JSON_Value *schema = json_value_init_object();
-    JSON_Object *schema_obj = json_value_get_object(schema);
+    mm_ptr<JSON_Object> schema_obj = json_value_get_object(schema);
     JSON_Array *interests_arr = NULL;
     json_object_set_string(schema_obj, "first", "");
     json_object_set_string(schema_obj, "last", "");

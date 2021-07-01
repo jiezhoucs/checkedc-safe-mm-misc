@@ -117,71 +117,73 @@ JSON_Status json_validate(const JSON_Value *schema, const JSON_Value *value);
 /*
  * JSON Object
  */
-JSON_Value  * json_object_get_value  (const JSON_Object *object, mm_array_ptr<const char> name);
-mm_array_ptr<const char> json_object_get_string (const JSON_Object *object, mm_array_ptr<const char> name);
-size_t        json_object_get_string_len(const JSON_Object *object, mm_array_ptr<const char> name); /* doesn't account for last null character */
-JSON_Object * json_object_get_object (const JSON_Object *object, mm_array_ptr<const char> name);
-JSON_Array  * json_object_get_array  (const JSON_Object *object, mm_array_ptr<const char> name);
-double        json_object_get_number (const JSON_Object *object, mm_array_ptr<const char> name); /* returns 0 on fail */
-int           json_object_get_boolean(const JSON_Object *object, mm_array_ptr<const char> name); /* returns -1 on fail */
+JSON_Value *json_object_get_value(mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+mm_array_ptr<const char> json_object_get_string (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+size_t        json_object_get_string_len(mm_ptr<const JSON_Object> object,
+    mm_array_ptr<const char> name); /* doesn't account for last null character */
+mm_ptr<JSON_Object> json_object_get_object (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+JSON_Array  * json_object_get_array  (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+double        json_object_get_number (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name); /* returns 0 on fail */
+int           json_object_get_boolean(mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name); /* returns -1 on fail */
 
 /* dotget functions enable addressing values with dot notation in nested objects,
  just like in structs or c++/java/c# objects (e.g. objectA.objectB.value).
  Because valid names in JSON can contain dots, some values may be inaccessible
  this way. */
-JSON_Value  * json_object_dotget_value  (const JSON_Object *object, mm_array_ptr<const char> name);
-mm_array_ptr<const char> json_object_dotget_string (const JSON_Object *object, mm_array_ptr<const char> name);
-size_t        json_object_dotget_string_len(const JSON_Object *object,
+JSON_Value  * json_object_dotget_value  (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+mm_array_ptr<const char> json_object_dotget_string(mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+size_t        json_object_dotget_string_len(mm_ptr<const JSON_Object> object,
     mm_array_ptr<const char> name); /* doesn't account for last null character */
-JSON_Object * json_object_dotget_object (const JSON_Object *object, mm_array_ptr<const char> name);
-JSON_Array  * json_object_dotget_array  (const JSON_Object *object, mm_array_ptr<const char> name);
-double        json_object_dotget_number (const JSON_Object *object, mm_array_ptr<const char> name); /* returns 0 on fail */
-int           json_object_dotget_boolean(const JSON_Object *object, mm_array_ptr<const char> name); /* returns -1 on fail */
+mm_ptr<JSON_Object> json_object_dotget_object (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+JSON_Array  * json_object_dotget_array  (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+double        json_object_dotget_number (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name); /* returns 0 on fail */
+int           json_object_dotget_boolean(mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name); /* returns -1 on fail */
 
 /* Functions to get available names */
-size_t        json_object_get_count   (const JSON_Object *object);
-mm_array_ptr<const char> json_object_get_name    (const JSON_Object *object, size_t index);
-JSON_Value  * json_object_get_value_at(const JSON_Object *object, size_t index);
-JSON_Value  * json_object_get_wrapping_value(const JSON_Object *object);
+size_t        json_object_get_count(mm_ptr<const JSON_Object> object);
+mm_array_ptr<const char> json_object_get_name(mm_ptr<const JSON_Object> object, size_t index);
+JSON_Value  * json_object_get_value_at(mm_ptr<const JSON_Object> object, size_t index);
+JSON_Value  * json_object_get_wrapping_value(mm_ptr<const JSON_Object> object);
 
 /* Functions to check if object has a value with a specific name. Returned value is 1 if object has
  * a value and 0 if it doesn't. dothas functions behave exactly like dotget functions. */
-int json_object_has_value        (const JSON_Object *object, mm_array_ptr<const char> name);
-int json_object_has_value_of_type(const JSON_Object *object, mm_array_ptr<const char> name, JSON_Value_Type type);
+int json_object_has_value        (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+int json_object_has_value_of_type(mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name, JSON_Value_Type type);
 
-int json_object_dothas_value        (const JSON_Object *object, mm_array_ptr<const char> name);
-int json_object_dothas_value_of_type(const JSON_Object *object, mm_array_ptr<const char> name, JSON_Value_Type type);
+int json_object_dothas_value     (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+int json_object_dothas_value_of_type(mm_ptr<const JSON_Object> object,
+    mm_array_ptr<const char> name, JSON_Value_Type type);
 
 /* Creates new name-value pair or frees and replaces old value with a new one.
  * json_object_set_value does not copy passed value so it shouldn't be freed afterwards. */
-JSON_Status json_object_set_value(JSON_Object *object, mm_array_ptr<const char> name, JSON_Value *value);
-JSON_Status json_object_set_string(JSON_Object *object, mm_array_ptr<const char> name,
+JSON_Status json_object_set_value(mm_ptr<JSON_Object> object, mm_array_ptr<const char> name, JSON_Value *value);
+JSON_Status json_object_set_string(mm_ptr<JSON_Object> object, mm_array_ptr<const char> name,
     mm_array_ptr<const char> string);
-JSON_Status json_object_set_string_with_len(JSON_Object *object, mm_array_ptr<const char> name,
+JSON_Status json_object_set_string_with_len(mm_ptr<JSON_Object> bject, mm_array_ptr<const char> name,
     mm_array_ptr<const char> string, size_t len);  /* length shouldn't include last null character */
-JSON_Status json_object_set_number(JSON_Object *object, mm_array_ptr<const char> name, double number);
-JSON_Status json_object_set_boolean(JSON_Object *object, mm_array_ptr<const char> name, int boolean);
-JSON_Status json_object_set_null(JSON_Object *object, mm_array_ptr<const char> name);
+JSON_Status json_object_set_number(mm_ptr<JSON_Object> object, mm_array_ptr<const char> name, double number);
+JSON_Status json_object_set_boolean(mm_ptr<JSON_Object> object, mm_array_ptr<const char> name, int boolean);
+JSON_Status json_object_set_null(mm_ptr<JSON_Object> object, mm_array_ptr<const char> name);
 
 /* Works like dotget functions, but creates whole hierarchy if necessary.
  * json_object_dotset_value does not copy passed value so it shouldn't be freed afterwards. */
-JSON_Status json_object_dotset_value(JSON_Object *object, mm_array_ptr<const char> name, JSON_Value *value);
-JSON_Status json_object_dotset_string(JSON_Object *object,
+JSON_Status json_object_dotset_value(mm_ptr<JSON_Object> object, mm_array_ptr<const char> name, JSON_Value *value);
+JSON_Status json_object_dotset_string(mm_ptr<JSON_Object> object,
     mm_array_ptr<const char> name, mm_array_ptr<const char> string);
-JSON_Status json_object_dotset_string_with_len(JSON_Object *object, mm_array_ptr<const char> name,
+JSON_Status json_object_dotset_string_with_len(mm_ptr<JSON_Object> object, mm_array_ptr<const char> name,
     mm_array_ptr<const char> string, size_t len); /* length shouldn't include last null character */
-JSON_Status json_object_dotset_number(JSON_Object *object, mm_array_ptr<const char> name, double number);
-JSON_Status json_object_dotset_boolean(JSON_Object *object, mm_array_ptr<const char> name, int boolean);
-JSON_Status json_object_dotset_null(JSON_Object *object, mm_array_ptr<const char> name);
+JSON_Status json_object_dotset_number(mm_ptr<JSON_Object> object, mm_array_ptr<const char> name, double number);
+JSON_Status json_object_dotset_boolean(mm_ptr<JSON_Object> object, mm_array_ptr<const char> name, int boolean);
+JSON_Status json_object_dotset_null(mm_ptr<JSON_Object> object, mm_array_ptr<const char> name);
 
 /* Frees and removes name-value pair */
-JSON_Status json_object_remove(JSON_Object *object, mm_array_ptr<const char> name);
+JSON_Status json_object_remove(mm_ptr<JSON_Object> object, mm_array_ptr<const char> name);
 
 /* Works like dotget function, but removes name-value pair only on exact match. */
-JSON_Status json_object_dotremove(JSON_Object *object, mm_array_ptr<const char> key);
+JSON_Status json_object_dotremove(mm_ptr<JSON_Object> object, mm_array_ptr<const char> key);
 
 /* Removes all name-value pairs in object */
-JSON_Status json_object_clear(JSON_Object *object);
+JSON_Status json_object_clear(mm_ptr<JSON_Object> object);
 
 /*
  *JSON Array
@@ -189,7 +191,7 @@ JSON_Status json_object_clear(JSON_Object *object);
 JSON_Value  * json_array_get_value  (const JSON_Array *array, size_t index);
 mm_array_ptr<const char> json_array_get_string (const JSON_Array *array, size_t index);
 size_t        json_array_get_string_len(const JSON_Array *array, size_t index); /* doesn't account for last null character */
-JSON_Object * json_array_get_object (const JSON_Array *array, size_t index);
+mm_ptr<JSON_Object> json_array_get_object (const JSON_Array *array, size_t index);
 JSON_Array  * json_array_get_array  (const JSON_Array *array, size_t index);
 double        json_array_get_number (const JSON_Array *array, size_t index); /* returns 0 on fail */
 int           json_array_get_boolean(const JSON_Array *array, size_t index); /* returns -1 on fail */
@@ -239,7 +241,7 @@ JSON_Value * json_value_deep_copy   (const JSON_Value *value);
 void         json_value_free        (JSON_Value *value);
 
 JSON_Value_Type json_value_get_type   (const JSON_Value *value);
-JSON_Object *   json_value_get_object (const JSON_Value *value);
+mm_ptr<JSON_Object>   json_value_get_object (const JSON_Value *value);
 JSON_Array  *   json_value_get_array  (const JSON_Value *value);
 mm_array_ptr<const char> json_value_get_string (const JSON_Value *value);
 size_t          json_value_get_string_len(const JSON_Value *value); /* doesn't account for last null character */
@@ -249,7 +251,7 @@ JSON_Value  *   json_value_get_parent (const JSON_Value *value);
 
 /* Same as above, but shorter */
 JSON_Value_Type json_type   (const JSON_Value *value);
-JSON_Object *   json_object (const JSON_Value *value);
+mm_ptr<JSON_Object>  json_object (const JSON_Value *value);
 JSON_Array  *   json_array  (const JSON_Value *value);
 mm_array_ptr<const char> json_string (const JSON_Value *value);
 size_t          json_string_len(const JSON_Value *value); /* doesn't account for last null character */
