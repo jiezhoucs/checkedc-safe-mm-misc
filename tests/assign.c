@@ -91,6 +91,34 @@ resume1:
     print_end("assigning NULL to an _MM_array_ptr in an array");
 }
 
+/*
+ * Test assigning the result of a ternary expression to a pointer.
+ * */
+void f4() {
+    print_start("assigning the result of a ternary expression to a pointer");
+
+    signal(SIGILL, ill_handler);
+    if (setjmp(resume_context) == 1) goto resume;
+
+    mm_ptr<Data> pd = mm_alloc<Data>(sizeof(Data));
+    pd->i = 42;
+    pd->j = 84;
+
+    mm_ptr<Data> pd1 = pd->i > 21 ? pd : NULL;
+    mm_ptr<int> pi = pd->j > 42 ? &pd->i : NULL;
+
+    if (pd1->i != 42 || *pi != 42) {
+        print_error("assign.c::f4(): assigning the result of a ternary expression "
+                    "to an mmsafe pointer");
+    }
+
+    mm_free<Data>(pd);
+    printf("%d\n", *pi);   // UAF
+
+resume:
+    print_end("assigning the result of a ternary expression to a pointer");
+}
+
 int main(int argc, char *argv[]) {
     signal(SIGILL, ill_handler);
     signal(SIGSEGV, segv_handler);
@@ -106,6 +134,8 @@ int main(int argc, char *argv[]) {
     f2();
 
     f3();
+
+    f4();
 
     printf("===== Finish testing assignment functionality. =====\n\n");
     return 0;
