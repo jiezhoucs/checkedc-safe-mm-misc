@@ -48,7 +48,7 @@
 #undef COUNTED_MALLOC
 
 void test_suite_1(void); /* Test 3 files from json.org + serialization*/
-void test_suite_2(JSON_Value *value); /* Test correctness of parsed values */
+void test_suite_2(mm_ptr<JSON_Value> value); /* Test correctness of parsed values */
 void test_suite_2_no_comments(void);
 void test_suite_2_with_comments(void);
 void test_suite_3(void); /* Test parsing valid and invalid strings */
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
 }
 
 void test_suite_1(void) {
-    JSON_Value *val;
+    mm_ptr<JSON_Value> val = NULL;
     TEST((val = json_parse_file(get_file_path("test_1_1.txt"))) != NULL);
     TEST(json_value_equals(json_parse_string(json_serialize_to_string(val)), val));
     TEST(json_value_equals(json_parse_string(json_serialize_to_string_pretty(val)), val));
@@ -143,10 +143,10 @@ void test_suite_1(void) {
     if (val) { json_value_free(val); }
 }
 
-void test_suite_2(JSON_Value *root_value) {
+void test_suite_2(mm_ptr<JSON_Value> root_value) {
     mm_ptr<JSON_Object> root_object = NULL;
     JSON_Array *array;
-    JSON_Value *array_value;
+    mm_ptr<JSON_Value> array_value = NULL;
     size_t len;
     size_t i;
     TEST(root_value);
@@ -255,7 +255,7 @@ void test_suite_2(JSON_Value *root_value) {
 
 void test_suite_2_no_comments(void) {
     const char *filename = "test_2.txt";
-    JSON_Value *root_value = NULL;
+    mm_ptr<JSON_Value> root_value = NULL;
     root_value = json_parse_file(get_file_path(filename));
     test_suite_2(root_value);
     TEST(json_value_equals(root_value, json_parse_string(json_serialize_to_string(root_value))));
@@ -265,7 +265,7 @@ void test_suite_2_no_comments(void) {
 
 void test_suite_2_with_comments(void) {
     const char *filename = "test_2_comments.txt";
-    JSON_Value *root_value = NULL;
+    mm_ptr<JSON_Value> root_value = NULL;
     root_value = json_parse_file_with_comments(get_file_path(filename));
     test_suite_2(root_value);
     TEST(json_value_equals(root_value, json_parse_string(json_serialize_to_string(root_value))));
@@ -340,7 +340,7 @@ void test_suite_3(void) {
 
 void test_suite_4() {
     const char *filename = "test_2.txt";
-    JSON_Value *a = NULL, *a_copy = NULL;
+    mm_ptr<JSON_Value> a = NULL, a_copy = NULL;
     printf("Testing %s:\n", filename);
     a = json_parse_file(get_file_path(filename));
     TEST(json_value_equals(a, a)); /* test equality test */
@@ -352,13 +352,13 @@ void test_suite_4() {
 void test_suite_5(void) {
     double zero = 0.0; /* msvc is silly (workaround for error C2124) */
 
-    JSON_Value *val_from_file = json_parse_file(get_file_path("test_5.txt"));
+    mm_ptr<JSON_Value> val_from_file = json_parse_file(get_file_path("test_5.txt"));
 
-    JSON_Value *val = NULL, *val_parent;
+    mm_ptr<JSON_Value> val = NULL, val_parent = NULL;
     mm_ptr<JSON_Object> obj = NULL;
     JSON_Array *interests_arr = NULL;
 
-    JSON_Value *remove_test_val = NULL;
+    mm_ptr<JSON_Value> remove_test_val = NULL;
     JSON_Array *remove_test_arr = NULL;
 
     val = json_value_init_object();
@@ -481,8 +481,8 @@ void test_suite_5(void) {
 
 void test_suite_6(void) {
     const char *filename = "test_2.txt";
-    JSON_Value *a = NULL;
-    JSON_Value *b = NULL;
+    mm_ptr<JSON_Value> a = NULL;
+    mm_ptr<JSON_Value> b = NULL;
     a = json_parse_file(get_file_path(filename));
     b = json_parse_file(get_file_path(filename));
     TEST(json_value_equals(a, b));
@@ -495,8 +495,8 @@ void test_suite_6(void) {
 }
 
 void test_suite_7(void) {
-    JSON_Value *val_from_file = json_parse_file(get_file_path("test_5.txt"));
-    JSON_Value *schema = json_value_init_object();
+    mm_ptr<JSON_Value> val_from_file = json_parse_file(get_file_path("test_5.txt"));
+    mm_ptr<JSON_Value> schema = json_value_init_object();
     mm_ptr<JSON_Object> schema_obj = json_value_get_object(schema);
     JSON_Array *interests_arr = NULL;
     json_object_set_string(schema_obj, "first", "");
@@ -514,8 +514,8 @@ void test_suite_7(void) {
 void test_suite_8(void) {
     const char *filename = "test_2.txt";
     const char *temp_filename = "test_2_serialized.txt";
-    JSON_Value *a = NULL;
-    JSON_Value *b = NULL;
+    mm_ptr<JSON_Value> a = NULL;
+    mm_ptr<JSON_Value> b = NULL;
     mm_array_ptr<char> buf = NULL;
     size_t serialization_size = 0;
     a = json_parse_file(get_file_path(filename));
@@ -533,8 +533,8 @@ void test_suite_9(void) {
     const char *temp_filename = "test_2_serialized_pretty.txt";
     char *file_contents = NULL;
     mm_array_ptr<char> serialized = NULL;
-    JSON_Value *a = NULL;
-    JSON_Value *b = NULL;
+    mm_ptr<JSON_Value> a = NULL;
+    mm_ptr<JSON_Value> b = NULL;
     size_t serialization_size = 0;
     a = json_parse_file(get_file_path(filename));
     TEST(json_serialize_to_file_pretty(a, get_file_path(temp_filename)) == JSONSuccess);
@@ -551,7 +551,7 @@ void test_suite_9(void) {
 }
 
 void test_suite_10(void) {
-    JSON_Value *val;
+    mm_ptr<JSON_Value> val = NULL;
     mm_array_ptr<char> serialized = NULL;
 
     malloc_count = 0;
@@ -577,7 +577,7 @@ void test_suite_11() {
     mm_array_ptr<const char> array_with_slashes = "[\"a/b/c\"]";
     const char * array_with_escaped_slashes = "[\"a\\/b\\/c\"]";
     mm_array_ptr<char> serialized = NULL;
-    JSON_Value *value = json_parse_string(array_with_slashes);
+    mm_ptr<JSON_Value> value = json_parse_string(array_with_slashes);
 
     serialized = json_serialize_to_string(value);
     TEST(STREQ(array_with_escaped_slashes, _GETARRAYPTR(char, serialized)));
@@ -647,8 +647,8 @@ void print_commits_info(const char *username, const char *repo) {
 #endif
 
 void persistence_example(void) {
-    JSON_Value *schema = json_parse_string("{\"name\":\"\"}");
-    JSON_Value *user_data = json_parse_file(get_file_path("user_data.json"));
+    mm_ptr<JSON_Value> schema = json_parse_string("{\"name\":\"\"}");
+    mm_ptr<JSON_Value> user_data = json_parse_file(get_file_path("user_data.json"));
     _multiple char buf[256];
     mm_array_ptr<const char> name = NULL;
     if (user_data == NULL || json_validate(schema, user_data) != JSONSuccess) {
