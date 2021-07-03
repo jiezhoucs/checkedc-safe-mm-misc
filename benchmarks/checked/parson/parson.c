@@ -144,7 +144,7 @@ static void         json_array_free(JSON_Array *array);
 
 /* JSON Value */
 static mm_ptr<JSON_Value> json_value_init_string_no_copy(mm_array_ptr<char> string, size_t length);
-static const JSON_String *json_value_get_string_desc(mm_ptr<const JSON_Value> value);
+static mm_ptr<const JSON_String> json_value_get_string_desc(mm_ptr<const JSON_Value> value);
 
 /* Parser */
 static JSON_Status  skip_quotes(mm_array_ptr<const char> *string);
@@ -1363,18 +1363,17 @@ JSON_Array * json_value_get_array(mm_ptr<const JSON_Value> value) {
     return json_value_get_type(value) == JSONArray ? value->value.array : NULL;
 }
 
-static const JSON_String *json_value_get_string_desc(mm_ptr<const JSON_Value> value) {
-    /* TODO */
-    return json_value_get_type(value) == JSONString ? _GETPTR(JSON_String, &value->value.string) : NULL;
+static mm_ptr<const JSON_String> json_value_get_string_desc(mm_ptr<const JSON_Value> value) {
+    return json_value_get_type(value) == JSONString ? &value->value.string : NULL;
 }
 
 mm_array_ptr<const char> json_value_get_string(mm_ptr<const JSON_Value> value) {
-    const JSON_String *str = json_value_get_string_desc(value);
+    mm_ptr<const JSON_String> str = json_value_get_string_desc(value);
     return str ? str->chars : NULL;
 }
 
 size_t json_value_get_string_len(mm_ptr<const JSON_Value> value) {
-    const JSON_String *str = json_value_get_string_desc(value);
+    mm_ptr<const JSON_String> str = json_value_get_string_desc(value);
     return str ? str->length : 0;
 }
 
@@ -1503,7 +1502,7 @@ mm_ptr<JSON_Value> json_value_init_null(void) {
 mm_ptr<JSON_Value> json_value_deep_copy(mm_ptr<const JSON_Value> value) {
     size_t i = 0;
     mm_ptr<JSON_Value> return_value = NULL, temp_value_copy = NULL, temp_value = NULL;
-    const JSON_String *temp_string = NULL;
+    mm_ptr<const JSON_String> temp_string = NULL;
     mm_array_ptr<const char> temp_key = NULL;
     mm_array_ptr<char> temp_string_copy = NULL;
     JSON_Array *temp_array = NULL, *temp_array_copy = NULL;
@@ -2139,7 +2138,7 @@ JSON_Status json_validate(mm_ptr<const JSON_Value> schema, mm_ptr<const JSON_Val
 int json_value_equals(mm_ptr<const JSON_Value> a, mm_ptr<const JSON_Value> b) {
     mm_ptr<JSON_Object> a_object = NULL, b_object = NULL;
     JSON_Array *a_array = NULL, *b_array = NULL;
-    const JSON_String *a_string = NULL, *b_string = NULL;
+    mm_ptr<const JSON_String> a_string = NULL, b_string = NULL;
     mm_array_ptr<const char> key = NULL;
     size_t a_count = 0, b_count = 0, i = 0;
     JSON_Value_Type a_type, b_type;
