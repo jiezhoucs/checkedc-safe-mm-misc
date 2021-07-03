@@ -122,7 +122,7 @@ mm_array_ptr<const char> json_object_get_string (mm_ptr<const JSON_Object> objec
 size_t        json_object_get_string_len(mm_ptr<const JSON_Object> object,
     mm_array_ptr<const char> name); /* doesn't account for last null character */
 mm_ptr<JSON_Object> json_object_get_object (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
-JSON_Array  * json_object_get_array  (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+mm_ptr<JSON_Array> json_object_get_array  (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
 double        json_object_get_number (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name); /* returns 0 on fail */
 int           json_object_get_boolean(mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name); /* returns -1 on fail */
 
@@ -135,7 +135,7 @@ mm_array_ptr<const char> json_object_dotget_string(mm_ptr<const JSON_Object> obj
 size_t        json_object_dotget_string_len(mm_ptr<const JSON_Object> object,
     mm_array_ptr<const char> name); /* doesn't account for last null character */
 mm_ptr<JSON_Object> json_object_dotget_object (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
-JSON_Array  * json_object_dotget_array  (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
+mm_ptr<JSON_Array> json_object_dotget_array  (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name);
 double        json_object_dotget_number (mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name); /* returns 0 on fail */
 int           json_object_dotget_boolean(mm_ptr<const JSON_Object> object, mm_array_ptr<const char> name); /* returns -1 on fail */
 
@@ -188,43 +188,43 @@ JSON_Status json_object_clear(mm_ptr<JSON_Object> object);
 /*
  *JSON Array
  */
-mm_ptr<JSON_Value> json_array_get_value  (const JSON_Array *array, size_t index);
-mm_array_ptr<const char> json_array_get_string (const JSON_Array *array, size_t index);
-size_t        json_array_get_string_len(const JSON_Array *array, size_t index); /* doesn't account for last null character */
-mm_ptr<JSON_Object> json_array_get_object (const JSON_Array *array, size_t index);
-JSON_Array  * json_array_get_array  (const JSON_Array *array, size_t index);
-double        json_array_get_number (const JSON_Array *array, size_t index); /* returns 0 on fail */
-int           json_array_get_boolean(const JSON_Array *array, size_t index); /* returns -1 on fail */
-size_t        json_array_get_count  (const JSON_Array *array);
-mm_ptr<JSON_Value> json_array_get_wrapping_value(const JSON_Array *array);
+mm_ptr<JSON_Value> json_array_get_value  (mm_ptr<const JSON_Array> array, size_t index);
+mm_array_ptr<const char> json_array_get_string (mm_ptr<const JSON_Array> array, size_t index);
+size_t        json_array_get_string_len(mm_ptr<const JSON_Array> array, size_t index); /* doesn't account for last null character */
+mm_ptr<JSON_Object> json_array_get_object (mm_ptr<const JSON_Array> array, size_t index);
+mm_ptr<JSON_Array> json_array_get_array  (mm_ptr<const JSON_Array> array, size_t index);
+double        json_array_get_number (mm_ptr<const JSON_Array> array, size_t index); /* returns 0 on fail */
+int           json_array_get_boolean(mm_ptr<const JSON_Array> array, size_t index); /* returns -1 on fail */
+size_t        json_array_get_count  (mm_ptr<const JSON_Array> array);
+mm_ptr<JSON_Value> json_array_get_wrapping_value(mm_ptr<const JSON_Array> array);
 
 /* Frees and removes value at given index, does nothing and returns JSONFailure if index doesn't exist.
  * Order of values in array may change during execution.  */
-JSON_Status json_array_remove(JSON_Array *array, size_t i);
+JSON_Status json_array_remove(mm_ptr<JSON_Array> array, size_t i);
 
 /* Frees and removes from array value at given index and replaces it with given one.
  * Does nothing and returns JSONFailure if index doesn't exist.
  * json_array_replace_value does not copy passed value so it shouldn't be freed afterwards. */
-JSON_Status json_array_replace_value(JSON_Array *array, size_t i, mm_ptr<JSON_Value> value);
-JSON_Status json_array_replace_string(JSON_Array *array, size_t i, mm_array_ptr<const char> string);
-JSON_Status json_array_replace_string_with_len(JSON_Array *array, size_t i,
+JSON_Status json_array_replace_value(mm_ptr<JSON_Array> array, size_t i, mm_ptr<JSON_Value> value);
+JSON_Status json_array_replace_string(mm_ptr<JSON_Array> array, size_t i, mm_array_ptr<const char> string);
+JSON_Status json_array_replace_string_with_len(mm_ptr<JSON_Array> array, size_t i,
     mm_array_ptr<const char> string, size_t len); /* length shouldn't include last null character */
-JSON_Status json_array_replace_number(JSON_Array *array, size_t i, double number);
-JSON_Status json_array_replace_boolean(JSON_Array *array, size_t i, int boolean);
-JSON_Status json_array_replace_null(JSON_Array *array, size_t i);
+JSON_Status json_array_replace_number(mm_ptr<JSON_Array> array, size_t i, double number);
+JSON_Status json_array_replace_boolean(mm_ptr<JSON_Array> array, size_t i, int boolean);
+JSON_Status json_array_replace_null(mm_ptr<JSON_Array> array, size_t i);
 
 /* Frees and removes all values from array */
-JSON_Status json_array_clear(JSON_Array *array);
+JSON_Status json_array_clear(mm_ptr<JSON_Array> array);
 
 /* Appends new value at the end of array.
  * json_array_append_value does not copy passed value so it shouldn't be freed afterwards. */
-JSON_Status json_array_append_value(JSON_Array *array, mm_ptr<JSON_Value> value);
-JSON_Status json_array_append_string(JSON_Array *array, mm_array_ptr<const char> string);
-JSON_Status json_array_append_string_with_len(JSON_Array *array,
+JSON_Status json_array_append_value(mm_ptr<JSON_Array> array, mm_ptr<JSON_Value> value);
+JSON_Status json_array_append_string(mm_ptr<JSON_Array> array, mm_array_ptr<const char> string);
+JSON_Status json_array_append_string_with_len(mm_ptr<JSON_Array> array,
     mm_array_ptr<const char> string, size_t len); /* length shouldn't include last null character */
-JSON_Status json_array_append_number(JSON_Array *array, double number);
-JSON_Status json_array_append_boolean(JSON_Array *array, int boolean);
-JSON_Status json_array_append_null(JSON_Array *array);
+JSON_Status json_array_append_number(mm_ptr<JSON_Array> array, double number);
+JSON_Status json_array_append_boolean(mm_ptr<JSON_Array> array, int boolean);
+JSON_Status json_array_append_null(mm_ptr<JSON_Array> array);
 
 /*
  *JSON Value
@@ -242,7 +242,7 @@ void         json_value_free        (mm_ptr<JSON_Value> value);
 
 JSON_Value_Type json_value_get_type   (mm_ptr<const JSON_Value> value);
 mm_ptr<JSON_Object>   json_value_get_object (mm_ptr<const JSON_Value> value);
-JSON_Array  *   json_value_get_array  (mm_ptr<const JSON_Value> value);
+mm_ptr<JSON_Array>    json_value_get_array  (mm_ptr<const JSON_Value> value);
 mm_array_ptr<const char> json_value_get_string (mm_ptr<const JSON_Value> value);
 size_t          json_value_get_string_len(mm_ptr<const JSON_Value> value); /* doesn't account for last null character */
 double          json_value_get_number (mm_ptr<const JSON_Value> value);
@@ -252,7 +252,7 @@ mm_ptr<JSON_Value> json_value_get_parent (mm_ptr<const JSON_Value> value);
 /* Same as above, but shorter */
 JSON_Value_Type json_type   (mm_ptr<const JSON_Value> value);
 mm_ptr<JSON_Object>  json_object (mm_ptr<const JSON_Value> value);
-JSON_Array  *   json_array  (mm_ptr<const JSON_Value> value);
+mm_ptr<JSON_Array>   json_array  (mm_ptr<const JSON_Value> value);
 mm_array_ptr<const char> json_string (mm_ptr<const JSON_Value> value);
 size_t          json_string_len(mm_ptr<const JSON_Value> value); /* doesn't account for last null character */
 double          json_number (mm_ptr<const JSON_Value> value);

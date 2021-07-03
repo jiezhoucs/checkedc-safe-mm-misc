@@ -145,7 +145,7 @@ void test_suite_1(void) {
 
 void test_suite_2(mm_ptr<JSON_Value> root_value) {
     mm_ptr<JSON_Object> root_object = NULL;
-    JSON_Array *array;
+    mm_ptr<JSON_Array> array = NULL;
     mm_ptr<JSON_Value> array_value = NULL;
     size_t len;
     size_t i;
@@ -356,10 +356,10 @@ void test_suite_5(void) {
 
     mm_ptr<JSON_Value> val = NULL, val_parent = NULL;
     mm_ptr<JSON_Object> obj = NULL;
-    JSON_Array *interests_arr = NULL;
+    mm_ptr<JSON_Array> interests_arr = NULL;
 
     mm_ptr<JSON_Value> remove_test_val = NULL;
-    JSON_Array *remove_test_arr = NULL;
+    mm_ptr<JSON_Array> remove_test_arr = NULL;
 
     val = json_value_init_object();
     TEST(val != NULL);
@@ -498,7 +498,7 @@ void test_suite_7(void) {
     mm_ptr<JSON_Value> val_from_file = json_parse_file(get_file_path("test_5.txt"));
     mm_ptr<JSON_Value> schema = json_value_init_object();
     mm_ptr<JSON_Object> schema_obj = json_value_get_object(schema);
-    JSON_Array *interests_arr = NULL;
+    mm_ptr<JSON_Array> interests_arr = NULL;
     json_object_set_string(schema_obj, "first", "");
     json_object_set_string(schema_obj, "last", "");
     json_object_set_number(schema_obj, "age", 0);
