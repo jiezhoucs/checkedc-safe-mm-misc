@@ -22,6 +22,9 @@
 #define HEAP_PADDING 8
 #define HIGH32BITS_MASK 0x00000000ffffffff
 
+#define GET_KEY(key_offset) ((key_offset >> 32) & HIGH32BITS_MASK)
+#define GET_OFFSET(key_offset) (key_offset & HIGH32BITS_MASK)
+
 // A helper struct that has the same inner structure as an mm_ptr.
 // It is used to help create an mm_ptr.
 typedef struct {
@@ -156,6 +159,8 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
 //
 // @param p - a _MM_ptr whose pointee is going to be freed.
 //
+// Potential optimization: can we pass p by register?
+//
 for_any(T) void mm_free(mm_ptr<const T> const p) {
     // free() allows freeing a null ptr, in which case nothing is performed.
     if (p == NULL) return;
@@ -164,7 +169,23 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
     // statement.
     volatile _MM_ptr_Rep *mm_ptr_ptr = (_MM_ptr_Rep *)&p;
 
+    // Do two temporal memory safety checks.
+    // First, check if the offset is zero. A non-zero offset means an invalid free.
+    uint64_t key_offset = mm_ptr_ptr->key_offset;
+    if (GET_OFFSET(key_offset) != 0) {
+        // An invalid free
+        fprintf(stderr, "Invalid Free (non-zero offset in an mmptr).\n");
+        abort();
+    }
+
+    // Second, do a key checking. This would catch double free or UAF errors.
     void *lock_ptr = mm_ptr_ptr->p - LOCK_SIZE;
+    if (GET_KEY(key_offset) != *(uint32_t *)lock_ptr) {
+        fprintf(stderr, "Double Free or UAF\n");
+        abort();
+    }
+
+    // Invalidate the lock.
     // This step may not be necessary in some cases. In some implementation,
     // free() zeros out all bytes of the memory region of the freed object.
     *(uint32_t *)lock_ptr = 0;
@@ -184,6 +205,19 @@ for_any(T) void mm_array_free(mm_array_ptr<const T> const p) {
     if (p == NULL) return;
 
     volatile _MM_array_ptr_Rep *mm_array_ptr_ptr = (_MM_array_ptr_Rep *)&p;
+
+    if ((char *)mm_array_ptr_ptr->p - (char *)mm_array_ptr_ptr->lock_ptr !=
+        HEAP_PADDING) {
+        // An invalid free
+        fprintf(stderr, "Invalid Free (non-zero offset in an mmptr).\n");
+        abort();
+    }
+
+    if (mm_array_ptr_ptr->key != *(mm_array_ptr_ptr->lock_ptr)) {
+        fprintf(stderr, "Double Free or UAF\n");
+        abort();
+    }
+
     *(mm_array_ptr_ptr->lock_ptr) = 0;
     free(mm_array_ptr_ptr->p - LOCK_SIZE - HEAP_PADDING);
 }
