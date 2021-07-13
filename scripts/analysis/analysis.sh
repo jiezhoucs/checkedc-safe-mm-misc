@@ -6,11 +6,6 @@
 
 . common.sh
 
-ANALYSIS_DIR="$ROOT_DIR/analysis"
-LLVM_BIN="$ANALYSIS_DIR/llvm-project/build/bin"
-CC="$LLVM_BIN/clang"
-LIT="$LLVM_BIN/llvm-lit"
-
 LLVM_TESTSUITE_BUILD="$ANALYSIS_DIR/ts-build"
 SPEC_BUILD="$LLVM_TESTSUITE_BUILD/External/SPEC"
 SPEC_INT_BUILD="$SPEC_BUILD/CINT2017rate"
