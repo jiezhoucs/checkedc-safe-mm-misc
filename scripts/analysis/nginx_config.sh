@@ -17,5 +17,5 @@ cd "$SRC_DIR"
 
 # Compile it if the first argument is "make".
 if [[ $1 == "make" ]]; then
-    make -j6
+    make -j$PARA_LEVEL
 fi

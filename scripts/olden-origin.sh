@@ -35,14 +35,7 @@ run_one() {
     # Compile the benchmark if its binary does not exist.
     if [[ ! -f "$BIN_DIR/$1/$1" ]]; then
         echo "Compiling $1..."
-        # Set the compile parallel level to be #ofLogicalCore - 2.
-        local parallell
-        if [[ $OS == "Linux" ]]; then
-            parallell=`lscpu | grep "^CPU(s)" | cut -d ':' -f2 | echo "$(cat -)-2" | bc`
-        elif [[ $OS == "Darwin" ]]; then
-            parallell=`sysctl -n hw.ncpu | echo "$(cat -)-2" | bc`
-        fi
-        make -j$parallell $1
+        make -j$PARA_LEVEL $1
     fi
 
     $LIT -v --filter $1 -o $DATA_DIR/$1.json .
