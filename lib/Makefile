@@ -3,7 +3,7 @@
 LLVM_DIR = ../../build/bin
 
 OPT=-O3
-CFLAGS = $(OPT) -I../include -Wall
+CFLAGS = $(OPT) -I../include -Wall -mrdrnd
 
 #
 # Checked-C Clang
@@ -50,4 +50,4 @@ debugso: debug.c
 	$(CC) -shared -fPIC -o libdebug.so $^
 
 clean:
-	rm -rf *.o *.so *.a *.ll
+	rm -rf *.o *.so *.a *.s *.ll

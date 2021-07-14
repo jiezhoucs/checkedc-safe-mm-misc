@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <immintrin.h>
 
 #define LOCK_SIZE 8  // It is actually 4 bytes in current implementation.
 #define HEAP_PADDING 8
@@ -42,9 +43,26 @@ typedef struct {
 } _MM_array_ptr_Rep;
 
 
+#if 0
 // Our current implementation uses a 32-bit key. We may need to change it
 // to 40-bit key later.
 uint32_t key = 3;
+#endif
+
+//
+// Function: rand_keygen()
+//
+// Generate a 32-bit random key using Intel's RDRAND instruction.
+//
+static uint32_t rand_keygen() {
+    uint32_t key;
+    while (1) {
+        int succeeded = _rdrand32_step(&key);
+        if (succeeded && key > 2) break;
+    }
+
+    return key;
+}
 
 //
 // Function: mm_alloc()
@@ -68,9 +86,7 @@ for_any(T) mm_ptr<T> mm_alloc(size_t size) {
     if (raw_ptr == NULL) return NULL;
 
     // Generate a random number as the key.
-    // FIXME: replace the naive rand() function with a robust random
-    // number generator.
-    uint32_t new_key = key++;
+    uint32_t new_key = rand_keygen();
     // The lock is located right before the first field of the referent.
     raw_ptr += HEAP_PADDING;
     *((uint32_t *)(raw_ptr)) = new_key;
@@ -98,7 +114,7 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
   void *raw_ptr = malloc(array_size + LOCK_SIZE + HEAP_PADDING);
   if (raw_ptr == NULL) return NULL;
 
-  uint64_t new_key = key++;
+  uint64_t new_key = rand_keygen();
   raw_ptr += HEAP_PADDING;
   *((uint64_t *)(raw_ptr)) = new_key;
 
@@ -138,7 +154,7 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     *((uint64_t *)(old_raw_ptr + HEAP_PADDING)) = 0;
 
     // Use a new key for the new object.
-    uint64_t new_key = key++;
+    uint64_t new_key = rand_keygen();
     new_raw_ptr += HEAP_PADDING;
     *((uint64_t *)new_raw_ptr) = new_key;
 
