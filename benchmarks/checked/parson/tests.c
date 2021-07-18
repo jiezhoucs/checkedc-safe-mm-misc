@@ -649,7 +649,7 @@ void print_commits_info(const char *username, const char *repo) {
 void persistence_example(void) {
     mm_ptr<JSON_Value> schema = json_parse_string("{\"name\":\"\"}");
     mm_ptr<JSON_Value> user_data = json_parse_file(get_file_path("user_data.json"));
-    _multiple char buf[256];
+    _checkable char buf[256];
     mm_array_ptr<const char> name = NULL;
     if (user_data == NULL || json_validate(schema, user_data) != JSONSuccess) {
         puts("Enter your name:");
