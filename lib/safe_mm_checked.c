@@ -1,9 +1,10 @@
 /*
- * This files defines customized memory allocators and deallocators
- * for memory objects pointed by mm_ptr and mm_array_ptr.
+ * This files defines the runtime library for the Checked C project, including
+ * customized memory allocators and deallocators for memory objects pointed
+ * by mm_ptr and mm_array_ptr.
  *
- * Note that the current implementation assumes we adopt a 32-32 key-offset
- * metadata design for mm_ptr. In the paper we say that we support two
+ * Note that the current implementation assumes a 32-32 key-offset metadata
+ * design for mmsafe ptr. In the paper we say that we support two
  * key-offset schemes: 32-32 and 40-24. Also it is not totally clear to us
  * which is faster key-offset or offset-key. For the 32-32 option it might
  * be the same but the key-offset one might be a little faster for
@@ -19,29 +20,19 @@
 #include <stdio.h>
 #include <immintrin.h>
 
-#define LOCK_SIZE 8  // It is actually 4 bytes in current implementation.
+/* The real lock size is 4 bytes but we allocate 8 bytes for it for alignment. */
+#define LOCK_MEM 8
 #define HEAP_PADDING 8
-#define HIGH32BITS_MASK 0x00000000ffffffff
+#define KEY_MASK 0x00000000ffffffff
 
-#define GET_KEY(key_offset) ((key_offset >> 32) & HIGH32BITS_MASK)
-#define GET_OFFSET(key_offset) (key_offset & HIGH32BITS_MASK)
+#define GET_KEY(key_offset) ((key_offset >> 32) & KEY_MASK)
+#define GET_OFFSET(key_offset) (key_offset & KEY_MASK)
 
-// A helper struct that has the same inner structure as an mm_ptr.
-// It is used to help create an mm_ptr.
+// A helper struct that has the same inner structure as an mmsafe ptr.
 typedef struct {
   void *p;
   uint64_t key_offset;
-} _MM_ptr_Rep;
-
-
-// A helper struct that has the "same" inner structure as a mm_array_ptr.
-// It is used to help create a _MM_array_ptr.
-typedef struct {
-  void *p;
-  uint64_t key;
-  uint64_t *lock_ptr;  // pointer to the lock.
-} _MM_array_ptr_Rep;
-
+} _MMSafe_ptr_Rep;
 
 #if 0
 // Our current implementation uses a 32-bit key. We may need to change it
@@ -82,48 +73,45 @@ for_any(T) mm_ptr<T> mm_alloc(size_t size) {
     // We need the HEAP_PADDING to ensure that mm_ptr inside a struct
     // is aligned by 16 bytes.
     // See this issue for the reason: https://github.com/jzhou76/checkedc-llvm/issues/2
-    void *raw_ptr = malloc(size + HEAP_PADDING + LOCK_SIZE);
+    void *raw_ptr = malloc(size + HEAP_PADDING + LOCK_MEM);
     if (raw_ptr == NULL) return NULL;
 
     // Generate a random number as the key.
     uint32_t new_key = rand_keygen();
-    // The lock is located right before the first field of the referent.
+    // The lock is located before the first field of the referent.
     raw_ptr += HEAP_PADDING;
     *((uint32_t *)(raw_ptr)) = new_key;
 
     // Create a helper struct.
-    _MM_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_SIZE, .key_offset = new_key };
+    _MMSafe_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_MEM, .key_offset = new_key };
     // Move the key to the highest 32 bits and make the offset 0.
     safe_ptr.key_offset <<= 32;
 
-    mm_ptr<T> *mm_ptr_ptr = (mm_ptr<T> *)&safe_ptr;
-    return *mm_ptr_ptr;
+    return *((mm_ptr<T> *)&safe_ptr);
 }
 
 //
 // Function: mm_array_alloc()
 //
 // This is a customized memory allocator to allocator an array on the heap.
-// Because the allocated array has an lock attached right before the first
-// element of it, the allocator allocates 8 more bytes for the lock.
-// It returns a _MM_array_ptr that contains a pointer to the first element
-// and a pointer to the lock.
+// The implementation is the same as mm_alloc() because in the current
+// prototype mm_ptr and mm_array_ptr have the same structure.
 //
 __attribute__ ((noinline))
 for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
-  void *raw_ptr = malloc(array_size + LOCK_SIZE + HEAP_PADDING);
+  void *raw_ptr = malloc(array_size + LOCK_MEM + HEAP_PADDING);
   if (raw_ptr == NULL) return NULL;
 
-  uint64_t new_key = rand_keygen();
+  uint32_t new_key = rand_keygen();
   raw_ptr += HEAP_PADDING;
-  *((uint64_t *)(raw_ptr)) = new_key;
+  *((uint32_t *)(raw_ptr)) = new_key;
 
-  _MM_array_ptr_Rep safe_ptr = {
-    .p = raw_ptr + LOCK_SIZE, .key = new_key, .lock_ptr = raw_ptr
-  };
+    // Create a helper struct.
+    _MMSafe_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_MEM, .key_offset = new_key };
+    // Move the key to the highest 32 bits and make the offset 0.
+    safe_ptr.key_offset <<= 32;
 
-  mm_array_ptr<T> *mm_array_ptr_ptr = (mm_array_ptr<T> *)&safe_ptr;
-  return *mm_array_ptr_ptr;
+  return *((mm_array_ptr<T> *)&safe_ptr);
 }
 
 //
@@ -141,8 +129,8 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
 __attribute__ ((noinline))
 for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     // Get the original raw pointer.
-    void * old_raw_ptr = ((_MM_array_ptr_Rep *)&p)->p;
-    old_raw_ptr = old_raw_ptr - LOCK_SIZE - HEAP_PADDING;
+    void * old_raw_ptr = ((_MMSafe_ptr_Rep *)&p)->p;
+    old_raw_ptr = old_raw_ptr - LOCK_MEM - HEAP_PADDING;
 
     void *new_raw_ptr = realloc(old_raw_ptr, size);
     if (new_raw_ptr == old_raw_ptr) {
@@ -151,16 +139,15 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
 
     // The new object is placed in a different location and the old one
     // is freed. The old object's lock needs to be invalidated.
-    *((uint64_t *)(old_raw_ptr + HEAP_PADDING)) = 0;
+    *((uint32_t *)(old_raw_ptr + HEAP_PADDING)) = 0;
 
     // Use a new key for the new object.
     uint64_t new_key = rand_keygen();
     new_raw_ptr += HEAP_PADDING;
-    *((uint64_t *)new_raw_ptr) = new_key;
+    *((uint32_t *)new_raw_ptr) = new_key;
 
-    _MM_array_ptr_Rep safe_ptr = {
-        .p = new_raw_ptr + LOCK_SIZE, .key = new_key, .lock_ptr = new_raw_ptr
-    };
+    _MMSafe_ptr_Rep safe_ptr = {.p = new_raw_ptr + LOCK_MEM, .key_offset = new_key};
+    safe_ptr.key_offset <<= 32;
 
     mm_array_ptr<T> *mm_array_ptr_ptr = (mm_array_ptr<T> *)&safe_ptr;
     return *mm_array_ptr_ptr;
@@ -172,6 +159,7 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
 // This is a customized memory deallocator for mm_ptr.
 // It sets the lock of the singleton memory object to 0
 // and calls free() from the stdlib to free the whole memory object.
+// Beofore the real free, it also does double-free and invalid-free checking.
 //
 // @param p - a _MM_ptr whose pointee is going to be freed.
 //
@@ -183,7 +171,7 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
 
     // Without the "volatile" keyword, Clang may optimize away the next
     // statement.
-    volatile _MM_ptr_Rep *mm_ptr_ptr = (_MM_ptr_Rep *)&p;
+    volatile _MMSafe_ptr_Rep *mm_ptr_ptr = (_MMSafe_ptr_Rep *)&p;
 
     // Do two temporal memory safety checks.
     // First, check if the offset is zero. A non-zero offset means an invalid free.
@@ -195,7 +183,7 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
     }
 
     // Second, do a key checking. This would catch double free or UAF errors.
-    void *lock_ptr = mm_ptr_ptr->p - LOCK_SIZE;
+    void *lock_ptr = mm_ptr_ptr->p - LOCK_MEM;
     if (GET_KEY(key_offset) != *(uint32_t *)lock_ptr) {
         fprintf(stderr, "Double Free or UAF\n");
         abort();
@@ -220,22 +208,30 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
 for_any(T) void mm_array_free(mm_array_ptr<const T> const p) {
     if (p == NULL) return;
 
-    volatile _MM_array_ptr_Rep *mm_array_ptr_ptr = (_MM_array_ptr_Rep *)&p;
+    volatile _MMSafe_ptr_Rep *mm_array_ptr_ptr = (_MMSafe_ptr_Rep *)&p;
 
-    if ((char *)mm_array_ptr_ptr->p - (char *)mm_array_ptr_ptr->lock_ptr !=
-        HEAP_PADDING) {
+    // Do two temporal memory safety checks.
+    // First, check if the offset is zero. A non-zero offset means an invalid free.
+    uint64_t key_offset = mm_array_ptr_ptr->key_offset;
+    if (GET_OFFSET(key_offset) != 0) {
         // An invalid free
         fprintf(stderr, "Invalid Free (non-zero offset in an mmptr).\n");
         abort();
     }
 
-    if (mm_array_ptr_ptr->key != *(mm_array_ptr_ptr->lock_ptr)) {
+    // Second, do a key checking. This would catch double free or UAF errors.
+    void *lock_ptr = mm_array_ptr_ptr->p - LOCK_MEM;
+    if (GET_KEY(key_offset) != *(uint32_t *)lock_ptr) {
         fprintf(stderr, "Double Free or UAF\n");
         abort();
     }
 
-    *(mm_array_ptr_ptr->lock_ptr) = 0;
-    free(mm_array_ptr_ptr->p - LOCK_SIZE - HEAP_PADDING);
+    // Invalidate the lock.
+    // This step may not be necessary in some cases. In some implementation,
+    // free() zeros out all bytes of the memory region of the freed object.
+    *(uint32_t *)lock_ptr = 0;
+
+    free(lock_ptr - HEAP_PADDING);
 }
 
 
@@ -257,7 +253,7 @@ for_any(T) void mm_array_free(mm_array_ptr<const T> const p) {
 // @param p - the safe pointer whose inner raw pointer to be extracted.
 //
 for_any(T) void *_getptr_mm(mm_ptr<const T> const p) {
-    return ((_MM_ptr_Rep *)&p)->p;
+    return ((_MMSafe_ptr_Rep *)&p)->p;
 }
 
 //
@@ -265,7 +261,7 @@ for_any(T) void *_getptr_mm(mm_ptr<const T> const p) {
 // from an mm_array_ptr<T>.
 //
 for_any(T) void *_getptr_mm_array(mm_array_ptr<const T> const p) {
-    return ((_MM_array_ptr_Rep *)&p)->p;
+    return ((_MMSafe_ptr_Rep *)&p)->p;
 }
 
 
@@ -282,7 +278,7 @@ for_any(T) void *_getptr_mm_array(mm_array_ptr<const T> const p) {
  * and "(void *)-1" for different errors.
  * */
 for_any(T) mm_ptr<T> create_invalid_mm_ptr(uint64_t ptr_val) {
-  _MM_ptr_Rep mmptr;
+  _MMSafe_ptr_Rep mmptr;
   mmptr.p = (void *)ptr_val;
   mm_ptr<T> *mm_ptr_ptr = (mm_ptr<T> *)&mmptr;
   return *mm_ptr_ptr;
@@ -301,14 +297,7 @@ for_any(T) mm_ptr<T> create_invalid_mm_ptr(uint64_t ptr_val) {
  *
  * */
 for_any(T) mm_array_ptr<T> mmptr_to_mmarrayptr(mm_ptr<T> p) {
-    _MM_ptr_Rep *mmptr_ptr = (_MM_ptr_Rep *)&p;
-    _MM_array_ptr_Rep mmarrayptr;
-    mmarrayptr.p = mmptr_ptr->p;
-    mmarrayptr.key = (mmptr_ptr->key_offset >> 32) & HIGH32BITS_MASK;
-    mmarrayptr.lock_ptr = mmptr_ptr->p -
-        (mmptr_ptr->key_offset & HIGH32BITS_MASK) - LOCK_SIZE;
-    mm_array_ptr<T> *mmarrayptr_ptr = (mm_array_ptr<T> *)&mmarrayptr;
-    return *mmarrayptr_ptr;
+    return *((mm_array_ptr<T> *)(&p));
 }
 
 /*
@@ -320,14 +309,7 @@ for_any(T) mm_array_ptr<T> mmptr_to_mmarrayptr(mm_ptr<T> p) {
  *
  * */
 for_any(T) mm_ptr<T> mmarrayptr_to_mmptr(mm_array_ptr<T> p) {
-    _MM_array_ptr_Rep *mmarrayptr_ptr = (_MM_array_ptr_Rep *)&p;
-    _MM_ptr_Rep mmptr;
-    mmptr.p = mmarrayptr_ptr->p;
-    uint64_t key = mmarrayptr_ptr->key;
-    uint64_t offset = mmarrayptr_ptr->p - (void *)mmarrayptr_ptr->lock_ptr + LOCK_SIZE;
-    mmptr.key_offset = (key << 32) & offset;
-    mm_ptr<T> *mmptr_ptr = (mm_ptr<T> *)&mmptr;
-    return *mmptr_ptr;
+    return *((mm_ptr<T> *)(&p));
 }
 
 
@@ -354,12 +336,9 @@ for_any(T) void _setptr_mm(mm_ptr<const T> *p, char *new_p) {
  * If the to-be-updated pointer is an mm_array_ptr and we would like to keep it
  * as a checked pointer, then we need this function.
  *
- * FIXME: The current implementation of mm_array_ptr has an individual
- * lock_addr field and thus the update of its raw C pointer does not require
- * updating any metadata. But in our new design the mm_array_ptr has an offset
- * subfield and it needs to be updated based on the new raw pointer.
- *
  * */
 for_any(T) void _setptr_mm_array(mm_array_ptr<const T> *p, char *new_p) {
-    *((char **)p) = new_p;
+    _MMSafe_ptr_Rep *safeptr = (_MMSafe_ptr_Rep *)p;
+    safeptr->key_offset += (new_p - (char *)(safeptr->p));
+    safeptr->p = (void *)new_p;
 }
