@@ -1,4 +1,5 @@
-/*
+/** safe_mm_checked.c - Runtime library of the temporal memory safe Checked C.
+ *
  * This files defines the runtime library for the Checked C project, including
  * customized memory allocators and deallocators for memory objects pointed
  * by mm_ptr and mm_array_ptr.
@@ -18,7 +19,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <immintrin.h>
+#include <immintrin.h>   /* for _rdrand32_step() */
 
 /* The real lock size is 4 bytes but we allocate 8 bytes for it for alignment. */
 #define LOCK_MEM 8
@@ -34,7 +35,7 @@ typedef struct {
   uint64_t key_offset;
 } _MMSafe_ptr_Rep;
 
-#if 0
+#if 1
 // Our current implementation uses a 32-bit key. We may need to change it
 // to 40-bit key later.
 uint32_t key = 3;
@@ -49,10 +50,22 @@ static uint32_t rand_keygen() {
     uint32_t key;
     while (1) {
         int succeeded = _rdrand32_step(&key);
+        // 0, 1, and 2 are reserved for invalid key, stack, and global variables.
         if (succeeded && key > 2) break;
     }
 
     return key;
+}
+
+/*
+ * Function: mm_initKey()
+ *
+ * Create the initial key for a program. All subsequent allocations just
+ * increase the key by 1. Call to this function is inserted by the compiler
+ * at the beginning of the main function.
+ * */
+void mm_init_key() {
+    key = rand_keygen();
 }
 
 //
