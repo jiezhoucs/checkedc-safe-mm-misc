@@ -1,5 +1,5 @@
 /**
- * Tests of the _multiple qualifier
+ * Tests of the _checkable qualifier
  * */
 
 #include "debug.h"
@@ -23,30 +23,30 @@ typedef struct {
     Obj *op;
 } NewNode;
 
-_multiple int gi = 30;
-_multiple int gi1;
-_multiple static int sgi = 40;
-_multiple static int sgi1;
+_checkable int gi = 30;
+_checkable int gi1;
+_checkable static int sgi = 40;
+_checkable static int sgi1;
 
-_multiple NewNode GNN;
-_multiple static NewNode SGNN;
+_checkable NewNode GNN;
+_checkable static NewNode SGNN;
 
 /*
- * Testing _multiple local and static local variables.
+ * Testing _checkable local and static local variables.
  * */
 void f0() {
-    print_start("_multiple local variables");
+    print_start("_checkable local variables");
     signal(SIGILL, ill_handler);
     if (setjmp(resume_context) == 1) goto resume;
 
-    _multiple int i = 10;
+    _checkable int i = 10;
     mm_ptr<int> p = &i;
     if (*p != 10) {
         print_error("multiple.c::f0():: getting the address of a stack integer");
     }
 
     // Test getting the address of a field of a local struct.
-    _multiple NewNode NN;
+    _checkable NewNode NN;
     mm_ptr<long> pl = &NN.l;
     mm_ptr<Obj> po = &NN.o;
     mm_ptr<int> pi = &NN.arr[3].i;
@@ -57,14 +57,14 @@ void f0() {
     }
 
     // Test getting the address of a static local integer.
-    _multiple static int si = 30;
+    _checkable static int si = 30;
     p = &si;
     if (*p != 30) {
         print_error("multiple.c::f0():: getting the address of a static local integer");
     }
 
     // Test getting the address of a field of a static local variable.
-    _multiple static NewNode SNN;
+    _checkable static NewNode SNN;
     pl = &SNN.l;
     po = &SNN.o;
     pi = &SNN.arr[3].i;
@@ -74,7 +74,7 @@ void f0() {
                     "static local struct");
     }
 
-    print_end("_multiple local variables");
+    print_end("_checkable local variables");
     return;
 
 resume:
@@ -82,10 +82,10 @@ resume:
 }
 
 /**
- * Test _multiple global variables
+ * Test _checkable global variables
  * */
 void f1() {
-    print_start("_multiple global variables");
+    print_start("_checkable global variables");
     signal(SIGILL, ill_handler);
     if (setjmp(resume_context) == 1) goto resume;
 
@@ -124,7 +124,7 @@ void f1() {
         print_error("multiple.c::f0():: getting the address of a field of a "
                     "static global struct");
     }
-    print_end("_multiple global variables");
+    print_end("_checkable global variables");
     return;
 
 resume:

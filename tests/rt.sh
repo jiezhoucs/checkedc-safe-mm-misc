@@ -13,6 +13,7 @@ SRC=(
     "cast"
     "array"
     "addressof"
+    "checkable"
 )
 
 #
