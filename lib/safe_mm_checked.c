@@ -89,16 +89,16 @@ for_any(T) mm_ptr<T> mm_alloc(size_t size) {
     void *raw_ptr = malloc(size + HEAP_PADDING + LOCK_MEM);
     if (raw_ptr == NULL) return NULL;
 
-    // Generate a random number as the key.
-    uint32_t new_key = rand_keygen();
     // The lock is located before the first field of the referent.
     raw_ptr += HEAP_PADDING;
-    *((uint32_t *)(raw_ptr)) = new_key;
+    *((uint32_t *)(raw_ptr)) = key;
 
-    // Create a helper struct.
-    _MMSafe_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_MEM, .key_offset = new_key };
+    // Create a helper struct to initialize the mm_ptr.
+    _MMSafe_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_MEM, .key_offset = key };
     // Move the key to the highest 32 bits and make the offset 0.
     safe_ptr.key_offset <<= 32;
+
+    key++;
 
     return *((mm_ptr<T> *)&safe_ptr);
 }
@@ -115,14 +115,15 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
   void *raw_ptr = malloc(array_size + LOCK_MEM + HEAP_PADDING);
   if (raw_ptr == NULL) return NULL;
 
-  uint32_t new_key = rand_keygen();
   raw_ptr += HEAP_PADDING;
-  *((uint32_t *)(raw_ptr)) = new_key;
+  *((uint32_t *)(raw_ptr)) = key;
 
-    // Create a helper struct.
-    _MMSafe_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_MEM, .key_offset = new_key };
+    // Create a helper struct to initialize the mm_array_ptr.
+    _MMSafe_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_MEM, .key_offset = key };
     // Move the key to the highest 32 bits and make the offset 0.
     safe_ptr.key_offset <<= 32;
+
+    key++;
 
   return *((mm_array_ptr<T> *)&safe_ptr);
 }
@@ -154,13 +155,12 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     // is freed. The old object's lock needs to be invalidated.
     *((uint32_t *)(old_raw_ptr + HEAP_PADDING)) = 0;
 
-    // Use a new key for the new object.
-    uint64_t new_key = rand_keygen();
     new_raw_ptr += HEAP_PADDING;
-    *((uint32_t *)new_raw_ptr) = new_key;
-
-    _MMSafe_ptr_Rep safe_ptr = {.p = new_raw_ptr + LOCK_MEM, .key_offset = new_key};
+    *((uint32_t *)new_raw_ptr) = key;
+    _MMSafe_ptr_Rep safe_ptr = {.p = new_raw_ptr + LOCK_MEM, .key_offset = key};
     safe_ptr.key_offset <<= 32;
+
+    key++;
 
     mm_array_ptr<T> *mm_array_ptr_ptr = (mm_array_ptr<T> *)&safe_ptr;
     return *mm_array_ptr_ptr;
