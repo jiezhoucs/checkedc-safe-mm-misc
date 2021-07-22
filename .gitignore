@@ -22,7 +22,6 @@ tests/addrof
 tests/hello.c
 
 # evaluation related
-data/
 eval/data/olden/checkedc
 eval/data/olden/origin
 

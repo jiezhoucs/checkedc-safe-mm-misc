@@ -14,7 +14,7 @@ TESTSUITE_DIR="$TESTS_DIR/test-suite"
 TESTSUITE_BUILD_DIR="$TESTS_DIR/ts-build"
 OLDEN_DIR="$LLVM_TESTSUITE_DIR/MultiSource/Benchmarks/Olden"
 PTRDIST_DIR="$LLVM_TESTSUITE_DIR/MultiSource/Benchmarks/Ptrdist"
-DATA_DIR="$MISC_DIR/data"
+DATA_DIR="$MISC_DIR/eval/perf_data"
 
 #
 # Compiler related

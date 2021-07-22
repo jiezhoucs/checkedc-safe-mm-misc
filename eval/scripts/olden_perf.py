@@ -9,8 +9,8 @@ import subprocess as sp
 import os
 import json
 
-ROOT_DIR = os.path.abspath(os.getcwd() + "/..")
-DATA_DIR = ROOT_DIR + "/data/olden"
+ROOT_DIR = os.path.abspath(os.getcwd() + "/../..")
+DATA_DIR = ROOT_DIR + "/eval/perf_data/olden"
 SCRIPT_DIR = ROOT_DIR + "/scripts"
 
 ITERATION = 10
@@ -20,8 +20,10 @@ benchmarks = [
     "bisort",
     "em3d",
     "health",
+    "mst",
     "perimeter",
     "power",
+    "treeadd",
     "tsp",
 ]
 
