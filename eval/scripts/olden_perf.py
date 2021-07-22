@@ -8,6 +8,7 @@ import numpy as np
 import subprocess as sp
 import os
 import json
+import csv
 
 ROOT_DIR = os.path.abspath(os.getcwd() + "/../..")
 DATA_DIR = ROOT_DIR + "/eval/perf_data/olden"
@@ -28,20 +29,20 @@ benchmarks = [
 ]
 
 exec_time_checked = { }
-exec_time_origin = { }
+exec_time_baseline = { }
 
 #
 # Function: run()
-# This function runs the original or the checked version of all benchmarks
+# This function runs the baselineal or the checked version of all benchmarks
 # ITERATION number of times and computes the arithmetic mean of the execution
 # time.
 #
 def run(version):
-    global exec_time_checked, exec_time_origin
-    if version == "origin":
-        data = DATA_DIR + "/origin"
-        script = SCRIPT_DIR + "/olden-origin.sh"
-        exec_time = exec_time_origin
+    global exec_time_checked, exec_time_baseline
+    if version == "baseline":
+        data = DATA_DIR + "/baseline"
+        script = SCRIPT_DIR + "/olden-baseline.sh"
+        exec_time = exec_time_baseline
     else:
         data = DATA_DIR + "/checkedc"
         script = SCRIPT_DIR + "/olden.sh"
@@ -50,51 +51,65 @@ def run(version):
     # Init
     os.chdir(SCRIPT_DIR)
     sp.run([script, "clean"])
-    for benchmark in benchmarks:
-        exec_time[benchmark] = 0
+    for prog in benchmarks:
+        exec_time[prog] = 0
 
     # Run the olden script and collect executime time data
     for i in range(ITERATION):
-        for benchmark in benchmarks:
+        for prog in benchmarks:
             os.chdir(SCRIPT_DIR)
-            sp.run([script, benchmark])
+            sp.run([script, prog])
             os.chdir(data)
-            grep = sp.Popen(("grep","exec_time", benchmark + ".json"), stdout=sp.PIPE)
+            grep = sp.Popen(("grep","exec_time", prog + ".json"), stdout=sp.PIPE)
             time = sp.check_output(("cut", "-d", ":", "-f2"), stdin=grep.stdout)
-            exec_time[benchmark] += float(time.decode('utf-8').rstrip()[1:-1])
+            exec_time[prog] += float(time.decode('utf-8').rstrip()[1:-1])
 
     # Compute the average execution time.
-    for benchmark in benchmarks:
-        exec_time[benchmark] /= ITERATION
+    for prog in benchmarks:
+        exec_time[prog] /= ITERATION
 
 
 #
-# Print out the results:
-# - slowdown (x) : checked / origin
-# - geo. mean of slowdown
+# Print out the results and write them to a file.
 #
-def print_result():
-    print(exec_time_origin)
+def write_result():
+    print("Execution time of baseline programs:")
+    print(exec_time_baseline)
+    print("Execution time of checked programs:")
     print(exec_time_checked)
 
-    slowdown = []
-    for benchmark in benchmarks:
-        time_orign, time_checked = exec_time_origin[benchmark], exec_time_checked[benchmark]
-        slowdown += [time_checked / time_orign]
-        print("%.2f " % slowdown[-1])
+    normalized = []       # normalized execution time of the checked programs
+    prog_normalized = {}  # prog:normalized
+    for prog in benchmarks:
+        time_orign, time_checked = exec_time_baseline[prog], exec_time_checked[prog]
+        normalized += [time_checked / time_orign]
+        prog_normalized[prog] = round(normalized[-1], 2)
+        print("%.2f " % normalized[-1])
 
-    print("Geometric mean of all benchmarks: ")
-    print(np.array(slowdown).prod() ** (1.0/len(slowdown)))
+    print("Geo. mean of Olden benchmarks: ", end='')
+    print(np.array(normalized).prod() ** (1.0/len(normalized)))
 
+    # Write the result to a CVS file.
+    with open(DATA_DIR + "/perf.csv", "w") as perf_csv:
+        writer = csv.writer(perf_csv)
+        header = ["program", "baseline(s)", "checked(s)", "normalized(x)"]
+        writer.writerow(header)
+
+        for prog in benchmarks:
+            row = [prog]
+            row += [exec_time_baseline[prog]]
+            row += [exec_time_checked[prog]]
+            row += [prog_normalized[prog]]
+            writer.writerow(row)
 
 #
 # Entrance of this script
 #
 def main():
-    run("origin")
+    run("baseline")
     run("checked")
 
-    print_result()
+    write_result()
 
 if __name__ == "__main__":
     main()
