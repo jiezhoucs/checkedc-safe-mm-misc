@@ -1,12 +1,11 @@
 #!/bin/bash
 
-./common.sh
 
 rm -rf CMakeCache.txt
 
 Build_Type="Debug"
 if [[`uname` == "Linux" ]]; then
-    Debug_Type="Release"
+    Build_Type="Release"
 fi
 
 cmake -G "Unix Makefiles"                    \
