@@ -5,21 +5,16 @@
 #
 
 # load common directory paths and variables
-cd ..
 . common.sh
 
-#
-# Olden-specific paths
-BUILD_DIR="$CETS_TS_BUILD"
-DATA_DIR="$DATA_DIR/olden/cets"
-BIN_DIR="$BUILD_DIR/MultiSource/Benchmarks/Olden"
+LLVM_TS_BIN_DIR="$LLVM_TS_BUILD/MultiSource/Benchmarks/Olden"
 
 PROGRAMS=(
-    "bh"
+    # "bh"
     "bisort"
-    "em3d"
+    # "em3d"
     "health"
-    "mst"
+    # "mst"
     "perimeter"
     "power"
     "treeadd"
@@ -27,14 +22,14 @@ PROGRAMS=(
     # "voronoi"
 )
 
-cd $BUILD_DIR
+cd $LLVM_TS_BUILD
 
 #
 # Run one single benchmark program.
 #
 run_one() {
     # Compile the benchmark if its binary does not exist.
-    if [[ ! -f "$BIN_DIR/$1/$1" ]]; then
+    if [[ ! -f "$LLVM_TS_BIN_DIR/$1/$1" ]]; then
         echo "Compiling $1..."
         # Set the compile parallel level to be #ofLogicalCore - 2.
         local parallell

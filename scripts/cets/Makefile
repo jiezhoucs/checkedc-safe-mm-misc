@@ -34,10 +34,5 @@ treeadd:
 tsp:
 	$(OLDEN) tsp
 
-# Ptrdist benchmarks
-anagram:
-	$(PTRDIST) $@
-
 clean:
 	./olden.sh clean
-	./ptrdist.sh clean
