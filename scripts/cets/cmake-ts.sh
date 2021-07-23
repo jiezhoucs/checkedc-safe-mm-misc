@@ -1,7 +1,10 @@
 #!/bin/bash
 
 #
-# This scripts generates Makefiles for the original llvm test-suite
+# This scripts generates Makefiles for the original llvm test-suite that will
+# be compiled by CETS.
+#
+# $1 - (optional) "lto": using LLD to do LTO.
 #
 
 
@@ -13,7 +16,16 @@ TESTSUITE_DIR="$TESTS_DIR/test-suite-cets"
 # CETS libraries correctly
 CFLAGS="-O3 -fuse-ld=lld -mllvm -enable-softboundcets -mllvm -softboundcets_disable_spatial_safety"
 LIBS="-lm -lrt"
-LDFLAGS="$CETS_LIB/libsoftboundcets_rt.a -L$CETS_LIB -Wl,-rpath,$CETS_LIB $LIBS"
+
+# Use lto.
+if [[ $1 == "lto" ]];then
+    CFLAGS="$CFLAGS -flto"
+    LDFLAGS="-flto $CETS_LIB/lto/libsoftboundcets_rt.a"
+else
+    LDFLAGS="$CETS_LIB/libsoftboundcets_rt.a"
+fi
+
+LDFLAGS="$LDFLAGS $LIBS"
 
 # Go to the build directory. Create one if it does not exist.
 [[ -d $LLVM_TS_BUILD ]] || mkdir -p $LLVM_TS_BUILD
