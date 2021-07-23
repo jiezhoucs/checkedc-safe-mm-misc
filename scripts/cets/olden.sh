@@ -57,10 +57,10 @@ run_all() {
 # Clean all compiled binaries.
 #
 clean() {
-    echo "Cleaning all refactored Olden benchmark binaries..."
+    echo "Cleaning all Olden benchmark binaries..."
     for prog in ${PROGRAMS[@]}; do
         echo "Cleaning $prog"
-        cd "$BIN_DIR/$prog"
+        cd "$LLVM_TS_BIN_DIR/$prog"
         find . -name "*.o" -delete
         rm -f "$prog" "$prog.stripped"
     done
