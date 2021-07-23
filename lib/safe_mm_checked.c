@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <immintrin.h>   /* for _rdrand32_step() */
 
+#define __INLINE __attribute__((always_inline))
+
 /* The real lock size is 4 bytes but we allocate 8 bytes for it for alignment. */
 #define LOCK_MEM 8
 #define HEAP_PADDING 8
@@ -46,6 +48,7 @@ uint32_t key = 3;
 //
 // Generate a 32-bit random key using Intel's RDRAND instruction.
 //
+__INLINE
 static uint32_t rand_keygen() {
     uint32_t key;
     while (1) {
@@ -63,6 +66,11 @@ static uint32_t rand_keygen() {
  * Create the initial key for a program. All subsequent allocations just
  * increase the key by 1. Call to this function is inserted by the compiler
  * at the beginning of the main function.
+ *
+ * Jie Zhou: For some unknow reason, if we add __INLINE to this function,
+ * and use LTO for Olden benchmarks, the cmake configuration procedure
+ * would throw a "LLVM ERROR: Cannot select: t9: i32,i32,ch = X86ISD::RDRAND t0"
+ * error while using the compiler to compile a temporary test program.
  * */
 void mm_init_key() {
     key = rand_keygen();

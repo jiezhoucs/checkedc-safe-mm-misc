@@ -8,24 +8,33 @@ CFLAGS = $(OPT) -I../include -Wall -mrdrnd
 #
 # Checked-C Clang
 CC = $(LLVM_DIR)/clang $(CFLAGS)
+AR = $(LLVM_DIR)/llvm-ar
+RANLIB = $(LLVM_DIR)/llvm-ranlib
 
 LIB_SRC = safe_mm_checked.c
 LIB_SAFEMM = libsafemm
+LIB_SAFEMM_LTO = $(LIB_SAFEMM)_lto
 
 .PHONY: libsafemm clean
 
 # Compile both a static library and a dynamic library.
-libsafemm: a so
+libsafemm: a lto
 
 #
 # Compile the lib to a static library.
 a: $(LIB_SRC)
-	make clean
+	rm -f $(LIB_SAFEMM).a $(LIB_SAFEMM).so
 	$(CC) -c $(LIB_SRC) -o $(LIB_SAFEMM).o
-	ar -rc $(LIB_SAFEMM).a $(LIB_SAFEMM).o
-	@ranlib $(LIB_SAFEMM).a
+	$(AR) -rc $(LIB_SAFEMM).a $(LIB_SAFEMM).o
+	$(RANLIB) $(LIB_SAFEMM).a
 	@rm -f $(LIB_SAFEMM).o
-	@make debug
+
+lto: $(LIB_SRC)
+	rm -rf $(LIB_SAFEMM_LTO).a $(LIB_SAFEMM_LTO).so
+	$(CC) -flto -c $(LIB_SRC) -o $(LIB_SAFEMM_LTO).o
+	$(AR) -rc $(LIB_SAFEMM_LTO).a $(LIB_SAFEMM_LTO).o
+	$(RANLIB) $(LIB_SAFEMM_LTO).a
+	@rm -f *.o
 
 #
 # Compile the lib to a shared libray. Note that on MacOS .dylib is the
