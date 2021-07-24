@@ -33,9 +33,8 @@ exec_time_baseline = { }
 
 #
 # Function: run()
-# This function runs the baselineal or the checked version of all benchmarks
-# ITERATION number of times and computes the arithmetic mean of the execution
-# time.
+# This function runs the baseline or the checked version of all benchmarks
+# ITERATION number of times and computes the geo. mean of the execution time.
 #
 def run(version):
     global exec_time_checked, exec_time_baseline
@@ -50,7 +49,8 @@ def run(version):
 
     # Init
     os.chdir(SCRIPT_DIR)
-    sp.run([script, "clean"])
+    if version != "baseline":
+        sp.run([script, "clean"])
     for prog in benchmarks:
         exec_time[prog] = 0
 

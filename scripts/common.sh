@@ -24,6 +24,10 @@ CXX=$LLVM_BIN_DIR/clang++
 CHECKEDC_INC=$MISC_DIR/include
 CHECKEDC_LIB=$MISC_DIR/lib
 CC_RELEASE="$LLVM_RELEASE_BIN_DIR/clang"
+LLVM_VANILLA_BIN="$ROOT_DIR/llvm-vanilla/build/bin"
+# Original LLVM compiler
+CC_VANILLA="$LLVM_VANILLA_BIN/clang"
+CXX_VANILLA="$LLVM_VANILLA_BIN/clang++"
 
 #
 # Others

@@ -51,7 +51,7 @@ def run(version):
     os.chdir(SCRIPT_DIR)
     if version != "baseline":
         os.chdir("cets")
-    sp.run([script, "clean"])
+        sp.run([script, "clean"])
     for prog in benchmarks:
         exec_time[prog] = 0
 
@@ -93,7 +93,7 @@ def write_result():
     print(np.array(normalized).prod() ** (1.0/len(normalized)))
 
     # Write the result to a CVS file.
-    with open(DATA_DIR + "/perf.csv", "w") as perf_csv:
+    with open(DATA_DIR + "/cets_perf.csv", "w") as perf_csv:
         writer = csv.writer(perf_csv)
         header = ["program", "baseline(s)", "checked(s)", "normalized(x)"]
         writer.writerow(header)
