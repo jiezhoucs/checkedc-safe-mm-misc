@@ -43,5 +43,5 @@ ks:
 
 clean:
 	./olden.sh clean
-	./olden-origin.sh clean
+	./olden-baseline.sh clean
 	./ptrdist.sh clean
