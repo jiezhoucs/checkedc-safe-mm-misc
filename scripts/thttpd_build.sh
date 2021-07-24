@@ -17,6 +17,7 @@ BUILD_DIR=$ROOT_DIR/benchmark-build/thttpd
 if [[ $1 == "baseline" ]]; then
     SRC_DIR=$MISC_DIR/benchmarks/baseline/thttpd-2.29
     BUILD_DIR=$BUILD_DIR/baseline
+    CC="$CC_VANILLA"
 else
     SRC_DIR=$MISC_DIR/benchmarks/checked/thttpd-2.29
     BUILD_DIR=$BUILD_DIR/checked
@@ -30,6 +31,8 @@ configure() {
 
     export CC="$CC"
 
+    rm -f config.cache
+
     if [[ ! -f "$BUILD_DIR" ]]; then
         mkdir -p "$BUILD_DIR"
     fi
@@ -39,6 +42,11 @@ configure() {
     if [[ $1 != "baseline" ]]; then
         sed -i "s|^LDFLAGS =|& \-L../../../lib|g" Makefile
         sed -i "s|\-lcrypt $|& \-lsafemm|g" Makefile
+    fi
+
+    # mkdir a directory for man page
+    if [[ ! -f "$BUILD_DIR/man/man1" ]]; then
+        mkdir -p "BUILD_DIR/man/man1"
     fi
 }
 
@@ -58,8 +66,12 @@ compile() {
 #
 # Entrance of this script
 #
-configure
+configure $1
 
+#
+# Note that installing the compiled and related files requires to run as root.
+# 07/24/2021: Jie Zhou: I forgot the exact reason for this.
+#
 if [[ $2 == "make" ]]; then
     compile
 fi
