@@ -9,8 +9,8 @@
 
 #
 # Olden-specific paths
-BUILD_DIR="$TESTS_DIR/ts-build-origin"
-DATA_DIR="$DATA_DIR/olden/origin"
+BUILD_DIR="$TESTS_DIR/ts-build-baseline"
+DATA_DIR="$DATA_DIR/olden/baseline"
 BIN_DIR="$BUILD_DIR/MultiSource/Benchmarks/Olden"
 
 PROGRAMS=(

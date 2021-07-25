@@ -28,5 +28,5 @@ cmake -DCMAKE_C_COMPILER="$CC"                                                 \
       -DCMAKE_PREFIX_PATH="$CHECKEDC_INC;$CHECKEDC_LIB"                        \
       -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS"                                      \
       -C"$TESTSUITE_DIR"/cmake/caches/O3.cmake                                 \
-      -DLARGE_PROBLEM_SIZE=1                                                   \
+      -DEXTRA_LARGE_PROBLEM_SIZE=1                                             \
       "$TESTSUITE_DIR"
