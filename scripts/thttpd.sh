@@ -4,7 +4,7 @@
 # This script starts a local thttpd server and tests it by transfering files.
 #
 
-EVAL_DIR=`realpath ../`
+EVAL_DIR=`realpath ../eval`
 DATA_DIR=$EVAL_DIR/data/thttpd
 BUILD_DIR=$EVAL_DIR/../../benchmark-build/thttpd
 
