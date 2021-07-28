@@ -9,7 +9,7 @@ DATA_DIR=$EVAL_DIR/data/thttpd
 BUILD_DIR=$EVAL_DIR/../../benchmark-build/thttpd
 
 ITERS=1000
-CONS=8
+CONS=32
 HOST=http://127.0.0.1
 PORT=8080
 FILES=$HOST:$PORT/files
@@ -26,10 +26,11 @@ init() {
 
     # Set up directories.
     if [[ $1 == "baseline" ]]; then
+        echo "Benchmark the baseline thttpd"
         DATA_DIR=$DATA_DIR/baseline
         BUILD_DIR=$BUILD_DIR/baseline
-
     else
+        echo "Benchmark the checked thttpd"
         DATA_DIR=$DATA_DIR/checked
         BUILD_DIR=$BUILD_DIR/checked
     fi
@@ -79,6 +80,6 @@ debug() {
 #
 # Entrance of this script
 #
-init
+init $1
 
 debug
