@@ -1,4 +1,4 @@
-file_size (Kb),baseline (Kb/s),std_dev,checked (Kb),std_dev
+file_size (Kb),baseline (Mb/s),std_dev,checked (Kb),std_dev
 1,36.66,2.37,36.43,4.85
 2,67.98,2.98,66.67,3.49
 4,131.59,3.98,125.0,7.62
