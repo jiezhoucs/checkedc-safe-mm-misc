@@ -15,6 +15,12 @@
 #define _GETPTR(T, p) _getptr_mm<T>(p)
 #define _GETARRAYPTR(T, p) _getptr_mm_array<T>(p)
 
+/* These macros provide convenience for programmers to type a little less. */
+#define MM_ALLOC(T) mm_alloc<T>(sizeof(T))
+#define MM_ARRAY_ALLOC(T, n) mm_array_alloc<T>(sizeof(T) * n)
+#define MM_FREE(T, p) mm_free<T>(p)
+#define MM_ARRAY_FREE(T, p) mm_array_free<T>(p)
+
 for_any(T) mm_ptr<T> mm_alloc(size_t size);
 for_any(T) void mm_free(mm_ptr<const T> const p);
 
