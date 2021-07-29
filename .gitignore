@@ -9,6 +9,8 @@
 *.o
 *.s
 
+*.dSYM
+
 # binaries
 tests/hello
 tests/basic
