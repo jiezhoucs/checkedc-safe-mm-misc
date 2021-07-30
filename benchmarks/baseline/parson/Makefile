@@ -1,5 +1,5 @@
 CC = ../../../../build/bin/clang
-CFLAGS = -O3 -g -Wall -Wextra -std=c89 -pedantic-errors
+CFLAGS = -O3 -Wall -Wextra -std=c89 -pedantic-errors
 
 SYSTEM = $(shell uname -s)
 

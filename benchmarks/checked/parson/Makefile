@@ -2,7 +2,7 @@ ROOT_DIR := $(shell realpath ../../../../)
 MISC_DIR := $(ROOT_DIR)/misc
 
 CC := $(ROOT_DIR)/build/bin/clang
-CFLAGS := -O3 -g -Wall  -std=c89 # -pedantic-errors
+CFLAGS := -O3 -Wall  -std=c89 # -pedantic-errors
 CFLAGS += -I$(MISC_DIR)/include
 LDFLAGS := -L$(MISC_DIR)/lib -lsafemm -ldebug
 
