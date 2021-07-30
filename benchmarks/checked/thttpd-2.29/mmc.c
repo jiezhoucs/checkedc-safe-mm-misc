@@ -110,8 +110,12 @@ static Map* find_hash( ino_t ino, dev_t dev, off_t size, time_t ct );
 static unsigned int hash( ino_t ino, dev_t dev, off_t size, time_t ct );
 
 
+/* There is not need to use mm_array_ptr<char> for the first argument because
+ * it is only passed to external functions.
+ * There is also no need to use mm_ptr for the third argument as it comes
+ * from a pointer to a stack object. */
 void*
-mmc_map( char* filename, struct stat* sbP, struct timeval* nowP )
+mmc_map( char* filename, mm_ptr<struct stat> sbP, struct timeval* nowP )
     {
     time_t now;
     struct stat sb;
@@ -119,7 +123,7 @@ mmc_map( char* filename, struct stat* sbP, struct timeval* nowP )
     int fd;
 
     /* Stat the file, if necessary. */
-    if ( sbP != (struct stat*) 0 )
+    if ( sbP != NULL )
 	sb = *sbP;
     else
 	{

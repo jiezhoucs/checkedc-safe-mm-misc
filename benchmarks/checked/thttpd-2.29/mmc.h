@@ -34,7 +34,7 @@
 ** If you have a stat buffer on the file, pass it in, otherwise pass 0.
 ** Same for the current time.
 */
-void* mmc_map( char* filename, struct stat* sbP, struct timeval* nowP );
+void* mmc_map( char* filename, mm_ptr<struct stat> sbP, struct timeval* nowP );
 
 /* Done with an mmap()ed area that was returned by mmc_map().
 ** If you have a stat buffer on the file, pass it in, otherwise pass 0.

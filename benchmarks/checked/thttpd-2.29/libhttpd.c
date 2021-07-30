@@ -3945,8 +3945,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	}
     else
 	{
-	hc->file_address = mmc_map( _getptr_mm_array<char>(hc->expnfilename),
-            _getptr_mm<struct stat>(&(hc->sb)), nowP );
+	hc->file_address = mmc_map( _getptr_mm_array<char>(hc->expnfilename), &(hc->sb), nowP);
 	if ( hc->file_address == (char*) 0 )
 	    {
 	    httpd_send_err( hc, 500, err500title, "", err500form, hc->encodedurl );
