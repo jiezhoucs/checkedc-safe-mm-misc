@@ -1,4 +1,4 @@
-CC = ../../../../build/bin/clang
+CC = ../../../../llvm-vanilla/build/bin/clang
 CFLAGS = -O3 -Wall -Wextra -std=c89 -pedantic-errors
 
 SYSTEM = $(shell uname -s)
