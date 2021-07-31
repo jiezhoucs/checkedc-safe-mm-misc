@@ -1830,7 +1830,7 @@ int httpd_get_conn(mm_ptr<httpd_server> hs, int listen_fd, mm_ptr<httpd_conn> hc
 ** finite state machine.
 */
 int
-httpd_got_request( httpd_conn* hc )
+httpd_got_request( mm_ptr<httpd_conn> hc )
     {
     char c;
 

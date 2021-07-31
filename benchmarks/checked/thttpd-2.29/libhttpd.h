@@ -220,7 +220,7 @@ int httpd_get_conn(mm_ptr<httpd_server> hs, int listen_fd, mm_ptr<httpd_conn> hc
 ** indication of whether there is no complete request yet, there is a
 ** complete request, or there won't be a valid request due to a syntax error.
 */
-int httpd_got_request( httpd_conn* hc );
+int httpd_got_request(mm_ptr<httpd_conn> hc );
 #define GR_NO_REQUEST 0
 #define GR_GOT_REQUEST 1
 #define GR_BAD_REQUEST 2

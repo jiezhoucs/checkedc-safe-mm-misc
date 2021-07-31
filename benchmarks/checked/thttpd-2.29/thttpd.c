@@ -1621,7 +1621,7 @@ handle_read(mm_ptr<connecttab> c, struct timeval* tvP )
     c->active_at = tvP->tv_sec;
 
     /* Do we have a complete request yet? */
-    switch ( httpd_got_request( _getptr_mm<httpd_conn>(hc) ) )
+    switch ( httpd_got_request( hc) )
 	{
 	case GR_NO_REQUEST:
 	return;
