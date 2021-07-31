@@ -121,7 +121,7 @@ static void check_options( void );
 static void free_httpd_server( mm_ptr<httpd_server> hs );
 static int initialize_listen_socket( httpd_sockaddr* saP );
 static void add_response( mm_ptr<httpd_conn> hc, mm_array_ptr<char> str );
-static void send_mime( mm_ptr<httpd_conn> hc, int status, char* title, char* encodings,
+static void send_mime( mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char> encodings,
         mm_array_ptr<char> extraheads, char* type, off_t length, time_t mod );
 static void send_response( mm_ptr<httpd_conn> hc, int status, char* title,
         mm_array_ptr<char> extraheads, char* form, char *arg );
@@ -615,7 +615,7 @@ httpd_clear_ndelay( int fd )
 
 
 static void
-send_mime( mm_ptr<httpd_conn> hc, int status, char* title, char* encodings,
+send_mime( mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char> encodings,
         mm_array_ptr<char> extraheads, char* type, off_t length, time_t mod )
     {
     time_t now, expires;
@@ -671,7 +671,7 @@ send_mime( mm_ptr<httpd_conn> hc, int status, char* title, char* encodings,
 	if ( encodings[0] != '\0' )
 	    {
 	    (void) my_snprintf( (char *)buf, sizeof(buf),
-		"Content-Encoding: %s\015\012", encodings );
+		"Content-Encoding: %s\015\012", _getptr_mm_array<char>(encodings));
 	    add_response( hc, buf );
 	    }
 	if ( partial_content )
@@ -3933,14 +3933,14 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     if ( hc->method == METHOD_HEAD )
 	{
 	send_mime(
-	    hc, 200, ok200title, _getptr_mm_array<char>(hc->encodings), "", hc->type, hc->sb.st_size,
+	    hc, 200, ok200title, hc->encodings, "", hc->type, hc->sb.st_size,
 	    hc->sb.st_mtime );
 	}
     else if ( hc->if_modified_since != (time_t) -1 &&
 	 hc->if_modified_since >= hc->sb.st_mtime )
 	{
 	send_mime(
-	    hc, 304, err304title, _getptr_mm_array<char>(hc->encodings), "", hc->type, (off_t) -1,
+	    hc, 304, err304title, hc->encodings, "", hc->type, (off_t) -1,
 	    hc->sb.st_mtime );
 	}
     else
@@ -3952,7 +3952,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	    return -1;
 	    }
 	send_mime(
-	    hc, 200, ok200title, _getptr_mm_array<char>(hc->encodings), "", hc->type, hc->sb.st_size,
+	    hc, 200, ok200title, hc->encodings, "", hc->type, hc->sb.st_size,
 	    hc->sb.st_mtime );
 	}
 
