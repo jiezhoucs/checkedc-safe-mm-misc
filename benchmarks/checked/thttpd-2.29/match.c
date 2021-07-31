@@ -34,6 +34,8 @@
 
 static int match_one( const char* pattern, int patternlen, const char* string );
 
+/* No need to refactor these few function as they only pass the pointer
+ * arguments to libc string processing functions. */
 int
 match( const char* pattern, const char* string )
     {
