@@ -19,7 +19,7 @@ rm -rf CMakeCache.txt
 
 if [[ $1 == "lto" ]]; then
     CFLAGS="-flto $CFLAGS"
-    LDFLAGS="$CHECKEDC_LIB/libsafemm_lto.a"
+    LDFLAGS="-flto $CHECKEDC_LIB/libsafemm_lto.a"
 fi
 
 cmake -DCMAKE_C_COMPILER="$CC"                                                 \
