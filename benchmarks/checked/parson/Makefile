@@ -12,12 +12,18 @@ ifeq ($(SYSTEM), Darwin)
 	LDFLAGS += -Xlinker -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
 endif
 
+SRC = tests.c parson.c
+
 all: test
 
 .PHONY: test
-test: tests.c parson.c
-	$(CC) $(CFLAGS)  -o $@ tests.c parson.c $(LDFLAGS)
+test: $(SRC)
+	$(CC) $(CFLAGS)  -o $@ $^ $(LDFLAGS)
 	./$@
+
+lto: $(SRC)
+	$(CC) $(CFLAGS) -flto -fuse-ld=lld $(MISC_DIR)/lib/libsafemm_lto.a -o test $^
+	./test
 
 clean:
 	rm -f test *.o

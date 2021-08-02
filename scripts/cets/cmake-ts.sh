@@ -14,15 +14,16 @@
 TESTSUITE_DIR="$TESTS_DIR/test-suite-cets"
 # THe lld in the CFLAGS is to make clang invoke lld; the default ld cannot link
 # CETS libraries correctly
-CFLAGS="-O3 -fuse-ld=lld -mllvm -enable-softboundcets -mllvm -softboundcets_disable_spatial_safety"
+CFLAGS="-O3 -mllvm -enable-softboundcets -mllvm -softboundcets_disable_spatial_safety"
+LDFLAGS="-fuse-ld=lld"
 LIBS="-lm -lrt"
 
 # Use lto.
 if [[ $1 == "lto" ]];then
-    CFLAGS="$CFLAGS -flto"
-    LDFLAGS="-flto $CETS_LIB/lto/libsoftboundcets_rt.a"
+    CFLAGS="-flto $CFLAGS "
+    LDFLAGS="$LDFLAGS $CETS_LIB/lto/libsoftboundcets_rt.a"
 else
-    LDFLAGS="$CETS_LIB/libsoftboundcets_rt.a"
+    LDFLAGS="$LDFLAGS $CETS_LIB/libsoftboundcets_rt.a"
 fi
 
 LDFLAGS="$LDFLAGS $LIBS"

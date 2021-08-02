@@ -9,8 +9,7 @@
 . common.sh
 
 # Use lld to link the libsafemm.
-CFLAGS="-fuse-ld=lld"
-LDFLAGS="$CHECKEDC_LIB/libsafemm.a"
+LDFLAGS="-fuse-ld=lld"
 
 # Go to the build directory. Create one if it does not exist.
 [[ -d $TESTSUITE_BUILD_DIR ]] || mkdir -p $TESTSUITE_BUILD_DIR
@@ -19,7 +18,9 @@ rm -rf CMakeCache.txt
 
 if [[ $1 == "lto" ]]; then
     CFLAGS="-flto $CFLAGS"
-    LDFLAGS="-flto $CHECKEDC_LIB/libsafemm_lto.a"
+    LDFLAGS="$LDFLAGS $CHECKEDC_LIB/libsafemm_lto.a"
+else
+    LDFLAGS="$LDFLAGS $CHECKEDC_LIB/libsafemm.a"
 fi
 
 cmake -DCMAKE_C_COMPILER="$CC"                                                 \
