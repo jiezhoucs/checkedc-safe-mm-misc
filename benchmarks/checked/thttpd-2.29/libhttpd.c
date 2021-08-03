@@ -134,7 +134,7 @@ static int send_err_file( mm_ptr<httpd_conn> hc, int status, char* title, mm_arr
 #endif /* ERR_DIR */
 #ifdef AUTH_FILE
 static void send_authenticate( mm_ptr<httpd_conn> hc, char* realm );
-static int b64_decode( const char* str, unsigned char* space, int size );
+static int b64_decode( mm_array_ptr<const char> str, unsigned char* space, int size );
 static int auth_check( mm_ptr<httpd_conn> hc, mm_array_ptr<char> dirname  );
 static int auth_check2( mm_ptr<httpd_conn> hc, char* dirname  );
 #endif /* AUTH_FILE */
@@ -989,11 +989,10 @@ static int b64_decode_table[256] = {
 ** be at most 3/4 the size of the encoded, and may be smaller if there
 ** are padding characters (blanks, newlines).
 */
-// TODO: refactor this function
 static int
-b64_decode( const char* str, unsigned char* space, int size )
+b64_decode( mm_array_ptr<const char> str, unsigned char* space, int size )
     {
-    const char* cp;
+    mm_array_ptr<const char> cp = NULL;
     int space_idx, phase;
     int d, prev_d = 0;
     unsigned char c;
@@ -1104,8 +1103,7 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
 	}
 
     /* Decode it. */
-    l = b64_decode(
-	_GETARRAYPTR(char, &(hc->authorization[6])), (unsigned char*) authinfo,
+    l = b64_decode(hc->authorization + 6, (unsigned char*) authinfo,
 	sizeof(authinfo) - 1 );
     authinfo[l] = '\0';
     /* Split into user and password. */
