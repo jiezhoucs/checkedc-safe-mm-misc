@@ -26,9 +26,9 @@ def compute():
                 have different lines of code")
         return
 
-    perf_file = open("thttpd_perf.csv", "w")
+    perf_file = open("perf_checked_nolto.csv", "w")
     data_writer = csv.writer(perf_file)
-    header = ["file_size (Kb)", "baseline (Mb/s)", "std_dev", "checked (Kb)", "std_dev"]
+    header = ["file_size (Kb)", "baseline (Mb/s)", "std_dev", "checked (Mb/s)", "std_dev"]
     data_writer.writerow(header)
 
     exp = 0  # exponent
