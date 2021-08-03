@@ -170,7 +170,7 @@ static char *mm_build_env(char *fmt, mm_array_ptr<char> mm_arg);
 static char* hostname_map( char* hostname );
 #endif /* SERVER_NAME_LIST */
 static char** make_envp( mm_ptr<httpd_conn> hc );
-static mm_array_ptr<char *> make_argp( mm_ptr<httpd_conn> hc );
+static mm_array_ptr<mm_array_ptr<char>> make_argp( mm_ptr<httpd_conn> hc );
 static void cgi_interpose_input( mm_ptr<httpd_conn> hc, int wfd );
 static void post_post_garbage_hack( mm_ptr<httpd_conn> hc );
 static void cgi_interpose_output( mm_ptr<httpd_conn> hc, int rfd );
@@ -3232,10 +3232,10 @@ make_envp( mm_ptr<httpd_conn> hc )
 ** since we're a sub-process.  This gets done after make_envp() because we
 ** scribble on hc->query.
 */
-mm_array_ptr<char *>
+mm_array_ptr<mm_array_ptr<char>>
 make_argp( mm_ptr<httpd_conn> hc )
     {
-    mm_array_ptr<char *> argp = NULL;
+    mm_array_ptr<mm_array_ptr<char>> argp = NULL;
     int argn;
     mm_array_ptr<char> cp1 = NULL, cp2 = NULL;
 
@@ -3243,16 +3243,16 @@ make_argp( mm_ptr<httpd_conn> hc )
     ** one for the filename and one for the NULL, we are guaranteed to
     ** have enough.  We could actually use strlen/2.
     */
-    argp = MM_ARRAY_NEW(char*, strlen(_getptr_mm_array<char>(hc->query)) + 2);
+    argp = MM_ARRAY_NEW(mm_array_ptr<char>, strlen(_GETARRAYPTR(char, hc->query)) + 2);
     if ( argp == NULL )
 	return NULL;
 
-    argp[0] = strrchr( _getptr_mm_array<char>(hc->expnfilename), '/' );
-    if ( argp[0] != (char*) 0 )
+    char *raw_argp0 = strrchr(_GETARRAYPTR(char, hc->expnfilename), '/' );
+    argp[0] = _create_mm_array_ptr<char>(hc->expnfilename, raw_argp0);
+    if ( argp[0] != NULL )
 	++argp[0];
     else
-        // TODO:
-	argp[0] = _getptr_mm_array<char>(hc->expnfilename);
+	argp[0] = hc->expnfilename;
 
     argn = 1;
     /* According to the CGI spec at http://hoohoo.ncsa.uiuc.edu/cgi/cl.html,
@@ -3268,18 +3268,18 @@ make_argp( mm_ptr<httpd_conn> hc )
 		{
 		*cp2 = '\0';
 		strdecode( cp1, cp1 );
-		argp[argn++] = _GETARRAYPTR(char, cp1);
+		argp[argn++] = cp1;
 		cp1 = cp2 + 1;
 		}
 	    }
 	if ( cp2 != cp1 )
 	    {
 	    strdecode( cp1, cp1 );
-	    argp[argn++] = _GETARRAYPTR(char, cp1);
+	    argp[argn++] = cp1;
 	    }
 	}
 
-    argp[argn] = (char*) 0;
+    argp[argn] = NULL;
     return argp;
     }
 
@@ -3471,7 +3471,7 @@ static void
 cgi_child( mm_ptr<httpd_conn> hc )
     {
     int r;
-    mm_array_ptr<char *> argp = NULL;
+    mm_array_ptr<mm_array_ptr<char>> argp = NULL;
     char** envp;
     char* binary;
     char* directory;
@@ -3565,7 +3565,7 @@ cgi_child( mm_ptr<httpd_conn> hc )
     /* Set up stdout/stderr.  If we're doing CGI header parsing,
     ** we need an output interposer too.
     */
-    if ( strncmp( argp[0], "nph-", 4 ) != 0 && hc->mime_flag )
+    if ( strncmp(_GETARRAYPTR(char, argp[0]), "nph-", 4 ) != 0 && hc->mime_flag )
 	{
 	int p[2];
 
@@ -3655,7 +3655,7 @@ cgi_child( mm_ptr<httpd_conn> hc )
 #endif /* HAVE_SIGSET */
 
     /* Run the program. */
-    (void) execve( binary, _getptr_mm_array<char *>(argp), envp );
+    (void) execve( binary, (char *const *)_marshal_shared_array_ptr<char>(argp), envp );
 
     /* Something went wrong. */
     syslog( LOG_ERR, "execve %.80s - %m", _getptr_mm_array<char>(hc->expnfilename));

@@ -45,4 +45,7 @@ for_any(T) mm_array_ptr<T> _create_mm_array_ptr(mm_array_ptr<T> p, char *new_p);
 /* Mark a checked pointer to be valid */
 for_any(T) void mm_checked(mm_ptr<T> p);
 for_any(T) void mmarray_checked(mm_array_ptr<T> p);
+
+/* Marshaling an array of mm_array_ptr to an array of raw pointers. */
+for_any(T) void **_marshal_shared_array_ptr(mm_array_ptr<mm_array_ptr<T>> p);
 #endif
