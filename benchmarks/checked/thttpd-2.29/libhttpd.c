@@ -140,7 +140,7 @@ static int auth_check2( mm_ptr<httpd_conn> hc, char* dirname  );
 #endif /* AUTH_FILE */
 static void send_dirredirect( mm_ptr<httpd_conn> hc );
 static int hexit( char c );
-static void strdecode( char* to, char* from );
+static void strdecode( mm_array_ptr<char> to, mm_array_ptr<char> from );
 #ifdef GENERATE_INDEXES
 static void strencode( char* to, int tosize, char* from );
 #endif /* GENERATE_INDEXES */
@@ -1242,7 +1242,6 @@ send_dirredirect( mm_ptr<httpd_conn> hc )
 	&header, &maxheader, sizeof(headstr) + strlen(_getptr_mm_array<char>(location)));
     (void) my_snprintf(_getptr_mm_array<char>(header), maxheader,
 	"%s%s\015\012", headstr, _getptr_mm_array<char>(location));
-    // TODO: refactor send_response's last argument
     send_response( hc, 302, err302title, header, err302form, location);
     }
 
@@ -1301,9 +1300,8 @@ hexit( char c )
 /* Copies and decodes a string.  It's ok for from and to to be the
 ** same string.
 */
-/* TODO: refactor this function */
 static void
-strdecode( char *to, char *from )
+strdecode( mm_array_ptr<char> to, mm_array_ptr<char> from )
     {
     for ( ; *from != '\0'; ++to, ++from )
 	{
@@ -2111,7 +2109,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
     hc->encodedurl = url;
     mm_httpd_realloc_str(
 	&hc->decodedurl, &hc->maxdecodedurl, strlen(_GETARRAYPTR(char, hc->encodedurl)) );
-    strdecode( _getptr_mm_array<char>(hc->decodedurl), _GETARRAYPTR(char, hc->encodedurl));
+    strdecode(hc->decodedurl, hc->encodedurl);
 
     mm_httpd_realloc_str( &hc->origfilename, &hc->maxorigfilename,
             strlen( _getptr_mm_array<char>(hc->decodedurl)) );
@@ -3240,8 +3238,7 @@ make_argp( mm_ptr<httpd_conn> hc )
     {
     mm_array_ptr<char *> argp = NULL;
     int argn;
-    char* cp1;
-    char* cp2;
+    mm_array_ptr<char> cp1 = NULL, cp2 = NULL;
 
     /* By allocating an arg slot for every character in the query, plus
     ** one for the filename and one for the NULL, we are guaranteed to
@@ -3266,20 +3263,20 @@ make_argp( mm_ptr<httpd_conn> hc )
     */
     if ( strchr( _getptr_mm_array<char>(hc->query), '=' ) == (char*) 0 )
 	{
-	for ( cp1 = cp2 = _getptr_mm_array<char>(hc->query); *cp2 != '\0'; ++cp2 )
+	for ( cp1 = cp2 = hc->query; *cp2 != '\0'; ++cp2 )
 	    {
 	    if ( *cp2 == '+' )
 		{
 		*cp2 = '\0';
 		strdecode( cp1, cp1 );
-		argp[argn++] = cp1;
+		argp[argn++] = _GETARRAYPTR(char, cp1);
 		cp1 = cp2 + 1;
 		}
 	    }
 	if ( cp2 != cp1 )
 	    {
 	    strdecode( cp1, cp1 );
-	    argp[argn++] = cp1;
+	    argp[argn++] = _GETARRAYPTR(char, cp1);
 	    }
 	}
 
