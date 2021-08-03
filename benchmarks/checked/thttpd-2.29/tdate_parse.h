@@ -28,6 +28,8 @@
 #ifndef _TDATE_PARSE_H_
 #define _TDATE_PARSE_H_
 
-time_t tdate_parse( char* str );
+#include "safe_mm_checked.h"
+
+time_t tdate_parse( mm_array_ptr<char> str );
 
 #endif /* _TDATE_PARSE_H_ */

@@ -189,12 +189,11 @@ tm_to_time( struct tm* tmP )
     }
 
 
-// TODO: refactor this function
 time_t
-tdate_parse( char* str )
+tdate_parse( mm_array_ptr<char> str )
     {
     struct tm tm;
-    char* cp;
+    mm_array_ptr<char> cp = NULL;
     char str_mon[500], str_wday[500];
     int tm_sec, tm_min, tm_hour, tm_mday, tm_year;
     long tm_mon, tm_wday;
@@ -213,7 +212,7 @@ tdate_parse( char* str )
     */
 
     /* DD-mth-YY HH:MM:SS GMT */
-    if ( sscanf( cp, "%d-%400[a-zA-Z]-%d %d:%d:%d GMT",
+    if ( sscanf( _GETARRAYPTR(char, cp), "%d-%400[a-zA-Z]-%d %d:%d:%d GMT",
 		&tm_mday, str_mon, &tm_year, &tm_hour, &tm_min,
 		&tm_sec ) == 6 &&
 	    scan_mon( str_mon, &tm_mon ) )
@@ -227,7 +226,7 @@ tdate_parse( char* str )
 	}
 
     /* DD mth YY HH:MM:SS GMT */
-    else if ( sscanf( cp, "%d %400[a-zA-Z] %d %d:%d:%d GMT",
+    else if ( sscanf(_GETARRAYPTR(char, cp), "%d %400[a-zA-Z] %d %d:%d:%d GMT",
 		&tm_mday, str_mon, &tm_year, &tm_hour, &tm_min,
 		&tm_sec) == 6 &&
 	    scan_mon( str_mon, &tm_mon ) )
@@ -241,7 +240,7 @@ tdate_parse( char* str )
 	}
 
     /* HH:MM:SS GMT DD-mth-YY */
-    else if ( sscanf( cp, "%d:%d:%d GMT %d-%400[a-zA-Z]-%d",
+    else if ( sscanf(_GETARRAYPTR(char, cp), "%d:%d:%d GMT %d-%400[a-zA-Z]-%d",
 		&tm_hour, &tm_min, &tm_sec, &tm_mday, str_mon,
 		&tm_year ) == 6 &&
 	    scan_mon( str_mon, &tm_mon ) )
@@ -255,7 +254,7 @@ tdate_parse( char* str )
 	}
 
     /* HH:MM:SS GMT DD mth YY */
-    else if ( sscanf( cp, "%d:%d:%d GMT %d %400[a-zA-Z] %d",
+    else if ( sscanf( _GETARRAYPTR(char, cp), "%d:%d:%d GMT %d %400[a-zA-Z] %d",
 		&tm_hour, &tm_min, &tm_sec, &tm_mday, str_mon,
 		&tm_year ) == 6 &&
 	    scan_mon( str_mon, &tm_mon ) )
@@ -269,7 +268,7 @@ tdate_parse( char* str )
 	}
 
     /* wdy, DD-mth-YY HH:MM:SS GMT */
-    else if ( sscanf( cp, "%400[a-zA-Z], %d-%400[a-zA-Z]-%d %d:%d:%d GMT",
+    else if ( sscanf( _GETARRAYPTR(char, cp), "%400[a-zA-Z], %d-%400[a-zA-Z]-%d %d:%d:%d GMT",
 		str_wday, &tm_mday, str_mon, &tm_year, &tm_hour, &tm_min,
 		&tm_sec ) == 7 &&
 	    scan_wday( str_wday, &tm_wday ) &&
@@ -285,7 +284,7 @@ tdate_parse( char* str )
 	}
 
     /* wdy, DD mth YY HH:MM:SS GMT */
-    else if ( sscanf( cp, "%400[a-zA-Z], %d %400[a-zA-Z] %d %d:%d:%d GMT",
+    else if ( sscanf( _GETARRAYPTR(char, cp), "%400[a-zA-Z], %d %400[a-zA-Z] %d %d:%d:%d GMT",
 		str_wday, &tm_mday, str_mon, &tm_year, &tm_hour, &tm_min,
 		&tm_sec ) == 7 &&
 	    scan_wday( str_wday, &tm_wday ) &&
@@ -301,7 +300,7 @@ tdate_parse( char* str )
 	}
 
     /* wdy mth DD HH:MM:SS GMT YY */
-    else if ( sscanf( cp, "%400[a-zA-Z] %400[a-zA-Z] %d %d:%d:%d GMT %d",
+    else if ( sscanf( _GETARRAYPTR(char, cp), "%400[a-zA-Z] %400[a-zA-Z] %d %d:%d:%d GMT %d",
 		str_wday, str_mon, &tm_mday, &tm_hour, &tm_min, &tm_sec,
 		&tm_year ) == 7 &&
 	    scan_wday( str_wday, &tm_wday ) &&

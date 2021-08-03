@@ -2234,8 +2234,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 	    else if ( strncasecmp(_GETARRAYPTR(char, buf), "If-Modified-Since:", 18 ) == 0 )
 		{
 		cp = buf + 18;
-        // TODO
-		hc->if_modified_since = tdate_parse(_GETARRAYPTR(char, cp));
+		hc->if_modified_since = tdate_parse(cp);
 		if ( hc->if_modified_since == (time_t) -1 )
 		    syslog( LOG_DEBUG, "unparsable time: %.80s", _GETARRAYPTR(char, cp));
 		}
@@ -2277,7 +2276,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 		      strncasecmp(_GETARRAYPTR(char, buf), "If-Range:", 9 ) == 0 )
 		{
 		cp = buf + 9;
-		hc->range_if = tdate_parse( _GETARRAYPTR(char, cp) );
+		hc->range_if = tdate_parse(cp);
 		if ( hc->range_if == (time_t) -1 )
 		    syslog( LOG_DEBUG, "unparsable time: %.80s", _GETARRAYPTR(char, cp));
 		}
