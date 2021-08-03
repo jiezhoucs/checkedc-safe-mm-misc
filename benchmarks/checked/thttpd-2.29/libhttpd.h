@@ -108,7 +108,7 @@ typedef struct {
     int status;
     off_t bytes_to_send;
     off_t bytes_sent;
-    char *encodedurl;
+    mm_array_ptr<char> encodedurl;
     mm_array_ptr<char> decodedurl;
     char *protocol;
     mm_array_ptr<char> origfilename;
@@ -116,17 +116,17 @@ typedef struct {
     mm_array_ptr<char> encodings;
     mm_array_ptr<char> pathinfo;
     mm_array_ptr<char> query;
-    char *referrer;
-    char *useragent;
+    mm_array_ptr<char> referrer;
+    mm_array_ptr<char> useragent;
     mm_array_ptr<char> accept;
     mm_array_ptr<char> accepte;
-    char *acceptl;
-    char *cookie;
-    char *contenttype;
+    mm_array_ptr<char> acceptl;
+    mm_array_ptr<char> cookie;
+    mm_array_ptr<char> contenttype;
     mm_array_ptr<char> reqhost;
-    char *hdrhost;
+    mm_array_ptr<char> hdrhost;
     mm_array_ptr<char> hostdir;
-    char *authorization;
+    mm_array_ptr<char> authorization;
     mm_array_ptr<char> remoteuser;
     mm_array_ptr<char> response;
     size_t maxdecodedurl, maxorigfilename, maxexpnfilename, maxencodings,
@@ -140,8 +140,7 @@ typedef struct {
     time_t if_modified_since, range_if;
     size_t contentlength;
     char *type;		/* not malloc()ed */
-    char *hostname;	/* not malloc()ed */
-    /* mm_array_ptr<char> hostname;  // no malloc() but assigned to be sth malloc()ed */
+    mm_array_ptr<char> hostname;
     int mime_flag;
     int one_one;	/* HTTP/1.1 or better */
     int got_range;
@@ -261,7 +260,7 @@ void httpd_destroy_conn( mm_ptr<httpd_conn> hc );
 /* Send an error message back to the client. */
 void httpd_send_err(
     mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char> extraheads, char* form,
-    char* arg );
+    mm_array_ptr<char> arg );
 
 /* Some error messages. */
 extern char* httpd_err400title;
@@ -272,14 +271,14 @@ extern char* httpd_err503title;
 extern char* httpd_err503form;
 
 /* Generate a string representation of a method number. */
-char* httpd_method_str( int method );
+mm_array_ptr<char> httpd_method_str( int method );
 
 /* Reallocate a string. */
 void httpd_realloc_str( char** strP, size_t* maxsizeP, size_t size );
 void mm_httpd_realloc_str(mm_ptr<mm_array_ptr<char>> strP, mm_ptr<size_t> maxsizeP, size_t size);
 
 /* Format a network socket to a string representation. */
-char *mm_httpd_ntoa( mm_ptr<httpd_sockaddr> saP );
+mm_array_ptr<char> mm_httpd_ntoa( mm_ptr<httpd_sockaddr> saP );
 char *httpd_ntoa( httpd_sockaddr *saP );
 
 /* Set NDELAY mode on a socket. */

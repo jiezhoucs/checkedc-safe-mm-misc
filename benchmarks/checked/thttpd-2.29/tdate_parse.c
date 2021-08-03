@@ -189,6 +189,7 @@ tm_to_time( struct tm* tmP )
     }
 
 
+// TODO: refactor this function
 time_t
 tdate_parse( char* str )
     {

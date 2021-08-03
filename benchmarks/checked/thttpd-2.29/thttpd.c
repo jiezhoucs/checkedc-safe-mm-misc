@@ -60,6 +60,8 @@
 #include "timers.h"
 #include "match.h"
 
+#include "debug.h"
+
 #ifndef SHUT_WR
 #define SHUT_WR 1
 #endif
@@ -1777,7 +1779,7 @@ handle_send(mm_ptr<connecttab> c, struct timeval* tvP )
 	** And ECONNRESET isn't interesting either.
 	*/
 	if ( errno != EPIPE && errno != EINVAL && errno != ECONNRESET )
-	    syslog( LOG_ERR, "write - %m sending %.80s", hc->encodedurl );
+	    syslog( LOG_ERR, "write - %m sending %.80s", _GETARRAYPTR(char, hc->encodedurl));
 	clear_connection( c, tvP );
 	return;
 	}
@@ -1878,7 +1880,6 @@ check_throttles(mm_ptr<connecttab> c ) {
     c->max_limit = c->min_limit = THROTTLE_NOLIMIT;
     for ( tnum = 0; tnum < numthrottles && c->numtnums < MAXTHROTTLENUMS;
 	  ++tnum )
-      // TODO: write a mm version of match
 	if ( match( throttles[tnum].pattern, _getptr_mm_array<char>(c->hc->expnfilename)))
 	    {
 	    /* If we're way over the limit, don't even start. */
@@ -2070,7 +2071,7 @@ idle( ClientData client_data, struct timeval* nowP )
 		{
 		syslog( LOG_INFO,
 		    "%.80s connection timed out reading",
-		    mm_httpd_ntoa( &c->hc->client_addr ) );
+		    _GETARRAYPTR(char, mm_httpd_ntoa( &c->hc->client_addr)) );
 		httpd_send_err( c->hc, 408, httpd_err408title, "", httpd_err408form, "" );
 		finish_connection(c, nowP );
 		}
@@ -2081,7 +2082,7 @@ idle( ClientData client_data, struct timeval* nowP )
 		{
 		syslog( LOG_INFO,
 		    "%.80s connection timed out sending",
-		    mm_httpd_ntoa( &c->hc->client_addr ) );
+		    _GETARRAYPTR(char, mm_httpd_ntoa( &c->hc->client_addr)));
 		clear_connection(c, nowP );
 		}
 	    break;
