@@ -40,6 +40,8 @@ for_any(T) mm_array_ptr<T> mmptr_to_mmarrayptr(mm_ptr<T> p);
 for_any(T) mm_ptr<T> mmarrayptr_to_mmptr(mm_array_ptr<T> p);
 
 for_any(T) void _setptr_mm_array(mm_array_ptr<const T> *p, char *new_p);
+/* Create an mmsafe pointer based on an existing checked pointer. */
+for_any(T) mm_array_ptr<T> _create_mm_array_ptr(mm_array_ptr<T> p, char *new_p);
 
 /* Mark a checked pointer to be valid */
 for_any(T) void mm_checked(mm_ptr<T> p);

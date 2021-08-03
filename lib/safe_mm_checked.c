@@ -370,3 +370,32 @@ for_any(T) void _setptr_mm_array(mm_array_ptr<const T> *p, char *new_p) {
     safeptr->key_offset += (new_p - (char *)(safeptr->p));
     safeptr->p = (void *)new_p;
 }
+
+/**
+ * Function: _create_mm_array_ptr()
+ *
+ * This function creates a new mm_array_ptr based on an existing pointer.
+ * The motivation of having this function is to have better interoperability
+ * with unchecked library code in terms of having more checked pointers.
+ * For example, strchr() locates a char in a string, and semantically the
+ * returned pointer is either a NULL or a pointer to the same object pointed
+ * by the source pointer. When we pass a checked pointer (metadata stripped)
+ * to strchar() and woud like to make the returned pointer checked, this
+ * _create_mm_array_ptr() would do the trick. It creates a new checked pointer
+ * with a provided new raw pointer and the key-offset is computed based on
+ * the key-offset of the existing pointer.
+ *
+ * Note: this function should only be used for library functions that returns
+ * a pointer that is either a NULL or point to the same object as the source
+ * object. Examples include strchr(), strrrchar(), and strpbrk().
+ *
+ * */
+for_any(T) mm_array_ptr<T> _create_mm_array_ptr(mm_array_ptr<T> p, char *new_p) {
+    _MMSafe_ptr_Rep *base_safeptr_ptr = (_MMSafe_ptr_Rep *)&p;
+    _MMSafe_ptr_Rep new_safeptr = {
+        new_p,
+        base_safeptr_ptr->key_offset + (new_p - (char *)(base_safeptr_ptr->p))
+  };
+
+  return *((mm_array_ptr<T> *)&new_safeptr);
+}
