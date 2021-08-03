@@ -399,3 +399,35 @@ for_any(T) mm_array_ptr<T> _create_mm_array_ptr(mm_array_ptr<T> p, char *new_p) 
 
   return *((mm_array_ptr<T> *)&new_safeptr);
 }
+
+/**
+ * Function: _marshal_shared_array_ptr()
+ *
+ * This function takes an mm_array_ptr to an an array of mm_array_ptr that
+ * are supposed to be shared between checked and unchecked code.
+ * It extracts all the raw C pointers of the array, puts them in a newly
+ * allocated array of raw pointers, and returns the starting address of this
+ * new array.
+ *
+ * Assumption: The input array of pointers ends with a NULL pointr.
+ *
+ * */
+for_any(T) void **_marshal_shared_array_ptr(mm_array_ptr<mm_array_ptr<T>> p) {
+  char **raw_p = *(char ***)&p;
+  unsigned size = 0;
+  /* First, compute the size of this array. */
+  while (*p++){
+    size++;
+  }
+  size++;
+
+  /* Second, make a new array of raw pointers. */
+  void **new_p = malloc(sizeof(void *) * size);
+  for (unsigned i = 0; i < size - 1; i++) {
+    /* The " * 2" in "i * 2" is to skip the metadata. */
+    new_p[i] = raw_p[i * 2];
+  }
+  new_p[size - 1] = NULL;
+
+  return new_p;
+}
