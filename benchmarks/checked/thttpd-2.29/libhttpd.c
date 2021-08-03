@@ -3835,7 +3835,6 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	/* Got an index file.  Expand symlinks again.  More pathinfo means
 	** something went wrong.
 	*/
-             // TODO: refactor the first arg of expand_symlinks()
 	cp = _getptr_mm_array<char>(expand_symlinks( _getptr_mm_array<char>(indexname),
                 &pi, hc->hs->no_symlink_check, hc->tildemapped));
 	if ( cp == (char*) 0 || pi[0] != '\0' )
