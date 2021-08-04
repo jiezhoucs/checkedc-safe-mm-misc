@@ -562,9 +562,9 @@ add_response( mm_ptr<httpd_conn> hc, mm_array_ptr<char> str )
     {
     size_t len;
 
-    len = strlen(_getptr_mm_array<char>(str));
+    len = strlen(_GETARRAYPTR(char, str));
     mm_httpd_realloc_str(&hc->response, &hc->maxresponse, hc->responselen + len );
-    (void) memmove( _getptr_mm<char>(&(hc->response[hc->responselen])), _getptr_mm<char>(str), len );
+    (void) memmove( _GETPTR(char, &(hc->response[hc->responselen])), _GETARRAYPTR(char, str), len );
     hc->responselen += len;
     }
 
@@ -673,7 +673,7 @@ send_mime( mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char> en
 	if ( encodings[0] != '\0' )
 	    {
 	    (void) my_snprintf( (char *)buf, sizeof(buf),
-		"Content-Encoding: %s\015\012", _getptr_mm_array<char>(encodings));
+		"Content-Encoding: %s\015\012", _GETARRAYPTR(char, encodings));
 	    add_response( hc, buf );
 	    }
 	if ( partial_content )
@@ -879,7 +879,7 @@ httpd_send_err( mm_ptr<httpd_conn> hc, int status, char* title,
     if ( hc->hs->vhost && hc->hostdir[0] != '\0' )
 	{
 	(void) my_snprintf( filename, sizeof(filename),
-	    "%s/%s/err%d.html", _getptr_mm_array<char>(hc->hostdir), ERR_DIR, status );
+	    "%s/%s/err%d.html", _GETARRAYPTR(char, hc->hostdir), ERR_DIR, status );
 	if ( send_err_file( hc, status, title, extraheads, filename ) )
 	    return;
 	}
@@ -944,7 +944,7 @@ send_authenticate( mm_ptr<httpd_conn> hc, char* realm ) {
 
     mm_httpd_realloc_str(
 	&header, &maxheader, sizeof(headstr) + strlen( realm ) + 3 );
-    (void) my_snprintf(_getptr_mm_array<char>(header), maxheader, "%s%s\"\015\012", headstr, realm );
+    (void) my_snprintf(_GETARRAYPTR(char, header), maxheader, "%s%s\"\015\012", headstr, realm );
     httpd_send_err( hc, 401, err401title, header, err401form, hc->encodedurl );
     /* If the request was a POST then there might still be data to be read,
     ** so we need to do a lingering close.
@@ -1043,7 +1043,7 @@ auth_check( mm_ptr<httpd_conn> hc, mm_array_ptr<char> dirname  )
 	{
 	char *topdir;
 	if ( hc->hs->vhost && hc->hostdir[0] != '\0' )
-	    topdir = _getptr_mm_array<char>(hc->hostdir);
+	    topdir = _GETARRAYPTR(char, hc->hostdir);
 	else
 	    topdir = ".";
 	switch ( auth_check2( hc, topdir) )
@@ -1054,7 +1054,7 @@ auth_check( mm_ptr<httpd_conn> hc, mm_array_ptr<char> dirname  )
 	    return 1;
 	    }
 	}
-    return auth_check2( hc, _getptr_mm_array<char>(dirname));
+    return auth_check2( hc, _GETARRAYPTR(char, dirname));
     }
 
 
@@ -1086,10 +1086,10 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
     /* Construct auth filename. */
     mm_httpd_realloc_str(
 	&authpath, &maxauthpath, strlen( dirname ) + 1 + sizeof(AUTH_FILE) );
-    (void) my_snprintf( _getptr_mm_array<char>(authpath), maxauthpath, "%s/%s", dirname, AUTH_FILE );
+    (void) my_snprintf( _GETARRAYPTR(char, authpath), maxauthpath, "%s/%s", dirname, AUTH_FILE );
 
     /* Does this directory have an auth file? */
-    if ( stat( _getptr_mm_array<char>(authpath), &sb ) < 0 )
+    if ( stat( _GETARRAYPTR(char, authpath), &sb ) < 0 )
 	/* Nope, let the request go through. */
 	return 0;
 
@@ -1122,16 +1122,16 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
 
     /* See if we have a cached entry and can use it. */
     if ( maxprevauthpath != 0 &&
-	 strcmp( _getptr_mm_array<char>(authpath), _getptr_mm_array<char>(prevauthpath)) == 0 &&
+	 strcmp( _GETARRAYPTR(char, authpath), _GETARRAYPTR(char, prevauthpath)) == 0 &&
 	 sb.st_mtime == prevmtime &&
-	 strcmp( authinfo, _getptr_mm_array<char>(prevuser)) == 0 )
+	 strcmp( authinfo, _GETARRAYPTR(char, prevuser)) == 0 )
 	{
 	/* Yes.  Check against the cached encrypted password. */
-	if ( strcmp(crypt(authpass, _getptr_mm_array<char>(prevcryp)), _getptr_mm_array<char>(prevcryp)) == 0 )
+	if ( strcmp(crypt(authpass, _GETARRAYPTR(char, prevcryp)), _GETARRAYPTR(char, prevcryp)) == 0 )
 	    {
 	    /* Ok! */
 	    mm_httpd_realloc_str( &hc->remoteuser, &hc->maxremoteuser, strlen( authinfo ) );
-	    (void) strcpy(_getptr_mm_array<char>(hc->remoteuser), authinfo );
+	    (void) strcpy(_GETARRAYPTR(char, hc->remoteuser), authinfo );
 	    return 1;
 	    }
 	else
@@ -1143,13 +1143,13 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
 	}
 
     /* Open the password file. */
-    fp = fopen( _getptr_mm_array<char>(authpath), "r" );
+    fp = fopen( _GETARRAYPTR(char, authpath), "r" );
     if ( fp == (FILE*) 0 )
 	{
 	/* The file exists but we can't open it?  Disallow access. */
 	syslog(
 	    LOG_ERR, "%.80s auth file %.80s could not be opened - %m",
-	    _GETARRAYPTR(char, mm_httpd_ntoa( &hc->client_addr )), _getptr_mm_array<char>(authpath));
+	    _GETARRAYPTR(char, mm_httpd_ntoa( &hc->client_addr )), _GETARRAYPTR(char, authpath));
 	httpd_send_err(
 	    hc, 403, err403title, "",
 	    ERROR_FORM( err403form, "The requested URL '%.80s' is protected by an authentication file, but the authentication file cannot be opened.\n" ),
@@ -1180,17 +1180,17 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
 		/* Ok! */
 		mm_httpd_realloc_str(
 		    &hc->remoteuser, &hc->maxremoteuser, strlen( line ) );
-		(void) strcpy(_getptr_mm_array<char>(hc->remoteuser), line );
+		(void) strcpy(_GETARRAYPTR(char, hc->remoteuser), line );
 		/* And cache this user's info for next time. */
 		mm_httpd_realloc_str(
-		    &prevauthpath, &maxprevauthpath, strlen(_getptr_mm_array<char>(authpath)) );
-		(void) strcpy(_getptr_mm_array<char>(prevauthpath), _getptr_mm_array<char>(authpath));
+		    &prevauthpath, &maxprevauthpath, strlen(_GETARRAYPTR(char, authpath)) );
+		(void) strcpy(_GETARRAYPTR(char, prevauthpath), _GETARRAYPTR(char, authpath));
 		prevmtime = sb.st_mtime;
 		mm_httpd_realloc_str(
 		    &prevuser, &maxprevuser, strlen(authinfo));
-		(void) strcpy(_getptr_mm_array<char>(prevuser), authinfo );
+		(void) strcpy(_GETARRAYPTR(char, prevuser), authinfo );
 		mm_httpd_realloc_str( &prevcryp, &maxprevcryp, strlen( cryp ) );
-		(void) strcpy( _getptr_mm_array<char>(prevcryp), cryp );
+		(void) strcpy( _GETARRAYPTR(char, prevcryp), cryp );
 		return 1;
 		}
 	    else
@@ -1227,21 +1227,21 @@ send_dirredirect( mm_ptr<httpd_conn> hc )
 	    *cp = '\0';
 	mm_httpd_realloc_str(
 	    &location, &maxlocation,
-	    strlen(_GETARRAYPTR(char, hc->encodedurl)) + 2 + strlen(_getptr_mm_array<char>(hc->query)) );
-	(void) my_snprintf(_getptr_mm_array<char>(location), maxlocation,
-	    "%s/?%s", _GETARRAYPTR(char, hc->encodedurl), _getptr_mm_array<char>(hc->query));
+	    strlen(_GETARRAYPTR(char, hc->encodedurl)) + 2 + strlen(_GETARRAYPTR(char, hc->query)) );
+	(void) my_snprintf(_GETARRAYPTR(char, location), maxlocation,
+	    "%s/?%s", _GETARRAYPTR(char, hc->encodedurl), _GETARRAYPTR(char, hc->query));
 	}
     else
 	{
 	mm_httpd_realloc_str(
 	    &location, &maxlocation, strlen(_GETARRAYPTR(char, hc->encodedurl)) + 1 );
-	(void) my_snprintf(_getptr_mm_array<char>(location), maxlocation,
+	(void) my_snprintf(_GETARRAYPTR(char, location), maxlocation,
 	    "%s/", _GETARRAYPTR(char, hc->encodedurl));
 	}
     mm_httpd_realloc_str(
-	&header, &maxheader, sizeof(headstr) + strlen(_getptr_mm_array<char>(location)));
-    (void) my_snprintf(_getptr_mm_array<char>(header), maxheader,
-	"%s%s\015\012", headstr, _getptr_mm_array<char>(location));
+	&header, &maxheader, sizeof(headstr) + strlen(_GETARRAYPTR(char, location)));
+    (void) my_snprintf(_GETARRAYPTR(char, header), maxheader,
+	"%s%s\015\012", headstr, _GETARRAYPTR(char, location));
     send_response( hc, 302, err302title, header, err302form, location);
     }
 
@@ -1356,12 +1356,12 @@ tilde_map_1( httpd_conn* hc )
 
     len = strlen( hc->expnfilename ) - 1;
     mm_httpd_realloc_str( &temp, &maxtemp, len );
-    (void) strcpy(_getptr_mm_array<char>(temp), &hc->expnfilename[1] );
+    (void) strcpy(_GETARRAYPTR(char, temp), &hc->expnfilename[1] );
     mm_httpd_realloc_str( &hc->expnfilename, &hc->maxexpnfilename, strlen( prefix ) + 1 + len );
     (void) strcpy( hc->expnfilename, prefix );
     if ( prefix[0] != '\0' )
 	(void) strcat( hc->expnfilename, "/" );
-    (void) strcat( hc->expnfilename, _getptr_mm_array<char>(temp));
+    (void) strcat( hc->expnfilename, _GETARRAYPTR(char, temp));
     return 1;
     }
 #endif /* TILDE_MAP_1 */
@@ -1381,15 +1381,15 @@ tilde_map_2( httpd_conn* hc )
 
     /* Get the username. */
     mm_httpd_realloc_str( &temp, &maxtemp, strlen( hc->expnfilename ) - 1 );
-    (void) strcpy( _getptr_mm_array<char>(temp), &hc->expnfilename[1] );
-    cp = strchr( _getptr_mm_array<char>(temp), '/' );
+    (void) strcpy( _GETARRAYPTR(char, temp), &hc->expnfilename[1] );
+    cp = strchr( _GETARRAYPTR(char, temp), '/' );
     if ( cp != (char*) 0 )
 	*cp++ = '\0';
     else
 	cp = "";
 
     /* Get the passwd entry. */
-    pw = getpwnam( _getptr_mm_array<char>(temp));
+    pw = getpwnam( _GETARRAYPTR(char, temp));
     if ( pw == (struct passwd*) 0 )
 	return 0;
 
@@ -1490,18 +1490,18 @@ vhost_map( mm_ptr<httpd_conn> hc )
     (void) strcpy( cp2, hc->hostname );
 #else /* VHOST_DIRLEVELS */
     mm_httpd_realloc_str(&hc->hostdir, &hc->maxhostdir, strlen(_GETARRAYPTR(char, hc->hostname)) );
-    (void) strcpy(_getptr_mm_array<char>(hc->hostdir), _GETARRAYPTR(char, hc->hostname));
+    (void) strcpy(_GETARRAYPTR(char, hc->hostdir), _GETARRAYPTR(char, hc->hostname));
 #endif /* VHOST_DIRLEVELS */
 
     /* Prepend hostdir to the filename. */
-    len = strlen(_getptr_mm_array<char>(hc->expnfilename));
+    len = strlen(_GETARRAYPTR(char, hc->expnfilename));
     mm_httpd_realloc_str( &tempfilename, &maxtempfilename, len );
-    (void) strcpy(_getptr_mm_array<char>(tempfilename), _getptr_mm_array<char>(hc->expnfilename));
+    (void) strcpy(_GETARRAYPTR(char, tempfilename), _GETARRAYPTR(char, hc->expnfilename));
     mm_httpd_realloc_str( &hc->expnfilename, &hc->maxexpnfilename,
-	strlen(_getptr_mm_array<char>(hc->hostdir)) + 1 + len );
-    (void) strcpy( _getptr_mm_array<char>(hc->expnfilename), _getptr_mm_array<char>(hc->hostdir));
-    (void) strcat( _getptr_mm_array<char>(hc->expnfilename), "/" );
-    (void) strcat(_getptr_mm_array<char>(hc->expnfilename), _getptr_mm_array<char>(tempfilename));
+	strlen(_GETARRAYPTR(char, hc->hostdir)) + 1 + len );
+    (void) strcpy( _GETARRAYPTR(char, hc->expnfilename), _GETARRAYPTR(char, hc->hostdir));
+    (void) strcat( _GETARRAYPTR(char, hc->expnfilename), "/" );
+    (void) strcat(_GETARRAYPTR(char, hc->expnfilename), _GETARRAYPTR(char, tempfilename));
     return 1;
     }
 
@@ -1547,7 +1547,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 	    {
 	    checkedlen = strlen( path );
 	    mm_httpd_realloc_str( &checked, &maxchecked, checkedlen );
-	    (void) strcpy( _getptr_mm_array<char>(checked), path );
+	    (void) strcpy( _GETARRAYPTR(char, checked), path );
 	    /* Trim trailing slashes. */
 	    while ( checked[checkedlen - 1] == '/' )
 		{
@@ -1567,14 +1567,14 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
     checkedlen = 0;
     restlen = strlen( path );
     mm_httpd_realloc_str( &rest, &maxrest, restlen );
-    (void) strcpy(_getptr_mm_array<char>(rest), path );
+    (void) strcpy(_GETARRAYPTR(char, rest), path );
     if ( rest[restlen - 1] == '/' )
 	rest[--restlen] = '\0';         /* trim trailing slash */
     if ( ! tildemapped )
 	/* Remove any leading slashes. */
 	while ( rest[0] == '/' )
 	    {
-	    (void) ol_strcpy(_getptr_mm_array<char>(rest), _getptr_mm<char>(&(rest[1])));
+	    (void) ol_strcpy(_GETARRAYPTR(char, rest), _getptr_mm<char>(&(rest[1])));
 	    --restlen;
 	    }
     r = rest;
@@ -1590,29 +1590,29 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 	prevrestlen = restlen;
 
 	/* Grab one component from r and transfer it to checked. */
-	cp1 = strchr(_getptr_mm_array<char>(r), '/' );
+	cp1 = strchr(_GETARRAYPTR(char, r), '/' );
 	if ( cp1 != (char*) 0 )
 	    {
-	    i = cp1 - (char *)_getptr_mm_array<char>(r);
+	    i = cp1 - (char *)_GETARRAYPTR(char, r);
 	    if ( i == 0 )
 		{
 		/* Special case for absolute paths. */
 		mm_httpd_realloc_str( &checked, &maxchecked, checkedlen + 1 );
-		(void) strncpy(_getptr_mm<char>(&checked[checkedlen]), _getptr_mm_array<char>(r), 1 );
+		(void) strncpy(_getptr_mm<char>(&checked[checkedlen]), _GETARRAYPTR(char, r), 1 );
 		checkedlen += 1;
 		}
-	    else if ( strncmp( _getptr_mm_array<char>(r), "..", MAX( i, 2 ) ) == 0 )
+	    else if ( strncmp( _GETARRAYPTR(char, r), "..", MAX( i, 2 ) ) == 0 )
 		{
 		/* Ignore ..'s that go above the start of the path. */
 		if ( checkedlen != 0 )
 		    {
-		    cp2 = strrchr( _getptr_mm_array<char>(checked), '/' );
+		    cp2 = strrchr( _GETARRAYPTR(char, checked), '/' );
 		    if ( cp2 == (char*) 0 )
 			checkedlen = 0;
-		    else if ( cp2 == _getptr_mm_array<char>(checked))
+		    else if ( cp2 == _GETARRAYPTR(char, checked))
 			checkedlen = 1;
 		    else
-			checkedlen = cp2 - (char *)_getptr_mm_array<char>(checked);
+			checkedlen = cp2 - (char *)_GETARRAYPTR(char, checked);
 		    }
 		}
 	    else
@@ -1620,7 +1620,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 		mm_httpd_realloc_str( &checked, &maxchecked, checkedlen + 1 + i );
 		if ( checkedlen > 0 && checked[checkedlen-1] != '/' )
 		    checked[checkedlen++] = '/';
-		(void) strncpy(_getptr_mm<char>(&checked[checkedlen]), _getptr_mm_array<char>(r), i );
+		(void) strncpy(_getptr_mm<char>(&checked[checkedlen]), _GETARRAYPTR(char, r), i );
 		checkedlen += i;
 		}
 	    checked[checkedlen] = '\0';
@@ -1630,18 +1630,18 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 	else
 	    {
 	    /* No slashes remaining, r is all one component. */
-	    if ( strcmp( _getptr_mm_array<char>(r), ".." ) == 0 )
+	    if ( strcmp( _GETARRAYPTR(char, r), ".." ) == 0 )
 		{
 		/* Ignore ..'s that go above the start of the path. */
 		if ( checkedlen != 0 )
 		    {
-		    cp2 = strrchr( _getptr_mm_array<char>(checked), '/' );
+		    cp2 = strrchr( _GETARRAYPTR(char, checked), '/' );
 		    if ( cp2 == (char*) 0 )
 			checkedlen = 0;
-		    else if ( cp2 == (char *)_getptr_mm_array<char>(checked))
+		    else if ( cp2 == (char *)_GETARRAYPTR(char, checked))
 			checkedlen = 1;
 		    else
-			checkedlen = cp2 - (char *)_getptr_mm_array<char>(checked);
+			checkedlen = cp2 - (char *)_GETARRAYPTR(char, checked);
 		    checked[checkedlen] = '\0';
 		    }
 		}
@@ -1651,7 +1651,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 		    &checked, &maxchecked, checkedlen + 1 + restlen );
 		if ( checkedlen > 0 && checked[checkedlen-1] != '/' )
 		    checked[checkedlen++] = '/';
-		(void) strcpy( _getptr_mm<char>(&checked[checkedlen]), _getptr_mm_array<char>(r));
+		(void) strcpy( _getptr_mm<char>(&checked[checkedlen]), _GETARRAYPTR(char, r));
 		checkedlen += restlen;
 		}
 	    r += restlen;
@@ -1661,7 +1661,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 	/* Try reading the current filename as a symlink */
 	if ( checked[0] == '\0' )
 	    continue;
-	linklen = readlink( _getptr_mm_array<char>(checked), lnk, sizeof(lnk) - 1 );
+	linklen = readlink( _GETARRAYPTR(char, checked), lnk, sizeof(lnk) - 1 );
 	if ( linklen == -1 )
 	    {
 	    if ( errno == EINVAL )
@@ -1671,12 +1671,12 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 		/* That last component was bogus.  Restore and return. */
 		*restP = r - ( prevrestlen - restlen );
 		if ( prevcheckedlen == 0 )
-		    (void) strcpy( _getptr_mm_array<char>(checked), "." );
+		    (void) strcpy( _GETARRAYPTR(char, checked), "." );
 		else
 		    checked[prevcheckedlen] = '\0';
 		return checked;
 		}
-	    syslog( LOG_ERR, "readlink %.80s - %m", _getptr_mm_array<char>(checked));
+	    syslog( LOG_ERR, "readlink %.80s - %m", _GETARRAYPTR(char, checked));
 	    return NULL;
 	    }
 	++nlinks;
@@ -1692,11 +1692,11 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 	/* Insert the link contents in front of the rest of the filename. */
 	if ( restlen != 0 )
 	    {
-	    (void) ol_strcpy( _getptr_mm_array<char>(rest), _getptr_mm_array<char>(r));
+	    (void) ol_strcpy( _GETARRAYPTR(char, rest), _GETARRAYPTR(char, r));
 	    mm_httpd_realloc_str( &rest, &maxrest, restlen + linklen + 1 );
 	    for ( i = restlen; i >= 0; --i )
 		rest[i + linklen + 1] = rest[i];
-	    (void) strcpy( _getptr_mm_array<char>(rest), lnk );
+	    (void) strcpy( _GETARRAYPTR(char, rest), lnk );
 	    rest[linklen] = '/';
 	    restlen += linklen + 1;
 	    r = rest;
@@ -1707,7 +1707,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 	    ** becomes the rest.
 	    */
 	    mm_httpd_realloc_str( &rest, &maxrest, linklen );
-	    (void) strcpy( _getptr_mm_array<char>(rest), lnk );
+	    (void) strcpy( _GETARRAYPTR(char, rest), lnk );
 	    restlen = linklen;
 	    r = rest;
 	    }
@@ -1729,7 +1729,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
     /* Ok. */
     *restP = r;
     if ( checked[0] == '\0' )
-	(void) strcpy( _getptr_mm_array<char>(checked), "." );
+	(void) strcpy( _GETARRAYPTR(char, checked), "." );
     return checked;
     }
 
@@ -1791,8 +1791,8 @@ int httpd_get_conn(mm_ptr<httpd_server> hs, int listen_fd, mm_ptr<httpd_conn> hc
 	}
     (void) fcntl( hc->conn_fd, F_SETFD, 1 );
     hc->hs = hs;
-    (void) memset(_getptr_mm<httpd_sockaddr>(&hc->client_addr), 0, sizeof(hc->client_addr) );
-    (void) memmove(_getptr_mm<httpd_sockaddr>(&hc->client_addr), &sa, sockaddr_len( &sa ) );
+    (void) memset(_GETPTR(httpd_sockaddr, &hc->client_addr), 0, sizeof(hc->client_addr) );
+    (void) memmove(_GETPTR(httpd_sockaddr, &hc->client_addr), &sa, sockaddr_len( &sa ) );
     hc->read_idx = 0;
     hc->checked_idx = 0;
     hc->checked_state = CHST_FIRSTWORD;
@@ -2112,11 +2112,16 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
     strdecode(hc->decodedurl, hc->encodedurl);
 
     mm_httpd_realloc_str( &hc->origfilename, &hc->maxorigfilename,
-            strlen( _getptr_mm_array<char>(hc->decodedurl)) );
-    (void) strcpy( _getptr_mm_array<char>(hc->origfilename), _getptr_mm<char>(&hc->decodedurl[1]));
+            strlen( _GETARRAYPTR(char, hc->decodedurl)) );
+    /* Jie Zhou: For some very mysterious reason, for the second arg of the
+     * next line, _GETPTR(char, ...) triggers an assertion failure. The same
+     * code pattern in a small test program compiles fine. Also, at line 567,
+     * the first arg of memmove has the same structure as the second arg of
+     * the next strcpy(), but line 567 comiles. WTH?? */
+    (void) strcpy( _GETARRAYPTR(char, hc->origfilename), _getptr_mm<char>(&hc->decodedurl[1]));
     /* Special case for top-level URL. */
     if ( hc->origfilename[0] == '\0' )
-	(void) strcpy( _getptr_mm_array<char>(hc->origfilename), "." );
+	(void) strcpy( _GETARRAYPTR(char, hc->origfilename), "." );
 
     /* Extract query string from encoded URL. */
     char *raw_cp = strchr( _GETARRAYPTR(char, hc->encodedurl), '?' );
@@ -2125,9 +2130,9 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 	{
 	++cp;
 	mm_httpd_realloc_str(&hc->query, &hc->maxquery, strlen( raw_cp ) );
-	(void) strcpy( _getptr_mm_array<char>(hc->query), raw_cp );
+	(void) strcpy( _GETARRAYPTR(char, hc->query), raw_cp );
 	/* Remove query from (decoded) origfilename. */
-	raw_cp = strchr( _getptr_mm_array<char>(hc->origfilename), '?' );
+	raw_cp = strchr( _GETARRAYPTR(char, hc->origfilename), '?' );
     cp = _create_mm_array_ptr<char>(hc->origfilename, raw_cp);
 	if ( cp != NULL )
 	    *cp = '\0';
@@ -2188,7 +2193,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 		cp += strspn(_GETARRAYPTR(char, cp), " \t" );
 		if ( hc->accept[0] != '\0' )
 		    {
-		    if ( strlen( _getptr_mm_array<char>(hc->accept)) > 5000 )
+		    if ( strlen( _GETARRAYPTR(char, hc->accept)) > 5000 )
 			{
 			syslog(
 			    LOG_ERR, "%.80s way too much Accept: data",
@@ -2196,13 +2201,13 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 			continue;
 			}
 		    mm_httpd_realloc_str( &hc->accept, &hc->maxaccept,
-			strlen( _getptr_mm_array<char>(hc->accept)) + 2 + strlen(_GETARRAYPTR(char, cp)) );
-		    (void) strcat( _getptr_mm_array<char>(hc->accept), ", " );
+			strlen( _GETARRAYPTR(char, hc->accept)) + 2 + strlen(_GETARRAYPTR(char, cp)) );
+		    (void) strcat( _GETARRAYPTR(char, hc->accept), ", " );
 		    }
 		else
 		    mm_httpd_realloc_str(
 			&hc->accept, &hc->maxaccept, strlen(_GETARRAYPTR(char, cp)));
-		(void) strcat( _getptr_mm_array<char>(hc->accept), _GETARRAYPTR(char, cp));
+		(void) strcat( _GETARRAYPTR(char, hc->accept), _GETARRAYPTR(char, cp));
 		}
 	    else if ( strncasecmp( _GETARRAYPTR(char, buf), "Accept-Encoding:", 16 ) == 0 )
 		{
@@ -2210,7 +2215,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 		cp += strspn(_GETARRAYPTR(char, cp), " \t" );
 		if ( hc->accepte[0] != '\0' )
 		    {
-		    if ( strlen( _getptr_mm_array<char>(hc->accepte)) > 5000 )
+		    if ( strlen( _GETARRAYPTR(char, hc->accepte)) > 5000 )
 			{
 			syslog(
 			    LOG_ERR, "%.80s way too much Accept-Encoding: data",
@@ -2218,12 +2223,12 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 			continue;
 			}
 		    mm_httpd_realloc_str( &hc->accepte, &hc->maxaccepte,
-			strlen( _getptr_mm_array<char>(hc->accepte)) + 2 + strlen(_GETARRAYPTR(char, cp)));
-		    (void) strcat(_getptr_mm_array<char>(hc->accepte), ", " );
+			strlen( _GETARRAYPTR(char, hc->accepte)) + 2 + strlen(_GETARRAYPTR(char, cp)));
+		    (void) strcat(_GETARRAYPTR(char, hc->accepte), ", " );
 		    }
 		else
 		    mm_httpd_realloc_str( &hc->accepte, &hc->maxaccepte, strlen(_GETARRAYPTR(char, cp)) );
-		(void) strcpy( _getptr_mm_array<char>(hc->accepte), _GETARRAYPTR(char, cp));
+		(void) strcpy( _GETARRAYPTR(char, hc->accepte), _GETARRAYPTR(char, cp));
 		}
 	    else if ( strncasecmp(_GETARRAYPTR(char, buf), "Accept-Language:", 16 ) == 0 )
 		{
@@ -2366,8 +2371,8 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 
     /* Copy original filename to expanded filename. */
     mm_httpd_realloc_str(
-	&hc->expnfilename, &hc->maxexpnfilename, strlen( _getptr_mm_array<char>(hc->origfilename)) );
-    (void) strcpy( _getptr_mm_array<char>(hc->expnfilename), _getptr_mm_array<char>(hc->origfilename));
+	&hc->expnfilename, &hc->maxexpnfilename, strlen( _GETARRAYPTR(char, hc->origfilename)) );
+    (void) strcpy( _GETARRAYPTR(char, hc->expnfilename), _GETARRAYPTR(char, hc->origfilename));
 
     /* Tilde mapping. */
     if ( hc->expnfilename[0] == '~' )
@@ -2407,16 +2412,16 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 	return -1;
 	}
     mm_httpd_realloc_str( &hc->expnfilename, &hc->maxexpnfilename, strlen(_GETARRAYPTR(char, cp)));
-    (void) strcpy( _getptr_mm_array<char>(hc->expnfilename), _GETARRAYPTR(char, cp));
-    mm_httpd_realloc_str(&hc->pathinfo, &hc->maxpathinfo, strlen(_getptr_mm_array<char>(pi)) );
-    (void) strcpy( _getptr_mm_array<char>(hc->pathinfo), _getptr_mm_array<char>(pi));
+    (void) strcpy( _GETARRAYPTR(char, hc->expnfilename), _GETARRAYPTR(char, cp));
+    mm_httpd_realloc_str(&hc->pathinfo, &hc->maxpathinfo, strlen(_GETARRAYPTR(char, pi)) );
+    (void) strcpy( _GETARRAYPTR(char, hc->pathinfo), _GETARRAYPTR(char, pi));
 
     /* Remove pathinfo stuff from the original filename too. */
     if ( hc->pathinfo[0] != '\0' )
 	{
 	int i;
-	i = strlen(_getptr_mm_array<char>(hc->origfilename)) - strlen( _getptr_mm_array<char>(hc->pathinfo));
-	if ( i > 0 && strcmp( _getptr_mm<char>(&hc->origfilename[i]), _getptr_mm_array<char>(hc->pathinfo)) == 0 )
+	i = strlen(_GETARRAYPTR(char, hc->origfilename)) - strlen( _GETARRAYPTR(char, hc->pathinfo));
+	if ( i > 0 && strcmp( _getptr_mm<char>(&hc->origfilename[i]), _GETARRAYPTR(char, hc->pathinfo)) == 0 )
 	    hc->origfilename[i - 1] = '\0';
 	}
 
@@ -2426,11 +2431,11 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
     if ( hc->expnfilename[0] == '/' )
 	{
 	if ( strncmp(
-		 _getptr_mm_array<char>(hc->expnfilename), hc->hs->cwd, strlen( hc->hs->cwd ) ) == 0 )
+		 _GETARRAYPTR(char, hc->expnfilename), hc->hs->cwd, strlen( hc->hs->cwd ) ) == 0 )
 	    {
 	    /* Elide the current directory. */
 	    (void) ol_strcpy(
-		_getptr_mm_array<char>(hc->expnfilename), _getptr_mm<char>(&hc->expnfilename[strlen( hc->hs->cwd )]));
+		_GETARRAYPTR(char, hc->expnfilename), _getptr_mm<char>(&hc->expnfilename[strlen( hc->hs->cwd )]));
 	    }
 #ifdef TILDE_MAP_2
 	else if ( hc->altdir[0] != '\0' &&
@@ -2490,7 +2495,7 @@ de_dotdot( mm_array_ptr<char> mm_file )
     char* cp2;
     int l;
 
-    char *file = _getptr_mm_array<char>(mm_file);
+    char *file = _GETARRAYPTR(char, mm_file);
 
     /* Collapse any multiple / sequences. */
     while ( ( cp = strstr( file, "//") ) != (char*) 0 )
@@ -2644,12 +2649,12 @@ figure_mime( mm_ptr<httpd_conn> hc )
 
     /* Peel off encoding extensions until there aren't any more. */
     n_me_indexes = 0;
-    for ( prev_dot = _getptr_mm<char>(&hc->expnfilename[strlen(_getptr_mm_array<char>(hc->expnfilename))]);
+    for ( prev_dot = _getptr_mm<char>(&hc->expnfilename[strlen(_GETARRAYPTR(char, hc->expnfilename))]);
             ; prev_dot = dot )
 	{
-	for ( dot = prev_dot - 1; dot >= (char *)_getptr_mm_array<char>(hc->expnfilename) && *dot != '.'; --dot )
+	for ( dot = prev_dot - 1; dot >= (char *)_GETARRAYPTR(char, hc->expnfilename) && *dot != '.'; --dot )
 	    ;
-	if ( dot < (char *)_getptr_mm_array<char>(hc->expnfilename))
+	if ( dot < (char *)_GETARRAYPTR(char, hc->expnfilename))
 	    {
 	    /* No dot found.  No more encoding extensions, and no type
 	    ** extension either.
@@ -2799,10 +2804,10 @@ ls( mm_ptr<httpd_conn> hc )
     char* timestr;
     ClientData client_data;
 
-    dirp = opendir( _getptr_mm_array<char>(hc->expnfilename));
+    dirp = opendir( _GETARRAYPTR(char, hc->expnfilename));
     if ( dirp == (DIR*) 0 )
 	{
-	syslog( LOG_ERR, "opendir %.80s - %m", _getptr_mm_array<char>(hc->expnfilename));
+	syslog( LOG_ERR, "opendir %.80s - %m", _GETARRAYPTR(char, hc->expnfilename));
 	httpd_send_err( hc, 404, err404title, "", err404form, hc->encodedurl );
 	return -1;
 	}
@@ -2925,12 +2930,12 @@ mode  links    bytes  last-changed  name\n\
 		{
 		httpd_realloc_str(
 		    &name, &maxname,
-		    strlen(_getptr_mm_array<char>(hc->expnfilename)) + 1 + strlen( nameptrs[i] ) );
+		    strlen(_GETARRAYPTR(char, hc->expnfilename)) + 1 + strlen( nameptrs[i] ) );
 		httpd_realloc_str(
 		    &rname, &maxrname,
-		    strlen(_getptr_mm_array<char>(hc->origfilename)) + 1 + strlen( nameptrs[i] ) );
+		    strlen(_GETARRAYPTR(char, hc->origfilename)) + 1 + strlen( nameptrs[i] ) );
 		if ( hc->expnfilename[0] == '\0' ||
-		     strcmp( _getptr_mm_array<char>(hc->expnfilename), "." ) == 0 )
+		     strcmp( _GETARRAYPTR(char, hc->expnfilename), "." ) == 0 )
 		    {
 		    (void) strcpy( name, nameptrs[i] );
 		    (void) strcpy( rname, nameptrs[i] );
@@ -2938,13 +2943,13 @@ mode  links    bytes  last-changed  name\n\
 		else
 		    {
 		    (void) my_snprintf( name, maxname,
-			"%s/%s", _getptr_mm_array<char>(hc->expnfilename), nameptrs[i] );
-		    if ( strcmp(_getptr_mm_array<char>(hc->origfilename), "." ) == 0 )
+			"%s/%s", _GETARRAYPTR(char, hc->expnfilename), nameptrs[i] );
+		    if ( strcmp(_GETARRAYPTR(char, hc->origfilename), "." ) == 0 )
 			(void) my_snprintf( rname, maxrname,
 			    "%s", nameptrs[i] );
 		    else
 			(void) my_snprintf( rname, maxrname,
-			    "%s%s", _getptr_mm_array<char>(hc->origfilename), nameptrs[i] );
+			    "%s%s", _GETARRAYPTR(char, hc->origfilename), nameptrs[i] );
 		    }
 		httpd_realloc_str(
 		    &encrname, &maxencrname, 3 * strlen( rname ) + 1 );
@@ -3043,7 +3048,7 @@ mode  links    bytes  last-changed  name\n\
 	/* Parent process. */
 	closedir( dirp );
 	syslog( LOG_DEBUG, "spawned indexing process %d for directory '%.200s'",
-            r, _getptr_mm_array<char>(hc->expnfilename));
+            r, _GETARRAYPTR(char, hc->expnfilename));
 #ifdef CGI_TIMELIMIT
 	/* Schedule a kill for the child process, in case it runs too long */
 	client_data.i = r;
@@ -3083,8 +3088,8 @@ build_env( char* fmt, char* arg )
     size = strlen( fmt ) + strlen( arg );
     if ( size > maxbuf )
 	mm_httpd_realloc_str( &buf, &maxbuf, size );
-    (void) my_snprintf(_getptr_mm_array<char>(buf), maxbuf, fmt, arg );
-    cp = strdup( _getptr_mm_array<char>(buf ));
+    (void) my_snprintf(_GETARRAYPTR(char, buf), maxbuf, fmt, arg );
+    cp = strdup( _GETARRAYPTR(char, buf ));
     if ( cp == (char*) 0 )
 	{
 	syslog( LOG_ERR, "out of memory copying environment variable" );
@@ -3100,13 +3105,13 @@ mm_build_env(char *fmt, mm_array_ptr<char> mm_arg) {
     static _checkable mm_array_ptr<char> buf = NULL;
     static _checkable size_t maxbuf = 0;
 
-    char *arg = _getptr_mm_array<char>(mm_arg);
+    char *arg = _GETARRAYPTR(char, mm_arg);
 
     size = strlen( fmt ) + strlen( arg );
     if ( size > maxbuf )
 	mm_httpd_realloc_str( &buf, &maxbuf, size );
-    (void) my_snprintf( _getptr_mm_array<char>(buf), maxbuf, fmt, arg );
-    cp = strdup( _getptr_mm_array<char>(buf));
+    (void) my_snprintf( _GETARRAYPTR(char, buf), maxbuf, fmt, arg );
+    cp = strdup( _GETARRAYPTR(char, buf));
     if ( cp == (char*) 0 )
 	{
 	syslog( LOG_ERR, "out of memory copying environment variable" );
@@ -3172,19 +3177,19 @@ make_envp( mm_ptr<httpd_conn> hc )
 	char* cp2;
 	size_t l;
 	envp[envn++] = mm_build_env( "PATH_INFO=/%s", hc->pathinfo);
-	l = strlen( hc->hs->cwd ) + strlen( _getptr_mm_array<char>(hc->pathinfo)) + 1;
+	l = strlen( hc->hs->cwd ) + strlen( _GETARRAYPTR(char, hc->pathinfo)) + 1;
     // DISCUSS: No need to make cp2 an mmsafeptr as it is only passed to
     // my_snprintf which is basically a wrapper of two library functions.
 	cp2 = NEW( char, l );
 	if ( cp2 != (char*) 0 )
 	    {
-	    (void) my_snprintf( cp2, l, "%s%s", hc->hs->cwd, _getptr_mm_array<char>(hc->pathinfo));
+	    (void) my_snprintf( cp2, l, "%s%s", hc->hs->cwd, _GETARRAYPTR(char, hc->pathinfo));
 	    envp[envn++] = build_env( "PATH_TRANSLATED=%s", cp2 );
 	    }
 	}
     envp[envn++] = build_env(
-	"SCRIPT_NAME=/%s", strcmp(_getptr_mm_array<char>(hc->origfilename), "." ) == 0 ?
-	"" : _getptr_mm_array<char>(hc->origfilename));
+	"SCRIPT_NAME=/%s", strcmp(_GETARRAYPTR(char, hc->origfilename), "." ) == 0 ?
+	"" : _GETARRAYPTR(char, hc->origfilename));
     if ( hc->query[0] != '\0')
 	envp[envn++] = build_env( "QUERY_STRING=%s", _GETARRAYPTR(char, hc->query));
     envp[envn++] = build_env(
@@ -3260,7 +3265,7 @@ make_argp( mm_ptr<httpd_conn> hc )
     ** character to determine if the command line is to be used, if it finds
     ** one, the command line is not to be used."
     */
-    if ( strchr( _getptr_mm_array<char>(hc->query), '=' ) == (char*) 0 )
+    if ( strchr( _GETARRAYPTR(char, hc->query), '=' ) == (char*) 0 )
 	{
 	for ( cp1 = cp2 = hc->query; *cp2 != '\0'; ++cp2 )
 	    {
@@ -3390,8 +3395,8 @@ cgi_interpose_output( mm_ptr<httpd_conn> hc, int rfd )
 	(void) memmove( _getptr_mm<char>(&(headers[headers_len])), buf, r );
 	headers_len += r;
 	headers[headers_len] = '\0';
-	if ( ( br = strstr(_getptr_mm_array<char>(headers), "\015\012\015\012" ) ) != (char*) 0 ||
-	     ( br = strstr(_getptr_mm_array<char>(headers), "\012\012" ) ) != (char*) 0 )
+	if ( ( br = strstr(_GETARRAYPTR(char, headers), "\015\012\015\012" ) ) != (char*) 0 ||
+	     ( br = strstr(_GETARRAYPTR(char, headers), "\012\012" ) ) != (char*) 0 )
 	    break;
 	}
 
@@ -3404,19 +3409,19 @@ cgi_interpose_output( mm_ptr<httpd_conn> hc, int rfd )
     ** default to 200.
     */
     status = 200;
-    if ( strncmp(_getptr_mm_array<char>(headers), "HTTP/", 5 ) == 0 )
+    if ( strncmp(_GETARRAYPTR(char, headers), "HTTP/", 5 ) == 0 )
 	{
-	cp = _getptr_mm_array<char>(headers);
+	cp = _GETARRAYPTR(char, headers);
 	cp += strcspn( cp, " \t" );
 	status = atoi( cp );
 	}
-    if ( ( cp = strstr( _getptr_mm_array<char>(headers), "Location:" ) ) != (char*) 0 &&
+    if ( ( cp = strstr( _GETARRAYPTR(char, headers), "Location:" ) ) != (char*) 0 &&
 	 cp < br &&
-	 ( cp == _getptr_mm_array<char>(headers) || *(cp-1) == '\012' ) )
+	 ( cp == _GETARRAYPTR(char, headers) || *(cp-1) == '\012' ) )
 	status = 302;
-    if ( ( cp = strstr( _getptr_mm_array<char>(headers), "Status:" ) ) != (char*) 0 &&
+    if ( ( cp = strstr( _GETARRAYPTR(char, headers), "Status:" ) ) != (char*) 0 &&
 	 cp < br &&
-	 ( cp == _getptr_mm_array<char>(headers) || *(cp-1) == '\012' ) )
+	 ( cp == _GETARRAYPTR(char, headers) || *(cp-1) == '\012' ) )
 	{
 	cp += 7;
 	cp += strspn( cp, " \t" );
@@ -3446,7 +3451,7 @@ cgi_interpose_output( mm_ptr<httpd_conn> hc, int rfd )
     (void) httpd_write_fully( hc->conn_fd, buf, strlen( buf ) );
 
     /* Write the saved headers. */
-    (void) httpd_write_fully( hc->conn_fd, _getptr_mm_array<char>(headers), headers_len );
+    (void) httpd_write_fully( hc->conn_fd, _GETARRAYPTR(char, headers), headers_len );
 
     /* Echo the rest of the output. */
     for (;;)
@@ -3632,14 +3637,14 @@ cgi_child( mm_ptr<httpd_conn> hc )
     ** to the program's own directory.  This isn't in the CGI 1.1
     ** spec, but it's what other HTTP servers do.
     */
-    directory = strdup( _getptr_mm_array<char>(hc->expnfilename));
+    directory = strdup( _GETARRAYPTR(char, hc->expnfilename));
     if ( directory == (char*) 0 )
-	binary = _getptr_mm_array<char>(hc->expnfilename);      /* ignore errors */
+	binary = _GETARRAYPTR(char, hc->expnfilename);      /* ignore errors */
     else
 	{
 	binary = strrchr( directory, '/' );
 	if ( binary == (char*) 0 )
-	    binary = _getptr_mm_array<char>(hc->expnfilename);
+	    binary = _GETARRAYPTR(char, hc->expnfilename);
 	else
 	    {
 	    *binary++ = '\0';
@@ -3658,7 +3663,7 @@ cgi_child( mm_ptr<httpd_conn> hc )
     (void) execve( binary, (char *const *)_marshal_shared_array_ptr<char>(argp), envp );
 
     /* Something went wrong. */
-    syslog( LOG_ERR, "execve %.80s - %m", _getptr_mm_array<char>(hc->expnfilename));
+    syslog( LOG_ERR, "execve %.80s - %m", _GETARRAYPTR(char, hc->expnfilename));
     httpd_send_err( hc, 500, err500title, "", err500form, hc->encodedurl );
     httpd_write_response( hc );
     _exit( 1 );
@@ -3697,7 +3702,7 @@ cgi( mm_ptr<httpd_conn> hc )
 	}
 
     /* Parent process. */
-    syslog( LOG_DEBUG, "spawned CGI process %d for file '%.200s'", r, _getptr_mm_array<char>(hc->expnfilename));
+    syslog( LOG_DEBUG, "spawned CGI process %d for file '%.200s'", r, _GETARRAYPTR(char, hc->expnfilename));
 #ifdef CGI_TIMELIMIT
     /* Schedule a kill for the child process, in case it runs too long */
     client_data.i = r;
@@ -3730,10 +3735,10 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     char* cp;
     _checkable mm_array_ptr<char> pi = NULL;
 
-    expnlen = strlen(_getptr_mm_array<char>(hc->expnfilename));
+    expnlen = strlen(_GETARRAYPTR(char, hc->expnfilename));
 
     /* Stat the file. */
-    if ( stat( _getptr_mm_array<char>(hc->expnfilename), _getptr_mm<struct stat>(&hc->sb)) < 0 )
+    if ( stat( _GETARRAYPTR(char, hc->expnfilename), _getptr_mm<struct stat>(&hc->sb)) < 0 )
 	{
 	httpd_send_err( hc, 500, err500title, "", err500form, hc->encodedurl );
 	return -1;
@@ -3771,9 +3776,9 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	** We send back an explicit redirect with the slash, because
 	** otherwise many clients can't build relative URLs properly.
 	*/
-	if ( strcmp(_getptr_mm_array<char>(hc->origfilename), "" ) != 0 &&
-	     strcmp( _getptr_mm_array<char>(hc->origfilename), "." ) != 0 &&
-	     hc->origfilename[strlen(_getptr_mm_array<char>(hc->origfilename) ) - 1] != '/' )
+	if ( strcmp(_GETARRAYPTR(char, hc->origfilename), "" ) != 0 &&
+	     strcmp( _GETARRAYPTR(char, hc->origfilename), "." ) != 0 &&
+	     hc->origfilename[strlen(_GETARRAYPTR(char, hc->origfilename) ) - 1] != '/' )
 	    {
 	    send_dirredirect( hc );
 	    return -1;
@@ -3784,14 +3789,14 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	    {
 	    mm_httpd_realloc_str( &indexname, &maxindexname,
 		expnlen + 1 + strlen( index_names[i] ) );
-	    (void) strcpy(_getptr_mm_array<char>(indexname), _getptr_mm_array<char>(hc->expnfilename));
-	    indxlen = strlen(_getptr_mm_array<char>(indexname));
+	    (void) strcpy(_GETARRAYPTR(char, indexname), _GETARRAYPTR(char, hc->expnfilename));
+	    indxlen = strlen(_GETARRAYPTR(char, indexname));
 	    if ( indxlen == 0 || indexname[indxlen - 1] != '/' )
-		(void) strcat(_getptr_mm_array<char>(indexname), "/" );
-	    if ( strcmp( _getptr_mm_array<char>(indexname), "./" ) == 0 )
+		(void) strcat(_GETARRAYPTR(char, indexname), "/" );
+	    if ( strcmp( _GETARRAYPTR(char, indexname), "./" ) == 0 )
 		indexname[0] = '\0';
-	    (void) strcat( _getptr_mm_array<char>(indexname), index_names[i] );
-	    if ( stat( _getptr_mm_array<char>(indexname), _getptr_mm<struct stat>(&hc->sb)) >= 0 )
+	    (void) strcat( _GETARRAYPTR(char, indexname), index_names[i] );
+	    if ( stat( _GETARRAYPTR(char, indexname), _getptr_mm<struct stat>(&hc->sb)) >= 0 )
 		goto got_one;
 	    }
 
@@ -3835,7 +3840,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	/* Got an index file.  Expand symlinks again.  More pathinfo means
 	** something went wrong.
 	*/
-	cp = _getptr_mm_array<char>(expand_symlinks( _getptr_mm_array<char>(indexname),
+	cp = _GETARRAYPTR(char, expand_symlinks( _GETARRAYPTR(char, indexname),
                 &pi, hc->hs->no_symlink_check, hc->tildemapped));
 	if ( cp == (char*) 0 || pi[0] != '\0' )
 	    {
@@ -3844,7 +3849,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	    }
 	expnlen = strlen( cp );
 	mm_httpd_realloc_str(&hc->expnfilename, &hc->maxexpnfilename, expnlen );
-	(void) strcpy(_getptr_mm_array<char>(hc->expnfilename), cp );
+	(void) strcpy(_GETARRAYPTR(char, hc->expnfilename), cp );
 
 	/* Now, is the index version world-readable or world-executable? */
 	if ( ! ( hc->sb.st_mode & ( S_IROTH | S_IXOTH ) ) )
@@ -3864,10 +3869,10 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 #ifdef AUTH_FILE
     /* Check authorization for this directory. */
     mm_httpd_realloc_str( &dirname, &maxdirname, expnlen );
-    (void) strcpy( _getptr_mm_array<char>(dirname), _getptr_mm_array<char>(hc->expnfilename));
-    cp = strrchr( _getptr_mm_array<char>(dirname), '/' );
+    (void) strcpy( _GETARRAYPTR(char, dirname), _GETARRAYPTR(char, hc->expnfilename));
+    cp = strrchr( _GETARRAYPTR(char, dirname), '/' );
     if ( cp == (char*) 0 )
-	(void) strcpy( _getptr_mm_array<char>(dirname), "." );
+	(void) strcpy( _GETARRAYPTR(char, dirname), "." );
     else
 	*cp = '\0';
     if ( auth_check( hc, dirname ) == -1 )
@@ -3876,7 +3881,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     /* Check if the filename is the AUTH_FILE itself - that's verboten. */
     if ( expnlen == sizeof(AUTH_FILE) - 1 )
 	{
-	if ( strcmp( _getptr_mm_array<char>(hc->expnfilename), AUTH_FILE ) == 0 )
+	if ( strcmp( _GETARRAYPTR(char, hc->expnfilename), AUTH_FILE ) == 0 )
 	    {
 	    syslog(
 		LOG_NOTICE,
@@ -3912,7 +3917,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     /* Is it world-executable and in the CGI area? */
     if ( hc->hs->cgi_pattern != (char*) 0 &&
 	 ( hc->sb.st_mode & S_IXOTH ) &&
-	 match( hc->hs->cgi_pattern, _getptr_mm_array<char>(hc->expnfilename)) )
+	 match( hc->hs->cgi_pattern, _GETARRAYPTR(char, hc->expnfilename)) )
 	return cgi( hc );
 
     /* It's not CGI.  If it's executable or there's pathinfo, someone's
@@ -3971,7 +3976,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	}
     else
 	{
-	hc->file_address = mmc_map( _getptr_mm_array<char>(hc->expnfilename), &(hc->sb), nowP);
+	hc->file_address = mmc_map( _GETARRAYPTR(char, hc->expnfilename), &(hc->sb), nowP);
 	if ( hc->file_address == (char*) 0 )
 	    {
 	    httpd_send_err( hc, 500, err500title, "", err500form, hc->encodedurl );
@@ -4079,7 +4084,7 @@ make_log_entry( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	/* And write the log entry. */
 	(void) fprintf( hc->hs->logfp,
 	    "%.80s - %.80s [%s] \"%.80s %.300s %.80s\" %d %s \"%.200s\" \"%.200s\"\n",
-        _GETARRAYPTR(char, mm_httpd_ntoa( &hc->client_addr )), _getptr_mm_array<char>(ru), date,
+        _GETARRAYPTR(char, mm_httpd_ntoa( &hc->client_addr )), _GETARRAYPTR(char, ru), date,
 	    _GETARRAYPTR(char, httpd_method_str( hc->method )), url, hc->protocol,
 	    hc->status, bytes, _GETARRAYPTR(char, hc->referrer), _GETARRAYPTR(char, hc->useragent));
 #ifdef FLUSH_LOG_EVERY_TIME
@@ -4089,7 +4094,7 @@ make_log_entry( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     else
 	syslog( LOG_INFO,
 	    "%.80s - %.80s \"%.80s %.200s %.80s\" %d %s \"%.200s\" \"%.200s\"",
-	    _GETARRAYPTR(char, mm_httpd_ntoa( &hc->client_addr )), _getptr_mm_array<char>(ru),
+	    _GETARRAYPTR(char, mm_httpd_ntoa( &hc->client_addr )), _GETARRAYPTR(char, ru),
 	    _GETARRAYPTR(char, httpd_method_str( hc->method )), url, hc->protocol,
 	    hc->status, bytes, _GETARRAYPTR(char, hc->referrer), _GETARRAYPTR(char, hc->useragent));
     }
@@ -4148,7 +4153,7 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
 	 ( cp1 = strstr( _GETARRAYPTR(char, hc->referrer), "//" ) ) == (char*) 0 )
 	{
 	/* Disallow if we require a referrer and the url matches. */
-	if ( hs->no_empty_referrers && match( hs->url_pattern, _getptr_mm_array<char>(hc->origfilename)) )
+	if ( hs->no_empty_referrers && match( hs->url_pattern, _GETARRAYPTR(char, hc->origfilename)) )
 	    return 0;
 	/* Otherwise ok. */
 	return 1;
@@ -4159,7 +4164,7 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
     for ( cp2 = cp1; *cp2 != '/' && *cp2 != ':' && *cp2 != '\0'; ++cp2 )
 	continue;
     mm_httpd_realloc_str( &refhost, &refhost_size, cp2 - cp1 );
-    for ( cp3 = _getptr_mm_array<char>(refhost); cp1 < cp2; ++cp1, ++cp3 )
+    for ( cp3 = _GETARRAYPTR(char, refhost); cp1 < cp2; ++cp1, ++cp3 )
 	if ( isupper(*cp1) )
 	    *cp3 = tolower(*cp1);
 	else
@@ -4197,8 +4202,8 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
     /* If the referrer host doesn't match the local host pattern, and
     ** the filename does match the url pattern, it's an illegal reference.
     */
-    if ( ! match( lp, _getptr_mm_array<char>(refhost)) &&
-            match( hs->url_pattern, _getptr_mm_array<char>(hc->origfilename)) )
+    if ( ! match( lp, _GETARRAYPTR(char, refhost)) &&
+            match( hs->url_pattern, _GETARRAYPTR(char, hc->origfilename)) )
 	return 0;
     /* Otherwise ok. */
     return 1;
@@ -4417,7 +4422,7 @@ mm_httpd_write_fully( int fd, const mm_array_ptr<char> buf, size_t nbytes )
 	{
 	int r;
 
-	r = write( fd, _getptr_mm_array<char>(buf + nwritten), nbytes - nwritten );
+	r = write( fd, _GETARRAYPTR(char, buf + nwritten), nbytes - nwritten );
 	if ( r < 0 && ( errno == EINTR || errno == EAGAIN ) )
 	    {
 	    sleep( 1 );

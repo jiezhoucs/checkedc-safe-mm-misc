@@ -1598,7 +1598,7 @@ handle_read(mm_ptr<connecttab> c, struct timeval* tvP )
 
     /* Read some more bytes. */
     sz = read(
-	hc->conn_fd, _getptr_mm<char>(&(hc->read_buf[hc->read_idx])),
+	hc->conn_fd, _GETARRAYPTR(char, &(hc->read_buf[hc->read_idx])),
 	hc->read_size - hc->read_idx );
     if ( sz == 0 )
 	{
@@ -1726,7 +1726,7 @@ handle_send(mm_ptr<connecttab> c, struct timeval* tvP )
 	*/
 	struct iovec iv[2];
 
-	iv[0].iov_base = _getptr_mm_array<char>(hc->response);
+	iv[0].iov_base = _GETARRAYPTR(char, hc->response);
 	iv[0].iov_len = hc->responselen;
 	iv[1].iov_base = &(hc->file_address[c->next_byte_index]);
 	iv[1].iov_len = MIN( c->end_byte_index - c->next_byte_index, max_bytes );
@@ -1794,7 +1794,7 @@ handle_send(mm_ptr<connecttab> c, struct timeval* tvP )
 	    {
 	    /* Yes; move the unwritten part to the front of the buffer. */
 	    int newlen = hc->responselen - sz;
-	    (void) memmove(_getptr_mm_array<char>(hc->response), _getptr_mm<char>(&(hc->response[sz])), newlen );
+	    (void) memmove(_GETARRAYPTR(char, hc->response), _GETARRAYPTR(char, &(hc->response[sz])), newlen );
 	    hc->responselen = newlen;
 	    sz = 0;
 	    }
@@ -1880,7 +1880,7 @@ check_throttles(mm_ptr<connecttab> c ) {
     c->max_limit = c->min_limit = THROTTLE_NOLIMIT;
     for ( tnum = 0; tnum < numthrottles && c->numtnums < MAXTHROTTLENUMS;
 	  ++tnum )
-	if ( match( throttles[tnum].pattern, _getptr_mm_array<char>(c->hc->expnfilename)))
+	if ( match( throttles[tnum].pattern, _GETARRAYPTR(char, c->hc->expnfilename)))
 	    {
 	    /* If we're way over the limit, don't even start. */
 	    if ( throttles[tnum].rate > throttles[tnum].max_limit * 2 )
