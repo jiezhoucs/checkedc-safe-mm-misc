@@ -1396,7 +1396,7 @@ tilde_map_2( httpd_conn* hc )
     /* Set up altdir. */
     mm_httpd_realloc_str( &hc->altdir, &hc->maxaltdir,
 	strlen( pw->pw_dir ) + 1 + strlen( postfix ) );
-    (void) strcpy( _getptr_array_mm<char>(hc->altdir), pw->pw_dir );
+    (void) strcpy( _GETARRAYPTR(char, hc->altdir), pw->pw_dir );
     if ( postfix[0] != '\0' )
 	{
 	(void) strcat( (char*)hc->altdir, "/" );
@@ -1574,7 +1574,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 	/* Remove any leading slashes. */
 	while ( rest[0] == '/' )
 	    {
-	    (void) ol_strcpy(_GETARRAYPTR(char, rest), _getptr_mm<char>(&(rest[1])));
+	    (void) ol_strcpy(_GETARRAYPTR(char, rest), _GETPTR(char, &(rest[1])));
 	    --restlen;
 	    }
     r = rest;
@@ -1598,7 +1598,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 		{
 		/* Special case for absolute paths. */
 		mm_httpd_realloc_str( &checked, &maxchecked, checkedlen + 1 );
-		(void) strncpy(_getptr_mm<char>(&checked[checkedlen]), _GETARRAYPTR(char, r), 1 );
+		(void) strncpy(_GETPTR(char, &checked[checkedlen]), _GETARRAYPTR(char, r), 1 );
 		checkedlen += 1;
 		}
 	    else if ( strncmp( _GETARRAYPTR(char, r), "..", MAX( i, 2 ) ) == 0 )
@@ -1620,7 +1620,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 		mm_httpd_realloc_str( &checked, &maxchecked, checkedlen + 1 + i );
 		if ( checkedlen > 0 && checked[checkedlen-1] != '/' )
 		    checked[checkedlen++] = '/';
-		(void) strncpy(_getptr_mm<char>(&checked[checkedlen]), _GETARRAYPTR(char, r), i );
+		(void) strncpy(_GETPTR(char, &checked[checkedlen]), _GETARRAYPTR(char, r), i );
 		checkedlen += i;
 		}
 	    checked[checkedlen] = '\0';
@@ -1651,7 +1651,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 		    &checked, &maxchecked, checkedlen + 1 + restlen );
 		if ( checkedlen > 0 && checked[checkedlen-1] != '/' )
 		    checked[checkedlen++] = '/';
-		(void) strcpy( _getptr_mm<char>(&checked[checkedlen]), _GETARRAYPTR(char, r));
+		(void) strcpy( _GETPTR(char, &checked[checkedlen]), _GETARRAYPTR(char, r));
 		checkedlen += restlen;
 		}
 	    r += restlen;
@@ -2118,7 +2118,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
      * code pattern in a small test program compiles fine. Also, at line 567,
      * the first arg of memmove has the same structure as the second arg of
      * the next strcpy(), but line 567 comiles. WTH?? */
-    (void) strcpy( _GETARRAYPTR(char, hc->origfilename), _getptr_mm<char>(&hc->decodedurl[1]));
+    (void) strcpy( _GETARRAYPTR(char, hc->origfilename), _GETPTR(char, &hc->decodedurl[1]));
     /* Special case for top-level URL. */
     if ( hc->origfilename[0] == '\0' )
 	(void) strcpy( _GETARRAYPTR(char, hc->origfilename), "." );
@@ -2421,7 +2421,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 	{
 	int i;
 	i = strlen(_GETARRAYPTR(char, hc->origfilename)) - strlen( _GETARRAYPTR(char, hc->pathinfo));
-	if ( i > 0 && strcmp( _getptr_mm<char>(&hc->origfilename[i]), _GETARRAYPTR(char, hc->pathinfo)) == 0 )
+	if ( i > 0 && strcmp( _GETARRAYPTR(char, &hc->origfilename[i]), _GETARRAYPTR(char, hc->pathinfo)) == 0 )
 	    hc->origfilename[i - 1] = '\0';
 	}
 
@@ -2435,7 +2435,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 	    {
 	    /* Elide the current directory. */
 	    (void) ol_strcpy(
-		_GETARRAYPTR(char, hc->expnfilename), _getptr_mm<char>(&hc->expnfilename[strlen( hc->hs->cwd )]));
+		_GETARRAYPTR(char, hc->expnfilename), _GETPTR(char, &hc->expnfilename[strlen( hc->hs->cwd )]));
 	    }
 #ifdef TILDE_MAP_2
 	else if ( hc->altdir[0] != '\0' &&
@@ -2720,10 +2720,10 @@ figure_mime( mm_ptr<httpd_conn> hc )
 	    encodings_len + enc_tab[me_indexes[i]].val_len + 1 );
 	if ( hc->encodings[0] != '\0' )
 	    {
-	    (void) strcpy( _getptr_mm<char>(&hc->encodings[encodings_len]), "," );
+	    (void) strcpy( _GETPTR(char, &hc->encodings[encodings_len]), "," );
 	    ++encodings_len;
 	    }
-	(void) strcpy( _getptr_mm<char>(&hc->encodings[encodings_len]), enc_tab[me_indexes[i]].val );
+	(void) strcpy( _GETPTR(char, &hc->encodings[encodings_len]), enc_tab[me_indexes[i]].val );
 	encodings_len += enc_tab[me_indexes[i]].val_len;
 	}
 
@@ -3392,7 +3392,7 @@ cgi_interpose_output( mm_ptr<httpd_conn> hc, int rfd )
 	    break;
 	    }
 	mm_httpd_realloc_str( &headers, &headers_size, headers_len + r );
-	(void) memmove( _getptr_mm<char>(&(headers[headers_len])), buf, r );
+	(void) memmove( _GETPTR(char, &(headers[headers_len])), buf, r );
 	headers_len += r;
 	headers[headers_len] = '\0';
 	if ( ( br = strstr(_GETARRAYPTR(char, headers), "\015\012\015\012" ) ) != (char*) 0 ||
@@ -3738,7 +3738,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     expnlen = strlen(_GETARRAYPTR(char, hc->expnfilename));
 
     /* Stat the file. */
-    if ( stat( _GETARRAYPTR(char, hc->expnfilename), _getptr_mm<struct stat>(&hc->sb)) < 0 )
+    if ( stat( _GETARRAYPTR(char, hc->expnfilename), _GETPTR(struct stat, &hc->sb)) < 0 )
 	{
 	httpd_send_err( hc, 500, err500title, "", err500form, hc->encodedurl );
 	return -1;
@@ -3796,7 +3796,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	    if ( strcmp( _GETARRAYPTR(char, indexname), "./" ) == 0 )
 		indexname[0] = '\0';
 	    (void) strcat( _GETARRAYPTR(char, indexname), index_names[i] );
-	    if ( stat( _GETARRAYPTR(char, indexname), _getptr_mm<struct stat>(&hc->sb)) >= 0 )
+	    if ( stat( _GETARRAYPTR(char, indexname), _GETPTR(struct stat, &hc->sb)) >= 0 )
 		goto got_one;
 	    }
 
@@ -3895,7 +3895,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	    }
 	}
     else if ( expnlen >= sizeof(AUTH_FILE) &&
-	      strcmp( _getptr_mm<char>(&(hc->expnfilename[expnlen - sizeof(AUTH_FILE) + 1])), AUTH_FILE ) == 0 &&
+	      strcmp( _GETPTR(char, &(hc->expnfilename[expnlen - sizeof(AUTH_FILE) + 1])), AUTH_FILE ) == 0 &&
 	      hc->expnfilename[expnlen - sizeof(AUTH_FILE)] == '/' )
 	{
 	syslog(
@@ -4240,7 +4240,7 @@ mm_httpd_ntoa( mm_ptr<httpd_sockaddr> saP )
 #ifdef USE_IPV6
     _checkable static char str[200];
 
-    if ( getnameinfo( _getptr_mm<struct sockaddr>(&saP->sa), mm_sockaddr_len( saP ),
+    if ( getnameinfo( _GETPTR(struct sockaddr, &saP->sa), mm_sockaddr_len( saP ),
                 (char *)str, sizeof(str), 0, 0, NI_NUMERICHOST ) != 0 )
 	{
 	str[0] = '?';
