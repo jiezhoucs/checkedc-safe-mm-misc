@@ -13,6 +13,7 @@ ifeq ($(SYSTEM), Darwin)
 endif
 
 SRC = tests.c parson.c
+OBJ = $(SRC:%.c=%.o)
 
 all: test
 
@@ -22,7 +23,8 @@ test: $(SRC)
 	./$@
 
 lto: $(SRC)
-	$(CC) $(CFLAGS) -flto -fuse-ld=lld $(MISC_DIR)/lib/libsafemm_lto.a -o test $^
+	$(CC) $(CFLAGS) -flto -c $^
+	$(CC) -fuse-ld=lld  $(MISC_DIR)/lib/libsafemm_lto.a -o test $(OBJ)
 	./test
 
 clean:
