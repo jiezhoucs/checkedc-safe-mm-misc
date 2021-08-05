@@ -1244,12 +1244,9 @@ send_dirredirect( mm_ptr<httpd_conn> hc )
     }
 
 
-// TODO: recover this function after implementing returnning a string constant
-// when the return type is mm_array_ptr<char>.
 mm_array_ptr<char>
 httpd_method_str( int method )
     {
-#if 0
     switch ( method )
 	{
 	case METHOD_GET: return "GET";
@@ -1260,25 +1257,6 @@ httpd_method_str( int method )
 	case METHOD_TRACE: return "TRACE";
 	default: return "UNKNOWN";
 	}
-#endif
-    mm_array_ptr<char> result = NULL;
-    switch ( method )
-	{
-	case METHOD_GET: result = "GET\0";
-                     break;
-	case METHOD_HEAD: result = "HEAD\0";
-                     break;
-	case METHOD_POST: result = "POST\0";
-                     break;
-	case METHOD_PUT: result = "PUT\0";
-                     break;
-	case METHOD_DELETE: result = "DELETE\0";
-                     break;
-	case METHOD_TRACE: result = "TRACE\0";
-                     break;
-	default: result = "UNKNOWN\0";
-	}
-    return result;
     }
 
 
