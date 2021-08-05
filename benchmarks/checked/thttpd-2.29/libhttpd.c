@@ -709,8 +709,7 @@ send_mime( mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char> en
 	    }
 	if ( extraheads[0] != '\0' )
 	    add_response( hc, extraheads );
-    _checkable char tmpstr[10] = "\015\012";
-	add_response( hc, tmpstr);
+	add_response( hc, "\015\012");
 	}
     }
 
