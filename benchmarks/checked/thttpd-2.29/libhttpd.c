@@ -165,7 +165,6 @@ static void cgi_kill( ClientData client_data, struct timeval* nowP );
 static int ls( mm_ptr<httpd_conn> hc );
 #endif /* GENERATE_INDEXES */
 static char* build_env( char* fmt, char* arg );
-static char *mm_build_env(char *fmt, mm_array_ptr<char> mm_arg);
 #ifdef SERVER_NAME_LIST
 static char* hostname_map( char* hostname );
 #endif /* SERVER_NAME_LIST */
@@ -3097,28 +3096,6 @@ build_env( char* fmt, char* arg )
     return cp;
     }
 
-static char*
-mm_build_env(char *fmt, mm_array_ptr<char> mm_arg) {
-    char* cp;
-    size_t size;
-    static _checkable mm_array_ptr<char> buf = NULL;
-    static _checkable size_t maxbuf = 0;
-
-    char *arg = _GETARRAYPTR(char, mm_arg);
-
-    size = strlen( fmt ) + strlen( arg );
-    if ( size > maxbuf )
-	mm_httpd_realloc_str( &buf, &maxbuf, size );
-    (void) my_snprintf( _GETARRAYPTR(char, buf), maxbuf, fmt, arg );
-    cp = strdup( _GETARRAYPTR(char, buf));
-    if ( cp == (char*) 0 )
-	{
-	syslog( LOG_ERR, "out of memory copying environment variable" );
-	exit( 1 );
-	}
-    return cp;
-}
-
 
 #ifdef SERVER_NAME_LIST
 static char*
@@ -3175,7 +3152,7 @@ make_envp( mm_ptr<httpd_conn> hc )
 	{
 	char* cp2;
 	size_t l;
-	envp[envn++] = mm_build_env( "PATH_INFO=/%s", hc->pathinfo);
+	envp[envn++] = build_env( "PATH_INFO=/%s", _GETARRAYPTR(char, hc->pathinfo));
 	l = strlen( hc->hs->cwd ) + strlen( _GETARRAYPTR(char, hc->pathinfo)) + 1;
     // DISCUSS: No need to make cp2 an mmsafeptr as it is only passed to
     // my_snprintf which is basically a wrapper of two library functions.
