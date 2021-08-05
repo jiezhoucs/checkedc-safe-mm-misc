@@ -525,7 +525,7 @@ void test_suite_8(void) {
     remove(temp_filename);
     serialization_size = json_serialization_size(a);
     buf = json_serialize_to_string(a);
-    TEST((strlen(_getptr_mm_array<char>(buf))+1) == serialization_size);
+    TEST((strlen(_GETARRAYPTR(char, buf))+1) == serialization_size);
 }
 
 void test_suite_9(void) {
@@ -543,7 +543,7 @@ void test_suite_9(void) {
     remove(temp_filename);
     serialization_size = json_serialization_size_pretty(a);
     serialized = json_serialize_to_string_pretty(a);
-    TEST((strlen(_getptr_mm_array<char>(serialized))+1) == serialization_size);
+    TEST((strlen(_GETARRAYPTR(char, serialized))+1) == serialization_size);
 
     file_contents = read_file(get_file_path(filename));
 

@@ -312,7 +312,7 @@ static mm_array_ptr<char> read_file(const char * filename) {
         fclose(fp);
         return NULL;
     }
-    size_read = fread(_getptr_mm_array<char>(file_contents), 1, size_to_read, fp);
+    size_read = fread(_GETARRAYPTR(char, file_contents), 1, size_to_read, fp);
     if (size_read == 0 || ferror(fp)) {
         fclose(fp);
         MM_ARRAY_FREE(char, file_contents);
@@ -1605,7 +1605,7 @@ JSON_Status json_serialize_to_file(mm_ptr<const JSON_Value> value, const char *f
         mm_json_free_serialized_string(serialized_string);
         return JSONFailure;
     }
-    if (fputs(_getptr_mm_array<char>(serialized_string), fp) == EOF) {
+    if (fputs(_GETARRAYPTR(char, serialized_string), fp) == EOF) {
         return_code = JSONFailure;
     }
     if (fclose(fp) == EOF) {
@@ -1667,7 +1667,7 @@ JSON_Status json_serialize_to_file_pretty(mm_ptr<const JSON_Value> value, const 
         mm_json_free_serialized_string(serialized_string);
         return JSONFailure;
     }
-    if (fputs(_getptr_mm_array<char>(serialized_string), fp) == EOF) {
+    if (fputs(_GETARRAYPTR(char, serialized_string), fp) == EOF) {
         return_code = JSONFailure;
     }
     if (fclose(fp) == EOF) {
