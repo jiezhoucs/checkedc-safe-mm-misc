@@ -76,6 +76,18 @@ void mm_init_key() {
     key = rand_keygen();
 }
 
+/**
+ * Function: mm_get_new_key()
+ *
+ * This function should not be only called in the source code. It is only
+ * used by the compiler to generate a new key for a function frame.
+ *
+ * */
+__INLINE
+uint32_t mm_get_new_key() {
+    return key++;
+}
+
 //
 // Function: mm_alloc()
 //
