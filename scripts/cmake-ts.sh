@@ -8,13 +8,17 @@
 # Load the common paths and variables.
 . common.sh
 
-# Use lld to link the libsafemm.
-LDFLAGS="-fuse-ld=lld"
-
 # Go to the build directory. Create one if it does not exist.
 [[ -d $TESTSUITE_BUILD_DIR ]] || mkdir -p $TESTSUITE_BUILD_DIR
 cd "$TESTSUITE_BUILD_DIR"
 rm -rf CMakeCache.txt
+
+#
+# Choose linker. Unfortunately lld seems to be not working on MacOS.
+#
+if [[ `uname` == "Linux" ]]; then
+    LDFLAGS="-fuse-ld=lld"
+fi
 
 if [[ $1 == "lto" ]]; then
     CFLAGS="-flto $CFLAGS"
