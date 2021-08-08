@@ -3259,7 +3259,7 @@ cgi_interpose_input( mm_ptr<httpd_conn> hc, int wfd )
     c = hc->read_idx - hc->checked_idx;
     if ( c > 0 )
 	{
-	if ( mm_httpd_write_fully( wfd, mmptr_to_mmarrayptr<char>(&(hc->read_buf[hc->checked_idx])), c ) != c )
+	if ( mm_httpd_write_fully( wfd, hc->read_buf + hc->checked_idx, c ) != c )
 	    return;
 	}
     while ( c < hc->contentlength )

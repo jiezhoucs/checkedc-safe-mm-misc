@@ -2050,7 +2050,7 @@ really_clear_connection(mm_ptr<connecttab> c, struct timeval* tvP )
 	}
     c->conn_state = CNST_FREE;
     c->next_free_connect = first_free_connect;
-    first_free_connect = mmptr_to_mmarrayptr<connecttab>(c) - connects;	/* division by sizeof is implied */
+    first_free_connect = _GETPTR(connecttab, c) - _GETARRAYPTR(connecttab, connects);	/* division by sizeof is implied */
     --num_connects;
     }
 
