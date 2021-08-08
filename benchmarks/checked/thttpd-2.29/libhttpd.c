@@ -2089,11 +2089,6 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 
     mm_httpd_realloc_str( &hc->origfilename, &hc->maxorigfilename,
             strlen( _GETARRAYPTR(char, hc->decodedurl)) );
-    /* Jie Zhou: For some very mysterious reason, for the second arg of the
-     * next line, _GETPTR(char, ...) triggers an assertion failure. The same
-     * code pattern in a small test program compiles fine. Also, at line 567,
-     * the first arg of memmove has the same structure as the second arg of
-     * the next strcpy(), but line 567 comiles. WTH?? */
     (void) strcpy( _GETARRAYPTR(char, hc->origfilename), _GETPTR(char, &hc->decodedurl[1]));
     /* Special case for top-level URL. */
     if ( hc->origfilename[0] == '\0' )
