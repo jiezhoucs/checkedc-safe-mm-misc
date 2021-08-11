@@ -1574,7 +1574,7 @@ mm_ptr<JSON_Value> json_value_deep_copy(mm_ptr<const JSON_Value> value) {
 
 size_t json_serialization_size(mm_ptr<const JSON_Value> value) {
     /* recursively allocating buffer on stack is a bad idea, so let's do it only once */
-    _checkable char num_buf[NUM_BUF_SIZE];
+    char num_buf[NUM_BUF_SIZE];
     int res = json_serialize_to_buffer_r(value, NULL, 0, 0, num_buf);
     return res < 0 ? 0 : (size_t)(res) + 1;
 }
@@ -1636,7 +1636,7 @@ mm_array_ptr<char> json_serialize_to_string(mm_ptr<const JSON_Value> value) {
 
 size_t json_serialization_size_pretty(mm_ptr<const JSON_Value> value) {
     /* recursively allocating buffer on stack is a bad idea, so let's do it only once */
-    _checkable char num_buf[NUM_BUF_SIZE];
+    char num_buf[NUM_BUF_SIZE];
     int res = json_serialize_to_buffer_r(value, NULL, 0, 1, num_buf);
     return res < 0 ? 0 : (size_t)(res) + 1;
 }
