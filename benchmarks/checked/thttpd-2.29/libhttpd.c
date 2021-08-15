@@ -625,7 +625,7 @@ send_mime( mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char> en
     char modbuf[100];
     char expbuf[100];
     char fixed_type[500];
-    _checkable char buf[1000];
+     char buf[1000];
     int partial_content;
     int s100;
 
@@ -779,7 +779,7 @@ send_response(mm_ptr<httpd_conn> hc, int status, char* title,
         mm_array_ptr<char> extraheads, char* form, mm_array_ptr<char> arg )
     {
     char defanged_arg[1000];
-    _checkable char buf[2000];
+     char buf[2000];
 
     send_mime(
 	hc, status, title, "", extraheads, "text/html; charset=%s", (off_t) -1,
@@ -817,7 +817,7 @@ send_response(mm_ptr<httpd_conn> hc, int status, char* title,
 static void
 send_response_tail( mm_ptr<httpd_conn> hc )
     {
-    _checkable char buf[1000];
+     char buf[1000];
 
     (void) my_snprintf((char *)buf, sizeof(buf), "\
     <hr>\n\
@@ -904,7 +904,7 @@ static int
 send_err_file( mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char> extraheads, char* filename )
     {
     FILE* fp;
-    _checkable char buf[1000];
+     char buf[1000];
     size_t r;
 
     fp = fopen( filename, "r" );
@@ -936,8 +936,8 @@ send_err_file( mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char
 
 static void
 send_authenticate( mm_ptr<httpd_conn> hc, char* realm ) {
-    _checkable static mm_array_ptr<char> header = NULL;
-    _checkable static size_t maxheader = 0;
+     static mm_array_ptr<char> header = NULL;
+     static size_t maxheader = 0;
     static char headstr[] = "WWW-Authenticate: Basic realm=\"";
 
     mm_httpd_realloc_str(
@@ -1063,8 +1063,8 @@ static int
 auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
     {
         int i = 20;
-    static _checkable mm_array_ptr<char> authpath = NULL;
-    static _checkable size_t maxauthpath = 0;
+    static  mm_array_ptr<char> authpath = NULL;
+    static  size_t maxauthpath = 0;
     struct stat sb;
     char authinfo[500];
     char* authpass;
@@ -1073,13 +1073,13 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
     FILE* fp;
     char line[500];
     char* cryp;
-    static _checkable mm_array_ptr<char> prevauthpath = NULL;
-    static _checkable size_t maxprevauthpath = 0;
+    static  mm_array_ptr<char> prevauthpath = NULL;
+    static  size_t maxprevauthpath = 0;
     static time_t prevmtime;
-    static _checkable mm_array_ptr<char> prevuser = NULL;
-    static _checkable size_t maxprevuser = 0;
-    static _checkable mm_array_ptr<char> prevcryp = NULL;
-    static _checkable size_t maxprevcryp = 0;
+    static  mm_array_ptr<char> prevuser = NULL;
+    static  size_t maxprevuser = 0;
+    static  mm_array_ptr<char> prevcryp = NULL;
+    static  size_t maxprevcryp = 0;
 
     /* Construct auth filename. */
     mm_httpd_realloc_str(
@@ -1212,10 +1212,10 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
 static void
 send_dirredirect( mm_ptr<httpd_conn> hc )
     {
-    static _checkable mm_array_ptr<char> location = NULL;
-    static _checkable mm_array_ptr<char> header = NULL;
-    static _checkable size_t maxlocation = 0;
-    static _checkable size_t maxheader = 0;
+    static  mm_array_ptr<char> location = NULL;
+    static  mm_array_ptr<char> header = NULL;
+    static  size_t maxlocation = 0;
+    static  size_t maxheader = 0;
     static char headstr[] = "Location: ";
 
     if ( hc->query[0] != '\0')
@@ -1325,8 +1325,8 @@ strencode( char* to, int tosize, char* from )
 static int
 tilde_map_1( httpd_conn* hc )
     {
-    static _checkable mm_array_ptr<char> temp = NULL;
-    static _checkable size_t maxtemp = 0;
+    static  mm_array_ptr<char> temp = NULL;
+    static  size_t maxtemp = 0;
     int len;
     static char* prefix = TILDE_MAP_1;
 
@@ -1347,8 +1347,8 @@ tilde_map_1( httpd_conn* hc )
 static int
 tilde_map_2( httpd_conn* hc )
     {
-    static _checkable mm_array_ptr<char> temp = NULL;
-    static _checkable size_t maxtemp = 0;
+    static  mm_array_ptr<char> temp = NULL;
+    static  size_t maxtemp = 0;
     static char* postfix = TILDE_MAP_2;
     char* cp;
     struct passwd* pw;
@@ -1402,10 +1402,10 @@ tilde_map_2( httpd_conn* hc )
 static int
 vhost_map( mm_ptr<httpd_conn> hc )
     {
-    _checkable httpd_sockaddr sa;
+     httpd_sockaddr sa;
     socklen_t sz;
-    static _checkable mm_array_ptr<char> tempfilename = NULL;
-    static _checkable size_t maxtempfilename = 0;
+    static  mm_array_ptr<char> tempfilename = NULL;
+    static  size_t maxtempfilename = 0;
     mm_array_ptr<char> cp1 = NULL;
     int len;
 #ifdef VHOST_DIRLEVELS
@@ -1494,10 +1494,10 @@ vhost_map( mm_ptr<httpd_conn> hc )
 static mm_array_ptr<char>
 expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_check, int tildemapped )
     {
-    static _checkable mm_array_ptr<char> checked = NULL;
-    static _checkable mm_array_ptr<char> rest = NULL;
+    static  mm_array_ptr<char> checked = NULL;
+    static  mm_array_ptr<char> rest = NULL;
     char lnk[5000];
-    static _checkable size_t maxchecked = 0, maxrest = 0;
+    static  size_t maxchecked = 0, maxrest = 0;
     size_t checkedlen, restlen, linklen, prevcheckedlen, prevrestlen;
     int nlinks, i;
     mm_array_ptr<char> r = NULL;
@@ -1997,7 +1997,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
     mm_array_ptr<char> reqhost = NULL;
     char* eol;
     mm_array_ptr<char> cp = NULL;
-    _checkable mm_array_ptr<char> pi = NULL;
+     mm_array_ptr<char> pi = NULL;
 
     hc->checked_idx = 0;	/* reset */
     method_str = bufgets( hc );
@@ -3053,8 +3053,8 @@ build_env( char* fmt, char* arg )
     {
     char* cp;
     size_t size;
-    static _checkable mm_array_ptr<char> buf = NULL;
-    static _checkable size_t maxbuf = 0;
+    static  mm_array_ptr<char> buf = NULL;
+    static  size_t maxbuf = 0;
 
     size = strlen( fmt ) + strlen( arg );
     if ( size > maxbuf )
@@ -3311,8 +3311,8 @@ cgi_interpose_output( mm_ptr<httpd_conn> hc, int rfd )
     int r;
     char buf[1024];
     size_t headers_len;
-    _checkable size_t headers_size;
-    _checkable mm_array_ptr<char> headers = NULL;
+     size_t headers_size;
+     mm_array_ptr<char> headers = NULL;
     char* br;
     int status;
     char* title;
@@ -3672,17 +3672,17 @@ cgi( mm_ptr<httpd_conn> hc )
 static int
 really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     {
-    static _checkable mm_array_ptr<char> indexname = NULL;
-    static _checkable size_t maxindexname = 0;
+    static  mm_array_ptr<char> indexname = NULL;
+    static  size_t maxindexname = 0;
     static const char* index_names[] = { INDEX_NAMES };
     int i;
 #ifdef AUTH_FILE
-    static _checkable mm_array_ptr<char> dirname = NULL;
-    static _checkable size_t maxdirname = 0;
+    static  mm_array_ptr<char> dirname = NULL;
+    static  size_t maxdirname = 0;
 #endif /* AUTH_FILE */
     size_t expnlen, indxlen;
     char* cp;
-    _checkable mm_array_ptr<char> pi = NULL;
+     mm_array_ptr<char> pi = NULL;
 
     expnlen = strlen(_GETARRAYPTR(char, hc->expnfilename));
 
@@ -4091,8 +4091,8 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
     char* cp1;
     char* cp2;
     char* cp3;
-    static _checkable mm_array_ptr<char> refhost = NULL;
-    static _checkable size_t refhost_size = 0;
+    static  mm_array_ptr<char> refhost = NULL;
+    static  size_t refhost_size = 0;
     char *lp;
 
     hs = hc->hs;
@@ -4187,7 +4187,7 @@ mm_array_ptr<char>
 mm_httpd_ntoa( mm_ptr<httpd_sockaddr> saP )
     {
 #ifdef USE_IPV6
-    _checkable static char str[200];
+     static char str[200];
 
     if ( getnameinfo( _GETPTR(struct sockaddr, &saP->sa), mm_sockaddr_len( saP ),
                 (char *)str, sizeof(str), 0, 0, NI_NUMERICHOST ) != 0 )
