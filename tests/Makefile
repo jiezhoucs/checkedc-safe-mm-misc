@@ -20,7 +20,8 @@ PRINT_PASSES = -mllvm -opt-bisect-limit=-1
 #
 CC = $(LLVM_DIR)/clang $(CFLAGS)
 
-SRC = basic.c assign.c dereference.c func.c cast.c array.c addressof.c checkable.c
+SRC = basic.c assign.c dereference.c func.c cast.c array.c addressof.c \
+	  checkable.c stack_global.c
 LIB = $(CHECKEDC_MISC)/lib-safemm.c
 OBJ = $(SRC:%.c=%.o)
 ASM = $(SRC:%.c=%.s)
@@ -86,6 +87,9 @@ addrof: addressof.c
 
 chk: checkable.c
 	$(CC) $(LDFLAGS) $^ -o checkable
+
+stack: stack_global.c
+	$(CC) $(LDFLAGS) $^ -o stack_global
 
 opt: opt.c
 	$(CC) -S -O1 -emit-llvm $^
