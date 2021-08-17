@@ -1,5 +1,6 @@
 .DS_Store
 test
+eval
 *.o
 testcpp
 tests/test_2_serialized.txt
