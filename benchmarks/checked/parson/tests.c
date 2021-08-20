@@ -564,7 +564,7 @@ void test_suite_10(void) {
 
     val = json_parse_file(get_file_path("test_2.txt"));
     serialized = json_serialize_to_string_pretty(val);
-    mm_json_free_serialized_string(serialized);
+    json_free_serialized_string(serialized);
     json_value_free(val);
 
     val = json_parse_file(get_file_path("test_2_pretty.txt"));

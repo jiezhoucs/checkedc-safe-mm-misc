@@ -96,8 +96,8 @@ JSON_Status json_serialize_to_buffer_pretty(mm_ptr<const JSON_Value> value,
 JSON_Status json_serialize_to_file_pretty(mm_ptr<const JSON_Value> value, const char *filename);
 mm_array_ptr<char>  json_serialize_to_string_pretty(mm_ptr<const JSON_Value> value);
 
-void        json_free_serialized_string(char *string); /* frees string from json_serialize_to_string and json_serialize_to_string_pretty */
-void mm_json_free_serialized_string(mm_array_ptr<char> string);
+/* frees string from json_serialize_to_string and json_serialize_to_string_pretty */
+void json_free_serialized_string(mm_array_ptr<char> string);
 
 /* Comparing */
 int  json_value_equals(mm_ptr<const JSON_Value> a, mm_ptr<const JSON_Value> b);

@@ -1602,7 +1602,7 @@ JSON_Status json_serialize_to_file(mm_ptr<const JSON_Value> value, const char *f
     }
     fp = fopen(filename, "w");
     if (fp == NULL) {
-        mm_json_free_serialized_string(serialized_string);
+        json_free_serialized_string(serialized_string);
         return JSONFailure;
     }
     if (fputs(_GETARRAYPTR(char, serialized_string), fp) == EOF) {
@@ -1611,7 +1611,7 @@ JSON_Status json_serialize_to_file(mm_ptr<const JSON_Value> value, const char *f
     if (fclose(fp) == EOF) {
         return_code = JSONFailure;
     }
-    mm_json_free_serialized_string(serialized_string);
+    json_free_serialized_string(serialized_string);
     return return_code;
 }
 
@@ -1628,7 +1628,7 @@ mm_array_ptr<char> json_serialize_to_string(mm_ptr<const JSON_Value> value) {
     }
     serialization_result = json_serialize_to_buffer(value, buf, buf_size_bytes);
     if (serialization_result == JSONFailure) {
-        mm_json_free_serialized_string(buf);
+        json_free_serialized_string(buf);
         return NULL;
     }
     return buf;
@@ -1664,7 +1664,7 @@ JSON_Status json_serialize_to_file_pretty(mm_ptr<const JSON_Value> value, const 
     }
     fp = fopen(filename, "w");
     if (fp == NULL) {
-        mm_json_free_serialized_string(serialized_string);
+        json_free_serialized_string(serialized_string);
         return JSONFailure;
     }
     if (fputs(_GETARRAYPTR(char, serialized_string), fp) == EOF) {
@@ -1673,7 +1673,7 @@ JSON_Status json_serialize_to_file_pretty(mm_ptr<const JSON_Value> value, const 
     if (fclose(fp) == EOF) {
         return_code = JSONFailure;
     }
-    mm_json_free_serialized_string(serialized_string);
+    json_free_serialized_string(serialized_string);
     return return_code;
 }
 
@@ -1690,17 +1690,13 @@ mm_array_ptr<char> json_serialize_to_string_pretty(mm_ptr<const JSON_Value> valu
     }
     serialization_result = json_serialize_to_buffer_pretty(value, buf, buf_size_bytes);
     if (serialization_result == JSONFailure) {
-        mm_json_free_serialized_string(buf);
+        json_free_serialized_string(buf);
         return NULL;
     }
     return buf;
 }
 
-void json_free_serialized_string(char *string) {
-    parson_free(string);
-}
-
-void mm_json_free_serialized_string(mm_array_ptr<char> string) {
+void json_free_serialized_string(mm_array_ptr<char> string) {
     MM_ARRAY_FREE(char, string);
 }
 
