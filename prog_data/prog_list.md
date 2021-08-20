@@ -7,3 +7,4 @@
 - memcached
 ~~- ClamAV~~ (It has a lot of C++ code)
 - php
+- gnupg
