@@ -1,0 +1,2 @@
+citylots.json filter=lfs diff=lfs merge=lfs -text
+trades.json filter=lfs diff=lfs merge=lfs -text

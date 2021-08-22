@@ -1,9 +1,22 @@
 # JSON Data Set for Evaluating parson
 
 - [citytlots](https://github.com/zemirco/sf-city-lots-json)
-- [canada](https://github.com/miloyip/nativejson-benchmark/tree/master/data)
-- [twitter](https://github.com/miloyip/nativejson-benchmark/tree/master/data)
 
 ## mongodb-json-file
-[gitrepo](https://github.com/ozlerhakan/mongodb-json-files)
+[Git Repository](https://github.com/ozlerhakan/mongodb-json-files)
+- products
+- students
+- grades
+- countries-small
+- profiles
+- covers
+- books
+- albums
+- restaurant
+- countries-big
+- zips
+- images
+- city_inspections
+- companies
+- trades
 
