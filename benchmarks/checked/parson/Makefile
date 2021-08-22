@@ -2,7 +2,7 @@ ROOT_DIR := $(shell realpath ../../../../)
 MISC_DIR := $(ROOT_DIR)/misc
 
 CC := $(ROOT_DIR)/build/bin/clang
-CFLAGS := -O3 -Wall  -std=c89 # -pedantic-errors
+CFLAGS := -O3 -Wall
 CFLAGS += -I$(MISC_DIR)/include
 LDFLAGS := -L$(MISC_DIR)/lib -lsafemm -ldebug
 
@@ -12,21 +12,26 @@ ifeq ($(SYSTEM), Darwin)
 	LDFLAGS += -Xlinker -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
 endif
 
-SRC = tests.c parson.c
-OBJ = $(SRC:%.c=%.o)
+TEST_SRC = tests.c parson.c
+EVAL_SRC = eval.c parson.c
+TET_OBJ = $(SRC:%.c=%.o)
 
-all: test
+all: test eval
 
-.PHONY: test
-test: $(SRC)
+.PHONY: test lto eval clean
+test: $(TEST_SRC)
 	$(CC) $(CFLAGS)  -o $@ $^ $(LDFLAGS)
 	./$@
 
-lto: $(SRC)
+lto: $(TEST_SRC)
 	$(CC) $(CFLAGS) -flto -c $^
 	$(CC) -fuse-ld=lld  $(MISC_DIR)/lib/libsafemm_lto.a -o test $(OBJ)
 	./test
 
+eval: $(EVAL_SRC)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	./$@
+
 clean:
-	rm -f test *.o
+	rm -f test eval *.o
 

@@ -1,5 +1,5 @@
 CC = ../../../../llvm-vanilla/build/bin/clang
-CFLAGS = -O3 -Wall -Wextra -std=c99 -pedantic-errors -Wno-unused-parameter
+CFLAGS = -O3 -Wall -Wextra -pedantic-errors -Wno-unused-parameter
 
 SYSTEM = $(shell uname -s)
 

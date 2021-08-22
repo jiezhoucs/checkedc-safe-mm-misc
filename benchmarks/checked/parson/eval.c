@@ -10,8 +10,8 @@
 #include <math.h>
 #include <errno.h>
 #include <time.h>
-#include <stdint.h>
 
+#include "safe_mm_checked.h"
 #include "parson.h"
 
 #define LARGE_FILE
@@ -101,7 +101,7 @@ const char* get_file_path(const char *filename) {
  * Write results to a file.
  * */
 void write_results() {
-    const char *result_file_path = "../../../eval/perf_data/parson/baseline/result.csv";
+    const char *result_file_path = "../../../eval/perf_data/parson/checked/result.csv";
     FILE *perf_file = fopen(result_file_path,  "w+");
     if (perf_file == NULL) {
         perror("failed to open result file");
@@ -136,8 +136,8 @@ void eval() {
         }
 
         /* Basic parsing and serialization */
-        JSON_Value *val = json_parse_file(file_path);
-        char *serialized = NULL, *serialized_pretty = NULL;
+        mm_ptr<JSON_Value> val = json_parse_file(file_path);
+        mm_array_ptr<char> serialized = NULL, serialized_pretty = NULL;
         TEST(val != NULL);
         /* Test json_value_get_type() */
         val = json_parse_file(file_path);
