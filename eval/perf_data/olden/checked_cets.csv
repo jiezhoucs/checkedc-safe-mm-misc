@@ -1,0 +1,11 @@
+benchmark,normalized(x)
+bh,0.955,
+bisort,1.402,2.241
+em3d,0.824,
+health,1.812,2.691
+mst,1.894,
+perimeter,1.34,2.063
+power,0.998,1.005
+treeadd,1.454,2.251
+tsp,1.287,1.614
+GeoMean,1.284,1.8890454168740753

@@ -14,7 +14,7 @@ ROOT_DIR = os.path.abspath(os.getcwd() + "/../..")
 DATA_DIR = ROOT_DIR + "/eval/perf_data/olden"
 SCRIPT_DIR = ROOT_DIR + "/scripts"
 
-ITERATION = 10
+ITERATION = 20
 
 benchmarks = [
     "bh",
@@ -83,14 +83,15 @@ def write_result():
     for prog in benchmarks:
         time_orign, time_checked = exec_time_baseline[prog], exec_time_checked[prog]
         normalized += [time_checked / time_orign]
-        prog_normalized[prog] = round(normalized[-1], 2)
-        print("%.2f " % normalized[-1])
+        prog_normalized[prog] = round(normalized[-1], 3)
+        print("%.3f " % normalized[-1])
 
     print("Geo. mean of Olden benchmarks: ", end='')
-    print(np.array(normalized).prod() ** (1.0/len(normalized)))
+    geomean = round(np.array(normalized).prod() ** (1.0/len(normalized)), 3)
+    print(geomean)
 
     # Write the result to a CVS file.
-    with open(DATA_DIR + "/perf.csv", "w") as perf_csv:
+    with open(DATA_DIR + "/checked.csv", "w") as perf_csv:
         writer = csv.writer(perf_csv)
         header = ["program", "baseline(s)", "checked(s)", "normalized(x)"]
         writer.writerow(header)
@@ -101,6 +102,9 @@ def write_result():
             row += [exec_time_checked[prog]]
             row += [prog_normalized[prog]]
             writer.writerow(row)
+        # write the geo.mean
+        row = ["GeoMean", ',', ',', ',', geomean]
+        writer.writerow(row)
 
 #
 # Entrance of this script

@@ -14,19 +14,20 @@ ROOT_DIR = os.path.abspath(os.getcwd() + "/../..")
 DATA_DIR = ROOT_DIR + "/eval/perf_data/olden"
 SCRIPT_DIR = ROOT_DIR + "/scripts"
 
-ITERATION = 10
+ITERATION = 20
 
 benchmarks = [
-    # "bh",
+    "bh",           # skipped
     "bisort",
-    # "em3d",
+    "em3d",         # skipped
     "health",
-    # "mst",
+    "mst",          # skipped
     "perimeter",
     "power",
     "treeadd",
     "tsp",
 ]
+skipped_progs = ["bh", "em3d", "mst"]
 
 exec_time_checked = { }
 exec_time_baseline = { }
@@ -61,6 +62,8 @@ def run(version):
             os.chdir(SCRIPT_DIR)
             if version != "baseline":
                 os.chdir("cets")
+            if prog in skipped_progs:
+                continue
             sp.run([script, prog])
             os.chdir(data)
             grep = sp.Popen(("grep","exec_time", prog + ".json"), stdout=sp.PIPE)
@@ -84,26 +87,33 @@ def write_result():
     normalized = []       # normalized execution time of the checked programs
     prog_normalized = {}  # prog:normalized
     for prog in benchmarks:
+        if prog in skipped_progs:
+            continue
         time_orign, time_checked = exec_time_baseline[prog], exec_time_checked[prog]
         normalized += [time_checked / time_orign]
-        prog_normalized[prog] = round(normalized[-1], 2)
-        print("%.2f " % normalized[-1])
+        prog_normalized[prog] = round(normalized[-1], 3)
+        print("%.3f " % normalized[-1])
 
     print("Geo. mean of Olden benchmarks: ", end='')
-    print(np.array(normalized).prod() ** (1.0/len(normalized)))
+    geomean = round(np.array(normalized).prod() ** (1.0/len(normalized)), 3)
+    print(geomean)
 
     # Write the result to a CVS file.
-    with open(DATA_DIR + "/cets_perf.csv", "w") as perf_csv:
+    with open(DATA_DIR + "/cets.csv", "w") as perf_csv:
         writer = csv.writer(perf_csv)
         header = ["program", "baseline(s)", "checked(s)", "normalized(x)"]
         writer.writerow(header)
 
         for prog in benchmarks:
             row = [prog]
-            row += [exec_time_baseline[prog]]
-            row += [exec_time_checked[prog]]
-            row += [prog_normalized[prog]]
+            if prog not in skipped_progs:
+                row += [exec_time_baseline[prog]]
+                row += [exec_time_checked[prog]]
+                row += [prog_normalized[prog]]
             writer.writerow(row)
+        # write the geo.mean
+        row = ["GeoMean", geomean]
+        writer.writerow(row)
 
 #
 # Entrance of this script
