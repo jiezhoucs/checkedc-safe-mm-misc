@@ -110,11 +110,11 @@ static void   remove_comments(char *string, const char *start_token, const char 
 static mm_array_ptr<char> parson_strndup(mm_array_ptr<const char> string, size_t n);
 static mm_array_ptr<char> parson_strdup(mm_array_ptr<const char> string);
 static int    hex_char_to_int(char c);
-static int    parse_utf16_hex(const char *string, unsigned int *result);
+static int    parse_utf16_hex(mm_array_ptr<const char> string, unsigned int *result);
 static int    num_bytes_in_utf8_sequence(unsigned char c);
-static int    verify_utf8_sequence(const unsigned char *string, int *len);
-static int    is_valid_utf8(const char *string, size_t string_len);
-static int    is_decimal(const char *string, size_t length);
+static int    verify_utf8_sequence(mm_array_ptr<const char> string, int *len);
+static int    is_valid_utf8(mm_array_ptr<const char> string, size_t string_len);
+static int    is_decimal(mm_array_ptr<const char> string, size_t length);
 
 /* JSON Object */
 static mm_ptr<JSON_Object> json_object_init(mm_ptr<JSON_Value> wrapping_value);
@@ -188,8 +188,9 @@ static int hex_char_to_int(char c) {
     return -1;
 }
 
-/* There is no need to refactor parse_utf16_hex() to use mm_array_ptr */
-static int parse_utf16_hex(const char *s, unsigned int *result) {
+/* There is no need to refactor the second argument because it points to
+ * a stack variable and it never gets escaped in this function. */
+static int parse_utf16_hex(mm_array_ptr<const char> s, unsigned int *result) {
     int x1, x2, x3, x4;
     if (s[0] == '\0' || s[1] == '\0' || s[2] == '\0' || s[3] == '\0') {
         return 0;
@@ -220,7 +221,9 @@ static int num_bytes_in_utf8_sequence(unsigned char c) {
     return 0; /* won't happen */
 }
 
-static int verify_utf8_sequence(const unsigned char *string, int *len) {
+/* No need to refactor len because it points to a local variable and it
+ * does not escape. */
+static int verify_utf8_sequence(mm_array_ptr<const char> string, int *len) {
     unsigned int cp = 0;
     *len = num_bytes_in_utf8_sequence(string[0]);
 
@@ -262,11 +265,11 @@ static int verify_utf8_sequence(const unsigned char *string, int *len) {
     return 1;
 }
 
-static int is_valid_utf8(const char *string, size_t string_len) {
+static int is_valid_utf8(mm_array_ptr<const char> string, size_t string_len) {
     int len = 0;
-    const char *string_end =  string + string_len;
+    mm_array_ptr<const char> string_end =  string + string_len;
     while (string < string_end) {
-        if (!verify_utf8_sequence((const unsigned char*)string, &len)) {
+        if (!verify_utf8_sequence(string, &len)) {
             return 0;
         }
         string += len;
@@ -275,11 +278,11 @@ static int is_valid_utf8(const char *string, size_t string_len) {
 }
 
 /* No need to refactor is_decimal() as its argument never escapes. */
-static int is_decimal(const char *string, size_t length) {
+static int is_decimal(mm_array_ptr<const char> string, size_t length) {
     if (length > 1 && string[0] == '0' && string[1] != '.') {
         return 0;
     }
-    if (length > 2 && !strncmp(string, "-0", 2) && string[2] != '.') {
+    if (length > 2 && !strncmp(_GETARRAYPTR(char, string), "-0", 2) && string[2] != '.') {
         return 0;
     }
     while (length--) {
@@ -323,7 +326,9 @@ static mm_array_ptr<char> read_file(const char * filename) {
     return file_contents;
 }
 
-/* There is no need to refactor remove_comments() */
+/* There is no need to refactor remove_comments() because string is returned
+ * by parson_strdup(), which allocates space and duplicates a string; and
+ * the second and third arguments are from string constants. */
 static void remove_comments(char *string, const char *start_token, const char *end_token) {
     int in_string = 0, escaped = 0;
     size_t i;
@@ -603,7 +608,7 @@ static int parse_utf16(mm_array_ptr<const char> *unprocessed, mm_array_ptr<char>
     mm_array_ptr<char> processed_ptr = *processed;
     mm_array_ptr<const char> unprocessed_ptr = *unprocessed;
     unprocessed_ptr++; /* skips u */
-    parse_succeeded = parse_utf16_hex(_GETARRAYPTR(char, unprocessed_ptr), &cp);
+    parse_succeeded = parse_utf16_hex(unprocessed_ptr, &cp);
     if (!parse_succeeded) {
         return JSONFailure;
     }
@@ -624,7 +629,7 @@ static int parse_utf16(mm_array_ptr<const char> *unprocessed, mm_array_ptr<char>
         if (*unprocessed_ptr++ != '\\' || *unprocessed_ptr++ != 'u') {
             return JSONFailure;
         }
-        parse_succeeded = parse_utf16_hex(_GETARRAYPTR(char, unprocessed_ptr), &trail);
+        parse_succeeded = parse_utf16_hex(unprocessed_ptr, &trail);
         if (!parse_succeeded || trail < 0xDC00 || trail > 0xDFFF) { /* valid trail surrogate? (0xDC00..0xDFFF) */
             return JSONFailure;
         }
@@ -889,8 +894,7 @@ static mm_ptr<JSON_Value> parse_number_value(mm_array_ptr<const char> *string) {
         return NULL;
     }
     if ((errno && errno != ERANGE) ||
-         !is_decimal((char *)(_GETARRAYPTR(char, *string)),
-             end - (char *)(_GETARRAYPTR(char, *string)))) {
+         !is_decimal(*string, end - (char *)(_GETARRAYPTR(char, *string)))) {
         return NULL;
     }
     _setptr_mm_array<char>(string, end);
@@ -1183,7 +1187,6 @@ mm_ptr<JSON_Value> json_parse_string_with_comments(mm_array_ptr<const char> stri
     if (string_mutable_copy == NULL) {
         return NULL;
     }
-    /* No need to refactor remove_comments */
     remove_comments(_GETARRAYPTR(char, string_mutable_copy), "/*", "*/");
     remove_comments(_GETARRAYPTR(char, string_mutable_copy), "//", "\n");
     string_mutable_copy_ptr = string_mutable_copy;
@@ -1442,7 +1445,7 @@ mm_ptr<JSON_Value> json_value_init_string_with_len(mm_array_ptr<const char> stri
     if (string == NULL) {
         return NULL;
     }
-    if (!is_valid_utf8(_GETARRAYPTR(char, string), length)) {
+    if (!is_valid_utf8(string, length)) {
         return NULL;
     }
     copy = parson_strndup(string, length);
