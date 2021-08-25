@@ -1,0 +1,15 @@
+json_file,normalized(x)
+countries-small,1.062
+profiles,1.085
+covers,1.088
+books,1.011
+albums,1.219
+restaurant,1.023
+countries-big,1.039
+zips,1.139
+images,1.144
+city\\\_insepctions,1.032
+companies,1.055
+trades,1.081
+citylots,1.106
+geomean,1.082
