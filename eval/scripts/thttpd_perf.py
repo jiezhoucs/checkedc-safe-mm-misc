@@ -26,12 +26,12 @@ def compute():
                 have different lines of code")
         return
 
-    perf_file = open("perf_checked_nolto.csv", "w")
+    perf_file = open("perf.csv", "w")
     data_writer = csv.writer(perf_file)
     header = ["file_size (Kb)", "baseline (Mb/s)", "std_dev", "checked (Mb/s)", "std_dev"]
     data_writer.writerow(header)
 
-    exp = 0  # exponent
+    exp = 4  # exponent
     # Process data in each httpd bandwidth file
     for i in range(0, len(bw_baseline_file)):
         bw_baseline = bw_baseline_file[i].split(",")[:-1]

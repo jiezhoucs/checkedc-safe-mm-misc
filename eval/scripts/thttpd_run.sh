@@ -12,10 +12,13 @@ DATA_DIR="$EVAL_DIR/perf_data/thttpd"
 BUILD_DIR="$BENCHMARK_BUILD/thttpd"
 
 # arguments for the thttpd server
-ITERS=10000
-CONS=32
+REQUESTS=10000
+CONS=8
 HOST=http://127.0.0.1
 PORT=8080
+
+# Repeated experiments.
+ITERATIONS=20
 
 #
 # Clean up existing data files and start the server.
@@ -68,7 +71,7 @@ init() {
 #
 run() {
     cd "$DATA_DIR"
-    for ii in {10..24}; do
+    for ii in {14..27}; do
         # For each iteration, file size is 2 to the power of i
         i=$(python -c "print (2 ** $ii)")
 
@@ -76,16 +79,14 @@ run() {
         echo "---------------"
 
         # Check if the server started successfully
-        if [[ `pgrep "thttpd"` ]]; then
-            echo "Starting the thttpd server"
-        else
+        if [[ ! `pgrep "thttpd"` ]]; then
             echo "thttpd failed to start!"
             exit
         fi
 
         # Run the test appending the output to the file
-        for j in {1..60}; do
-            ab -c $CONS -n $ITERS $HOST:$PORT/files/file-$i 2>&1 >> results.$i.1
+        for j in $(seq 1 $ITERATIONS); do
+            ab -c $CONS -n $REQUESTS $HOST:$PORT/files/file-$i 2>&1 >> results.$i
         done
     done
 }
@@ -97,12 +98,12 @@ collect_results() {
     echo "Starting to collect data (file transfer rate)..."
 
     # for file sizes from 1,024 bytes to 2^24 = 16,777,216 bytes
-    for ii in {10..24}; do
+    for ii in {14..27}; do
         # Print out the size.
         i=$(python -c "print (2 ** $ii)")
 
         # Print out the results.
-        grep "Transfer rate" results.$i.* | awk '{printf "%s,", $3}' >> bandwidth.dt
+        grep "Transfer rate" results.$i | awk '{printf "%s,", $3}' >> bandwidth.dt
 
         # Print a newline
         echo >> bandwidth.dt

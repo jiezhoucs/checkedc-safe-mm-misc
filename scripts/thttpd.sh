@@ -8,8 +8,8 @@ EVAL_DIR=`realpath ../eval`
 DATA_DIR=$EVAL_DIR/data/thttpd
 BUILD_DIR=$EVAL_DIR/../../benchmark-build/thttpd
 
-ITERS=1000
-CONS=32
+REQUESTS=10000
+CONS=8
 HOST=http://127.0.0.1
 PORT=8080
 FILES=$HOST:$PORT/files
@@ -74,7 +74,7 @@ init() {
 #
 debug() {
     echo "Testing ......"
-    ab -c $CONS -n $ITERS $FILES/file-1024
+    ab -c $CONS -n $REQUESTS $FILES/file-4096
 }
 
 #
