@@ -103,7 +103,7 @@ def write_result():
             row += [prog_normalized[prog]]
             writer.writerow(row)
         # write the geo.mean
-        row = ["GeoMean", ',', ',', ',', geomean]
+        row = ["geo\\\\\_mean", '', '', geomean]
         writer.writerow(row)
 
 #
