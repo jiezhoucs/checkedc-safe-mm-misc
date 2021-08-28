@@ -71,7 +71,7 @@ init() {
 #
 run() {
     cd "$DATA_DIR"
-    for ii in {14..27}; do
+    for ii in {12..25}; do
         # For each iteration, file size is 2 to the power of i
         i=$(python -c "print (2 ** $ii)")
 
@@ -98,7 +98,7 @@ collect_results() {
     echo "Starting to collect data (file transfer rate)..."
 
     # for file sizes from 1,024 bytes to 2^24 = 16,777,216 bytes
-    for ii in {14..27}; do
+    for ii in {12..25}; do
         # Print out the size.
         i=$(python -c "print (2 ** $ii)")
 

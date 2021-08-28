@@ -31,7 +31,8 @@ def compute():
     header = ["file_size (Kb)", "baseline (Mb/s)", "std_dev", "checked (Mb/s)", "std_dev"]
     data_writer.writerow(header)
 
-    exp = 4  # exponent
+    normalized = []
+    exp = 2  # exponent
     # Process data in each httpd bandwidth file
     for i in range(0, len(bw_baseline_file)):
         bw_baseline = bw_baseline_file[i].split(",")[:-1]
@@ -50,7 +51,11 @@ def compute():
         std_checked = round(np.std(np.array(bw_checked)), 2)
 
         file_size = 2**exp
-        data_row = [file_size, mean_baseline, std_baseline, mean_checked, std_checked]
+        if file_size < 2**10:
+            data_row = [str(file_size) + " KB"]
+        else:
+            data_row = [str(int(file_size / (2**10))) + " MB"]
+        data_row += [mean_baseline, std_baseline, mean_checked, std_checked]
         data_writer.writerow(data_row)
         exp += 1
 
@@ -59,10 +64,13 @@ def compute():
                 (mean_checked - std_checked) > (mean_baseline + std_baseline)):
             print("The checked thttpd outperms the original one!")
 
+        normalized += [mean_baseline / mean_checked]
         print("mean_baseline: " + str(mean_baseline) + "; mean_checked: " + str(mean_checked))
         print("std_baseline = " + str(std_baseline) + "; std_checked = " + str(std_checked))
+        print("overhead = " + str((mean_baseline / mean_checked - 1) * 100) + "%")
         print()
 
+    print("Geo Mean: " + str(np.array(normalized).prod() ** (1.0 / len(normalized))))
     perf_file.close()
 
 #
