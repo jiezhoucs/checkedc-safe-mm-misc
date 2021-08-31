@@ -15,3 +15,9 @@ LIT="$LLVM_BIN/llvm-lit"
 PROGRAMS="$ANALYSIS_DIR/programs"
 
 BREW_LIB="/home/linuxbrew/.linuxbrew/lib"
+
+#
+# Analysis passes
+#
+GET_OBJ_SIZE_PASS="-Wl,-mllvm,-get-obj-size"
+MARSHAL_ARRAY_PASS="-Wl,-mllvm,-marshal-array-size"

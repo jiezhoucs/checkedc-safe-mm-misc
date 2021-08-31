@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 
 #
-# This scripts configures the compiling files of PHP-8.0.9
+# This scripts configures the compiling files of gnupg-2.2.20.
+#
+# Jie Zhou: GNUPG-2.3.1 cannot compile because some dependency library are
+# too old on my machine.
 #
 
 . common.sh
 
-# GNUPG-2.3.1 cannot compile because some dependency library are too old on
-# Jie Zhou's machine.
 SRC_DIR="$PROGRAMS/gnupg"
 
 export CC="$CC"
@@ -15,7 +16,7 @@ export CXX="$CXX"
 export CFLAGS="-flto"
 export CXXFLAGS="-flto"
 export LD="$CC"
-export LDFLAGS="-fuse-ld=lld -Wl,-mllvm,-get-obj-size"
+export LDFLAGS="-fuse-ld=lld $MARSHAL_ARRAY_PASS"
 export AR="$AR"
 export NM="$NM"
 

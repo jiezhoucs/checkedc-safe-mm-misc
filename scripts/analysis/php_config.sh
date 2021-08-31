@@ -13,7 +13,7 @@ export CXX="$CXX"
 export CFLAGS="-flto"
 export CXXFLAGS="-flto"
 export LD="$CC"
-export LDFLAGS="-fuse-ld=lld -Wl,-mllvm,-get-obj-size"
+export LDFLAGS="-fuse-ld=lld $MARSHAL_ARRAY_PASS"
 export AR="$AR"
 export NM="$NM"
 
@@ -33,4 +33,4 @@ cd $SRC_DIR
 # "-fuse-ld=lld"; it would otherwise reports a "invalid linker name in argument '-fuse-ld=lld -Wl,-mllvm,-get-obj-size'"
 # error during linking.
 #
-sed -i "1iLDFLAGS=-Wl,-mllvm,-get-obj-size" Makefile
+sed -i "1iLDFLAGS=$LDFLAGS" Makefile
