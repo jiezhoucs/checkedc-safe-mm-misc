@@ -25,6 +25,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <stddef.h>
 #include <stdint.h>
 
+#include "safe_mm_checked.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -55,11 +55,12 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #endif
 
 // Same as realloc(x,s), except x is freed when realloc fails
-static inline void *lzfse_reallocf(void *x, size_t s) {
-  void *y = realloc(x, s);
-  if (y == 0) {
-    free(x);
-    return 0;
+static inline
+mm_array_ptr<uint8_t> lzfse_reallocf(mm_array_ptr<uint8_t> x, size_t s) {
+  mm_array_ptr<uint8_t> y = mm_array_realloc<uint8_t>(x, s);
+  if (y == NULL) {
+    MM_ARRAY_FREE(uint8_t, x);
+    return NULL;
   }
   return y;
 }
@@ -161,7 +162,7 @@ int main(int argc, char **argv) {
   // Load input
   size_t in_allocated = 0; // allocated in IN
   size_t in_size = 0;      // used in IN
-  uint8_t *in = 0;         // input buffer
+  mm_array_ptr<uint8_t> in = NULL;  // input buffer
   int in_fd = -1;          // input file desc
 
   if (in_file != 0) {
@@ -196,8 +197,8 @@ int main(int argc, char **argv) {
     }
 #endif
   }
-  in = (uint8_t *)malloc(in_allocated);
-  if (in == 0) {
+  in = MM_ARRAY_ALLOC(uint8_t, in_allocated);
+  if (in == NULL) {
     perror("malloc");
     exit(1);
   }
@@ -210,13 +211,13 @@ int main(int argc, char **argv) {
       else
         in_allocated += (100 << 20); // or add 100 MB if already large
       in = lzfse_reallocf(in, in_allocated);
-      if (in == 0) {
+      if (in == NULL) {
         perror("malloc");
         exit(1);
       }
     }
 
-    ptrdiff_t r = read(in_fd, in + in_size, in_allocated - in_size);
+    ptrdiff_t r = read(in_fd, _GETARRAYPTR(uint8_t, in + in_size), in_allocated - in_size);
     if (r < 0) {
       perror("read");
       exit(1);
@@ -244,31 +245,36 @@ int main(int argc, char **argv) {
   size_t out_size = 0;
   size_t aux_allocated = (op == LZFSE_ENCODE) ? lzfse_encode_scratch_size()
                                               : lzfse_decode_scratch_size();
-  void *aux = aux_allocated ? malloc(aux_allocated) : 0;
-  if (aux_allocated != 0 && aux == 0) {
+  mm_array_ptr<uint8_t> aux = aux_allocated ?
+                              MM_ARRAY_ALLOC(uint8_t, aux_allocated) : NULL;
+  if (aux_allocated != 0 && aux == NULL) {
     perror("malloc");
     exit(1);
   }
-  uint8_t *out = (uint8_t *)malloc(out_allocated);
-  if (out == 0) {
+  /* uint8_t *out = (uint8_t *)malloc(out_allocated); */
+  mm_array_ptr<uint8_t> out = MM_ARRAY_ALLOC(uint8_t, out_allocated);
+  if (out == NULL) {
     perror("malloc");
     exit(1);
   }
 
   double c0 = get_time();
   while (1) {
+      // TODO: refactor lzfse_encode_buffer and lzfse_decode_buffer
     if (op == LZFSE_ENCODE)
-      out_size = lzfse_encode_buffer(out, out_allocated, in, in_size, aux);
+      out_size = lzfse_encode_buffer(_GETARRAYPTR(uint8_t, out), out_allocated,
+              _GETARRAYPTR(uint8_t, in), in_size, _GETARRAYPTR(uint8_t, aux));
     else
-      out_size = lzfse_decode_buffer(out, out_allocated, in, in_size, aux);
+      out_size = lzfse_decode_buffer(_GETARRAYPTR(uint8_t, out), out_allocated,
+              _GETARRAYPTR(uint8_t, in), in_size, _GETARRAYPTR(uint8_t, aux));
 
     // If output buffer was too small, grow and retry.
     if (out_size == 0 || (op == LZFSE_DECODE && out_size == out_allocated)) {
       if (verbosity > 0)
         fprintf(stderr, "Output buffer was too small, increasing size...\n");
       out_allocated <<= 1;
-      out = (uint8_t *)lzfse_reallocf(out, out_allocated);
-      if (out == 0) {
+      out = lzfse_reallocf(out, out_allocated);
+      if (out == NULL) {
         perror("malloc");
         exit(1);
       }
@@ -313,7 +319,7 @@ int main(int argc, char **argv) {
 #endif
   }
   for (size_t out_pos = 0; out_pos < out_size;) {
-    ptrdiff_t w = write(out_fd, out + out_pos, out_size - out_pos);
+    ptrdiff_t w = write(out_fd, _GETARRAYPTR(uint8_t, out + out_pos), out_size - out_pos);
     if (w < 0) {
       perror("write");
       exit(1);
@@ -329,8 +335,8 @@ int main(int argc, char **argv) {
     out_fd = -1;
   }
 
-  free(in);
-  free(out);
-  free(aux);
+  MM_ARRAY_FREE(uint8_t, in);
+  MM_ARRAY_FREE(uint8_t, out);
+  MM_ARRAY_FREE(uint8_t, aux);
   return 0; // OK
 }
