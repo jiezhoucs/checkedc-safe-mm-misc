@@ -245,8 +245,8 @@ int main(int argc, char **argv) {
   size_t out_size = 0;
   size_t aux_allocated = (op == LZFSE_ENCODE) ? lzfse_encode_scratch_size()
                                               : lzfse_decode_scratch_size();
-  mm_array_ptr<uint8_t> aux = aux_allocated ?
-                              MM_ARRAY_ALLOC(uint8_t, aux_allocated) : NULL;
+  mm_array_ptr<void> aux = aux_allocated ?
+                              MM_ARRAY_ALLOC(void, aux_allocated) : NULL;
   if (aux_allocated != 0 && aux == NULL) {
     perror("malloc");
     exit(1);
@@ -260,13 +260,12 @@ int main(int argc, char **argv) {
 
   double c0 = get_time();
   while (1) {
-      // TODO: refactor lzfse_encode_buffer and lzfse_decode_buffer
+      // TODO: lzfse_decode_buffer
     if (op == LZFSE_ENCODE)
-      out_size = lzfse_encode_buffer(_GETARRAYPTR(uint8_t, out), out_allocated,
-              _GETARRAYPTR(uint8_t, in), in_size, _GETARRAYPTR(uint8_t, aux));
+      out_size = lzfse_encode_buffer(out, out_allocated, in, in_size, aux);
     else
       out_size = lzfse_decode_buffer(_GETARRAYPTR(uint8_t, out), out_allocated,
-              _GETARRAYPTR(uint8_t, in), in_size, _GETARRAYPTR(uint8_t, aux));
+              _GETARRAYPTR(uint8_t, in), in_size, _GETARRAYPTR(void, aux));
 
     // If output buffer was too small, grow and retry.
     if (out_size == 0 || (op == LZFSE_DECODE && out_size == out_allocated)) {
@@ -337,6 +336,6 @@ int main(int argc, char **argv) {
 
   MM_ARRAY_FREE(uint8_t, in);
   MM_ARRAY_FREE(uint8_t, out);
-  MM_ARRAY_FREE(uint8_t, aux);
+  MM_ARRAY_FREE(void, aux);
   return 0; // OK
 }

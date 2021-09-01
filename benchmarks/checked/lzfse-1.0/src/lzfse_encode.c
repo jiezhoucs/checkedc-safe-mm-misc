@@ -30,9 +30,9 @@ size_t lzfse_encode_scratch_size() {
   return (s1 > s2) ? s1 : s2; // max(lzfse,lzvn)
 }
 
-size_t lzfse_encode_buffer_with_scratch(uint8_t *__restrict dst_buffer, 
-                       size_t dst_size, const uint8_t *__restrict src_buffer,
-                       size_t src_size, void *__restrict scratch_buffer) {
+size_t lzfse_encode_buffer_with_scratch(mm_array_ptr<uint8_t> __restrict dst_buffer,
+                       size_t dst_size, mm_array_ptr<const uint8_t> __restrict src_buffer,
+                       size_t src_size, mm_array_ptr<void> __restrict scratch_buffer) {
   const size_t original_size = src_size;
 
   // If input is really really small, go directly to uncompressed buffer
@@ -47,9 +47,10 @@ size_t lzfse_encode_buffer_with_scratch(uint8_t *__restrict dst_buffer,
     if (dst_size <= extra_size)
       goto try_uncompressed; // DST is really too small, give up
 
+    // TODO
     size_t sz = lzvn_encode_buffer(
-        dst_buffer + sizeof(lzvn_compressed_block_header),
-        dst_size - extra_size, src_buffer, src_size, scratch_buffer);
+        _GETARRAYPTR(uint8_t, dst_buffer + sizeof(lzvn_compressed_block_header)),
+        dst_size - extra_size, _GETARRAYPTR(uint8_t, src_buffer), src_size, _GETARRAYPTR(void, scratch_buffer));
     if (sz == 0 || sz >= src_size)
       goto try_uncompressed; // failed, or no compression, fall back to
                              // uncompressed block
@@ -60,8 +61,8 @@ size_t lzfse_encode_buffer_with_scratch(uint8_t *__restrict dst_buffer,
     header.magic = LZFSE_COMPRESSEDLZVN_BLOCK_MAGIC;
     header.n_raw_bytes = (uint32_t)src_size;
     header.n_payload_bytes = (uint32_t)sz;
-    memcpy(dst_buffer, &header, sizeof(header));
-    store4(dst_buffer + sizeof(lzvn_compressed_block_header) + sz,
+    memcpy(_GETARRAYPTR(uint8_t, dst_buffer), &header, sizeof(header));
+    store4(_GETARRAYPTR(uint8_t, dst_buffer + sizeof(lzvn_compressed_block_header) + sz),
            LZFSE_ENDOFSTREAM_BLOCK_MAGIC);
 
     return sz + extra_size;
@@ -69,14 +70,17 @@ size_t lzfse_encode_buffer_with_scratch(uint8_t *__restrict dst_buffer,
 
   // Try encoding with LZFSE
   {
-    lzfse_encoder_state *state = scratch_buffer;
-    memset(state, 0x00, sizeof *state);
-    if (lzfse_encode_init(state) != LZFSE_STATUS_OK)
+    /* lzfse_encoder_state *state = scratch_buffer; */
+    mm_ptr<lzfse_encoder_state> state = (mm_ptr<lzfse_encoder_state>)scratch_buffer;
+    memset(_GETPTR(lzfse_encoder_state, state), 0x00, sizeof(lzfse_encoder_state));
+    // TODO
+    if (lzfse_encode_init(_GETPTR(lzfse_encoder_state, state)) != LZFSE_STATUS_OK)
       goto try_uncompressed;
-    state->dst = dst_buffer;
-    state->dst_begin = dst_buffer;
-    state->dst_end = &dst_buffer[dst_size];
-    state->src = src_buffer;
+    // TODO
+    state->dst = _GETARRAYPTR(uint8_t, dst_buffer);
+    state->dst_begin = _GETARRAYPTR(uint8_t, dst_buffer);
+    state->dst_end = _GETARRAYPTR(uint8_t, dst_buffer + dst_size);
+    state->src = _GETARRAYPTR(uint8_t, src_buffer);
     state->src_encode_i = 0;
 
     if (src_size >= 0xffffffffU) {
@@ -88,7 +92,8 @@ size_t lzfse_encode_buffer_with_scratch(uint8_t *__restrict dst_buffer,
       //  The first chunk, we just process normally.
       const lzfse_offset encoder_block_size = 262144;
       state->src_end = encoder_block_size;
-      if (lzfse_encode_base(state) != LZFSE_STATUS_OK)
+      // TODO
+      if (lzfse_encode_base(_GETPTR(lzfse_encoder_state, state)) != LZFSE_STATUS_OK)
         goto try_uncompressed;
       src_size -= encoder_block_size;
       while (src_size >= encoder_block_size) {
@@ -98,9 +103,11 @@ size_t lzfse_encode_buffer_with_scratch(uint8_t *__restrict dst_buffer,
         //  offsets remain positive (as opposed to resetting to zero and
         //  having negative offsets).
         state->src_end = 2 * encoder_block_size;
-        if (lzfse_encode_base(state) != LZFSE_STATUS_OK)
+        // TODO
+        if (lzfse_encode_base(_GETPTR(lzfse_encoder_state, state)) != LZFSE_STATUS_OK)
           goto try_uncompressed;
-        lzfse_encode_translate(state, encoder_block_size);
+        // TODO
+        lzfse_encode_translate(_GETPTR(lzfse_encoder_state, state), encoder_block_size);
         src_size -= encoder_block_size;
       }
       //  Set the end for the final chunk.
@@ -112,12 +119,14 @@ size_t lzfse_encode_buffer_with_scratch(uint8_t *__restrict dst_buffer,
       state->src_end = (lzfse_offset)src_size;
     //  This is either the trailing chunk (if the source file is huge), or
     //  the whole source file.
-    if (lzfse_encode_base(state) != LZFSE_STATUS_OK)
+    // TODO
+    if (lzfse_encode_base(_GETPTR(lzfse_encoder_state, state)) != LZFSE_STATUS_OK)
       goto try_uncompressed;
-    if (lzfse_encode_finish(state) != LZFSE_STATUS_OK)
+    // TODO
+    if (lzfse_encode_finish(_GETPTR(lzfse_encoder_state, state)) != LZFSE_STATUS_OK)
       goto try_uncompressed;
     //  No error occured, return compressed size.
-    return state->dst - dst_buffer;
+    return state->dst - (uint8_t *)(_GETARRAYPTR(uint8_t, dst_buffer));
   }
 
 try_uncompressed:
@@ -126,38 +135,38 @@ try_uncompressed:
   if (original_size + 12 <= dst_size && original_size < INT32_MAX) {
     uncompressed_block_header header = {.magic = LZFSE_UNCOMPRESSED_BLOCK_MAGIC,
                                         .n_raw_bytes = (uint32_t)src_size};
-    uint8_t *dst_end = dst_buffer;
+    uint8_t *dst_end = _GETARRAYPTR(uint8_t, dst_buffer);
     memcpy(dst_end, &header, sizeof header);
     dst_end += sizeof header;
-    memcpy(dst_end, src_buffer, original_size);
+    memcpy(dst_end, _GETARRAYPTR(uint8_t, src_buffer), original_size);
     dst_end += original_size;
-    store4(dst_end, LZFSE_ENDOFSTREAM_BLOCK_MAGIC);
+    store4(_GETARRAYPTR(uint8_t, dst_end), LZFSE_ENDOFSTREAM_BLOCK_MAGIC);
     dst_end += 4;
-    return dst_end - dst_buffer;
+    return dst_end - _GETARRAYPTR(uint8_t, dst_buffer);
   }
 
   //  Otherwise, there's nothing we can do, so return zero.
   return 0;
 }
 
-size_t lzfse_encode_buffer(uint8_t *__restrict dst_buffer, size_t dst_size,
-                           const uint8_t *__restrict src_buffer,
-                           size_t src_size, void *__restrict scratch_buffer) {
+size_t lzfse_encode_buffer(mm_array_ptr<uint8_t> __restrict dst_buffer, size_t dst_size,
+                           mm_array_ptr<const uint8_t> __restrict src_buffer,
+                           size_t src_size, mm_array_ptr<void> __restrict scratch_buffer) {
   int has_malloc = 0;
   size_t ret = 0;
 
   // Deal with the possible NULL pointer
   if (scratch_buffer == NULL) {
     // +1 in case scratch size could be zero
-    scratch_buffer = malloc(lzfse_encode_scratch_size() + 1);
+    scratch_buffer = MM_ARRAY_ALLOC(void, (lzfse_encode_scratch_size() + 1));
     has_malloc = 1;
   }
   if (scratch_buffer == NULL)
     return 0;
-  ret = lzfse_encode_buffer_with_scratch(dst_buffer, 
-                        dst_size, src_buffer, 
+  ret = lzfse_encode_buffer_with_scratch(dst_buffer,
+                        dst_size, src_buffer,
                         src_size, scratch_buffer);
   if (has_malloc)
-    free(scratch_buffer);
+    MM_ARRAY_FREE(void, scratch_buffer);
   return ret;
-} 
+}

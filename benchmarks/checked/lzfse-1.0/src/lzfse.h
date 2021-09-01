@@ -86,11 +86,11 @@ LZFSE_API size_t lzfse_encode_scratch_size();
  *  successfully compressed. If the input cannot be compressed to fit into
  *  the provided buffer, or an error occurs, zero is returned, and the
  *  contents of dst_buffer are unspecified.                                   */
-LZFSE_API size_t lzfse_encode_buffer(uint8_t *__restrict dst_buffer,
+LZFSE_API size_t lzfse_encode_buffer(mm_array_ptr<uint8_t> __restrict dst_buffer,
                                      size_t dst_size,
-                                     const uint8_t *__restrict src_buffer,
+                                     mm_array_ptr<const uint8_t> __restrict src_buffer,
                                      size_t src_size,
-                                     void *__restrict scratch_buffer);
+                                     mm_array_ptr<void> __restrict scratch_buffer);
 
 /*! @abstract Get the required scratch buffer size to decompress using LZFSE. */
 LZFSE_API size_t lzfse_decode_scratch_size();

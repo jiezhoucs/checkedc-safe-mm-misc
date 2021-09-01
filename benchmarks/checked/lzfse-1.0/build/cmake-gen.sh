@@ -14,3 +14,11 @@ cmake .. -G "Unix Makefiles"                                                   \
       -DCMAKE_C_COMPILER="$CC"                                                 \
       -DCMAKE_C_FLAGS="$CFLAGS"                                                \
       -DCMAKE_INSTALL_PREFIX="$BUILD_DIR"                                      \
+
+#
+# Add targets in the Makefile for simple testing
+#
+
+sed -i '$aencode:\n\t./lzfse \-v \-encode \-i enwik8 \-o enwik8_compressed' Makefile
+echo >> Makefile
+sed -i '$adecode:\n\t./lzfse \-v \-decode \-i enwik8_compressed \-o enwik8_origin' Makefile
