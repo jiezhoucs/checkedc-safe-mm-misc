@@ -13,7 +13,7 @@
 
 /* Extract the raw pointer from a checked pointer. */
 #define _GETPTR(T, p) ((T *)(p))
-#define _GETARRAYPTR(T, p) ((T *)p)
+#define _GETARRAYPTR(T, p) ((T *)(p))
 
 /* These macros provide convenience for programmers to type a little less. */
 #define MM_ALLOC(T) mm_alloc<T>(sizeof(T))
