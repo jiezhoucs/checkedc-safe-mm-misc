@@ -24,7 +24,6 @@ lto: $(EVAL_SRC)
 
 eval: $(EVAL_SRC)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-	./$@
 
 clean:
 	rm -f eval test *.o
