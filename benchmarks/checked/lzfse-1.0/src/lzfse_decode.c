@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2015-2016, Apple Inc. All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:  
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
 1.  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 
@@ -26,7 +26,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 
 size_t lzfse_decode_scratch_size() { return sizeof(lzfse_decoder_state); }
 
-size_t lzfse_decode_buffer_with_scratch(uint8_t *__restrict dst_buffer, 
+size_t lzfse_decode_buffer_with_scratch(uint8_t *__restrict dst_buffer,
                          size_t dst_size, const uint8_t *__restrict src_buffer,
                          size_t src_size, void *__restrict scratch_buffer) {
   lzfse_decoder_state *s = (lzfse_decoder_state *)scratch_buffer;
@@ -63,10 +63,10 @@ size_t lzfse_decode_buffer(uint8_t *__restrict dst_buffer, size_t dst_size,
   }
   if (scratch_buffer == NULL)
     return 0;
-  ret = lzfse_decode_buffer_with_scratch(dst_buffer, 
-                               dst_size, src_buffer, 
+  ret = lzfse_decode_buffer_with_scratch(dst_buffer,
+                               dst_size, src_buffer,
                                src_size, scratch_buffer);
   if (has_malloc)
     free(scratch_buffer);
   return ret;
-} 
+}
