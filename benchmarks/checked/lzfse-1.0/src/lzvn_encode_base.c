@@ -33,20 +33,20 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 /*! @abstract Copy at least \p nbytes bytes from \p src to \p dst, by blocks
  * of 8 bytes (may go beyond range). No overlap.
  * @return \p dst + \p nbytes. */
-static inline unsigned char *lzvn_copy64(unsigned char *restrict dst,
-                                         const unsigned char *restrict src,
-                                         size_t nbytes) {
+static inline mm_array_ptr<unsigned char>
+lzvn_copy64(mm_array_ptr<unsigned char> restrict dst,
+            const unsigned char *restrict src, size_t nbytes) {
   for (size_t i = 0; i < nbytes; i += 8)
-    store8(dst + i, load8(src + i));
+    store8(_GETARRAYPTR(unsigned char, dst + i), load8(src + i));
   return dst + nbytes;
 }
 
 /*! @abstract Copy exactly \p nbytes bytes from \p src to \p dst (respects range).
  * No overlap.
  * @return \p dst + \p nbytes. */
-static inline unsigned char *lzvn_copy8(unsigned char *restrict dst,
-                                        const unsigned char *restrict src,
-                                        size_t nbytes) {
+static inline mm_array_ptr<unsigned char>
+lzvn_copy8(mm_array_ptr<unsigned char> restrict dst,
+           mm_array_ptr<const unsigned char> restrict src, size_t nbytes) {
   for (size_t i = 0; i < nbytes; i++)
     dst[i] = src[i];
   return dst + nbytes;
@@ -59,15 +59,15 @@ static inline unsigned char *lzvn_copy8(unsigned char *restrict dst,
  * @return pointer to the next output, <= \p q1.
  * @return \p q1 if output is full. In that case, output will be partially invalid.
  */
-static inline unsigned char *emit_literal(const unsigned char *p,
-                                          unsigned char *q, unsigned char *q1,
-                                          size_t L) {
+static inline mm_array_ptr<unsigned char>
+emit_literal(mm_array_ptr<const unsigned char> p, mm_array_ptr<unsigned char> q,
+             mm_array_ptr<unsigned char> q1, size_t L) {
   size_t x;
   while (L > 15) {
     x = L < 271 ? L : 271;
     if (q + x + 10 >= q1)
       goto OUT_FULL;
-    store2(q, 0xE0 + ((x - 16) << 8));
+    store2(_GETARRAYPTR(unsigned char, q), 0xE0 + ((x - 16) << 8));
     q += 2;
     L -= x;
     q = lzvn_copy8(q, p, x);
@@ -92,25 +92,26 @@ OUT_FULL:
  * @return pointer to the next output, <= \p q1.
  * @return \p q1 if output is full. In that case, output will be partially invalid.
  */
-static inline unsigned char *emit(const unsigned char *p, unsigned char *q,
-                                  unsigned char *q1, size_t L, size_t M,
-                                  size_t D, size_t D_prev) {
+static inline mm_array_ptr<unsigned char>
+emit(mm_array_ptr<const unsigned char> p, mm_array_ptr<unsigned char> q,
+                  mm_array_ptr<unsigned char> q1, size_t L, size_t M, size_t D,
+                  size_t D_prev) {
   size_t x;
   while (L > 15) {
     x = L < 271 ? L : 271;
     if (q + x + 10 >= q1)
       goto OUT_FULL;
-    store2(q, 0xE0 + ((x - 16) << 8));
+    store2(_GETARRAYPTR(unsigned char, q), 0xE0 + ((x - 16) << 8));
     q += 2;
     L -= x;
-    q = lzvn_copy64(q, p, x);
+    q = lzvn_copy64(q, _GETARRAYPTR(unsigned char, p), x);
     p += x;
   }
   if (L > 3) {
     if (q + L + 10 >= q1)
       goto OUT_FULL;
     *q++ = 0xE0 + L; // 1110LLLL
-    q = lzvn_copy64(q, p, L);
+    q = lzvn_copy64(q, _GETARRAYPTR(unsigned char, p), L);
     p += L;
     L = 0;
   }
@@ -119,7 +120,7 @@ static inline unsigned char *emit(const unsigned char *p, unsigned char *q,
   x -= 3; // M = (x+3) + M'    max value for x is 7-2*L
 
   // Here L<4 literals remaining, we read them here
-  uint32_t literal = load4(p);
+  uint32_t literal = load4(_GETARRAYPTR(unsigned char, p));
   // P is not accessed after this point
 
   // Relaxed capacity test covering all cases
@@ -132,29 +133,29 @@ static inline unsigned char *emit(const unsigned char *p, unsigned char *q,
     } else {
       *q++ = (L << 6) + (x << 3) + 6; //  LLxxx110
     }
-    store4(q, literal);
+    store4(_GETARRAYPTR(unsigned char, q), literal);
     q += L;
   } else if (D < 2048 - 2 * 256) {
     // Short dist    D>>8 in 0..5
     *q++ = (D >> 8) + (L << 6) + (x << 3); // LLxxxDDD
     *q++ = D & 0xFF;
-    store4(q, literal);
+    store4(_GETARRAYPTR(unsigned char, q), literal);
     q += L;
   } else if (D >= (1 << 14) || M == 0 || (x + 3) + M > 34) {
     // Long dist
     *q++ = (L << 6) + (x << 3) + 7;
-    store2(q, D);
+    store2(_GETARRAYPTR(unsigned char, q), D);
     q += 2;
-    store4(q, literal);
+    store4(_GETARRAYPTR(unsigned char, q), literal);
     q += L;
   } else {
     // Medium distance
     x += M;
     M = 0;
     *q++ = 0xA0 + (x >> 2) + (L << 3);
-    store2(q, D << 2 | (x & 3));
+    store2(_GETARRAYPTR(unsigned char, q), D << 2 | (x & 3));
     q += 2;
-    store4(q, literal);
+    store4(_GETARRAYPTR(unsigned char, q), literal);
     q += L;
   }
 
@@ -163,7 +164,7 @@ static inline unsigned char *emit(const unsigned char *p, unsigned char *q,
     if (q + 2 >= q1)
       goto OUT_FULL;
     x = M < 271 ? M : 271;
-    store2(q, 0xf0 + ((x - 16) << 8));
+    store2(_GETARRAYPTR(unsigned char, q), 0xf0 + ((x - 16) << 8));
     q += 2;
     M -= x;
   }
@@ -209,6 +210,7 @@ static inline lzvn_offset trailing_zero_bytes(uint32_t x) {
  * Assumes we can read 4 chars from each position. */
 static inline lzvn_offset nmatch4(const unsigned char *src, lzvn_offset i,
                                   lzvn_offset j) {
+  /* No need to refactor this function as src is only passed to load4 */
   uint32_t vi = load4(src + i);
   uint32_t vj = load4(src + j);
   return trailing_zero_bytes(vi ^ vj);
@@ -223,12 +225,12 @@ static inline lzvn_offset nmatch4(const unsigned char *src, lzvn_offset i,
  * @return If a match can be found, return 1 and set all \p match fields,
  * otherwise return 0.
  * @note \p *match should be 0 before the call. */
-static inline int lzvn_find_match(const unsigned char *src,
+static inline int lzvn_find_match(mm_array_ptr<const unsigned char> src,
                                   lzvn_offset src_begin,
                                   lzvn_offset src_end, lzvn_offset l_begin,
                                   lzvn_offset m0_begin, lzvn_offset m_begin,
                                   lzvn_match_info *match) {
-  lzvn_offset n = nmatch4(src, m_begin, m0_begin);
+  lzvn_offset n = nmatch4(_GETARRAYPTR(unsigned char, src), m_begin, m0_begin);
   if (n < 3)
     return 0; // no match
 
@@ -239,7 +241,7 @@ static inline int lzvn_find_match(const unsigned char *src,
   // Expand forward
   lzvn_offset m_end = m_begin + n;
   while (n == 4 && m_end + 4 < src_end) {
-    n = nmatch4(src, m_end, m_end - D);
+    n = nmatch4(_GETARRAYPTR(unsigned char, src), m_end, m_end - D);
     m_end += n;
   }
 
@@ -263,7 +265,7 @@ static inline int lzvn_find_match(const unsigned char *src,
 
 /*! @abstract Same as lzvn_find_match, but we already know that N bytes do
  *  match (N<=4). */
-static inline int lzvn_find_matchN(const unsigned char *src,
+static inline int lzvn_find_matchN(mm_array_ptr<const unsigned char> src,
                                    lzvn_offset src_begin,
                                    lzvn_offset src_end, lzvn_offset l_begin,
                                    lzvn_offset m0_begin, lzvn_offset m_begin,
@@ -279,7 +281,7 @@ static inline int lzvn_find_matchN(const unsigned char *src,
   // Expand forward
   lzvn_offset m_end = m_begin + n;
   while (n == 4 && m_end + 4 < src_end) {
-    n = nmatch4(src, m_end, m_end - D);
+    n = nmatch4(_GETARRAYPTR(unsigned char, src), m_end, m_end - D);
     m_end += n;
   }
 
@@ -313,8 +315,8 @@ static inline lzvn_offset lzvn_emit_match(lzvn_encoder_state *state,
   size_t M = (size_t)match.M;                              // match length
   size_t D = (size_t)match.D;                              // match distance
   size_t D_prev = (size_t)state->d_prev; // previously emitted match distance
-  unsigned char *dst = emit(state->src + state->src_literal, state->dst,
-                            state->dst_end, L, M, D, D_prev);
+  mm_array_ptr<unsigned char> dst = emit(state->src + state->src_literal, state->dst,
+                                         state->dst_end, L, M, D, D_prev);
   // Check if DST is full
   if (dst >= state->dst_end) {
     return 0; // FULL
@@ -334,8 +336,8 @@ static inline lzvn_offset lzvn_emit_match(lzvn_encoder_state *state,
 static inline lzvn_offset lzvn_emit_literal(lzvn_encoder_state *state,
                                             lzvn_offset n) {
   size_t L = (size_t)n;
-  unsigned char *dst = emit_literal(state->src + state->src_literal, state->dst,
-                                    state->dst_end, L);
+  mm_array_ptr<unsigned char> dst =
+      emit_literal(state->src + state->src_literal, state->dst, state->dst_end, L);
   // Check if DST is full
   if (dst >= state->dst_end)
     return 0; // FULL
@@ -356,7 +358,7 @@ static inline lzvn_offset lzvn_emit_end_of_stream(lzvn_encoder_state *state) {
     return 0; // FULL
 
   // Insert end marker and update state
-  store8(state->dst, 0x06); // end-of-stream command
+  store8(_GETARRAYPTR(unsigned char, state->dst), 0x06); // end-of-stream command
   state->dst += 8;
   return 8; // dst_used
 }
@@ -369,7 +371,7 @@ static inline void lzvn_init_table(lzvn_encoder_state *state) {
   lzvn_offset index = -LZVN_ENCODE_MAX_DISTANCE; // max match distance
   if (index < state->src_begin)
     index = state->src_begin;
-  uint32_t value = load4(state->src + index);
+  uint32_t value = load4(_GETARRAYPTR(unsigned char, state->src) + index);
 
   lzvn_encode_entry_type e;
   for (int i = 0; i < 4; i++) {
@@ -385,7 +387,7 @@ void lzvn_encode(lzvn_encoder_state *state) {
 
   for (; state->src_current < state->src_current_end; state->src_current++) {
     // Get 4 bytes at src_current
-    uint32_t vi = load4(state->src + state->src_current);
+    uint32_t vi = load4(_GETARRAYPTR(unsigned char, state->src + state->src_current));
 
     // Compute new hash H at position I, and push value into position table
     int h = hash3i(vi); // index of first entry
@@ -533,9 +535,9 @@ void lzvn_encode(lzvn_encoder_state *state) {
 
 size_t lzvn_encode_scratch_size(void) { return LZVN_ENCODE_WORK_SIZE; }
 
-static size_t lzvn_encode_partial(void *__restrict dst, size_t dst_size,
-                                  const void *__restrict src, size_t src_size,
-                                  size_t *src_used, void *__restrict work) {
+static size_t lzvn_encode_partial(mm_array_ptr<uint8_t> __restrict dst, size_t dst_size,
+                                  mm_array_ptr<const uint8_t> __restrict src, size_t src_size,
+                                  size_t *src_used, mm_array_ptr<void> __restrict work) {
   // Min size checks to avoid accessing memory outside buffers.
   if (dst_size < LZVN_ENCODE_MIN_DST_SIZE) {
     *src_used = 0;
@@ -557,8 +559,8 @@ static size_t lzvn_encode_partial(void *__restrict dst, size_t dst_size,
   state.src_current = 0;
   state.dst = dst;
   state.dst_begin = dst;
-  state.dst_end = (unsigned char *)dst + dst_size - 8; // reserve 8 bytes for end-of-stream
-  state.table = work;
+  state.dst_end = dst + dst_size - 8; // reserve 8 bytes for end-of-stream
+  state.table = (mm_ptr<lzvn_encode_entry_type>)work;
 
   // Do not encode if the input buffer is too small. We'll emit a literal instead.
   if (src_size >= LZVN_ENCODE_MIN_SRC_SIZE) {
@@ -574,16 +576,16 @@ static size_t lzvn_encode_partial(void *__restrict dst, size_t dst_size,
   lzvn_emit_literal(&state, state.src_end - state.src_literal);
 
   // Restore original size, so end-of-stream always succeeds, and emit it
-  state.dst_end = (unsigned char *)dst + dst_size;
+  state.dst_end = dst + dst_size;
   lzvn_emit_end_of_stream(&state);
 
   *src_used = state.src_literal;
   return (size_t)(state.dst - state.dst_begin);
 }
 
-size_t lzvn_encode_buffer(void *__restrict dst, size_t dst_size,
-                          const void *__restrict src, size_t src_size,
-                          void *__restrict work) {
+size_t lzvn_encode_buffer(mm_array_ptr<uint8_t> __restrict dst, size_t dst_size,
+                          mm_array_ptr<const uint8_t> __restrict src, size_t src_size,
+                          mm_array_ptr<void> __restrict work) {
   size_t src_used = 0;
   size_t dst_used =
       lzvn_encode_partial(dst, dst_size, src, src_size, &src_used, work);

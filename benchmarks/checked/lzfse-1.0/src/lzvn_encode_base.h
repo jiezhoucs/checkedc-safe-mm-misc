@@ -74,7 +74,7 @@ typedef struct {
   // Encoder I/O
 
   // Source buffer
-  const unsigned char *src;
+  mm_array_ptr<const unsigned char> src;
   // Valid range in source buffer: we can access src[i] for src_begin <= i <
   // src_end. src_begin may be negative.
   lzvn_offset src_begin;
@@ -88,10 +88,10 @@ typedef struct {
   lzvn_offset src_literal;
 
   // Next byte to write in destination buffer
-  unsigned char *dst;
+  mm_array_ptr<unsigned char> dst;
   // Valid range in destination buffer: [dst_begin, dst_end - 1]
-  unsigned char *dst_begin;
-  unsigned char *dst_end;
+  mm_array_ptr<unsigned char> dst_begin;
+  mm_array_ptr<unsigned char> dst_end;
 
   // Encoder state
 
@@ -104,7 +104,7 @@ typedef struct {
   // Hash table used to find matches. Stores LZVN_ENCODE_OFFSETS_PER_HASH 32-bit
   // signed indices in the source buffer, and the corresponding 4-byte values.
   // The number of entries in the table is LZVN_ENCODE_HASH_VALUES.
-  lzvn_encode_entry_type *table;
+  mm_ptr<lzvn_encode_entry_type> table;
 
 } lzvn_encoder_state;
 

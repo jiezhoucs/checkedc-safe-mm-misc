@@ -33,6 +33,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <stddef.h>
 #include <stdint.h>
 
+#include "safe_mm_checked.h"
+
 #if defined(_MSC_VER) && !defined(__clang__)
 #  define LZFSE_INLINE __forceinline
 #  define __builtin_expect(X, Y) (X)
@@ -407,9 +409,9 @@ int lzfse_decode(lzfse_decoder_state *s);
 
 size_t lzvn_decode_scratch_size(void);
 size_t lzvn_encode_scratch_size(void);
-size_t lzvn_encode_buffer(void *__restrict dst, size_t dst_size,
-                          const void *__restrict src, size_t src_size,
-                          void *__restrict work);
+size_t lzvn_encode_buffer(mm_array_ptr<uint8_t> __restrict dst, size_t dst_size,
+                          mm_array_ptr<const uint8_t> __restrict src, size_t src_size,
+                          mm_array_ptr<void> __restrict work);
 size_t lzvn_decode_buffer(void *__restrict dst, size_t dst_size,
                           const void *__restrict src, size_t src_size);
 

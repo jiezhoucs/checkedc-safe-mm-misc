@@ -47,10 +47,8 @@ size_t lzfse_encode_buffer_with_scratch(mm_array_ptr<uint8_t> __restrict dst_buf
     if (dst_size <= extra_size)
       goto try_uncompressed; // DST is really too small, give up
 
-    // TODO
-    size_t sz = lzvn_encode_buffer(
-        _GETARRAYPTR(uint8_t, dst_buffer + sizeof(lzvn_compressed_block_header)),
-        dst_size - extra_size, _GETARRAYPTR(uint8_t, src_buffer), src_size, _GETARRAYPTR(void, scratch_buffer));
+    size_t sz = lzvn_encode_buffer( dst_buffer + sizeof(lzvn_compressed_block_header),
+        dst_size - extra_size, src_buffer, src_size, scratch_buffer);
     if (sz == 0 || sz >= src_size)
       goto try_uncompressed; // failed, or no compression, fall back to
                              // uncompressed block
@@ -70,7 +68,6 @@ size_t lzfse_encode_buffer_with_scratch(mm_array_ptr<uint8_t> __restrict dst_buf
 
   // Try encoding with LZFSE
   {
-    /* lzfse_encoder_state *state = scratch_buffer; */
     mm_ptr<lzfse_encoder_state> state = (mm_ptr<lzfse_encoder_state>)scratch_buffer;
     memset(_GETPTR(lzfse_encoder_state, state), 0x00, sizeof(lzfse_encoder_state));
     // TODO
