@@ -87,8 +87,7 @@ size_t lzfse_encode_buffer_with_scratch(mm_array_ptr<uint8_t> __restrict dst_buf
       //  The first chunk, we just process normally.
       const lzfse_offset encoder_block_size = 262144;
       state->src_end = encoder_block_size;
-      // TODO
-      if (lzfse_encode_base(_GETPTR(lzfse_encoder_state, state)) != LZFSE_STATUS_OK)
+      if (lzfse_encode_base(state) != LZFSE_STATUS_OK)
         goto try_uncompressed;
       src_size -= encoder_block_size;
       while (src_size >= encoder_block_size) {
@@ -98,11 +97,9 @@ size_t lzfse_encode_buffer_with_scratch(mm_array_ptr<uint8_t> __restrict dst_buf
         //  offsets remain positive (as opposed to resetting to zero and
         //  having negative offsets).
         state->src_end = 2 * encoder_block_size;
-        // TODO
-        if (lzfse_encode_base(_GETPTR(lzfse_encoder_state, state)) != LZFSE_STATUS_OK)
+        if (lzfse_encode_base(state) != LZFSE_STATUS_OK)
           goto try_uncompressed;
-        // TODO
-        lzfse_encode_translate(_GETPTR(lzfse_encoder_state, state), encoder_block_size);
+        lzfse_encode_translate(state, encoder_block_size);
         src_size -= encoder_block_size;
       }
       //  Set the end for the final chunk.
@@ -114,11 +111,9 @@ size_t lzfse_encode_buffer_with_scratch(mm_array_ptr<uint8_t> __restrict dst_buf
       state->src_end = (lzfse_offset)src_size;
     //  This is either the trailing chunk (if the source file is huge), or
     //  the whole source file.
-    // TODO
-    if (lzfse_encode_base(_GETPTR(lzfse_encoder_state, state)) != LZFSE_STATUS_OK)
+    if (lzfse_encode_base(state) != LZFSE_STATUS_OK)
       goto try_uncompressed;
-    // TODO
-    if (lzfse_encode_finish(_GETPTR(lzfse_encoder_state, state)) != LZFSE_STATUS_OK)
+    if (lzfse_encode_finish(state) != LZFSE_STATUS_OK)
       goto try_uncompressed;
     //  No error occured, return compressed size.
     return state->dst - dst_buffer;

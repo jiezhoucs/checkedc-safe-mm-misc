@@ -388,9 +388,9 @@ typedef struct {
 // MARK: - LZFSE encode/decode interfaces
 
 int lzfse_encode_init(mm_ptr<lzfse_encoder_state> s);
-int lzfse_encode_translate(lzfse_encoder_state *s, lzfse_offset delta);
-int lzfse_encode_base(lzfse_encoder_state *s);
-int lzfse_encode_finish(lzfse_encoder_state *s);
+int lzfse_encode_translate(mm_ptr<lzfse_encoder_state> s, lzfse_offset delta);
+int lzfse_encode_base(mm_ptr<lzfse_encoder_state> s);
+int lzfse_encode_finish(mm_ptr<lzfse_encoder_state> s);
 int lzfse_decode(lzfse_decoder_state *s);
 
 // MARK: - LZVN encode/decode interfaces

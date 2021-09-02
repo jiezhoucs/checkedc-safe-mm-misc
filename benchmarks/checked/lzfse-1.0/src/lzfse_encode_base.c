@@ -43,7 +43,7 @@ static inline uint64_t setField(uint32_t v, int offset, int nbits) {
  * lzfse_compressed_block_header_v1 to a lzfse_compressed_block_header_v2.
  * All but the header_size and freq fields of the output are modified. */
 static inline void
-lzfse_encode_v1_state(lzfse_compressed_block_header_v2 *out,
+lzfse_encode_v1_state(mm_ptr<lzfse_compressed_block_header_v2> out,
                       const lzfse_compressed_block_header_v1 *in) {
   out->magic = LZFSE_COMPRESSEDV2_BLOCK_MAGIC;
   out->n_raw_bytes = in->n_raw_bytes;
@@ -112,14 +112,14 @@ static inline uint32_t lzfse_encode_v1_freq_value(int value, int *nbits) {
  * Only the header_size and freq fields of the output are modified.
  * @return Size of the lzfse_compressed_block_header_v2 */
 static inline size_t
-lzfse_encode_v1_freq_table(lzfse_compressed_block_header_v2 *out,
+lzfse_encode_v1_freq_table(mm_ptr<lzfse_compressed_block_header_v2> out,
                            const lzfse_compressed_block_header_v1 *in) {
   uint32_t accum = 0;
   int accum_nbits = 0;
   const uint16_t *src = &(in->l_freq[0]); // first value of first table (struct
                                           // will not be modified, so this code
                                           // will remain valid)
-  uint8_t *dst = &(out->freq[0]);
+  mm_array_ptr<uint8_t> dst = mmptr_to_mmarrayptr<uint8_t>(&(out->freq[0]));
   for (int i = 0; i < LZFSE_ENCODE_L_SYMBOLS + LZFSE_ENCODE_M_SYMBOLS +
                           LZFSE_ENCODE_D_SYMBOLS + LZFSE_ENCODE_LITERAL_SYMBOLS;
        i++) {
@@ -145,7 +145,7 @@ lzfse_encode_v1_freq_table(lzfse_compressed_block_header_v2 *out,
   }
 
   // Return final size of out
-  uint32_t header_size = (uint32_t)(dst - (uint8_t *)out);
+  uint32_t header_size = (uint32_t)(dst - (mm_array_ptr<uint8_t>)out);
   out->packed_fields[0] = 0;
   out->packed_fields[1] = 0;
   out->packed_fields[2] = setField(header_size, 0, 32);
@@ -168,7 +168,7 @@ lzfse_encode_v1_freq_table(lzfse_compressed_block_header_v2 *out,
  * @return LZFSE_STATUS_OK on success.
  * @return LZFSE_STATUS_DST_FULL and restore initial state if output buffer is
  * full. */
-static int lzfse_encode_matches(lzfse_encoder_state *s) {
+static int lzfse_encode_matches(mm_ptr<lzfse_encoder_state> s) {
   if (s->n_literals == 0 && s->n_matches == 0)
     return LZFSE_STATUS_OK; // nothing to store, OK
 
@@ -182,7 +182,7 @@ static int lzfse_encode_matches(lzfse_encoder_state *s) {
   fse_encoder_entry literal_encoder[LZFSE_ENCODE_LITERAL_SYMBOLS];
   int ok = 1;
   lzfse_compressed_block_header_v1 header1 = {0};
-  lzfse_compressed_block_header_v2 *header2 = 0;
+  mm_ptr<lzfse_compressed_block_header_v2> header2 = NULL;
 
   // Keep initial state to be able to restore it if DST full
   mm_array_ptr<uint8_t> dst0 = s->dst;
@@ -234,7 +234,7 @@ static int lzfse_encode_matches(lzfse_encoder_state *s) {
     ok = 0;
     goto END;
   }
-  header2 = (lzfse_compressed_block_header_v2 *)(s->dst);
+  header2 = (mm_ptr<lzfse_compressed_block_header_v2>)(s->dst);
 
   // Setup header V1
   header1.magic = LZFSE_COMPRESSEDV1_BLOCK_MAGIC;
@@ -422,7 +422,7 @@ END:
  * @return LZFSE_STATUS_OK if OK.
  * @return LZFSE_STATUS_DST_FULL if the match can't be pushed, meaning one of
  * the buffers is full. In that case the state is not modified. */
-static inline int lzfse_push_lmd(lzfse_encoder_state *s, uint32_t L,
+static inline int lzfse_push_lmd(mm_ptr<lzfse_encoder_state> s, uint32_t L,
                                  uint32_t M, uint32_t D) {
   // Check if we have enough space to push the match (we add some margin to copy
   // literals faster here, and round final count later)
@@ -438,19 +438,20 @@ static inline int lzfse_push_lmd(lzfse_encoder_state *s, uint32_t L,
   s->d_values[n] = D;
 
   // Store literals
-  uint8_t *dst = s->literals + s->n_literals;
+  mm_array_ptr<uint8_t> dst =
+      mmptr_to_mmarrayptr<uint8_t>(&s->literals[0]) + s->n_literals;
   mm_array_ptr<const uint8_t> src = s->src + s->src_literal;
-  uint8_t *dst_end = dst + L;
+  mm_array_ptr<uint8_t> dst_end = dst + L;
   if (s->src_literal + L + 16 > s->src_end) {
     // Careful at the end of SRC, we can't read 16 bytes
     if (L > 0)
-      memcpy(dst, _GETARRAYPTR(const uint8_t, src), L);
+      memcpy(_GETARRAYPTR(uint8_t, dst), _GETARRAYPTR(const uint8_t, src), L);
   } else {
-    copy16(dst, _GETARRAYPTR(const uint8_t, src));
+    copy16(_GETARRAYPTR(uint8_t, dst), _GETARRAYPTR(const uint8_t, src));
     dst += 16;
     src += 16;
     while (dst < dst_end) {
-      copy16(dst, _GETARRAYPTR(const uint8_t, src));
+      copy16(_GETARRAYPTR(uint8_t, dst), _GETARRAYPTR(const uint8_t, src));
       dst += 16;
       src += 16;
     }
@@ -467,7 +468,8 @@ static inline int lzfse_push_lmd(lzfse_encoder_state *s, uint32_t L,
  * @return LZFSE_STATUS_OK if OK.
  * @return LZFSE_STATUS_DST_FULL if the match can't be pushed, meaning one of the
  * buffers is full. In that case the state is not modified. */
-static int lzfse_push_match(lzfse_encoder_state *s, const lzfse_match *match) {
+static int lzfse_push_match(mm_ptr<lzfse_encoder_state> s,
+                            mm_ptr<const lzfse_match> match) {
   // Save the initial n_matches, n_literals, src_literal
   uint32_t n_matches0 = s->n_matches;
   uint32_t n_literals0 = s->n_literals;
@@ -527,8 +529,8 @@ END:
  * @return LZFSE_STATUS_OK if OK.
  * @return LZFSE_STATUS_DST_FULL if the match can't be added, meaning one of the
  * buffers is full. In that case the state is not modified. */
-static int lzfse_backend_match(lzfse_encoder_state *s,
-                               const lzfse_match *match) {
+static int lzfse_backend_match(mm_ptr<lzfse_encoder_state> s,
+                               mm_ptr<const lzfse_match> match) {
   // Try to push the match in state
   if (lzfse_push_match(s, match) == LZFSE_STATUS_OK)
     return LZFSE_STATUS_OK; // OK, match added to state
@@ -546,7 +548,7 @@ static int lzfse_backend_match(lzfse_encoder_state *s,
  * @return LZFSE_STATUS_OK if OK.
  * @return LZFSE_STATUS_DST_FULL if the literals can't be added, meaning one of
  * the buffers is full. In that case the state is not modified. */
-static int lzfse_backend_literals(lzfse_encoder_state *s, lzfse_offset L) {
+static int lzfse_backend_literals(mm_ptr<lzfse_encoder_state> s, lzfse_offset L) {
   // Create a fake match with M=0, D=1
   lzfse_match match;
   lzfse_offset pos = s->src_literal + L;
@@ -561,7 +563,7 @@ static int lzfse_backend_literals(lzfse_encoder_state *s, lzfse_offset L) {
  * @return LZFSE_STATUS_DST_FULL if either the final block, or the end-of-stream
  * can't be added, meaning one of the buffers is full. If the block was emitted,
  * the state is updated to reflect this. Otherwise, it is left unchanged. */
-static int lzfse_backend_end_of_stream(lzfse_encoder_state *s) {
+static int lzfse_backend_end_of_stream(mm_ptr<lzfse_encoder_state> s) {
   // Final match triggers write, otherwise emit blocks when we have enough
   // matches stored
   if (lzfse_encode_matches(s) != LZFSE_STATUS_OK)
@@ -606,7 +608,7 @@ int lzfse_encode_init(mm_ptr<lzfse_encoder_state> s) {
 /*! @abstract Translate state \p src forward by \p delta > 0.
  * Offsets in \p src are updated backwards to point to the same positions.
  * @return  LZFSE_STATUS_OK */
-int lzfse_encode_translate(lzfse_encoder_state *s, lzfse_offset delta) {
+int lzfse_encode_translate(mm_ptr<lzfse_encoder_state> s, lzfse_offset delta) {
   assert(delta >= 0);
   if (delta == 0)
     return LZFSE_STATUS_OK; // OK
@@ -627,7 +629,7 @@ int lzfse_encode_translate(lzfse_encoder_state *s, lzfse_offset delta) {
   // history_table positions, translated, and clamped to invalid pos
   int32_t invalidPos = -4 * LZFSE_ENCODE_MAX_D_VALUE;
   for (int i = 0; i < LZFSE_ENCODE_HASH_VALUES; i++) {
-    int32_t *p = &(s->history_table[i].pos[0]);
+    mm_array_ptr<int32_t> p = mmptr_to_mmarrayptr<int32_t>(&(s->history_table[i].pos[0]));
     for (int j = 0; j < LZFSE_ENCODE_HASH_WIDTH; j++) {
       lzfse_offset newPos = p[j] - delta; // translate
       p[j] = (int32_t)((newPos < invalidPos) ? invalidPos : newPos); // clamp
@@ -640,9 +642,10 @@ int lzfse_encode_translate(lzfse_encoder_state *s, lzfse_offset delta) {
 // ===============================================================
 // Encoder front end
 
-int lzfse_encode_base(lzfse_encoder_state *s) {
-  lzfse_history_set *history_table = s->history_table;
-  lzfse_history_set *hashLine = 0;
+int lzfse_encode_base(mm_ptr<lzfse_encoder_state> s) {
+  mm_array_ptr<lzfse_history_set> history_table =
+      mmptr_to_mmarrayptr<lzfse_history_set>(&s->history_table[0]);
+  mm_array_ptr<lzfse_history_set> hashLine = NULL;
   lzfse_history_set newH;
   const lzfse_match NO_MATCH = {0};
   int ok = 1;
@@ -806,7 +809,7 @@ END:
   return ok ? LZFSE_STATUS_OK : LZFSE_STATUS_DST_FULL;
 }
 
-int lzfse_encode_finish(lzfse_encoder_state *s) {
+int lzfse_encode_finish(mm_ptr<lzfse_encoder_state> s) {
   const lzfse_match NO_MATCH = {0};
 
   // Emit pending match
