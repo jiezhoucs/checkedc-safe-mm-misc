@@ -34,17 +34,17 @@ typedef struct {
   // Decoder I/O
 
   // Next byte to read in source buffer
-  const unsigned char *src;
+  mm_array_ptr<const unsigned char> src;
   // Next byte after source buffer
-  const unsigned char *src_end;
+  mm_array_ptr<const unsigned char> src_end;
 
   // Next byte to write in destination buffer (by decoder)
-  unsigned char *dst;
+  mm_array_ptr<unsigned char> dst;
   // Valid range for destination buffer is [dst_begin, dst_end - 1]
-  unsigned char *dst_begin;
-  unsigned char *dst_end;
+  mm_array_ptr<unsigned char> dst_begin;
+  mm_array_ptr<unsigned char> dst_end;
   // Next byte to read in destination buffer (modified by caller)
-  unsigned char *dst_current;
+  mm_array_ptr<unsigned char> dst_current;
 
   // Decoder state
 

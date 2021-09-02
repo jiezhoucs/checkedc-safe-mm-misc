@@ -212,7 +212,7 @@ typedef struct {
   //  Number of bytes used to encode L, M, D triplets for the block.
   uint32_t n_lmd_payload_bytes;
   //  Pointer to the next literal to emit.
-  const uint8_t *current_literal;
+  mm_array_ptr<const uint8_t> current_literal;
   //  L, M, D triplet for the match currently being emitted. This is used only
   //  if we need to restart after reaching the end of the destination buffer in
   //  the middle of a literal or match.
@@ -251,18 +251,18 @@ typedef struct {
 typedef struct {
   //  Pointer to next byte to read from source buffer (this is advanced as we
   //  decode; src_begin describe the buffer and do not change).
-  const uint8_t *src;
+  mm_array_ptr<const uint8_t> src;
   //  Pointer to first byte of source buffer.
-  const uint8_t *src_begin;
+  mm_array_ptr<const uint8_t> src_begin;
   //  Pointer to one byte past the end of the source buffer.
-  const uint8_t *src_end;
+  mm_array_ptr<const uint8_t> src_end;
   //  Pointer to the next byte to write to destination buffer (this is advanced
   //  as we decode; dst_begin and dst_end describe the buffer and do not change).
-  uint8_t *dst;
+  mm_array_ptr<uint8_t> dst;
   //  Pointer to first byte of destination buffer.
-  uint8_t *dst_begin;
+  mm_array_ptr<uint8_t> dst_begin;
   //  Pointer to one byte past the end of the destination buffer.
-  uint8_t *dst_end;
+  mm_array_ptr<uint8_t> dst_end;
   //  1 if we have reached the end of the stream, 0 otherwise.
   int end_of_stream;
   //  magic number of the current block if we are within a block,
@@ -391,7 +391,7 @@ int lzfse_encode_init(mm_ptr<lzfse_encoder_state> s);
 int lzfse_encode_translate(mm_ptr<lzfse_encoder_state> s, lzfse_offset delta);
 int lzfse_encode_base(mm_ptr<lzfse_encoder_state> s);
 int lzfse_encode_finish(mm_ptr<lzfse_encoder_state> s);
-int lzfse_decode(lzfse_decoder_state *s);
+int lzfse_decode(mm_ptr<lzfse_decoder_state> s);
 
 // MARK: - LZVN encode/decode interfaces
 

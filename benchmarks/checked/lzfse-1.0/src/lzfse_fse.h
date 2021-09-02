@@ -300,19 +300,19 @@ FSE_INLINE void fse_out_push32(fse_out_stream32 *s, fse_bit_count n,
  *  operations. This is why we have the special case for n == 0 (in which case
  *  we want to load only 7 bytes instead of 8). */
 FSE_INLINE int fse_in_checked_init64(fse_in_stream64 *s, fse_bit_count n,
-                                     const uint8_t **pbuf,
-                                     const uint8_t *buf_start) {
+                                     mm_array_ptr<const uint8_t> *pbuf,
+                                     mm_array_ptr<const uint8_t> buf_start) {
   if (n) {
     if (*pbuf < buf_start + 8)
       return -1; // out of range
     *pbuf -= 8;
-    memcpy(&(s->accum), *pbuf, 8);
+    memcpy(&(s->accum), _GETARRAYPTR(const uint8_t, *pbuf), 8);
     s->accum_nbits = n + 64;
   } else {
     if (*pbuf < buf_start + 7)
       return -1; // out of range
     *pbuf -= 7;
-    memcpy(&(s->accum), *pbuf, 7);
+    memcpy(&(s->accum), _GETARRAYPTR(const uint8_t, *pbuf), 7);
     s->accum &= 0xffffffffffffff;
     s->accum_nbits = n + 56;
   }
@@ -360,18 +360,18 @@ FSE_INLINE int fse_in_checked_init32(fse_in_stream32 *s, fse_bit_count n,
  * checking the new value of \c *pbuf remains >= \c buf_start.
  * @return 0 if OK.
  * @return -1 on failure. */
-FSE_INLINE int fse_in_checked_flush64(fse_in_stream64 *s, const uint8_t **pbuf,
-                                      const uint8_t *buf_start) {
+FSE_INLINE int fse_in_checked_flush64(fse_in_stream64 *s, mm_array_ptr<const uint8_t> *pbuf,
+                                      mm_array_ptr<const uint8_t> buf_start) {
   //  Get number of bits to add to bring us into the desired range.
   fse_bit_count nbits = (63 - s->accum_nbits) & -8;
   //  Convert bits to bytes and decrement buffer address, then load new data.
-  const uint8_t *buf = (*pbuf) - (nbits >> 3);
+  mm_array_ptr<const uint8_t> buf = (*pbuf) - (nbits >> 3);
   if (buf < buf_start) {
     return -1; // out of range
   }
   *pbuf = buf;
   uint64_t incoming;
-  memcpy(&incoming, buf, 8);
+  memcpy(&incoming, _GETARRAYPTR(uint8_t, buf), 8);
   // Update the state object and verify its validity (in DEBUG).
   s->accum = (s->accum << nbits) | fse_mask_lsb64(incoming, nbits);
   s->accum_nbits += nbits;
@@ -381,21 +381,21 @@ FSE_INLINE int fse_in_checked_flush64(fse_in_stream64 *s, const uint8_t **pbuf,
 
 /*! @abstract Identical to previous function (but again, we're only filling
  * a 32-bit field with between 24 and 31 bits). */
-FSE_INLINE int fse_in_checked_flush32(fse_in_stream32 *s, const uint8_t **pbuf,
-                                      const uint8_t *buf_start) {
+FSE_INLINE int fse_in_checked_flush32(fse_in_stream32 *s, mm_array_ptr<const uint8_t> *pbuf,
+                                      mm_array_ptr<const uint8_t> buf_start) {
   //  Get number of bits to add to bring us into the desired range.
   fse_bit_count nbits = (31 - s->accum_nbits) & -8;
 
   if (nbits > 0) {
     //  Convert bits to bytes and decrement buffer address, then load new data.
-    const uint8_t *buf = (*pbuf) - (nbits >> 3);
+    mm_array_ptr<const uint8_t> buf = (*pbuf) - (nbits >> 3);
     if (buf < buf_start) {
       return -1; // out of range
     }
 
     *pbuf = buf;
 
-    uint32_t incoming = *((uint32_t *)buf);
+    uint32_t incoming = *((mm_array_ptr<uint32_t>)buf);
 
     // Update the state object and verify its validity (in DEBUG).
     s->accum = (s->accum << nbits) | fse_mask_lsb32(incoming, nbits);
@@ -522,7 +522,7 @@ FSE_INLINE void fse_encode(fse_state *__restrict pstate,
  *  @note The caller must ensure we have enough bits available in the input
  *  stream accumulator. */
 FSE_INLINE uint8_t fse_decode(fse_state *__restrict pstate,
-                              const int32_t *__restrict decoder_table,
+                              mm_array_ptr<const int32_t> __restrict decoder_table,
                               fse_in_stream *__restrict in) {
   int32_t e = decoder_table[*pstate];
 

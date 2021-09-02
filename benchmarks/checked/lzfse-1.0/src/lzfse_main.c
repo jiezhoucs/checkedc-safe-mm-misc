@@ -259,12 +259,10 @@ int main(int argc, char **argv) {
 
   double c0 = get_time();
   while (1) {
-      // TODO: lzfse_decode_buffer
     if (op == LZFSE_ENCODE)
       out_size = lzfse_encode_buffer(out, out_allocated, in, in_size, aux);
     else
-      out_size = lzfse_decode_buffer(_GETARRAYPTR(uint8_t, out), out_allocated,
-              _GETARRAYPTR(uint8_t, in), in_size, _GETARRAYPTR(void, aux));
+      out_size = lzfse_decode_buffer(out, out_allocated, in, in_size, aux);
 
     // If output buffer was too small, grow and retry.
     if (out_size == 0 || (op == LZFSE_DECODE && out_size == out_allocated)) {

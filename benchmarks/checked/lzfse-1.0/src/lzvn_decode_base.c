@@ -86,8 +86,8 @@ void lzvn_decode(lzvn_decoder_state *state) {
   if (src_len == 0 || dst_len == 0)
     return; // empty buffer
 
-  const unsigned char *src_ptr = state->src;
-  unsigned char *dst_ptr = state->dst;
+  mm_array_ptr<const unsigned char> src_ptr = state->src;
+  mm_array_ptr<unsigned char> dst_ptr = state->dst;
   size_t D = state->d_prev;
   size_t M;
   size_t L;
@@ -314,7 +314,7 @@ med_d:
   L = (size_t)extract(opc, 3, 2);
   if (src_len <= opc_len + L)
     return; // source truncated
-  uint16_t opc23 = load2(&src_ptr[1]);
+  uint16_t opc23 = load2(_GETPTR(unsigned char, &src_ptr[1]));
   M = (size_t)((extract(opc, 0, 3) << 2 | extract(opc23, 0, 2)) + 3);
   D = (size_t)extract(opc23, 2, 14);
   goto copy_literal_and_match;
@@ -352,7 +352,7 @@ lrg_d:
   M = (size_t)extract(opc, 3, 3) + 3;
   if (src_len <= opc_len + L)
     return; // source truncated
-  D = load2(&src_ptr[1]);
+  D = load2(_GETPTR(unsigned char, &src_ptr[1]));
   goto copy_literal_and_match;
 
 pre_d:
@@ -395,7 +395,7 @@ copy_literal_and_match:
     //  The literal is 0-3 bytes; if we are not near the end of the buffer,
     //  we can safely just do a 4 byte copy (which is guaranteed to cover
     //  the complete literal, and may include some other bytes as well).
-    store4(dst_ptr, load4(src_ptr));
+    store4(_GETARRAYPTR(unsigned char, dst_ptr), load4(_GETARRAYPTR(unsigned char, src_ptr)));
   } else if (L <= dst_len) {
     //  We are too close to the end of either the input or output stream
     //  to be able to safely use a four-byte copy, but we will not exhaust
@@ -449,7 +449,8 @@ copy_match:
     //  the match, but this is OK because we know we have a safety bound
     //  away from the end of the destination buffer.
     for (size_t i = 0; i < M; i += 8)
-      store8(&dst_ptr[i], load8(&dst_ptr[i - D]));
+      store8(_GETPTR(unsigned char, &dst_ptr[i]),
+          load8(_GETPTR(unsigned char, &dst_ptr[i - D])));
   } else if (M <= dst_len) {
     //  Either the match distance is too small, or we are too close to
     //  the end of the buffer to safely use eight byte copies. Fall back
@@ -594,7 +595,8 @@ copy_literal:
     //  we can safely copy the literal using wide copies, without worrying
     //  about reading or writing past the end of either buffer.
     for (size_t i = 0; i < L; i += 8)
-      store8(&dst_ptr[i], load8(&src_ptr[i]));
+      store8(_GETPTR(unsigned char, &dst_ptr[i]),
+          load8(_GETPTR(unsigned char, &src_ptr[i])));
   } else if (L <= dst_len) {
     //  We are too close to the end of either the input or output stream
     //  to be able to safely use an eight-byte copy. Instead we copy the

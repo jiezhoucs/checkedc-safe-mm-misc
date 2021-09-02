@@ -153,16 +153,16 @@ static inline void copy(uint8_t *dst, const uint8_t *src, size_t length) {
   } while (dst < dst_end);
 }
 
-static int lzfse_decode_lmd(lzfse_decoder_state *s) {
-  lzfse_compressed_block_decoder_state *bs = &(s->compressed_lzfse_block_state);
+static int lzfse_decode_lmd(mm_ptr<lzfse_decoder_state> s) {
+  mm_ptr<lzfse_compressed_block_decoder_state> bs = &(s->compressed_lzfse_block_state);
   fse_state l_state = bs->l_state;
   fse_state m_state = bs->m_state;
   fse_state d_state = bs->d_state;
   fse_in_stream in = bs->lmd_in_stream;
-  const uint8_t *src_start = s->src_begin;
-  const uint8_t *src = s->src + bs->lmd_in_buf;
-  const uint8_t *lit = bs->current_literal;
-  uint8_t *dst = s->dst;
+  mm_array_ptr<const uint8_t> src_start = s->src_begin;
+  mm_array_ptr<const uint8_t> src = s->src + bs->lmd_in_buf;
+  mm_array_ptr<const uint8_t> lit = bs->current_literal;
+  mm_array_ptr<uint8_t> dst = mmptr_to_mmarrayptr<uint8_t>(&s->dst[0]);
   uint32_t symbols = bs->n_matches;
   int32_t L = bs->l_value;
   int32_t M = bs->m_value;
@@ -196,7 +196,8 @@ static int lzfse_decode_lmd(lzfse_decoder_state *s) {
     }
     L = fse_value_decode(&l_state, bs->l_decoder, &in);
     assert(l_state < LZFSE_ENCODE_L_STATES);
-    if ((lit + L) >= (bs->literals + LZFSE_LITERALS_PER_BLOCK + 64)) {
+    if ((lit + L) >= (mmptr_to_mmarrayptr<const uint8_t>(&bs->literals[0]) +
+                      LZFSE_LITERALS_PER_BLOCK + 64)) {
       return LZFSE_STATUS_ERROR;
     }
     res = fse_in_flush2(&in, &src, src_start);
@@ -226,7 +227,7 @@ static int lzfse_decode_lmd(lzfse_decoder_state *s) {
       //  and match with 16- and 32-byte operations, without worrying
       //  about writing off the end of the buffer.
       remaining_bytes -= L + M;
-      copy(dst, lit, L);
+      copy(_GETARRAYPTR(uint8_t, dst), _GETARRAYPTR(uint8_t, lit), L);
       dst += L;
       lit += L;
       //  For the match, we have two paths; a fast copy by 16-bytes if
@@ -235,7 +236,7 @@ static int lzfse_decode_lmd(lzfse_decoder_state *s) {
       //  possible overlap between source and destination if the distance
       //  is small.
       if (D >= 8 || D >= M)
-        copy(dst, dst - D, M);
+        copy(_GETARRAYPTR(uint8_t, dst), _GETARRAYPTR(uint8_t, dst - D), M);
       else
         for (size_t i = 0; i < M; i++)
           dst[i] = dst[i - D];
@@ -329,7 +330,7 @@ static int lzfse_decode_lmd(lzfse_decoder_state *s) {
   return LZFSE_STATUS_OK;
 }
 
-int lzfse_decode(lzfse_decoder_state *s) {
+int lzfse_decode(mm_ptr<lzfse_decoder_state> s) {
   while (1) {
     // Are we inside a block?
     switch (s->block_magic) {
@@ -337,7 +338,7 @@ int lzfse_decode(lzfse_decoder_state *s) {
       // We need at least 4 bytes of magic number to identify next block
       if (s->src + 4 > s->src_end)
         return LZFSE_STATUS_SRC_EMPTY; // SRC truncated
-      uint32_t magic = load4(s->src);
+      uint32_t magic = load4(_GETARRAYPTR(const uint8_t, s->src));
 
       if (magic == LZFSE_ENDOFSTREAM_BLOCK_MAGIC) {
         s->src += 4;
@@ -349,9 +350,9 @@ int lzfse_decode(lzfse_decoder_state *s) {
         if (s->src + sizeof(uncompressed_block_header) > s->src_end)
           return LZFSE_STATUS_SRC_EMPTY; // SRC truncated
         // Setup state for uncompressed block
-        uncompressed_block_decoder_state *bs = &(s->uncompressed_block_state);
+        mm_ptr<uncompressed_block_decoder_state> bs = &(s->uncompressed_block_state);
         bs->n_raw_bytes =
-            load4(s->src + offsetof(uncompressed_block_header, n_raw_bytes));
+            load4(_GETARRAYPTR(uint8_t, s->src + offsetof(uncompressed_block_header, n_raw_bytes)));
         s->src += sizeof(uncompressed_block_header);
         s->block_magic = magic;
         break;
@@ -361,12 +362,12 @@ int lzfse_decode(lzfse_decoder_state *s) {
         if (s->src + sizeof(lzvn_compressed_block_header) > s->src_end)
           return LZFSE_STATUS_SRC_EMPTY; // SRC truncated
         // Setup state for compressed LZVN block
-        lzvn_compressed_block_decoder_state *bs =
+        mm_ptr<lzvn_compressed_block_decoder_state> bs =
             &(s->compressed_lzvn_block_state);
-        bs->n_raw_bytes =
-            load4(s->src + offsetof(lzvn_compressed_block_header, n_raw_bytes));
-        bs->n_payload_bytes = load4(
-            s->src + offsetof(lzvn_compressed_block_header, n_payload_bytes));
+        bs->n_raw_bytes = load4(_GETARRAYPTR(uint8_t,
+              s->src + offsetof(lzvn_compressed_block_header, n_raw_bytes)));
+        bs->n_payload_bytes = load4(_GETARRAYPTR(uint8_t,
+            s->src + offsetof(lzvn_compressed_block_header, n_payload_bytes)));
         bs->d_prev = 0;
         s->src += sizeof(lzvn_compressed_block_header);
         s->block_magic = magic;
@@ -396,7 +397,8 @@ int lzfse_decode(lzfse_decoder_state *s) {
         } else {
           if (s->src + sizeof(lzfse_compressed_block_header_v1) > s->src_end)
             return LZFSE_STATUS_SRC_EMPTY; // SRC truncated
-          memcpy(&header1, s->src, sizeof(lzfse_compressed_block_header_v1));
+          memcpy(&header1, _GETARRAYPTR(uint8_t, s->src),
+              sizeof(lzfse_compressed_block_header_v1));
           header_size = sizeof(lzfse_compressed_block_header_v1);
         }
 
@@ -420,7 +422,7 @@ int lzfse_decode(lzfse_decoder_state *s) {
         s->src += header_size;
 
         // Setup state for compressed V1 block from header
-        lzfse_compressed_block_decoder_state *bs =
+        mm_ptr<lzfse_compressed_block_decoder_state> bs =
             &(s->compressed_lzfse_block_state);
         bs->n_lmd_payload_bytes = header1.n_lmd_payload_bytes;
         bs->n_matches = header1.n_matches;
@@ -440,9 +442,11 @@ int lzfse_decode(lzfse_decoder_state *s) {
         // Decode literals
         {
           fse_in_stream in;
-          const uint8_t *buf_start = s->src_begin;
+          mm_array_ptr<const uint8_t> buf_start =
+            mmptr_to_mmarrayptr<const uint8_t>(&s->src_begin[0]);
           s->src += header1.n_literal_payload_bytes; // skip literal payload
-          const uint8_t *buf = s->src; // read bits backwards from the end
+          mm_array_ptr<const uint8_t> buf =
+            mmptr_to_mmarrayptr<const uint8_t>(&s->src[0]); // read bits backwards from the end
           if (fse_in_init(&in, header1.literal_bits, &buf, buf_start) != 0)
             return LZFSE_STATUS_ERROR;
 
@@ -451,36 +455,38 @@ int lzfse_decode(lzfse_decoder_state *s) {
           fse_state state2 = header1.literal_state[2];
           fse_state state3 = header1.literal_state[3];
 
+          mm_array_ptr<int32_t> literal_decoder =
+              mmptr_to_mmarrayptr<int32_t>(&bs->literal_decoder[0]);
           for (uint32_t i = 0; i < header1.n_literals; i += 4) // n_literals is multiple of 4
           {
 #if FSE_IOSTREAM_64
             if (fse_in_flush(&in, &buf, buf_start) != 0)
               return LZFSE_STATUS_ERROR; // [57, 64] bits
             bs->literals[i + 0] =
-                fse_decode(&state0, bs->literal_decoder, &in); // 10b max
+                fse_decode(&state0, literal_decoder, &in); // 10b max
             bs->literals[i + 1] =
-                fse_decode(&state1, bs->literal_decoder, &in); // 10b max
+                fse_decode(&state1, literal_decoder, &in); // 10b max
             bs->literals[i + 2] =
-                fse_decode(&state2, bs->literal_decoder, &in); // 10b max
+                fse_decode(&state2, literal_decoder, &in); // 10b max
             bs->literals[i + 3] =
-                fse_decode(&state3, bs->literal_decoder, &in); // 10b max
+                fse_decode(&state3, literal_decoder, &in); // 10b max
 #else
             if (fse_in_flush(&in, &buf, buf_start) != 0)
               return LZFSE_STATUS_ERROR; // [25, 23] bits
             bs->literals[i + 0] =
-                fse_decode(&state0, bs->literal_decoder, &in); // 10b max
+                fse_decode(&state0, literal_decoder, &in); // 10b max
             bs->literals[i + 1] =
-                fse_decode(&state1, bs->literal_decoder, &in); // 10b max
+                fse_decode(&state1, literal_decoder, &in); // 10b max
             if (fse_in_flush(&in, &buf, buf_start) != 0)
               return LZFSE_STATUS_ERROR; // [25, 23] bits
             bs->literals[i + 2] =
-                fse_decode(&state2, bs->literal_decoder, &in); // 10b max
+                fse_decode(&state2, literal_decoder, &in); // 10b max
             bs->literals[i + 3] =
-                fse_decode(&state3, bs->literal_decoder, &in); // 10b max
+                fse_decode(&state3, literal_decoder, &in); // 10b max
 #endif
           }
 
-          bs->current_literal = bs->literals;
+          bs->current_literal = mmptr_to_mmarrayptr<uint8_t>(&bs->literals[0]);
         } // literals
 
         // SRC is not incremented to skip the LMD payload, since we need it
@@ -492,7 +498,7 @@ int lzfse_decode(lzfse_decoder_state *s) {
         {
           fse_in_stream in;
           // read bits backwards from the end
-          const uint8_t *buf = s->src + header1.n_lmd_payload_bytes;
+          mm_array_ptr<const uint8_t> buf = s->src + header1.n_lmd_payload_bytes;
           if (fse_in_init(&in, header1.lmd_bits, &buf, s->src) != 0)
             return LZFSE_STATUS_ERROR;
 
@@ -516,7 +522,7 @@ int lzfse_decode(lzfse_decoder_state *s) {
     } // LZFSE_NO_BLOCK_MAGIC
 
     case LZFSE_UNCOMPRESSED_BLOCK_MAGIC: {
-      uncompressed_block_decoder_state *bs = &(s->uncompressed_block_state);
+      mm_ptr<uncompressed_block_decoder_state> bs = &(s->uncompressed_block_state);
 
       //  Compute the size (in bytes) of the data that we will actually copy.
       //  This size is minimum(bs->n_raw_bytes, space in src, space in dst).
@@ -542,7 +548,7 @@ int lzfse_decode(lzfse_decoder_state *s) {
       // Now that we know that the copy size is bounded to the source and
       // dest buffers, go ahead and copy the data.
       // We always have copy_size > 0 here
-      memcpy(s->dst, s->src, copy_size);
+      memcpy(_GETARRAYPTR(uint8_t, s->dst), _GETARRAYPTR(uint8_t, s->src), copy_size);
       s->src += copy_size;
       s->dst += copy_size;
       bs->n_raw_bytes -= copy_size;
@@ -552,7 +558,7 @@ int lzfse_decode(lzfse_decoder_state *s) {
 
     case LZFSE_COMPRESSEDV1_BLOCK_MAGIC:
     case LZFSE_COMPRESSEDV2_BLOCK_MAGIC: {
-      lzfse_compressed_block_decoder_state *bs =
+      mm_ptr<lzfse_compressed_block_decoder_state> bs =
           &(s->compressed_lzfse_block_state);
       // Require the entire LMD payload to be in SRC
       if (s->src_end <= s->src ||
@@ -569,7 +575,7 @@ int lzfse_decode(lzfse_decoder_state *s) {
     } // LZFSE_COMPRESSEDV1_BLOCK_MAGIC || LZFSE_COMPRESSEDV2_BLOCK_MAGIC
 
     case LZFSE_COMPRESSEDLZVN_BLOCK_MAGIC: {
-      lzvn_compressed_block_decoder_state *bs =
+      mm_ptr<lzvn_compressed_block_decoder_state> bs =
           &(s->compressed_lzvn_block_state);
       if (bs->n_payload_bytes > 0 && s->src_end <= s->src)
         return LZFSE_STATUS_SRC_EMPTY; // need more SRC data
