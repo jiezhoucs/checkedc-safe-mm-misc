@@ -251,7 +251,6 @@ int main(int argc, char **argv) {
     perror("malloc");
     exit(1);
   }
-  /* uint8_t *out = (uint8_t *)malloc(out_allocated); */
   mm_array_ptr<uint8_t> out = MM_ARRAY_ALLOC(uint8_t, out_allocated);
   if (out == NULL) {
     perror("malloc");

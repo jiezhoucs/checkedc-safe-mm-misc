@@ -70,14 +70,12 @@ size_t lzfse_encode_buffer_with_scratch(mm_array_ptr<uint8_t> __restrict dst_buf
   {
     mm_ptr<lzfse_encoder_state> state = (mm_ptr<lzfse_encoder_state>)scratch_buffer;
     memset(_GETPTR(lzfse_encoder_state, state), 0x00, sizeof(lzfse_encoder_state));
-    // TODO
-    if (lzfse_encode_init(_GETPTR(lzfse_encoder_state, state)) != LZFSE_STATUS_OK)
+    if (lzfse_encode_init(state) != LZFSE_STATUS_OK)
       goto try_uncompressed;
-    // TODO
-    state->dst = _GETARRAYPTR(uint8_t, dst_buffer);
-    state->dst_begin = _GETARRAYPTR(uint8_t, dst_buffer);
-    state->dst_end = _GETARRAYPTR(uint8_t, dst_buffer + dst_size);
-    state->src = _GETARRAYPTR(uint8_t, src_buffer);
+    state->dst = dst_buffer;
+    state->dst_begin = dst_buffer;
+    state->dst_end = dst_buffer + dst_size;
+    state->src = src_buffer;
     state->src_encode_i = 0;
 
     if (src_size >= 0xffffffffU) {
@@ -123,7 +121,7 @@ size_t lzfse_encode_buffer_with_scratch(mm_array_ptr<uint8_t> __restrict dst_buf
     if (lzfse_encode_finish(_GETPTR(lzfse_encoder_state, state)) != LZFSE_STATUS_OK)
       goto try_uncompressed;
     //  No error occured, return compressed size.
-    return state->dst - (uint8_t *)(_GETARRAYPTR(uint8_t, dst_buffer));
+    return state->dst - dst_buffer;
   }
 
 try_uncompressed:

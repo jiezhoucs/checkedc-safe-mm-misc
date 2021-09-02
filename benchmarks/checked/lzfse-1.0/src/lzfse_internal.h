@@ -159,7 +159,7 @@ typedef struct {
 /*! @abstract Encoder state object. */
 typedef struct {
   //  Pointer to first byte of the source buffer.
-  const uint8_t *src;
+  mm_array_ptr<const uint8_t> src;
   //  Length of the source buffer in bytes. Note that this is not a size_t,
   //  but rather lzfse_offset, which is a signed type. The largest
   //  representable buffer is 2GB, but arbitrarily large buffers may be
@@ -177,11 +177,11 @@ typedef struct {
   //  sense to use a smaller offset than src_end.
   lzfse_offset src_encode_end;
   //  Pointer to the next byte to be written in the destination buffer.
-  uint8_t *dst;
+  mm_array_ptr<uint8_t> dst;
   //  Pointer to the first byte of the destination buffer.
-  uint8_t *dst_begin;
+  mm_array_ptr<uint8_t> dst_begin;
   //  Pointer to one byte past the end of the destination buffer.
-  uint8_t *dst_end;
+  mm_array_ptr<uint8_t> dst_end;
   //  Pending match; will be emitted unless a better match is found.
   lzfse_match pending;
   //  The number of matches written so far. Note that there is no problem in
@@ -387,7 +387,7 @@ typedef struct {
 
 // MARK: - LZFSE encode/decode interfaces
 
-int lzfse_encode_init(lzfse_encoder_state *s);
+int lzfse_encode_init(mm_ptr<lzfse_encoder_state> s);
 int lzfse_encode_translate(lzfse_encoder_state *s, lzfse_offset delta);
 int lzfse_encode_base(lzfse_encoder_state *s);
 int lzfse_encode_finish(lzfse_encoder_state *s);

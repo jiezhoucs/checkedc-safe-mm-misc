@@ -185,7 +185,7 @@ static int lzfse_encode_matches(lzfse_encoder_state *s) {
   lzfse_compressed_block_header_v2 *header2 = 0;
 
   // Keep initial state to be able to restore it if DST full
-  uint8_t *dst0 = s->dst;
+  mm_array_ptr<uint8_t> dst0 = s->dst;
   uint32_t n_literals0 = s->n_literals;
 
   // Add 0x00 literals until n_literals multiple of 4, since we encode 4
@@ -273,7 +273,7 @@ static int lzfse_encode_matches(lzfse_encoder_state *s) {
     fse_state state0, state1, state2, state3;
     state0 = state1 = state2 = state3 = 0;
 
-    uint8_t *buf = s->dst;
+    mm_array_ptr<uint8_t> buf = s->dst;
     uint32_t i = s->n_literals; // I multiple of 4
     // We encode starting from the last literal so we can decode starting from
     // the first
@@ -314,7 +314,7 @@ static int lzfse_encode_matches(lzfse_encoder_state *s) {
     fse_state l_state, m_state, d_state;
     l_state = m_state = d_state = 0;
 
-    uint8_t *buf = s->dst;
+    mm_array_ptr<uint8_t> buf = s->dst;
     uint32_t i = s->n_matches;
 
     // Add 8 padding bytes to the L,M,D payload
@@ -322,7 +322,7 @@ static int lzfse_encode_matches(lzfse_encoder_state *s) {
       ok = 0;
       goto END;
     } // out full
-    store8(buf, 0);
+    store8(_GETARRAYPTR(uint8_t, buf), 0);
     buf += 8;
 
     // We encode starting from the last match so we can decode starting from the
@@ -439,18 +439,18 @@ static inline int lzfse_push_lmd(lzfse_encoder_state *s, uint32_t L,
 
   // Store literals
   uint8_t *dst = s->literals + s->n_literals;
-  const uint8_t *src = s->src + s->src_literal;
+  mm_array_ptr<const uint8_t> src = s->src + s->src_literal;
   uint8_t *dst_end = dst + L;
   if (s->src_literal + L + 16 > s->src_end) {
     // Careful at the end of SRC, we can't read 16 bytes
     if (L > 0)
-      memcpy(dst, src, L);
+      memcpy(dst, _GETARRAYPTR(const uint8_t, src), L);
   } else {
-    copy16(dst, src);
+    copy16(dst, _GETARRAYPTR(const uint8_t, src));
     dst += 16;
     src += 16;
     while (dst < dst_end) {
-      copy16(dst, src);
+      copy16(dst, _GETARRAYPTR(const uint8_t, src));
       dst += 16;
       src += 16;
     }
@@ -570,7 +570,7 @@ static int lzfse_backend_end_of_stream(lzfse_encoder_state *s) {
   // Emit end-of-stream block
   if (s->dst + 4 > s->dst_end)
     return LZFSE_STATUS_DST_FULL; // DST full
-  store4(s->dst, LZFSE_ENDOFSTREAM_BLOCK_MAGIC);
+  store4(_GETARRAYPTR(uint8_t, s->dst), LZFSE_ENDOFSTREAM_BLOCK_MAGIC);
   s->dst += 4;
 
   return LZFSE_STATUS_OK; // OK
@@ -587,7 +587,7 @@ static int lzfse_backend_end_of_stream(lzfse_encoder_state *s) {
  * - d_prev to 0.
  @endcode
  * @return LZFSE_STATUS_OK */
-int lzfse_encode_init(lzfse_encoder_state *s) {
+int lzfse_encode_init(mm_ptr<lzfse_encoder_state> s) {
   const lzfse_match NO_MATCH = {0};
   lzfse_history_set line;
   for (int i = 0; i < LZFSE_ENCODE_HASH_WIDTH; i++) {
@@ -655,7 +655,7 @@ int lzfse_encode_base(lzfse_encoder_state *s) {
     lzfse_offset pos = s->src_encode_i; // pos >= 0
 
     // Load 4 byte value and get hash line
-    uint32_t x = load4(s->src + pos);
+    uint32_t x = load4(_GETARRAYPTR(uint8_t, s->src + pos));
     hashLine = history_table + hashX(x);
     lzfse_history_set h = *hashLine;
 
@@ -686,13 +686,14 @@ int lzfse_encode_base(lzfse_encoder_state *s) {
       if (ref + LZFSE_ENCODE_MAX_D_VALUE < pos)
         continue; // too far
 
-      const uint8_t *src_ref = s->src + ref;
-      const uint8_t *src_pos = s->src + pos;
+      mm_array_ptr<const uint8_t> src_ref = s->src + ref;
+      mm_array_ptr<const uint8_t> src_pos = s->src + pos;
       uint32_t length = 4;
       uint32_t maxLength =
         (uint32_t)(s->src_end - pos - 8); // ensure we don't hit the end of SRC
       while (length < maxLength) {
-        uint64_t d = load8(src_ref + length) ^ load8(src_pos + length);
+        uint64_t d = load8(_GETARRAYPTR(const uint8_t, src_ref + length)) ^
+                     load8(_GETARRAYPTR(const uint8_t, src_pos + length));
         if (d == 0) {
           length += 8;
           continue;

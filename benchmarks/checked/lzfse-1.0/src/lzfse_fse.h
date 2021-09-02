@@ -31,6 +31,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #include <stdlib.h>
 #include <string.h>
 
+#include "safe_mm_checked.h"
+
 //  Select between 32/64-bit I/O streams for FSE. Note that the FSE stream
 //  size need not match the word size of the machine, but in practice you
 //  want to use 64b streams on 64b systems for better performance.
@@ -178,12 +180,12 @@ FSE_INLINE void fse_out_init32(fse_out_stream32 *s) {
  * We assume we can write 8 bytes to the output buffer \c (*pbuf[0..7]) in all
  * cases.
  * @note *pbuf is incremented by the number of written bytes. */
-FSE_INLINE void fse_out_flush64(fse_out_stream64 *s, uint8_t **pbuf) {
+FSE_INLINE void fse_out_flush64(fse_out_stream64 *s, mm_array_ptr<uint8_t> *pbuf) {
   fse_bit_count nbits =
       s->accum_nbits & -8; // number of bits written, multiple of 8
 
   // Write 8 bytes of current accumulator
-  memcpy(*pbuf, &(s->accum), 8);
+  memcpy(_GETARRAYPTR(uint8_t, *pbuf), &(s->accum), 8);
   *pbuf += (nbits >> 3); // bytes
 
   // Update state
@@ -220,12 +222,12 @@ FSE_INLINE void fse_out_flush32(fse_out_stream32 *s, uint8_t **pbuf) {
  * We assume we can write 8 bytes to the output buffer \c (*pbuf[0..7]) in all
  * cases.
  * @note *pbuf is incremented by the number of written bytes. */
-FSE_INLINE void fse_out_finish64(fse_out_stream64 *s, uint8_t **pbuf) {
+FSE_INLINE void fse_out_finish64(fse_out_stream64 *s, mm_array_ptr<uint8_t> *pbuf) {
   fse_bit_count nbits =
       (s->accum_nbits + 7) & -8; // number of bits written, multiple of 8
 
   // Write 8 bytes of current accumulator
-  memcpy(*pbuf, &(s->accum), 8);
+  memcpy(_GETARRAYPTR(uint8_t, *pbuf), &(s->accum), 8);
   *pbuf += (nbits >> 3); // bytes
 
   // Update state
