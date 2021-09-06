@@ -14,7 +14,7 @@ SRC=(
     "array"
     "addressof"
     # "checkable"
-    "stack"
+    "stack_global"
 )
 
 #

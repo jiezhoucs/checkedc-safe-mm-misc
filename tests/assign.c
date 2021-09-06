@@ -4,6 +4,27 @@
 
 #include "debug.h"
 
+typedef struct {
+    int i;
+    long j;
+    float f;
+    Node n;
+    int ir[30];
+    mm_ptr<Node> pn;
+} Obj;
+
+typedef struct {
+    int i;
+    long l;
+    mm_array_ptr<char> p0;
+    Obj o0;
+    Obj o;
+    mm_ptr<Obj> po;
+    int ir[30];
+    Obj oarr[10];
+    Obj *op;
+} NewNode;
+
 //
 // Testing assigning an MMSafe_ptr to another.
 void f0() {
@@ -119,6 +140,46 @@ resume:
     print_end("assigning the result of a ternary expression to a pointer");
 }
 
+/*
+ * Test assigning an array of a struct pointed by an mmptr to an mmarrayptr.
+ * */
+void f5() {
+    print_start("assigning an array of a struct pointed by an mmptr to an mmarrayptr");
+    signal(SIGILL, ill_handler);
+    if (setjmp(resume_context) == 1) goto resume0;
+
+    mm_ptr<NewNode> pnn = mm_alloc<NewNode>(sizeof(NewNode));
+    pnn->ir[10] = 42;
+    pnn->oarr[5].ir[20] = 84;
+    mm_array_ptr<int> pi = pnn->ir;
+    mm_array_ptr<int> pi2 = pnn->oarr[5].ir + 20;
+
+    if (pi[10] != 42 || *pi2 != 84) {
+        print_error("assign.c::f5(): error0");
+    }
+
+    mm_free<NewNode>(pnn);
+    pi[10] = 40;  /* UAF */
+
+resume0:
+    if (setjmp(resume_context) == 1) goto resume1;
+
+    pnn = mm_alloc<NewNode>(sizeof(NewNode));
+    pnn->po = mm_alloc<Obj>(sizeof(Obj));
+    pnn->po->ir[10] = 100;
+    pi = pnn->po->ir;
+
+    if (*(pi + 10) != 100) {
+        print_error("assign.c::f5(): error1");
+    }
+
+    mm_free<Obj>(pnn->po);
+    *pi = 10;  /* UAF */
+
+resume1:
+    print_end("assigning an array of a struct pointed by an mmptr to an mmarrayptr");
+}
+
 int main(int argc, char *argv[]) {
     signal(SIGILL, ill_handler);
     signal(SIGSEGV, segv_handler);
@@ -136,6 +197,8 @@ int main(int argc, char *argv[]) {
     f3();
 
     f4();
+
+    f5();
 
     printf("===== Finish testing assignment functionality. =====\n\n");
     return 0;
