@@ -119,7 +119,7 @@ lzfse_encode_v1_freq_table(mm_ptr<lzfse_compressed_block_header_v2> out,
   const uint16_t *src = &(in->l_freq[0]); // first value of first table (struct
                                           // will not be modified, so this code
                                           // will remain valid)
-  mm_array_ptr<uint8_t> dst = mmptr_to_mmarrayptr<uint8_t>(&(out->freq[0]));
+  mm_array_ptr<uint8_t> dst = out->freq;
   for (int i = 0; i < LZFSE_ENCODE_L_SYMBOLS + LZFSE_ENCODE_M_SYMBOLS +
                           LZFSE_ENCODE_D_SYMBOLS + LZFSE_ENCODE_LITERAL_SYMBOLS;
        i++) {
@@ -438,8 +438,7 @@ static inline int lzfse_push_lmd(mm_ptr<lzfse_encoder_state> s, uint32_t L,
   s->d_values[n] = D;
 
   // Store literals
-  mm_array_ptr<uint8_t> dst =
-      mmptr_to_mmarrayptr<uint8_t>(&s->literals[0]) + s->n_literals;
+  mm_array_ptr<uint8_t> dst = s->literals + s->n_literals;
   mm_array_ptr<const uint8_t> src = s->src + s->src_literal;
   mm_array_ptr<uint8_t> dst_end = dst + L;
   if (s->src_literal + L + 16 > s->src_end) {
@@ -629,7 +628,7 @@ int lzfse_encode_translate(mm_ptr<lzfse_encoder_state> s, lzfse_offset delta) {
   // history_table positions, translated, and clamped to invalid pos
   int32_t invalidPos = -4 * LZFSE_ENCODE_MAX_D_VALUE;
   for (int i = 0; i < LZFSE_ENCODE_HASH_VALUES; i++) {
-    mm_array_ptr<int32_t> p = mmptr_to_mmarrayptr<int32_t>(&(s->history_table[i].pos[0]));
+    mm_array_ptr<int32_t> p = s->history_table[i].pos;
     for (int j = 0; j < LZFSE_ENCODE_HASH_WIDTH; j++) {
       lzfse_offset newPos = p[j] - delta; // translate
       p[j] = (int32_t)((newPos < invalidPos) ? invalidPos : newPos); // clamp
@@ -643,8 +642,7 @@ int lzfse_encode_translate(mm_ptr<lzfse_encoder_state> s, lzfse_offset delta) {
 // Encoder front end
 
 int lzfse_encode_base(mm_ptr<lzfse_encoder_state> s) {
-  mm_array_ptr<lzfse_history_set> history_table =
-      mmptr_to_mmarrayptr<lzfse_history_set>(&s->history_table[0]);
+  mm_array_ptr<lzfse_history_set> history_table = s->history_table;
   mm_array_ptr<lzfse_history_set> hashLine = NULL;
   lzfse_history_set newH;
   const lzfse_match NO_MATCH = {0};

@@ -162,7 +162,7 @@ static int lzfse_decode_lmd(mm_ptr<lzfse_decoder_state> s) {
   mm_array_ptr<const uint8_t> src_start = s->src_begin;
   mm_array_ptr<const uint8_t> src = s->src + bs->lmd_in_buf;
   mm_array_ptr<const uint8_t> lit = bs->current_literal;
-  mm_array_ptr<uint8_t> dst = mmptr_to_mmarrayptr<uint8_t>(&s->dst[0]);
+  mm_array_ptr<uint8_t> dst = s->dst;
   uint32_t symbols = bs->n_matches;
   int32_t L = bs->l_value;
   int32_t M = bs->m_value;
@@ -196,8 +196,11 @@ static int lzfse_decode_lmd(mm_ptr<lzfse_decoder_state> s) {
     }
     L = fse_value_decode(&l_state, bs->l_decoder, &in);
     assert(l_state < LZFSE_ENCODE_L_STATES);
-    if ((lit + L) >= (mmptr_to_mmarrayptr<const uint8_t>(&bs->literals[0]) +
-                      LZFSE_LITERALS_PER_BLOCK + 64)) {
+    // FIXME: Currently our compiler does not support directly comparing a
+    // checked pointer with another checked pointer created from an arith-expr
+    // of an array field in a struct pointed by a checked pointer.
+    mm_array_ptr<const uint8_t> _tmp = bs->literals + LZFSE_LITERALS_PER_BLOCK + 64;
+    if ((lit + L) >= _tmp) {
       return LZFSE_STATUS_ERROR;
     }
     res = fse_in_flush2(&in, &src, src_start);
@@ -442,11 +445,9 @@ int lzfse_decode(mm_ptr<lzfse_decoder_state> s) {
         // Decode literals
         {
           fse_in_stream in;
-          mm_array_ptr<const uint8_t> buf_start =
-            mmptr_to_mmarrayptr<const uint8_t>(&s->src_begin[0]);
+          mm_array_ptr<const uint8_t> buf_start = s->src_begin;
           s->src += header1.n_literal_payload_bytes; // skip literal payload
-          mm_array_ptr<const uint8_t> buf =
-            mmptr_to_mmarrayptr<const uint8_t>(&s->src[0]); // read bits backwards from the end
+          mm_array_ptr<const uint8_t> buf = s->src; // read bits backwards from the end
           if (fse_in_init(&in, header1.literal_bits, &buf, buf_start) != 0)
             return LZFSE_STATUS_ERROR;
 
@@ -455,8 +456,7 @@ int lzfse_decode(mm_ptr<lzfse_decoder_state> s) {
           fse_state state2 = header1.literal_state[2];
           fse_state state3 = header1.literal_state[3];
 
-          mm_array_ptr<int32_t> literal_decoder =
-              mmptr_to_mmarrayptr<int32_t>(&bs->literal_decoder[0]);
+          mm_array_ptr<int32_t> literal_decoder = bs->literal_decoder;
           for (uint32_t i = 0; i < header1.n_literals; i += 4) // n_literals is multiple of 4
           {
 #if FSE_IOSTREAM_64
@@ -486,7 +486,7 @@ int lzfse_decode(mm_ptr<lzfse_decoder_state> s) {
 #endif
           }
 
-          bs->current_literal = mmptr_to_mmarrayptr<uint8_t>(&bs->literals[0]);
+          bs->current_literal = bs->literals;
         } // literals
 
         // SRC is not incremented to skip the LMD payload, since we need it

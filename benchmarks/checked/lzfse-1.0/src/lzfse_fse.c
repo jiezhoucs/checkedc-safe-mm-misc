@@ -56,7 +56,7 @@ void fse_init_encoder_table(int nstates, int nsymbols,
 // present in the data.
 int fse_init_decoder_table(int nstates, int nsymbols,
                            const uint16_t *__restrict freq,
-                           int32_t *__restrict t) {
+                           mm_array_ptr<int32_t> __restrict t) {
   assert(nsymbols <= 256);
   assert(fse_check_freq(freq, nsymbols, nstates) == 0);
   int n_clz = __builtin_clz(nstates);
@@ -89,7 +89,7 @@ int fse_init_decoder_table(int nstates, int nsymbols,
         e.delta = (int16_t)((j - j0) << (k - 1));
       }
 
-      memcpy(t, &e, sizeof(e));
+      memcpy(_GETARRAYPTR(uint32_t, t), &e, sizeof(e));
       t++;
     }
   }
@@ -110,7 +110,7 @@ void fse_init_value_decoder_table(int nstates, int nsymbols,
                                   const uint16_t *__restrict freq,
                                   const uint8_t *__restrict symbol_vbits,
                                   const int32_t *__restrict symbol_vbase,
-                                  fse_value_decoder_entry *__restrict t) {
+                                  mm_array_ptr<fse_value_decoder_entry> __restrict t) {
   assert(nsymbols <= 256);
   assert(fse_check_freq(freq, nsymbols, nstates) == 0);
 
@@ -140,7 +140,7 @@ void fse_init_value_decoder_table(int nstates, int nsymbols,
         e.delta = (int16_t)((j - j0) << (k - 1));
       }
 
-      memcpy(t, &e, 8);
+      memcpy(_GETARRAYPTR(fse_value_decoder_entry, t), &e, 8);
       t++;
     }
   }

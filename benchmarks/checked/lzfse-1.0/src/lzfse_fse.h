@@ -540,7 +540,7 @@ FSE_INLINE uint8_t fse_decode(fse_state *__restrict pstate,
  * stream accumulator. */
 FSE_INLINE int32_t
 fse_value_decode(fse_state *__restrict pstate,
-                 const fse_value_decoder_entry *value_decoder_table,
+                 mm_array_ptr<const fse_value_decoder_entry> value_decoder_table,
                  fse_in_stream *__restrict in) {
   fse_value_decoder_entry entry = value_decoder_table[*pstate];
   uint32_t state_and_value_bits = (uint32_t)fse_in_pull(in, entry.total_bits);
@@ -604,7 +604,7 @@ void fse_init_encoder_table(int nstates, int nsymbols,
  */
 int fse_init_decoder_table(int nstates, int nsymbols,
                            const uint16_t *__restrict freq,
-                           int32_t *__restrict t);
+                           mm_array_ptr<int32_t> __restrict t);
 
 /*! @abstract Initialize value decoder table \c t[nstates].
  *
@@ -625,7 +625,7 @@ void fse_init_value_decoder_table(int nstates, int nsymbols,
                                   const uint16_t *__restrict freq,
                                   const uint8_t *__restrict symbol_vbits,
                                   const int32_t *__restrict symbol_vbase,
-                                  fse_value_decoder_entry *__restrict t);
+                                  mm_array_ptr<fse_value_decoder_entry> __restrict t);
 
 /*! @abstract Normalize a table \c t[nsymbols] of occurrences to
  *  \c freq[nsymbols]. */
