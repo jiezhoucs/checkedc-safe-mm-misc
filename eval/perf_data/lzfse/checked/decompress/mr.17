@@ -1,0 +1,7 @@
+LZFSE decode
+Input: /home/jie/projects/checkedc/misc/eval/lzfse_dataset/mr.encoded
+Output: /tmp/origin
+Input size: 3580219 B
+Output size: 9970564 B
+Compression ratio: 2.785
+Speed: 2.55 ns/B, 374.72 MB/s

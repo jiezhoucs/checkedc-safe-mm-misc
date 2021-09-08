@@ -1,0 +1,7 @@
+LZFSE encode
+Input: /home/jie/projects/checkedc/misc/eval/lzfse_dataset/sao
+Output: /tmp/compressed
+Input size: 7251944 B
+Output size: 5441014 B
+Compression ratio: 1.333
+Speed: 16.78 ns/B, 56.85 MB/s

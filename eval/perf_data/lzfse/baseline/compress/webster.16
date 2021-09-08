@@ -1,0 +1,7 @@
+LZFSE encode
+Input: /home/jie/projects/checkedc/misc/eval/lzfse_dataset/webster
+Output: /tmp/compressed
+Input size: 41458703 B
+Output size: 12209496 B
+Compression ratio: 3.396
+Speed: 15.20 ns/B, 62.75 MB/s

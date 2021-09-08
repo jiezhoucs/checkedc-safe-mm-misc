@@ -1,0 +1,7 @@
+LZFSE encode
+Input: /home/jie/projects/checkedc/misc/eval/lzfse_dataset/x-ray
+Output: /tmp/compressed
+Input size: 8474240 B
+Output size: 5988093 B
+Compression ratio: 1.415
+Speed: 17.22 ns/B, 55.40 MB/s

@@ -1,0 +1,7 @@
+LZFSE encode
+Input: /home/jie/projects/checkedc/misc/eval/lzfse_dataset/reymont
+Output: /tmp/compressed
+Input size: 6627202 B
+Output size: 2009293 B
+Compression ratio: 3.298
+Speed: 15.63 ns/B, 61.02 MB/s

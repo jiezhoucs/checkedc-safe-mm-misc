@@ -1,0 +1,7 @@
+LZFSE encode
+Input: /home/jie/projects/checkedc/misc/eval/lzfse_dataset/dickens
+Output: /tmp/compressed
+Input size: 10192446 B
+Output size: 3864220 B
+Compression ratio: 2.638
+Speed: 17.75 ns/B, 53.72 MB/s
