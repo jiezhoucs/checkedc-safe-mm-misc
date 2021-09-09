@@ -86,25 +86,31 @@ def perf():
                   "de_baseline(MB/s)", "de_checked(MB/s)", "de_overhead(%)"]
         writer.writerow(header)
 
-        en_overheads, de_overheads = [], []
+        en_normalized, de_normalized = [], []
         for data in INPUTS:
             row = [data, FILE_SIZE[data].split()[0]]
             en_baseline = configs[0]["data_rates"][data]
             en_checked  = configs[1]["data_rates"][data]
             de_baseline = configs[2]["data_rates"][data]
             de_checked  = configs[3]["data_rates"][data]
-            en_overhead = round((en_baseline - en_checked) / en_baseline * 100, 1)
-            de_overhead = round((de_baseline - de_checked) / de_baseline * 100, 1)
-            en_overheads += [en_baseline / en_checked]
-            de_overheads += [de_baseline / de_checked]
+            en_overhead = round((en_baseline / en_checked - 1) * 100, 1)
+            de_overhead = round((de_baseline / de_checked - 1) * 100, 1)
+            en_normalized += [en_baseline / en_checked]
+            de_normalized += [de_baseline / de_checked]
             row += [en_baseline, en_checked, en_overhead,
                     de_baseline, de_checked, de_overhead]
             writer.writerow(row)
 
-    en_geomean = round(np.array(en_overheads).prod() ** (1.0 / len(INPUTS)), 3)
-    print("Compression rate overhead: " + str(round((en_geomean - 1) * 100, 1)) + "%")
-    de_geomean = round(np.array(de_overheads).prod() ** (1.0 / len(INPUTS)), 2)
-    print("Decompression rate overhead: " + str(round((de_geomean - 1) * 100 ,1)) + "%")
+    # Print summarized data for compression
+    print("Min(encode_overhead) = " + str(round((min(en_normalized) - 1) * 100, 1)))
+    print("Max(encode_overhead) = " + str(round((max(en_normalized) - 1) * 100, 1)))
+    en_geomean = round(np.array(en_normalized).prod() ** (1.0 / len(INPUTS)), 3)
+    print("Geomean(encode_overhead): " + str(round((en_geomean - 1) * 100, 1)) + "%")
+    # Print summarized data for decompression
+    print("Min(decode_overhead) = " + str(round((min(de_normalized) - 1) * 100, 1)))
+    print("Max(decode_overhead) = " + str(round((max(de_normalized) - 1) * 100, 1)))
+    de_geomean = round(np.array(de_normalized).prod() ** (1.0 / len(INPUTS)), 2)
+    print("Geomean(decode_overhead): " + str(round((de_geomean - 1) * 100 ,1)) + "%")
 
 #
 # Entrance of this script
