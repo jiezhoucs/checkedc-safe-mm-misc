@@ -113,14 +113,14 @@ def perf():
     # Print summarized data for compression
     print("Min(encode_overhead) = " + str(round((1 - max(en_normalized)) * 100, 1)) + "%")
     print("Max(encode_overhead) = " + str(round((1 - min(en_normalized)) * 100, 1)) + "%")
-    en_geomean = round(np.array(en_normalized).prod() ** (1.0 / len(INPUTS)), 3)
-    print("Geomean(encode_overhead): " + str(round((1 - en_geomean) * 100, 1)) + "%")
+    en_geomean = round((1 - np.array(en_normalized).prod() ** (1.0 / len(INPUTS))) * 100, 1)
+    print("Geomean(encode_overhead): " + str(en_geomean) + "%")
     print()
     # Print summarized data for decompression
     print("Min(decode_overhead) = " + str(round((1 - max(de_normalized)) * 100, 1)) + "%")
     print("Max(decode_overhead) = " + str(round((1 - min(de_normalized)) * 100, 1)) + "%")
-    de_geomean = round(np.array(de_normalized).prod() ** (1.0 / len(INPUTS)), 2)
-    print("Geomean(decode_overhead): " + str(round((1- de_geomean) * 100 ,1)) + "%")
+    de_geomean = round((1 - np.array(de_normalized).prod() ** (1.0 / len(INPUTS))) * 100, 1)
+    print("Geomean(decode_overhead): " + str(de_geomean) + "%")
 
 #
 # Entrance of this script
