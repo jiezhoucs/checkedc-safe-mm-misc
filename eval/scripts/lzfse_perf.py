@@ -49,17 +49,25 @@ FILE_SIZE = {
 }
 
 #
-# 4 setups
+# 4 setups.
 #
 configs =[
-    {"rate_file_dir" : BASELINE_DATA_DIR + "compress/",
-      "data_rates"   : { }},
-    {"rate_file_dir" : CHECKED_DATA_DIR + "compress/",
-      "data_rates"   : { }},
-    {"rate_file_dir" : BASELINE_DATA_DIR + "decompress/",
-      "data_rates"   : { }},
-    {"rate_file_dir" : CHECKED_DATA_DIR + "decompress/",
-      "data_rates"   : { }},
+    {
+        "rate_file_dir" : BASELINE_DATA_DIR + "compress/",
+        "data_rates"    : { }
+    },
+    {
+        "rate_file_dir" : CHECKED_DATA_DIR + "compress/",
+        "data_rates"    : { }
+    },
+    {
+        "rate_file_dir" : BASELINE_DATA_DIR + "decompress/",
+        "data_rates"    : { }
+    },
+    {
+        "rate_file_dir" : CHECKED_DATA_DIR + "decompress/",
+        "data_rates"    : { }
+    },
 ]
 
 #
@@ -70,6 +78,7 @@ def perf():
         data_rates = config["data_rates"]
         for data in INPUTS:
             for i in range(1, ITER + 1):
+                # Read in raw data
                 rate_file = open(config["rate_file_dir"] + data + "." + str(i))
                 rate = float(rate_file.readlines()[-1].split(',')[-1].split()[0])
                 if data in data_rates:
@@ -93,24 +102,25 @@ def perf():
             en_checked  = configs[1]["data_rates"][data]
             de_baseline = configs[2]["data_rates"][data]
             de_checked  = configs[3]["data_rates"][data]
-            en_overhead = round((en_baseline / en_checked - 1) * 100, 1)
-            de_overhead = round((de_baseline / de_checked - 1) * 100, 1)
-            en_normalized += [en_baseline / en_checked]
-            de_normalized += [de_baseline / de_checked]
+            en_overhead = round((en_baseline - en_checked) / en_baseline * 100, 1)
+            de_overhead = round((de_baseline - de_checked) / de_baseline * 100, 1)
+            en_normalized += [en_checked / en_baseline]
+            de_normalized += [de_checked / de_baseline]
             row += [en_baseline, en_checked, en_overhead,
                     de_baseline, de_checked, de_overhead]
             writer.writerow(row)
 
     # Print summarized data for compression
-    print("Min(encode_overhead) = " + str(round((min(en_normalized) - 1) * 100, 1)))
-    print("Max(encode_overhead) = " + str(round((max(en_normalized) - 1) * 100, 1)))
+    print("Min(encode_overhead) = " + str(round((1 - max(en_normalized)) * 100, 1)) + "%")
+    print("Max(encode_overhead) = " + str(round((1 - min(en_normalized)) * 100, 1)) + "%")
     en_geomean = round(np.array(en_normalized).prod() ** (1.0 / len(INPUTS)), 3)
-    print("Geomean(encode_overhead): " + str(round((en_geomean - 1) * 100, 1)) + "%")
+    print("Geomean(encode_overhead): " + str(round((1 - en_geomean) * 100, 1)) + "%")
+    print()
     # Print summarized data for decompression
-    print("Min(decode_overhead) = " + str(round((min(de_normalized) - 1) * 100, 1)))
-    print("Max(decode_overhead) = " + str(round((max(de_normalized) - 1) * 100, 1)))
+    print("Min(decode_overhead) = " + str(round((1 - max(de_normalized)) * 100, 1)) + "%")
+    print("Max(decode_overhead) = " + str(round((1 - min(de_normalized)) * 100, 1)) + "%")
     de_geomean = round(np.array(de_normalized).prod() ** (1.0 / len(INPUTS)), 2)
-    print("Geomean(decode_overhead): " + str(round((de_geomean - 1) * 100 ,1)) + "%")
+    print("Geomean(decode_overhead): " + str(round((1- de_geomean) * 100 ,1)) + "%")
 
 #
 # Entrance of this script
