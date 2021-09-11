@@ -13,15 +13,141 @@ Document Path:          /files/file-524288
 Document Length:        524288 bytes
 
 Concurrency Level:      8
-Time taken for tests:   1.631 seconds
+Time taken for tests:   1.556 seconds
 Complete requests:      10000
 Failed requests:        0
 Total transferred:      5245270000 bytes
 HTML transferred:       5242880000 bytes
-Requests per second:    6131.95 [#/sec] (mean)
-Time per request:       1.305 [ms] (mean)
-Time per request:       0.163 [ms] (mean, across all concurrent requests)
-Transfer rate:          3140990.74 [Kbytes/sec] received
+Requests per second:    6427.69 [#/sec] (mean)
+Time per request:       1.245 [ms] (mean)
+Time per request:       0.156 [ms] (mean, across all concurrent requests)
+Transfer rate:          3292479.33 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     1    1   0.1      1       4
+Waiting:        0    0   0.1      0       2
+Total:          1    1   0.1      1       4
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%      4 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.558 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6420.19 [#/sec] (mean)
+Time per request:       1.246 [ms] (mean)
+Time per request:       0.156 [ms] (mean, across all concurrent requests)
+Transfer rate:          3288634.27 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     0    1   0.1      1       2
+Waiting:        0    0   0.0      0       1
+Total:          0    1   0.1      1       2
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%      2 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.576 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6345.08 [#/sec] (mean)
+Time per request:       1.261 [ms] (mean)
+Time per request:       0.158 [ms] (mean, across all concurrent requests)
+Transfer rate:          3250160.36 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     1    1   0.3      1      10
+Waiting:        0    0   0.3      0       9
+Total:          1    1   0.3      1      11
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%     11 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.575 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6348.40 [#/sec] (mean)
+Time per request:       1.260 [ms] (mean)
+Time per request:       0.158 [ms] (mean, across all concurrent requests)
+Transfer rate:          3251864.68 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
@@ -36,135 +162,51 @@ Percentage of the requests served within a certain time (ms)
   75%      1
   80%      1
   90%      1
-  95%      2
+  95%      1
+  98%      1
+  99%      1
+ 100%      2 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.562 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6400.10 [#/sec] (mean)
+Time per request:       1.250 [ms] (mean)
+Time per request:       0.156 [ms] (mean, across all concurrent requests)
+Transfer rate:          3278344.11 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     0    1   0.1      1       2
+Waiting:        0    0   0.0      0       1
+Total:          0    1   0.1      1       2
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
   98%      2
   99%      2
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.577 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6340.95 [#/sec] (mean)
-Time per request:       1.262 [ms] (mean)
-Time per request:       0.158 [ms] (mean, across all concurrent requests)
-Transfer rate:          3248047.93 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.1      1       2
-Waiting:        0    0   0.0      0       1
-Total:          1    1   0.1      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.565 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6389.09 [#/sec] (mean)
-Time per request:       1.252 [ms] (mean)
-Time per request:       0.157 [ms] (mean, across all concurrent requests)
-Transfer rate:          3272707.63 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     0    1   0.2      1      10
-Waiting:        0    0   0.2      0       9
-Total:          0    1   0.2      1      10
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%     10 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.561 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6406.58 [#/sec] (mean)
-Time per request:       1.249 [ms] (mean)
-Time per request:       0.156 [ms] (mean, across all concurrent requests)
-Transfer rate:          3281664.68 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.0      1       2
-Waiting:        0    0   0.0      0       0
-Total:          1    1   0.0      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
  100%      2 (longest request)
 This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
@@ -186,598 +228,10 @@ Complete requests:      10000
 Failed requests:        0
 Total transferred:      5245270000 bytes
 HTML transferred:       5242880000 bytes
-Requests per second:    6336.48 [#/sec] (mean)
-Time per request:       1.263 [ms] (mean)
+Requests per second:    6336.74 [#/sec] (mean)
+Time per request:       1.262 [ms] (mean)
 Time per request:       0.158 [ms] (mean, across all concurrent requests)
-Transfer rate:          3245755.18 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.1      1       2
-Waiting:        0    0   0.0      0       1
-Total:          1    1   0.1      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.548 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6458.66 [#/sec] (mean)
-Time per request:       1.239 [ms] (mean)
-Time per request:       0.155 [ms] (mean, across all concurrent requests)
-Transfer rate:          3308340.90 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     0    1   0.2      1      10
-Waiting:        0    0   0.2      0       8
-Total:          1    1   0.2      1      10
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%     10 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.568 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6376.00 [#/sec] (mean)
-Time per request:       1.255 [ms] (mean)
-Time per request:       0.157 [ms] (mean, across all concurrent requests)
-Transfer rate:          3265998.96 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.1      1       2
-Waiting:        0    0   0.0      0       1
-Total:          1    1   0.1      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.516 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6597.21 [#/sec] (mean)
-Time per request:       1.213 [ms] (mean)
-Time per request:       0.152 [ms] (mean, across all concurrent requests)
-Transfer rate:          3379309.70 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.0      1       2
-Waiting:        0    0   0.0      0       1
-Total:          1    1   0.0      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.535 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6515.86 [#/sec] (mean)
-Time per request:       1.228 [ms] (mean)
-Time per request:       0.153 [ms] (mean, across all concurrent requests)
-Transfer rate:          3337640.74 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.1      1       2
-Waiting:        0    0   0.0      0       1
-Total:          1    1   0.1      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.614 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6195.79 [#/sec] (mean)
-Time per request:       1.291 [ms] (mean)
-Time per request:       0.161 [ms] (mean, across all concurrent requests)
-Transfer rate:          3173690.93 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     0    1   0.3      1      10
-Waiting:        0    0   0.3      0       9
-Total:          0    1   0.3      1      10
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%     10 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.528 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6546.55 [#/sec] (mean)
-Time per request:       1.222 [ms] (mean)
-Time per request:       0.153 [ms] (mean, across all concurrent requests)
-Transfer rate:          3353359.64 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.1      1       2
-Waiting:        0    0   0.0      0       0
-Total:          1    1   0.1      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.525 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6555.77 [#/sec] (mean)
-Time per request:       1.220 [ms] (mean)
-Time per request:       0.153 [ms] (mean, across all concurrent requests)
-Transfer rate:          3358086.18 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.1      1       2
-Waiting:        0    0   0.0      0       0
-Total:          1    1   0.1      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.517 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6594.10 [#/sec] (mean)
-Time per request:       1.213 [ms] (mean)
-Time per request:       0.152 [ms] (mean, across all concurrent requests)
-Transfer rate:          3377716.43 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     0    1   0.2      1      10
-Waiting:        0    0   0.2      0       9
-Total:          1    1   0.2      1      10
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%     10 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.568 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6378.27 [#/sec] (mean)
-Time per request:       1.254 [ms] (mean)
-Time per request:       0.157 [ms] (mean, across all concurrent requests)
-Transfer rate:          3267161.36 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     0    1   0.0      1       2
-Waiting:        0    0   0.0      0       1
-Total:          1    1   0.0      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.545 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6472.08 [#/sec] (mean)
-Time per request:       1.236 [ms] (mean)
-Time per request:       0.155 [ms] (mean, across all concurrent requests)
-Transfer rate:          3315214.10 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.1      1       2
-Waiting:        0    0   0.0      0       1
-Total:          1    1   0.1      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.512 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6613.62 [#/sec] (mean)
-Time per request:       1.210 [ms] (mean)
-Time per request:       0.151 [ms] (mean, across all concurrent requests)
-Transfer rate:          3387717.57 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.2      1       9
-Waiting:        0    0   0.2      0       9
-Total:          1    1   0.2      1      10
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%     10 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.536 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6512.12 [#/sec] (mean)
-Time per request:       1.228 [ms] (mean)
-Time per request:       0.154 [ms] (mean, across all concurrent requests)
-Transfer rate:          3335723.70 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.1      1       2
-Waiting:        0    0   0.0      0       1
-Total:          1    1   0.1      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.538 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6503.64 [#/sec] (mean)
-Time per request:       1.230 [ms] (mean)
-Time per request:       0.154 [ms] (mean, across all concurrent requests)
-Transfer rate:          3331382.66 [Kbytes/sec] received
-
-Connection Times (ms)
-              min  mean[+/-sd] median   max
-Connect:        0    0   0.0      0       0
-Processing:     1    1   0.1      1       2
-Waiting:        0    0   0.0      0       1
-Total:          1    1   0.1      1       2
-
-Percentage of the requests served within a certain time (ms)
-  50%      1
-  66%      1
-  75%      1
-  80%      1
-  90%      1
-  95%      1
-  98%      1
-  99%      1
- 100%      2 (longest request)
-This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
-Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
-Licensed to The Apache Software Foundation, http://www.apache.org/
-
-Benchmarking 127.0.0.1 (be patient)
-
-
-Server Software:        thttpd/2.29
-Server Hostname:        127.0.0.1
-Server Port:            8080
-
-Document Path:          /files/file-524288
-Document Length:        524288 bytes
-
-Concurrency Level:      8
-Time taken for tests:   1.567 seconds
-Complete requests:      10000
-Failed requests:        0
-Total transferred:      5245270000 bytes
-HTML transferred:       5242880000 bytes
-Requests per second:    6382.45 [#/sec] (mean)
-Time per request:       1.253 [ms] (mean)
-Time per request:       0.157 [ms] (mean, across all concurrent requests)
-Transfer rate:          3269302.91 [Kbytes/sec] received
+Transfer rate:          3245888.87 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
@@ -811,15 +265,57 @@ Document Path:          /files/file-524288
 Document Length:        524288 bytes
 
 Concurrency Level:      8
-Time taken for tests:   1.558 seconds
+Time taken for tests:   1.573 seconds
 Complete requests:      10000
 Failed requests:        0
 Total transferred:      5245270000 bytes
 HTML transferred:       5242880000 bytes
-Requests per second:    6417.78 [#/sec] (mean)
-Time per request:       1.247 [ms] (mean)
-Time per request:       0.156 [ms] (mean, across all concurrent requests)
-Transfer rate:          3287403.80 [Kbytes/sec] received
+Requests per second:    6357.06 [#/sec] (mean)
+Time per request:       1.258 [ms] (mean)
+Time per request:       0.157 [ms] (mean, across all concurrent requests)
+Transfer rate:          3256296.81 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     1    1   2.1      1     209
+Waiting:        0    0   0.0      0       0
+Total:          1    1   2.1      1     209
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%    209 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.528 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6542.57 [#/sec] (mean)
+Time per request:       1.223 [ms] (mean)
+Time per request:       0.153 [ms] (mean, across all concurrent requests)
+Transfer rate:          3351323.65 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
@@ -827,6 +323,510 @@ Connect:        0    0   0.0      0       0
 Processing:     0    1   0.1      1       2
 Waiting:        0    0   0.0      0       0
 Total:          0    1   0.1      1       2
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%      2 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.609 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6213.84 [#/sec] (mean)
+Time per request:       1.287 [ms] (mean)
+Time per request:       0.161 [ms] (mean, across all concurrent requests)
+Transfer rate:          3182938.02 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     0    1   0.0      1       2
+Waiting:        0    0   0.0      0       0
+Total:          0    1   0.0      1       2
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%      2 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.555 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6430.24 [#/sec] (mean)
+Time per request:       1.244 [ms] (mean)
+Time per request:       0.156 [ms] (mean, across all concurrent requests)
+Transfer rate:          3293785.61 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     0    1   0.3      1      10
+Waiting:        0    0   0.3      0       9
+Total:          0    1   0.3      1      10
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%     10 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.513 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6610.04 [#/sec] (mean)
+Time per request:       1.210 [ms] (mean)
+Time per request:       0.151 [ms] (mean, across all concurrent requests)
+Transfer rate:          3385883.59 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     1    1   0.0      1       2
+Waiting:        0    0   0.0      0       1
+Total:          1    1   0.0      1       2
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%      2 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.561 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6405.50 [#/sec] (mean)
+Time per request:       1.249 [ms] (mean)
+Time per request:       0.156 [ms] (mean, across all concurrent requests)
+Transfer rate:          3281111.83 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     1    1   0.1      1       2
+Waiting:        0    0   0.0      0       0
+Total:          1    1   0.1      1       2
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%      2 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.579 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6332.24 [#/sec] (mean)
+Time per request:       1.263 [ms] (mean)
+Time per request:       0.158 [ms] (mean, across all concurrent requests)
+Transfer rate:          3243586.85 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     1    1   0.2      1      10
+Waiting:        0    0   0.2      0       8
+Total:          1    1   0.2      1      10
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%     10 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.514 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6605.08 [#/sec] (mean)
+Time per request:       1.211 [ms] (mean)
+Time per request:       0.151 [ms] (mean, across all concurrent requests)
+Transfer rate:          3383340.80 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     1    1   0.1      1       2
+Waiting:        0    0   0.0      0       1
+Total:          1    1   0.1      1       2
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%      2 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.526 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6554.00 [#/sec] (mean)
+Time per request:       1.221 [ms] (mean)
+Time per request:       0.153 [ms] (mean, across all concurrent requests)
+Transfer rate:          3357177.21 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     0    1   0.1      1       2
+Waiting:        0    0   0.0      0       1
+Total:          1    1   0.1      1       2
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%      2 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.556 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6427.66 [#/sec] (mean)
+Time per request:       1.245 [ms] (mean)
+Time per request:       0.156 [ms] (mean, across all concurrent requests)
+Transfer rate:          3292462.40 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     1    1   0.3      1      11
+Waiting:        0    0   0.3      0       9
+Total:          1    1   0.3      1      11
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%     11 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.533 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6523.22 [#/sec] (mean)
+Time per request:       1.226 [ms] (mean)
+Time per request:       0.153 [ms] (mean, across all concurrent requests)
+Transfer rate:          3341409.50 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     0    1   0.1      1       2
+Waiting:        0    0   0.0      0       1
+Total:          0    1   0.1      1       2
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%      2 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.517 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6592.58 [#/sec] (mean)
+Time per request:       1.213 [ms] (mean)
+Time per request:       0.152 [ms] (mean, across all concurrent requests)
+Transfer rate:          3376939.28 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     0    1   0.0      1       2
+Waiting:        0    0   0.0      0       1
+Total:          0    1   0.0      1       2
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%      2 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.527 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6550.78 [#/sec] (mean)
+Time per request:       1.221 [ms] (mean)
+Time per request:       0.153 [ms] (mean, across all concurrent requests)
+Transfer rate:          3355527.80 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     1    1   0.3      1      10
+Waiting:        0    0   0.3      0       9
+Total:          1    1   0.3      1      10
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      1
+ 100%     10 (longest request)
+This is ApacheBench, Version 2.3 <$Revision: 1843412 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+
+
+Server Software:        thttpd/2.29
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /files/file-524288
+Document Length:        524288 bytes
+
+Concurrency Level:      8
+Time taken for tests:   1.549 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      5245270000 bytes
+HTML transferred:       5242880000 bytes
+Requests per second:    6456.24 [#/sec] (mean)
+Time per request:       1.239 [ms] (mean)
+Time per request:       0.155 [ms] (mean, across all concurrent requests)
+Transfer rate:          3307099.91 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:     1    1   0.1      1       2
+Waiting:        0    0   0.0      0       1
+Total:          1    1   0.1      1       2
 
 Percentage of the requests served within a certain time (ms)
   50%      1
