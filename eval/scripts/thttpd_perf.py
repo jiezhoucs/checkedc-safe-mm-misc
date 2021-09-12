@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
 '''
-This script processes the output from running the ab HTTP benchmarking tool.
-It computes the airhmetic means and std deviations of both baseline and
-checked thttpd.
+This script processes the outputs from running the ab HTTP benchmarking tool.
+It computes the arithmetic means and std deviations of both baseline and
+checked thttpd. It also computes the overhead incurred by Checked C.
 '''
 
 import sys
@@ -28,7 +28,8 @@ def compute():
 
     perf_file = open("perf.csv", "w")
     data_writer = csv.writer(perf_file)
-    header = ["file_size (Kb)", "baseline (Mb/s)", "std_dev", "checked (Mb/s)", "std_dev"]
+    header = ["file_size (Kb)", "baseline (Mb/s)", "std_dev",\
+            "checked (Mb/s)", "std_dev","overhead(%)"]
     data_writer.writerow(header)
 
     normalized = []
@@ -49,6 +50,7 @@ def compute():
         mean_checked = round(np.mean(np.array(bw_checked)), 2)
         std_baseline = round(np.std(np.array(bw_baseline)), 2)
         std_checked = round(np.std(np.array(bw_checked)), 2)
+        overhead = (mean_baseline - mean_checked) / mean_baseline * 100
 
         file_size = 2**exp
         if file_size < 2**10:
@@ -64,13 +66,18 @@ def compute():
                 (mean_checked - std_checked) > (mean_baseline + std_baseline)):
             print("The checked thttpd outperms the original one!")
 
-        normalized += [mean_baseline / mean_checked]
+        normalized += [mean_checked / mean_baseline]
         print("mean_baseline: " + str(mean_baseline) + "; mean_checked: " + str(mean_checked))
         print("std_baseline = " + str(std_baseline) + "; std_checked = " + str(std_checked))
-        print("overhead = " + str((mean_baseline / mean_checked - 1) * 100) + "%")
+        print("overhead = " + str(overhead) + "%")
         print()
 
-    print("Geo Mean: " + str(np.array(normalized).prod() ** (1.0 / len(normalized))))
+    geomean = round((1 - (np.array(normalized).prod() ** (1.0 / len(normalized)))) * 100, 1)
+    Min = round((1 - min(normalized)) * 100, 1)
+    Max = round((1 - max(normalized)) * 100, 1)
+    print("Min: " + str(Min) + "%")
+    print("Max: " + str(Max) + "%")
+    print("Geo Mean: " + str(geomean) + "%")
     perf_file.close()
 
 #
