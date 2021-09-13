@@ -1,0 +1,47 @@
+{
+  "__version__": [
+    0, 
+    8, 
+    0
+  ], 
+  "elapsed": 0.4037439823150635, 
+  "tests": [
+    {
+      "code": "PASS", 
+      "elapsed": 0.3618779182434082, 
+      "metrics": {
+        "compile_time": 0.0865, 
+        "exec_time": 0.3443, 
+        "hash": "d374388e1a1a1cf11107224de0eaa20b", 
+        "link_time": 0.0485, 
+        "size": 21408, 
+        "size..bss": 1, 
+        "size..comment": 517, 
+        "size..data": 40, 
+        "size..dynamic": 416, 
+        "size..dynsym": 216, 
+        "size..eh_frame": 556, 
+        "size..eh_frame_hdr": 100, 
+        "size..fini": 13, 
+        "size..fini_array": 8, 
+        "size..gnu.hash": 28, 
+        "size..gnu.version": 18, 
+        "size..gnu.version_r": 64, 
+        "size..got": 16, 
+        "size..got.plt": 56, 
+        "size..hash": 80, 
+        "size..init": 27, 
+        "size..init_array": 8, 
+        "size..interp": 28, 
+        "size..note.ABI-tag": 32, 
+        "size..note.gnu.property": 192, 
+        "size..plt": 80, 
+        "size..rodata": 976, 
+        "size..text": 5583, 
+        "size..tm_clone_table": 0
+      }, 
+      "name": "test-suite :: MultiSource/Benchmarks/Olden/power/power.test", 
+      "output": "\n/home/jie/projects/checkedc/tests/ts-build/tools/timeit-target --limit-core 0 --limit-cpu 7200 --timeout 7200 --limit-file-size 104857600 --limit-rss-size 838860800 --append-exitstatus --redirect-output /home/jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power/Output/power.test.out --redirect-input /dev/null --chdir /home/jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power --summary /home/jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power/Output/power.test.time /home/jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power/power\ncd /home/jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power ; /home/jie/projects/checkedc/tests/ts-build/tools/fpcmp-target -r 0.00001 /home/jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Olden/power/Output/power.test.out power.reference_output"
+    }
+  ]
+}

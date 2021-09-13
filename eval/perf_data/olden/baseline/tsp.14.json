@@ -1,0 +1,53 @@
+{
+  "__version__": [
+    0, 
+    8, 
+    0
+  ], 
+  "elapsed": 13.326935052871704, 
+  "tests": [
+    {
+      "code": "PASS", 
+      "elapsed": 13.260939121246338, 
+      "metrics": {
+        "compile_time": 0.0612, 
+        "exec_time": 12.8077, 
+        "hash": "0dd5532d0a0968b0edcb777ce3491853", 
+        "link_time": 0.0259, 
+        "size": 16760, 
+        "size..bss": 24, 
+        "size..comment": 82, 
+        "size..data": 16, 
+        "size..dynamic": 416, 
+        "size..dynsym": 288, 
+        "size..eh_frame": 428, 
+        "size..eh_frame_hdr": 76, 
+        "size..fini": 13, 
+        "size..fini_array": 8, 
+        "size..gnu.hash": 28, 
+        "size..gnu.version": 24, 
+        "size..gnu.version_r": 80, 
+        "size..got": 16, 
+        "size..got.plt": 80, 
+        "size..hash": 104, 
+        "size..init": 27, 
+        "size..init_array": 8, 
+        "size..interp": 28, 
+        "size..note.ABI-tag": 32, 
+        "size..note.gnu.property": 192, 
+        "size..plt": 128, 
+        "size..rodata": 198, 
+        "size..text": 3764, 
+        "size..tm_clone_table": 0
+      }, 
+      "name": "test-suite :: MultiSource/Benchmarks/Olden/tsp/tsp.test", 
+      "output": "\n/home/jie/projects/checkedc/tests/ts-build-baseline/tools/timeit-target --limit-core 0 --limit-cpu 7200 --timeout 7200 --limit-file-size 104857600 --limit-rss-size 838860800 --append-exitstatus --redirect-output /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/tsp/Output/tsp.test.out --redirect-input /dev/null --chdir /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/tsp --summary /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/tsp/Output/tsp.test.time /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/tsp/tsp 20480000\ncd /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/tsp ; /home/jie/projects/checkedc/tests/ts-build-baseline/tools/fpcmp-target /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/tsp/Output/tsp.test.out tsp.reference_output.extra_large"
+    }, 
+    {
+      "code": "NOEXE", 
+      "elapsed": 0.0012590885162353516, 
+      "name": "test-suite :: MultiSource/Benchmarks/Rodinia/hotspot/hotspot.test", 
+      "output": "Executable '/home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Rodinia/hotspot/hotspot' is missing"
+    }
+  ]
+}

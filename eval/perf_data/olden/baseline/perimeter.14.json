@@ -1,0 +1,47 @@
+{
+  "__version__": [
+    0, 
+    8, 
+    0
+  ], 
+  "elapsed": 2.808896064758301, 
+  "tests": [
+    {
+      "code": "PASS", 
+      "elapsed": 2.7050869464874268, 
+      "metrics": {
+        "compile_time": 0.0512, 
+        "exec_time": 2.0767, 
+        "hash": "f1028306cff40ee42581c552d88061b6", 
+        "link_time": 0.0274, 
+        "size": 16752, 
+        "size..bss": 12, 
+        "size..comment": 82, 
+        "size..data": 16, 
+        "size..dynamic": 400, 
+        "size..dynsym": 216, 
+        "size..eh_frame": 604, 
+        "size..eh_frame_hdr": 100, 
+        "size..fini": 13, 
+        "size..fini_array": 8, 
+        "size..gnu.hash": 28, 
+        "size..gnu.version": 18, 
+        "size..gnu.version_r": 32, 
+        "size..got": 16, 
+        "size..got.plt": 56, 
+        "size..hash": 80, 
+        "size..init": 27, 
+        "size..init_array": 8, 
+        "size..interp": 28, 
+        "size..note.ABI-tag": 32, 
+        "size..note.gnu.property": 192, 
+        "size..plt": 80, 
+        "size..rodata": 183, 
+        "size..text": 2077, 
+        "size..tm_clone_table": 0
+      }, 
+      "name": "test-suite :: MultiSource/Benchmarks/Olden/perimeter/perimeter.test", 
+      "output": "\n/home/jie/projects/checkedc/tests/ts-build-baseline/tools/timeit-target --limit-core 0 --limit-cpu 7200 --timeout 7200 --limit-file-size 104857600 --limit-rss-size 838860800 --append-exitstatus --redirect-output /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/perimeter/Output/perimeter.test.out --redirect-input /dev/null --chdir /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/perimeter --summary /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/perimeter/Output/perimeter.test.time /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/perimeter/perimeter 100\ncd /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/perimeter ; /home/jie/projects/checkedc/tests/ts-build-baseline/tools/fpcmp-target /home/jie/projects/checkedc/tests/ts-build-baseline/MultiSource/Benchmarks/Olden/perimeter/Output/perimeter.test.out perimeter.reference_output.extra_large"
+    }
+  ]
+}

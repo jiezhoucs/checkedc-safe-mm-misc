@@ -1,0 +1,47 @@
+{
+  "__version__": [
+    0, 
+    8, 
+    0
+  ], 
+  "elapsed": 5.010059118270874, 
+  "tests": [
+    {
+      "code": "PASS", 
+      "elapsed": 4.974385976791382, 
+      "metrics": {
+        "compile_time": 0.020900000000000002, 
+        "exec_time": 3.2022, 
+        "hash": "9ccca72a8b71faf68b95705f95495710", 
+        "link_time": 0.0515, 
+        "size": 22312, 
+        "size..bss": 104, 
+        "size..comment": 82, 
+        "size..data": 24, 
+        "size..dynamic": 432, 
+        "size..dynsym": 528, 
+        "size..eh_frame": 644, 
+        "size..eh_frame_hdr": 132, 
+        "size..fini": 13, 
+        "size..fini_array": 8, 
+        "size..gnu.hash": 32, 
+        "size..gnu.version": 44, 
+        "size..gnu.version_r": 48, 
+        "size..got": 16, 
+        "size..got.plt": 152, 
+        "size..hash": 184, 
+        "size..init": 27, 
+        "size..init_array": 48, 
+        "size..interp": 28, 
+        "size..note.ABI-tag": 32, 
+        "size..note.gnu.property": 224, 
+        "size..plt": 272, 
+        "size..rodata": 876, 
+        "size..text": 3772, 
+        "size..tm_clone_table": 0
+      }, 
+      "name": "test-suite :: MultiSource/Benchmarks/Olden/treeadd/treeadd.test", 
+      "output": "\n/home/jie/projects/checkedc/tests/ts-build-cets/tools/timeit-target --limit-core 0 --limit-cpu 7200 --timeout 7200 --limit-file-size 104857600 --limit-rss-size 838860800 --append-exitstatus --redirect-output /home/jie/projects/checkedc/tests/ts-build-cets/MultiSource/Benchmarks/Olden/treeadd/Output/treeadd.test.out --redirect-input /dev/null --chdir /home/jie/projects/checkedc/tests/ts-build-cets/MultiSource/Benchmarks/Olden/treeadd --summary /home/jie/projects/checkedc/tests/ts-build-cets/MultiSource/Benchmarks/Olden/treeadd/Output/treeadd.test.time /home/jie/projects/checkedc/tests/ts-build-cets/MultiSource/Benchmarks/Olden/treeadd/treeadd 26\ncd /home/jie/projects/checkedc/tests/ts-build-cets/MultiSource/Benchmarks/Olden/treeadd ; /home/jie/projects/checkedc/tests/ts-build-cets/tools/fpcmp-target /home/jie/projects/checkedc/tests/ts-build-cets/MultiSource/Benchmarks/Olden/treeadd/Output/treeadd.test.out treeadd.reference_output.extra_large"
+    }
+  ]
+}

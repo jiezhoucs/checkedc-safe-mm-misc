@@ -10,7 +10,7 @@
 #
 # Olden-specific paths
 BUILD_DIR="$TESTS_DIR/ts-build"
-DATA_DIR="$DATA_DIR/olden/checkedc"
+DATA_DIR="$DATA_DIR/olden/checked"
 BIN_DIR="$BUILD_DIR/MultiSource/Benchmarks/Olden"
 
 PROGRAMS=(
