@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# This script runs olden benchmarks multiple times and collect data.
+# This script collects Olden performance data.
 #
 
 import numpy as np
