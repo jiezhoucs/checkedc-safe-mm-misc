@@ -4,6 +4,12 @@
 # This scritps run the benchmarks of the Olden test suite.
 #
 
+#
+# cd to the CETS directory that contains the script for running CETS.
+#
+ROOT_DIR=`dirname $0 | sed 's/$/\/..\/..\/../' | xargs realpath`
+cd "$ROOT_DIR/misc/scripts/cets"
+
 # load common directory paths and variables
 . common.sh
 
