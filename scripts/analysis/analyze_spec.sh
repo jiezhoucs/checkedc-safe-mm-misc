@@ -10,6 +10,7 @@ BUILD_DIR="$ANALYSIS_DIR/ts-build"
 SPEC_BUILD="$BUILD_DIR/External/SPEC"
 SPEC_INT_BUILD="$SPEC_BUILD/CINT2017rate"
 SPEC_FP_BUILD="$SPEC_BUILD/CFP2017rate"
+DATA_DIR="$ANALYSIS_DIR/data/"
 
 # All SPEC C benchmarks
 SPEC_ALL_C=(
@@ -59,6 +60,17 @@ compile_all() {
 }
 
 #
+# Run a benchmark
+#
+run() {
+    # Remove old data
+    rm -f /tmp/analysis_result.txt
+    cd $BUILD_DIR
+    echo "Running $1..."
+    $LIT -vv --filter $1 -o "$DATA_DIR/$1.json" .
+}
+
+#
 # Clean all compiled binaries
 #
 clean() {
@@ -92,4 +104,7 @@ if [[ $# == 1 ]]; then
     else
         compile_one $1
     fi
+elif [[ $# == 2 && $2 == "run" ]]; then
+    compile_one $1
+    run $1
 fi
