@@ -9,14 +9,14 @@
 
 . common.sh
 
-SRC_DIR="$PROGRAMS/gnupg"
+SRC_DIR="$PROGRAMS/gnupg-2.2.20"
 
 export CC="$CC"
 export CXX="$CXX"
 export CFLAGS="-flto"
 export CXXFLAGS="-flto"
 export LD="$CC"
-export LDFLAGS="-fuse-ld=lld $MARSHAL_ARRAY_PASS"
+export LDFLAGS="-fuse-ld=lld $DYN_STATS_PASS -lstdc++ $ANALYSIS_LIB/libanalysis.o"
 export AR="$AR"
 export NM="$NM"
 

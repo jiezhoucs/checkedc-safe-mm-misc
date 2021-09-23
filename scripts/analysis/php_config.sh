@@ -13,9 +13,12 @@ export CXX="$CXX"
 export CFLAGS="-flto"
 export CXXFLAGS="-flto"
 export LD="$CC"
-export LDFLAGS="-fuse-ld=lld $MARSHAL_ARRAY_PASS"
+export LDFLAGS="-fuse-ld=lld $MARSHAL_ARRAY_PASS -lstdc++ $ANALYSIS_LIB/libanalysis.o"
 export AR="$AR"
 export NM="$NM"
+
+# Remove existing data file.
+rm -f /tmp/analysis_result.txt
 
 cd $SRC_DIR
 ./configure --prefix="$SRC_DIR/build"                   \
