@@ -13,7 +13,7 @@ export CXX="$CXX"
 export CFLAGS="-flto"
 export CXXFLAGS="-flto"
 export LD="$CC"
-export LDFLAGS="-fuse-ld=lld $MARSHAL_ARRAY_PASS -lstdc++ $ANALYSIS_LIB/libanalysis.o"
+export LDFLAGS="-fuse-ld=lld $DYN_STATS_PASS -lstdc++ $ANALYSIS_LIB/libanalysis.o"
 export AR="$AR"
 export NM="$NM"
 
