@@ -1,0 +1,4281 @@
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 2097248
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 2097248
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1048576
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1048576
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 4194260
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 4194260
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 32822
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 17001
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 2097152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 64
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 10000000
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 65536
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 200
+Total shared array of pointers: 200
+Largest heap object: 102401
+Largest shared array of pointers: 200
+Total shared array of pointers: 200
+Largest heap object: 102401
+Largest shared array of pointers: 200
+Total shared array of pointers: 200
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 29152
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 0
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 1336
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 196609
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 131072
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 16385
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 5320
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
+Largest heap object: 102401
+Largest shared array of pointers: 0
+Total shared array of pointers: 0
