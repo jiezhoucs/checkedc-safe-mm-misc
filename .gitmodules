@@ -1,0 +1,3 @@
+[submodule "eval/wss"]
+	path = eval/wss
+	url = git@github.com:brendangregg/wss.git
