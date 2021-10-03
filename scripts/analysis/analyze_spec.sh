@@ -44,6 +44,8 @@ SPEC_FP_PROGRAMS=(
 # Compile one program
 #
 compile_one() {
+    clean_stat_files
+
     cd $BUILD_DIR
     echo "Compiling $1"
     make $1 -j8
@@ -74,6 +76,10 @@ run() {
 # Clean all compiled binaries
 #
 clean() {
+    # Clean stats files
+    clean_stat_files
+
+    # Clean binaries.
     for prog in ${SPEC_INT_PROGRAMS[@]}; do
         echo "removing $prog"
         cd $SPEC_INT_BUILD/$prog

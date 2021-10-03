@@ -11,7 +11,7 @@ HTTPD_DIR="$ANALYSIS_DIR/programs/httpd-2.4.46"
 SERVER_ROOT_DIR="$HTTPD_DIR/install"
 
 # Number of open connections.
-CON=1
+CON=8
 
 # Requets
 REQUESTS=10000
@@ -33,6 +33,26 @@ PORT=8091
 START=20
 END=25
 
+#
+# Set the port number and copy files to the root directory if they do not exit.
+#
+prepare() {
+    cd $SERVER_ROOT_DIR
+    # Copy random files to here.
+    if [[ ! -d "htdocs/files" ]]; then
+        cp -r ../../../files htdocs/
+    fi
+
+    # Set the port number
+    port=8`head -52 conf/httpd.conf | tail -1 | cut -d '8' -f2`
+    if [[ $port == "80" ]]; then
+        sed -i "52s/80/8091/" conf/httpd.conf
+    fi
+}
+
+#
+# Start the server and run ab
+#
 run() {
     cd $SERVER_ROOT_DIR
     # Start the server. Kill it if it is already started.
@@ -49,6 +69,7 @@ run() {
         exit
     fi
 
+    # Run ab.
     for i in $(seq 20 25); do
         size=`echo 2^$i | bc`
         echo "Fetching file file-$size..."
@@ -62,4 +83,6 @@ run() {
 #
 # Entrance of this script
 #
+prepare
+
 run

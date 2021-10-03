@@ -6,11 +6,11 @@
 
 ROOT_DIR=`realpath ../../../`
 ANALYSIS_DIR="$ROOT_DIR/analysis"
-NGINX_DIR="$ANALYSIS_DIR/programs/nginx-1.21.1"
+NGINX_DIR="$ANALYSIS_DIR/programs/nginx-1.21.3"
 SERVER_ROOT_DIR="$NGINX_DIR/build"
 
 # Number of open connections.
-CON=1
+CON=8
 
 # Requets
 REQUESTS=10000
@@ -42,6 +42,7 @@ config() {
     if [[ $port == "80;" ]]; then
         sed -i "36s/80/8090/" conf/nginx.conf
     fi
+
     # Copy random files here
     if [[ ! -d html/files ]]; then
         cp -r ../../../files html/

@@ -18,8 +18,7 @@ LDFLAGS="$LDFLAGS $DYN_STATS_PASS -lstdc++ $ANALYSIS_LIB/libanalysis.o"
 # LDFLAGS="$LDFLAGS $GET_OBJ_SIZE_PASS"
 
 # Remove existing data file.
-rm -f /tmp/struct_size.txt
-rm -f /tmp/analysis_result.txt
+clean_stat_files
 
 #
 # Start to configure
@@ -38,3 +37,8 @@ fi
             --nm="$NM"                                                         \
             --ranlib="$RANLIB"                                                 \
             --samples=fate-suite
+
+if [[ $1 == "make" ]]; then
+    make -j8
+    make install -j8
+fi

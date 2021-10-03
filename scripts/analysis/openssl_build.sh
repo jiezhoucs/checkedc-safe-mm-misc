@@ -3,6 +3,8 @@
 #
 # This scripts configures openssl-3.0.0.
 #
+# For testing, do "make test"
+#
 
 . common.sh
 
@@ -18,9 +20,6 @@ export AR="$AR"
 export NM="$NM"
 export RANLIB="$RANLIB"
 
-# Remove existing data file.
-rm -f /tmp/analysis_result.txt
-
 #
 # Start to build
 #
@@ -31,3 +30,16 @@ fi
 
 ./config --prefix="$BUILD_DIR"  \
          -no-shared
+
+#
+# Remove existing data file.
+#
+clean_stat_files
+
+#
+# Compile
+#
+if [[ $1 == "make" ]]; then
+    make -j8
+    make install -j8
+fi

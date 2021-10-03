@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+#
+# This scripts configures the Makefiles for curl-7.79.1.
+#
+# To run built-in tests, do "make test -jx".
+#
+
 . common.sh
 
 SRC_DIR="$PROGRAMS/curl-7.79.1"
@@ -44,9 +50,17 @@ config_cmake() {
 # Run configure to create build files.
 #
 config_configure() {
+    if [[ ! -f "configure" ]]; then
+        autoreconf -fi
+    fi
+
     cd $SRC_DIR
     if [[ ! -d $BUILD_DIR ]]; then
         mkdir $BUILD_DIR
+    fi
+
+    if [[ -f Makefile ]]; then
+        make -k clean
     fi
 
     ./configure  --prefix="$BUILD_DIR"                                         \
@@ -65,4 +79,10 @@ config_configure() {
 #
 # Entrance of this script.
 #
+clean_stat_files
+
 config_configure
+
+if [[ $1 == "make" ]]; then
+    make -j8
+fi
