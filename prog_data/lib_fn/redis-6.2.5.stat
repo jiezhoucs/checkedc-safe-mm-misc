@@ -1,0 +1,12 @@
+Lib funtions:
+getaddrinfo
+Total call site: 7
+Lib funtions:
+getaddrinfo
+Total call site: 7
+Lib funtions:
+getaddrinfo
+execve
+backtrace
+backtrace_symbols_fd
+Total call site: 12

@@ -1,0 +1,864 @@
+Lib funtions:
+apr_dbm_open_ex
+apr_app_initialize
+apr_pool_create_ex
+apr_file_open_stderr
+apr_getopt_init
+apr_getopt
+apr_file_open_stdin
+apr_file_open
+Total call site: 9
+Lib funtions:
+apr_app_initialize
+apr_temp_dir_get
+apr_file_mktemp
+apr_pool_create_ex
+apr_file_open_stderr
+apr_file_open
+Total call site: 7
+Lib funtions:
+apr_sockaddr_info_get
+apr_getnameinfo
+apr_file_open
+apr_pool_create_ex
+apr_file_open_stderr
+apr_getopt_init
+apr_app_initialize
+apr_getopt
+apr_file_open_stdout
+apr_file_open_stdin
+Total call site: 12
+Lib funtions:
+apr_file_open
+apr_temp_dir_get
+apr_file_open_stdin
+apr_app_initialize
+apr_pool_create_ex
+apr_file_open_stderr
+apr_getopt
+apr_getopt_init
+apr_file_mktemp
+Total call site: 13
+Lib funtions:
+apr_file_open_stdin
+apr_app_initialize
+apr_pool_create_ex
+apr_file_open_stderr
+apr_dbm_open_ex
+apr_getopt_init
+apr_getopt
+Total call site: 8
+Lib funtions:
+apr_app_initialize
+apr_pool_create_ex
+apr_getopt_init
+apr_getopt
+apr_sockaddr_info_get
+apr_socket_create
+apr_os_file_put
+Total call site: 8
+Lib funtions:
+apr_file_open
+apr_proc_create
+apr_filepath_merge
+apr_app_initialize
+apr_file_open_stdin
+apr_file_open_stdout
+apr_pool_create_ex
+apr_getopt_init
+apr_getopt
+apr_procattr_create
+Total call site: 12
+Lib funtions:
+apr_filepath_get
+apr_file_open
+apr_strtoff
+apr_app_initialize
+apr_getopt_init
+apr_getopt
+apr_pool_create_ex
+apr_file_open_stderr
+apr_file_open_stdout
+apr_dir_open
+apr_hash_this
+Total call site: 26
+Lib funtions:
+apr_pool_create_ex
+apr_parse_addr_port
+apr_getopt
+apr_app_initialize
+apr_getopt_init
+apr_socket_create
+apr_pollset_create
+apr_ipsubnet_create
+apr_sockaddr_info_get
+apr_file_open
+apr_pollset_poll
+Total call site: 14
+Lib funtions:
+ap_hook_optional_fn_retrieve
+apr_dbm_open_ex
+Total call site: 2
+Lib funtions:
+ap_pcfg_openfile
+ap_getword
+ap_hook_optional_fn_retrieve
+Total call site: 8
+Lib funtions:
+apr_dbd_pvselect
+apr_dbd_get_row
+ap_hook_optional_fn_retrieve
+Total call site: 7
+Lib funtions:
+ap_global_mutex_create
+ap_hook_pre_config
+ap_hook_post_config
+ap_hook_child_init
+apr_global_mutex_child_init
+Total call site: 5
+Lib funtions:
+ap_getword_conf
+ap_hook_check_authn
+Total call site: 3
+Lib funtions:
+ap_expr_str_exec
+ap_getword_conf
+apr_sockaddr_info_get
+ap_expr_parse_cmd_mi
+ap_hook_pre_config
+ap_hook_post_config
+apr_ipsubnet_create
+Total call site: 16
+Lib funtions:
+ap_pcfg_openfile
+apr_pool_create_ex
+ap_getword
+ap_getword_conf
+ap_hook_optional_fn_retrieve
+ap_expr_parse_cmd_mi
+ap_expr_str_exec
+Total call site: 8
+Lib funtions:
+ap_expr_parse_cmd_mi
+ap_expr_str_exec
+ap_getword_conf
+Total call site: 3
+Lib funtions:
+ap_hook_optional_fn_retrieve
+ap_getword
+apr_dbm_open_ex
+ap_expr_parse_cmd_mi
+ap_expr_str_exec
+ap_getword_white
+Total call site: 8
+Lib funtions:
+apr_gid_name_get
+apr_uid_name_get
+Total call site: 2
+Lib funtions:
+apr_dbd_pvselect
+apr_dbd_get_row
+ap_expr_parse_cmd_mi
+ap_expr_str_exec
+ap_getword_white
+Total call site: 9
+Lib funtions:
+ap_expr_parse_cmd_mi
+apr_pool_userdata_get
+ap_hook_pre_config
+ap_hook_check_config
+ap_hook_check_authz
+ap_hook_check_access_ex
+ap_expr_exec
+ap_getword_conf
+Total call site: 16
+Lib funtions:
+apr_hook_debug_show
+apr_hook_sort_register
+apr_dir_open
+pcre_compile2
+apr_global_mutex_create
+apr_hash_this
+apr_socket_accept
+apr_socket_addr_get
+apr_ipsubnet_create
+apr_pollset_create
+apr_pollset_create_ex
+apr_pollset_poll
+apr_os_thread_get
+apr_proc_mutex_create
+apr_shm_create
+apr_skiplist_init
+apr_strtok
+apr_thread_cond_create
+apr_thread_mutex_create
+apr_threadattr_create
+apr_thread_create
+apr_uid_name_get
+apr_gid_name_get
+apr_getopt_init
+apr_getopt
+apr_file_open
+apr_app_initialize
+apr_pool_create_ex
+apr_sockaddr_info_get
+apr_filepath_merge
+apr_file_open_stderr
+apr_getnameinfo
+apr_sockaddr_ip_get
+apr_file_open_stdout
+apr_pool_userdata_get
+apr_filepath_root
+apr_allocator_create
+apr_parse_addr_port
+apr_procattr_create
+apr_tokenize_to_argv
+apr_proc_create
+apr_file_pipe_create_ex
+apr_socket_create
+apr_strtoi64
+apr_strtoff
+apr_optional_hook_add
+apr_brigade_partition
+apr_atomic_casptr
+apr_dso_load
+apr_dso_sym
+apr_xml_parser_done
+apr_file_pipe_create
+Total call site: 316
+Lib funtions:
+apr_ipsubnet_create
+ap_hook_check_access
+Total call site: 3
+Lib funtions:
+ap_expr_str_exec
+ap_hook_check_authn
+ap_expr_parse_cmd_mi
+ap_hook_fixups
+ap_hook_note_auth_failure
+ap_getword
+ap_getword_nulls
+Total call site: 9
+Lib funtions:
+ap_hook_check_authn
+ap_hook_handler
+ap_hook_post_config
+ap_hook_note_auth_failure
+ap_expr_str_exec
+ap_expr_parse_cmd_mi
+ap_parse_form_data
+apr_strtoff
+Total call site: 16
+Lib funtions:
+ap_hook_access_checker
+Total call site: 1
+Lib funtions:
+apr_rmm_attach
+ap_hook_child_init
+ap_hook_pre_config
+ap_getword_white
+apr_global_mutex_child_init
+apr_shm_create
+ap_hook_post_config
+ap_hook_post_read_request
+ap_hook_check_authn
+ap_hook_fixups
+ap_hook_note_auth_failure
+apr_rmm_init
+ap_global_mutex_create
+Total call site: 16
+Lib funtions:
+ap_hook_handler
+ap_hook_post_config
+apr_mmap_dup
+apr_file_open
+apr_mmap_create
+ap_hook_translate_name
+Total call site: 6
+Lib funtions:
+apr_shm_create
+Total call site: 2
+Lib funtions:
+apr_dbm_open
+apr_pool_create_ex
+Total call site: 9
+Lib funtions:
+apr_memcache_stats
+apr_strtok
+apr_memcache_create
+apr_parse_addr_port
+apr_memcache_server_create
+apr_memcache_getp
+Total call site: 9
+Lib funtions:
+ap_global_mutex_create
+ap_hook_pre_config
+apr_pool_create_ex
+ap_hook_post_config
+ap_hook_child_init
+apr_global_mutex_child_init
+apr_optional_hook_add
+apr_brigade_partition
+ap_get_list_item
+apr_strtoff
+Total call site: 16
+Lib funtions:
+apr_file_mktemp
+ap_get_list_item
+apr_brigade_partition
+apr_file_open
+apr_pool_create_ex
+apr_strtoff
+Total call site: 15
+Lib funtions:
+apr_redis_stats
+apr_redis_getp
+apr_strtok
+apr_redis_create
+apr_parse_addr_port
+apr_redis_server_create
+Total call site: 9
+Lib funtions:
+apr_hook_sort_register
+apr_hook_debug_show
+apr_pool_userdata_get
+ap_hook_handler
+ap_hook_quick_handler
+ap_hook_insert_error_filter
+ap_hook_post_config
+apr_file_open
+apr_temp_dir_get
+apr_strtoff
+Total call site: 19
+Lib funtions:
+ap_getword_conf
+ap_getword_conf_nc
+Total call site: 5
+Lib funtions:
+apr_pool_userdata_get
+apr_hook_sort_register
+apr_hook_debug_show
+ap_hook_post_config
+ap_proc_mutex_create
+apr_proc_mutex_child_init
+ap_hook_pre_config
+apr_thread_create
+ap_hook_child_init
+apr_pool_create_ex
+Total call site: 21
+Lib funtions:
+apr_pool_create_ex
+apr_dbd_get_driver
+ap_hook_pre_config
+ap_hook_post_config
+apr_hash_this
+apr_dbd_prepare
+apr_thread_mutex_create
+apr_optional_hook_add
+ap_hook_child_init
+apr_reslist_create
+apr_reslist_acquire
+apr_dbd_open_ex
+Total call site: 17
+Lib funtions:
+ap_hook_pre_connection
+Total call site: 1
+Lib funtions:
+ap_getword_conf
+ap_hook_pre_read_request
+ap_hook_process_connection
+ap_hook_post_read_request
+Total call site: 4
+Lib funtions:
+apr_brigade_partition
+apr_strtoff
+Total call site: 2
+Lib funtions:
+apr_brigade_partition
+ap_save_brigade
+Total call site: 2
+Lib funtions:
+apr_tokenize_to_argv
+ap_getword_white
+ap_hook_post_config
+apr_pool_userdata_get
+apr_file_open_stderr
+apr_pollset_poll
+ap_getword
+apr_procattr_create
+apr_proc_create
+apr_pollset_create
+Total call site: 18
+Lib funtions:
+apr_brigade_partition
+ap_hook_insert_filter
+apr_strtoff
+Total call site: 4
+Lib funtions:
+ap_save_brigade
+apr_pool_create_ex
+apr_brigade_pflatten
+ap_pregsub_ex
+apr_strtoff
+Total call site: 6
+Lib funtions:
+apr_strtok
+ap_hook_insert_filter
+ap_expr_exec
+ap_expr_parse_cmd_mi
+Total call site: 7
+Lib funtions:
+apr_brigade_partition
+apr_strtoff
+ap_hook_post_config
+ap_get_token
+Total call site: 9
+Lib funtions:
+ap_hook_post_config
+apr_pool_create_ex
+ap_hook_fixups
+apr_brigade_pflatten
+apr_strtok
+apr_uid_name_get
+apr_filepath_merge
+Total call site: 16
+Lib funtions:
+ap_hook_post_config
+ap_hook_type_checker
+ap_pcfg_openfile
+ap_getword
+ap_getword_conf
+Total call site: 8
+Lib funtions:
+ap_hook_pre_connection
+ap_hook_pre_config
+ap_hook_log_transaction
+ap_hook_insert_filter
+Total call site: 4
+Lib funtions:
+ap_hook_check_access
+ap_hook_log_transaction
+ap_expr_exec
+ap_expr_str_exec
+ap_hook_quick_handler
+ap_hook_handler
+ap_hook_translate_name
+ap_hook_map_to_storage
+ap_hook_fixups
+ap_hook_type_checker
+ap_hook_check_access_ex
+ap_hook_check_authn
+ap_hook_check_authz
+ap_hook_insert_filter
+ap_expr_parse_cmd_mi
+Total call site: 16
+Lib funtions:
+ap_expr_exec
+ap_hook_check_config
+ap_hook_pre_config
+ap_hook_log_transaction
+ap_hook_child_init
+ap_hook_open_logs
+apr_file_open
+apr_thread_mutex_create
+ap_getword
+apr_strtok
+ap_expr_parse_cmd_mi
+Total call site: 13
+Lib funtions:
+ap_hook_child_init
+ap_hook_post_config
+ap_hook_post_read_request
+ap_hook_generate_log_id
+Total call site: 4
+Lib funtions:
+ap_hook_fixups
+apr_strtok
+Total call site: 2
+Lib funtions:
+ap_build_cont_config
+Total call site: 1
+Lib funtions:
+ap_getword_conf
+ap_hook_insert_error_filter
+ap_hook_insert_filter
+Total call site: 7
+Lib funtions:
+ap_hook_header_parser
+ap_hook_post_read_request
+ap_expr_exec_re
+ap_getword
+ap_expr_parse_cmd_mi
+ap_getword_conf
+Total call site: 10
+Lib funtions:
+ap_hook_insert_filter
+ap_expr_str_exec
+ap_hook_post_config
+ap_hook_pre_config
+ap_expr_exec
+ap_hook_insert_error_filter
+ap_hook_fixups
+ap_hook_post_read_request
+ap_getword_conf
+ap_expr_parse_cmd_mi
+ap_getword
+Total call site: 18
+Lib funtions:
+apr_strtok
+apr_sockaddr_ip_get
+ap_hook_pre_connection
+ap_hook_post_config
+apr_sockaddr_info_get
+ap_hook_post_read_request
+apr_ipsubnet_create
+ap_pcfg_openfile
+ap_getword_conf
+Total call site: 21
+Lib funtions:
+ap_proxy_connect_to_backend
+apr_pollset_create
+proxy_hook_scheme_handler
+proxy_hook_canon_handler
+apr_sockaddr_info_get
+apr_pollset_poll
+Total call site: 6
+Lib funtions:
+ap_getword
+proxy_hook_scheme_handler
+ap_getword_conf
+ap_getword_nulls
+apr_sockaddr_info_get
+ap_proxy_acquire_connection
+proxy_hook_canon_handler
+ap_proxy_canon_netloc
+apr_socket_addr_get
+apr_socket_create
+apr_strtok
+apr_sockaddr_ip_get
+apr_socket_accept
+Total call site: 21
+Lib funtions:
+apr_file_mktemp
+apr_file_name_get
+ap_proxy_acquire_connection
+apr_pool_userdata_get
+ap_proxy_determine_connection
+ap_proxy_create_hdrbrgd
+proxy_hook_scheme_handler
+ap_hook_post_config
+ap_proxy_canon_netloc
+ap_save_brigade
+apr_temp_dir_get
+apr_filepath_merge
+proxy_hook_canon_handler
+apr_pool_create_ex
+ap_rgetline_core
+Total call site: 19
+Lib funtions:
+ap_proxy_acquire_connection
+ap_proxy_determine_connection
+ap_proxy_canon_netloc
+proxy_hook_scheme_handler
+apr_pool_create_ex
+ap_expr_exec_re
+ap_expr_str_exec_re
+proxy_hook_canon_handler
+ap_expr_parse_cmd_mi
+Total call site: 10
+Lib funtions:
+proxy_hook_scheme_handler
+proxy_hook_canon_handler
+apr_socket_create
+Total call site: 4
+Lib funtions:
+ap_proxy_acquire_connection
+ap_proxy_determine_connection
+proxy_hook_scheme_handler
+apr_optional_hook_add
+ap_proxy_canon_netloc
+proxy_hook_canon_handler
+Total call site: 6
+Lib funtions:
+ap_proxy_canon_netloc
+proxy_hook_scheme_handler
+proxy_hook_canon_handler
+ap_proxy_acquire_connection
+ap_proxy_determine_connection
+apr_pool_create_ex
+Total call site: 6
+Lib funtions:
+proxy_hook_scheme_handler
+ap_proxy_canon_netloc
+ap_proxy_determine_connection
+proxy_hook_canon_handler
+ap_proxy_acquire_connection
+ap_proxy_create_hdrbrgd
+apr_pollset_create
+apr_pollset_poll
+Total call site: 8
+Lib funtions:
+ap_hook_translate_name
+ap_hook_post_config
+apr_dbm_open_ex
+Total call site: 3
+Lib funtions:
+ap_proxy_acquire_connection
+ap_proxy_determine_connection
+ap_proxy_canon_netloc
+proxy_hook_scheme_handler
+proxy_hook_canon_handler
+Total call site: 6
+Lib funtions:
+apr_parse_addr_port
+ap_hook_post_read_request
+ap_getword_conf
+ap_hook_handler
+apr_thread_mutex_create
+ap_hook_translate_name
+ap_hook_child_init
+apr_global_mutex_child_init
+ap_global_mutex_create
+apr_pool_create_ex
+apr_strtoi64
+ap_hook_map_to_storage
+ap_hook_fixups
+ap_hook_pre_config
+apr_optional_hook_add
+ap_hook_post_config
+apr_hook_sort_register
+apr_hook_debug_show
+apr_sockaddr_info_get
+ap_get_token
+apr_strtok
+ap_pstr2_alnum
+apr_reslist_create
+apr_socket_create
+apr_reslist_acquire
+apr_socket_addr_get
+Total call site: 63
+Lib funtions:
+ap_hook_pre_config
+ap_hook_expr_lookup
+apr_thread_pool_create
+apr_sockaddr_info_get
+apr_pool_create_ex
+ap_proxy_define_worker
+ap_hook_post_config
+ap_expr_exec
+ap_proxy_acquire_connection
+ap_getword_conf
+ap_getword_conf2
+ap_expr_parse_cmd_mi
+Total call site: 18
+Lib funtions:
+ap_proxy_canon_netloc
+ap_hook_post_config
+ap_hook_pre_config
+ap_hook_handler
+ap_hook_child_init
+proxy_hook_post_request
+proxy_hook_pre_request
+proxy_hook_canon_handler
+apr_strtok
+ap_proxy_define_worker
+ap_pstr2_alnum
+ap_global_mutex_create
+Total call site: 14
+Lib funtions:
+ap_cookie_read
+ap_hook_session_save
+ap_hook_session_load
+apr_strtok
+Total call site: 5
+Lib funtions:
+ap_hook_session_load
+apr_dbd_pvbselect
+apr_dbd_get_row
+apr_strtok
+ap_hook_session_save
+ap_hook_monitor
+ap_cookie_read
+Total call site: 9
+Lib funtions:
+apr_hook_debug_show
+apr_hook_sort_register
+apr_strtok
+ap_hook_insert_filter
+ap_hook_insert_error_filter
+ap_hook_fixups
+Total call site: 19
+Lib funtions:
+ap_hook_session_encode
+ap_hook_session_decode
+apr_crypto_make
+apr_crypto_block_decrypt_init
+apr_crypto_block_decrypt
+ap_hook_post_config
+apr_crypto_get_driver
+apr_crypto_passphrase
+apr_pool_userdata_get
+ap_getword_conf
+ap_pcfg_openfile
+apr_tokenize_to_argv
+ap_get_exec_line
+apr_crypto_block_encrypt
+apr_crypto_get_block_key_types
+apr_hash_this
+apr_crypto_block_encrypt_init
+Total call site: 21
+Lib funtions:
+ap_hook_post_config
+apr_file_open
+apr_shm_attach
+ap_hook_pre_config
+apr_shm_create
+Total call site: 7
+Lib funtions:
+ap_hook_post_config
+Total call site: 1
+Lib funtions:
+ap_hook_post_config
+Total call site: 1
+Lib funtions:
+ap_hook_post_config
+Total call site: 1
+Lib funtions:
+apr_pool_create_ex
+ap_hook_post_config
+apr_file_open
+apr_strtok
+Total call site: 5
+Lib funtions:
+apr_file_open_stdout
+ap_hook_test_config
+ap_hook_drop_privileges
+ap_hook_pre_config
+Total call site: 4
+Lib funtions:
+ap_hook_post_config
+ap_hook_handler
+apr_hook_debug_show
+ap_xml_parse_input
+ap_hook_fixups
+apr_hook_sort_register
+apr_pool_create_ex
+apr_hash_this
+ap_getword_white
+apr_xml_to_text
+Total call site: 34
+Lib funtions:
+ap_hook_check_config
+apr_file_open_stdout
+ap_hook_handler
+Total call site: 3
+Lib funtions:
+ap_hook_child_init
+ap_hook_pre_config
+ap_hook_handler
+ap_hook_post_config
+Total call site: 4
+Lib funtions:
+apr_pool_userdata_get
+ap_hook_handler
+ap_hook_pre_config
+ap_hook_post_config
+apr_file_open
+apr_pool_create_ex
+apr_os_pipe_put_ex
+apr_os_file_put
+apr_procattr_create
+ap_hook_get_suexec_identity
+ap_getword_nulls
+ap_os_create_privileged_process
+apr_proc_create
+Total call site: 18
+Lib funtions:
+ap_hook_handler
+apr_file_open
+apr_dir_open
+apr_pool_create_ex
+ap_getword_nc
+Total call site: 7
+Lib funtions:
+apr_dbm_open
+apr_dbm_get_usednames
+apr_file_open
+dav_do_find_liveprop
+apr_filepath_root
+dav_hook_gather_propsets
+dav_get_liveprop_info
+apr_xml_to_text
+dav_hook_find_liveprop
+dav_hook_insert_all_liveprops
+apr_dir_open
+dav_lock_query
+Total call site: 21
+Lib funtions:
+ap_hook_handler
+Total call site: 1
+Lib funtions:
+ap_hook_translate_name
+ap_getword
+ap_getword_conf
+apr_uid_homepath_get
+ap_hook_get_suexec_identity
+Total call site: 8
+Lib funtions:
+apr_dir_open
+ap_hook_fixups
+apr_pool_create_ex
+Total call site: 3
+Lib funtions:
+ap_hook_fixups
+ap_getword_conf
+Total call site: 4
+Lib funtions:
+ap_hook_translate_name
+Total call site: 1
+Lib funtions:
+ap_hook_translate_name
+ap_expr_str_exec
+ap_hook_fixups
+ap_expr_parse_cmd_mi
+Total call site: 6
+Lib funtions:
+ap_hook_type_checker
+ap_hook_fixups
+ap_hook_handler
+ap_get_list_item
+ap_get_token
+apr_dir_open
+apr_file_open
+Total call site: 13
+Lib funtions:
+ap_expr_parse_cmd_mi
+ap_getword_conf
+apr_pool_userdata_get
+apr_dbd_pvselect
+apr_dbd_get_row
+apr_pool_create_ex
+apr_proc_create
+ap_hook_post_config
+ap_hook_handler
+ap_hook_pre_config
+ap_hook_fixups
+ap_hook_child_init
+ap_hook_translate_name
+apr_hash_this
+apr_procattr_create
+apr_uid_homepath_get
+apr_filepath_root
+apr_filepath_merge
+ap_expr_exec_re
+apr_strtok
+apr_dbm_get_usednames_ex
+apr_tokenize_to_argv
+apr_file_open
+apr_dbm_open_ex
+apr_global_mutex_child_init
+apr_thread_mutex_create
+ap_global_mutex_create
+apr_uid_name_get
+apr_gid_name_get
+Total call site: 41

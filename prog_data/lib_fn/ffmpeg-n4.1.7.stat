@@ -1,0 +1,24 @@
+Lib funtions:
+xcb_query_pointer_reply
+xcb_get_geometry_reply
+xcb_shm_get_image_reply
+xcb_get_image_reply
+xcb_xfixes_get_cursor_image_reply
+getaddrinfo
+xcb_shm_query_version_reply
+xcb_xfixes_query_version_reply
+vaMapBuffer
+__strtoul_internal
+Total call site: 23
+Lib funtions:
+xcb_query_pointer_reply
+xcb_get_geometry_reply
+xcb_shm_get_image_reply
+xcb_get_image_reply
+xcb_xfixes_get_cursor_image_reply
+getaddrinfo
+xcb_shm_query_version_reply
+xcb_xfixes_query_version_reply
+vaMapBuffer
+__strtoul_internal
+Total call site: 23

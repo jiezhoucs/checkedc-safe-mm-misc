@@ -1,0 +1,54 @@
+Lib funtions:
+sqlite3_open_v2
+sqlite3_exec
+xmlParseBalancedChunkMemory
+sqlite3_load_extension
+sqlite3_prepare_v2
+sqlite3_blob_open
+xmlSplitQName2
+xmlDocDumpFormatMemory
+htmlDocDumpMemoryFormat
+xmlC14NDocSaveTo
+xmlDocDumpMemoryEnc
+execvp
+execle
+scandir
+getaddrinfo
+gethostbyname_r
+Total call site: 30
+Lib funtions:
+sqlite3_open_v2
+sqlite3_exec
+xmlParseBalancedChunkMemory
+sqlite3_load_extension
+sqlite3_prepare_v2
+sqlite3_blob_open
+xmlSplitQName2
+xmlDocDumpFormatMemory
+htmlDocDumpMemoryFormat
+xmlC14NDocSaveTo
+xmlDocDumpMemoryEnc
+execvp
+execle
+scandir
+getaddrinfo
+gethostbyname_r
+Total call site: 30
+Lib funtions:
+sqlite3_open_v2
+sqlite3_exec
+xmlParseBalancedChunkMemory
+sqlite3_load_extension
+sqlite3_prepare_v2
+sqlite3_blob_open
+xmlSplitQName2
+xmlDocDumpFormatMemory
+htmlDocDumpMemoryFormat
+xmlC14NDocSaveTo
+xmlDocDumpMemoryEnc
+execvp
+execle
+scandir
+getaddrinfo
+gethostbyname_r
+Total call site: 32

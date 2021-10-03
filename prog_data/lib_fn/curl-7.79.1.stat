@@ -1,0 +1,31 @@
+Lib funtions:
+getaddrinfo
+Total call site: 1
+Lib funtions:
+getaddrinfo
+Total call site: 1
+Lib funtions:
+getaddrinfo
+nghttp2_session_client_new
+nghttp2_session_callbacks_new
+idn2_lookup_ul
+ASN1_STRING_to_UTF8
+X509_get0_signature
+X509_PUBKEY_get0_param
+RSA_get0_key
+DSA_get0_pqg
+PEM_read_bio_X509
+i2d_X509_PUBKEY
+d2i_OCSP_RESPONSE
+OCSP_resp_find_status
+d2i_PKCS12_bio
+PKCS12_parse
+DSA_get0_key
+DH_get0_pqg
+DH_get0_key
+SSL_get0_alpn_selected
+PEM_read_bio_PrivateKey
+d2i_PrivateKey_bio
+d2i_X509_bio
+PEM_read_bio_X509_AUX
+Total call site: 27

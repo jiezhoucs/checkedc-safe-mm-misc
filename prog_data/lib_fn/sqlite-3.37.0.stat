@@ -1,0 +1,7 @@
+Lib funtions:
+sqlite3_open_v2
+sqlite3_prepare
+sqlite3_exec
+sqlite3_blob_open
+sqlite3_prepare_v3
+Total call site: 12
