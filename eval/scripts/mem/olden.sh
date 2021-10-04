@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+#
+# This script runs the Olden benchmarks and wss.pl to collect their memory
+# consumption data.
+#
+
+. common.sh
+
+DATA_DIR="$DATA_DIR/olden"
+
+BENCHMARKS=(
+    "bh"
+    "bisort"
+    "em3d"
+    "health"
+    "mst"
+    "perimeter"
+    "power"
+    "treeadd"
+    "tsp"
+)
+
+CETS_BENCHMARKS=(
+    # "bh"
+    "bisort"
+    # "em3d"
+    "health"
+    # "mst"
+    "perimeter"
+    "power"
+    "treeadd"
+    "tsp"
+)
+
+#
+# Run that scripts that run Olden benchmarks, and run wss.pl to collect
+# memory consumption data.
+#
+run() {
+    cd $SCRIPTS_DIR
+
+    # Prepare script and data directory.
+    if [[ $1 == "baseline" ]]; then
+        olden_script="./olden-baseline.sh"
+        data_dir="$DATA_DIR/baseline"
+    elif [[ $1 == "cets" ]]; then
+        olden_script="cets/olden.sh"
+        data_dir="$DATA_DIR/cets"
+    else
+        olden_script="./olden.sh"
+        data_dir="$DATA_DIR/checked"
+    fi
+    mkdir -p $data_dir
+    rm -rf $data_dir/*
+
+    # Run benchmarks and collect memory data produced by wss.pl.
+    for prog in ${BENCHMARKS[@]}; do
+        # Skip over benchmarks that CETS cannot handle.
+        if [[ $1 == "cets" &&
+            ($prog == "bh" || $prog == "em3d" || $prog == "mst") ]]; then
+            continue
+        fi
+
+        echo "Measuring memory consumption of $prog"
+        pid=""
+        $olden_script $prog &
+        # Since it launches llvm-lit to run a benchmark, there might be a little
+        # latency before the benchmark is really started. We therefore use
+        # a loop to catch the pid of the benchmark process.
+        while [[ ! $pid ]]; do
+            pid=`pgrep $prog`
+        done
+        # Collect memory consumption data every 0.2 second.
+        $($WSS_DIR/wss.pl -s 0 $pid 0.2 >& $data_dir/$prog.stat)
+    done
+}
+
+#
+# Entrance of this script.
+#
+run $1
