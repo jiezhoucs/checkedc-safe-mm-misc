@@ -1,4 +1,4 @@
-| Benchmark       | SLOC    | Struct  | Heap Obj    | Callsite |
+| Benchmark       | SLOC    | Largest struct (byte) | Largest Heap Obj (byte) | Callsite |
 | --------------- | ------- | ------- | ----------- | -------- |
 | 500.perlbench_r | 287,722 | 8,192   | 26,316,801  | 5        |
 | 502.gcc_r       | 593,991 | 30,304  | 5,212,129   | 0        |

@@ -1,4 +1,4 @@
-| Applications     | SLOC      | struct     | heap obj    | callsite | largest shared arr | total shared arr |
+| Applications     | SLOC      | Largest struct (byte)| Largest heap obj (byte) | callsite | largest shared arr | total shared arr |
 | ---------------  | -------   | ---------- | ----------- | -------- | --- | ----- |
 | curl-7.79.1      | 149,343   | 7,880      | 10,000,000  | 29       | 200 | 200   |
 | ffmpeg-n4.1.7    | 1,048,121 | 67,108,888 | 50,331,712  | 46       | 0   | 0     |
