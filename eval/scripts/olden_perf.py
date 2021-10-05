@@ -5,14 +5,12 @@
 #
 
 import numpy as np
-import subprocess as sp
 import os
 import json
 import csv
 
 ROOT_DIR = os.path.abspath(os.getcwd() + "/../..")
 DATA_DIR = ROOT_DIR + "/eval/perf_data/olden/"
-SCRIPT_DIR = ROOT_DIR + "/scripts"
 
 ITERATION = 20
 
