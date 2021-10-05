@@ -1,0 +1,6 @@
+Watching PID 495056 page references for every 0.1 seconds...
+Est(s)     RSS(MB)    PSS(MB)    Ref(MB)
+0.100         3.12       1.58       0.29
+0.100         3.12       1.58       0.03
+0.100         3.12       1.58       0.00
+ERROR: can't open /proc/495056/smaps: No such file or directory at /home/jie/projects/checkedc/misc/eval/wss/wss.pl line 226.
