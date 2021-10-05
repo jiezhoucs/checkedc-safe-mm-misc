@@ -4,6 +4,8 @@
 # This script runs the Olden benchmarks and wss.pl to collect their memory
 # consumption data.
 #
+# $1 - "baseline", "checked", or "cets".
+#
 
 . common.sh
 
@@ -63,16 +65,16 @@ run() {
         fi
 
         echo "Measuring memory consumption of $prog"
-        pid=""
+        pid=
         $olden_script $prog &
         # Since it launches llvm-lit to run a benchmark, there might be a little
         # latency before the benchmark is really started. We therefore use
         # a loop to catch the pid of the benchmark process.
         while [[ ! $pid ]]; do
-            pid=`pgrep $prog`
+            pid=`pgrep -n -U $UID $prog`
         done
-        # Collect memory consumption data every 0.2 second.
-        $($WSS_DIR/wss.pl -s 0 $pid 0.2 >& $data_dir/$prog.stat)
+        # Collect memory consumption data every 0.1 second.
+        $WSS_DIR/wss.pl -s 0 $pid 0.1 >& $data_dir/$prog.stat || true
     done
 }
 
