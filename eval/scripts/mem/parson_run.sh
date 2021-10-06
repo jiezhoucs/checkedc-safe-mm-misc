@@ -4,7 +4,7 @@
 # This script runs the baseline and Checked C parson for the purpose of
 # memory consumption measurement.
 #
-# $1 - "baseline", "checked", or "cets".
+# $1 - "baseline" or "checked"
 #
 
 . common.sh
