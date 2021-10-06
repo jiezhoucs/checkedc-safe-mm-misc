@@ -1,0 +1,7 @@
+data,baseline_rss (MB),checked_rss (x),baseline_wss (MB),checked_wss (x)
+images,19.98,0.999,13.14,0.828
+city_inspections,47.98,1.001,25.89,1.153
+companies,150.97,1.001,29.07,0.966
+trades,465.05,1.0,52.6,0.947
+citylots,8578.09,1.696,40.55,1.883
+geomean,,1.042,,1.039
