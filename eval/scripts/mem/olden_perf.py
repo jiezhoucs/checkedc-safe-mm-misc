@@ -81,7 +81,7 @@ def collect_data(setting):
         if wss[-1] == 0:
             wss = wss[:-1]
         # Exclude data for the first 10% of execution time.
-        start, end = int(len(rss) * 0.1), len(rss) - 1
+        start, end = int(len(rss) * 0.05), len(rss) - 1
         rss, wss = rss[start:end], wss[start: end]
         # Get the maximum RSS
         mem_data[setting]["rss_max"][prog] = round(max(rss), 2)
