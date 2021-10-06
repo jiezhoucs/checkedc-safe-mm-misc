@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <time.h>
 #include <stdint.h>
+#include <unistd.h>
 
 #include "parson.h"
 
@@ -37,8 +38,27 @@ static int tests_failed;
 /* Measure the execution time of parson library functions */
 static struct timespec timer_start;
 static struct timespec timer_end;
-
 static uint64_t exe_time;
+
+/* Data files that only take very short time to be processed. */
+const char *short_data[] = {
+    "albums", "books", "covers", "countries-small", "profiles", "restaurant",
+    "countries-big"
+};
+const int SHORT_DATA_NUM = 7;
+
+/* Some data files only takes very short time to be processed. We need let
+ * the program sleep for a while so that wss.pl would have the time to
+ * measure its RSS before it exits. Currently the checking interval for wss
+ * is 0.05 second. */
+void sleep_for_mem_measure(const char *data_file) {
+    for (int i = 0 ; i < SHORT_DATA_NUM; i++) {
+        if (!strcmp(short_data[i], data_file)) {
+            sleep(1);
+            return;
+        }
+    }
+}
 
 /*
  * Construct the path of each data file.
@@ -117,6 +137,9 @@ void eval(const char *file_name) {
     json_free_serialized_string(serialized);
     json_free_serialized_string(serialized_pretty);
     if (val) { json_value_free(val); }
+
+    /* For memory consumption measurement. */
+    sleep_for_mem_measure(file_name);
 
     /* Finished parsing; record time. */
     if (clock_gettime(CLOCK_MONOTONIC, &timer_end) == -1) {
