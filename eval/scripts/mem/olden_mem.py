@@ -54,6 +54,12 @@ mem_data = {
 }
 
 #
+# Round a float number to its nearest integer.
+#
+def Int(num):
+    return int(round(num, 0))
+
+#
 # Collect data in the output files from wss.pl, and compute the average and
 # max RSS and WSS.
 #
@@ -110,7 +116,7 @@ def write_result():
             normalized = round(checked_rss_max / baseline_rss_max, 2)
             checked_rss_norm += [normalized]
             # Add baseline memory consumption (MB)
-            row += [baseline_rss_max]
+            row += [Int(baseline_rss_max)]
             # Add normalized Checked C memory consumption (X)
             row += [normalized]
             if prog in CETS_SKIPPED:
@@ -128,7 +134,7 @@ def write_result():
             normalized = round(checked_wss_max / baseline_wss_max, 2)
             checked_wss_norm += [normalized]
             # Add baseline memory consumption (MB)
-            row += [baseline_wss_max]
+            row += [Int(baseline_wss_max)]
             # Add normalized Checked C memory consumption (X)
             row += [normalized]
             if prog in CETS_SKIPPED:

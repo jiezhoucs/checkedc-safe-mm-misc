@@ -66,6 +66,12 @@ mem_data = {
 }
 
 #
+# Round a float number to its nearest integer.
+#
+def Int(num):
+    return int(round(num, 0))
+
+#
 # Collect data in the output files from wss.pl, and compute the average and
 # max RSS and average WSS.
 #
@@ -92,8 +98,7 @@ def collect_data(setting, task):
             # This means the first line of data has a 0 WSS.
             continue
         # Get the maximum RSS
-        rss_max = round(max(rss), 2)
-        mem_data[setting][task]["rss_max"][data_name] = rss_max
+        mem_data[setting][task]["rss_max"][data_name] = round(max(rss), 2)
         mem_data[setting][task]["wss_max"][data_name] = round(max(wss), 2)
         # Compute the average RSS and WSS.
         mem_data[setting][task]["rss"][data_name] = round(np.mean(rss), 2)
@@ -124,7 +129,7 @@ def write_result():
                    normalized = round(en_checked_rss / en_base_rss, 3)
                    en_rss_norm += [normalized]
                    # Add baseline encoding for RSS.
-                   row += [en_base_rss]
+                   row += [Int(en_base_rss)]
                    # Add normalized Checked C encoding for RSS.
                    row += [normalized]
             else:
@@ -138,7 +143,7 @@ def write_result():
                    normalized = round(en_checked_wss / en_base_wss, 3)
                    en_wss_norm += [normalized]
                    # Add baseline encoding for WSS.
-                   row += [en_base_wss]
+                   row += [Int(en_base_wss)]
                    # Add normalized Checked C encoding for RSS.
                    row += [normalized]
             else:
@@ -151,9 +156,9 @@ def write_result():
                    de_checked_rss = mem_data["checked"]["decode"]["rss_max"][data_name]
                    normalized = round(de_checked_rss / de_base_rss, 3)
                    de_rss_norm += [normalized]
-                   # Add baseline encoding for RSS.
-                   row += [de_base_rss]
-                   # Add normalized Checked C encoding for RSS.
+                   # Add baseline decoding for RSS.
+                   row += [Int(de_base_rss)]
+                   # Add normalized Checked C decoding for RSS.
                    row += [normalized]
             else:
                 row += ["", ""]
@@ -166,7 +171,7 @@ def write_result():
                    normalized = round(de_checked_wss / de_base_wss, 3)
                    de_wss_norm += [normalized]
                    # Add baseline decoding for RSS.
-                   row += [de_base_wss]
+                   row += [Int(de_base_wss)]
                    # Add normalized Checked C decoding for RSS.
                    row += [normalized]
             else:
