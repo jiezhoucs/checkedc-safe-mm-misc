@@ -1,0 +1,5 @@
+Watching PID 510319 page references for every 0.05 seconds...
+Est(s)     RSS(MB)    PSS(MB)    Ref(MB)
+0.050        11.43      10.41       7.51
+0.050        12.25      11.22       8.36
+ERROR: can't open /proc/510319/smaps: No such file or directory at /home/jie/projects/checkedc/misc/eval/wss/wss.pl line 226.
