@@ -125,7 +125,7 @@ def write_result():
                 writer.writerow(row)
 
         # Compute the geomean of Checked C's and CETS' RSS and WSS.
-        data_num = len(data_files)
+        data_num = len(checked_rss_norm)
         checked_rss_geomean = round(np.array(checked_rss_norm).prod() ** (1.0 / data_num), 3)
         checked_wss_geomean = round(np.array(checked_wss_norm).prod() ** (1.0 / data_num), 3)
 
