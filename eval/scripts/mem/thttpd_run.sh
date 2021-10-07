@@ -12,7 +12,7 @@ DATA_DIR="$EVAL_DIR/mem_data/thttpd"
 BUILD_DIR="$ROOT_DIR/benchmark-build/thttpd"
 
 # arguments for the thttpd server
-REQUESTS=50000
+REQUESTS=10000
 CONS=8
 HOST=http://127.0.0.1
 PORT=8080
@@ -73,7 +73,7 @@ run() {
 
     # Start wss.pl.
     pid=`pidof thttpd`
-    $WSS -s 0 $pid 0.5 >> $DATA_DIR/mem.stat 2>&1 &
+    $WSS -s 0 $pid 0.1 >> $DATA_DIR/mem.stat 2>&1 &
 
     for ii in {12..25}; do
         # For each iteration, file size is 2 to the power of i
