@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# This script reads in parson consumption data and calculates the
+# This script reads in parson memory consumption data and calculates the
 # memory overhead of Checked C.
 #
 
