@@ -86,7 +86,10 @@ def write_result():
 
         rss_norm = []
         for size in [2**i for i in range(FILE_SIZE_START, FILE_SIZE_START_END + 1)]:
-            row = [size]
+            if size < 1024:
+                row = [str(size) + " KB"]
+            else:
+                row = [str(int(size / 1024)) + " MB"]
             # Add rss data
             baseline_rss_max = mem_data["baseline"]["rss_max"][size]
             checked_rss_max = mem_data["checked"]["rss_max"][size]
