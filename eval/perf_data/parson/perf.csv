@@ -1,15 +1,15 @@
 json_file,normalized(x)
-countries-small (328 KB),1.0
-profiles (454 KB),1.08
-covers (470 KB),1.076
-books (524 KB),1.016
-albums (634 KB),1.217
-restaurant (666 KB),1.009
-countries-big (2.2 MB),1.023
-zips (3.0 MB),1.134
+countries-small (328 KB),1.055
+profiles (454 KB),1.096
+covers (470 KB),1.086
+books (524 KB),1.025
+albums (634 KB),1.242
+restaurant (666 KB),1.017
+countries-big (2.2 MB),1.042
+zips (3.0 MB),1.147
 images (9.2 MB),1.14
-city\\\_insepctions (23 MB),1.031
-companies (75 MB),1.051
-trades (232 MB),1.086
-citylots (181 MB),1.111
-geo\\\_mean,1.073
+city\\\_insepctions (23 MB),1.042
+companies (75 MB),1.065
+trades (232 MB),1.097
+citylots (181 MB),1.114
+geo\\\_mean,1.088
