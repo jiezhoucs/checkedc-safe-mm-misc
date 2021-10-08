@@ -4,4 +4,4 @@ Output: /tmp/origin
 Input size: 3109891 B
 Output size: 6152192 B
 Compression ratio: 1.978
-Speed: 2.55 ns/B, 373.68 MB/s
+Speed: 2.53 ns/B, 376.87 MB/s

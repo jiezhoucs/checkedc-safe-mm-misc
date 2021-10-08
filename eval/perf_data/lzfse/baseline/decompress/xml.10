@@ -5,4 +5,4 @@ Input size: 683327 B
 Output buffer was too small, increasing size...
 Output size: 5345280 B
 Compression ratio: 7.822
-Speed: 1.72 ns/B, 556.03 MB/s
+Speed: 1.70 ns/B, 560.98 MB/s

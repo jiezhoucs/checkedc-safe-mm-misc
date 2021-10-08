@@ -4,4 +4,4 @@ Output: /tmp/compressed
 Input size: 6152192 B
 Output size: 3109891 B
 Compression ratio: 1.978
-Speed: 17.24 ns/B, 55.31 MB/s
+Speed: 17.35 ns/B, 54.98 MB/s
