@@ -4,16 +4,16 @@
     8, 
     0
   ], 
-  "elapsed": 17.534202814102173, 
+  "elapsed": 17.131691932678223, 
   "tests": [
     {
       "code": "PASS", 
-      "elapsed": 17.508662939071655, 
+      "elapsed": 17.11018395423889, 
       "metrics": {
-        "compile_time": 0.1341, 
-        "exec_time": 16.671, 
+        "compile_time": 0.1657, 
+        "exec_time": 16.1769, 
         "hash": "ff482f623f379a90c01d103300da7387", 
-        "link_time": 0.077, 
+        "link_time": 0.0642, 
         "size": 21392, 
         "size..bss": 24, 
         "size..comment": 517, 
@@ -45,7 +45,7 @@
     }, 
     {
       "code": "NOEXE", 
-      "elapsed": 0.0012059211730957031, 
+      "elapsed": 0.0011868476867675781, 
       "name": "test-suite :: MultiSource/Benchmarks/Rodinia/hotspot/hotspot.test", 
       "output": "Executable '/home/jie/projects/checkedc/tests/ts-build/MultiSource/Benchmarks/Rodinia/hotspot/hotspot' is missing"
     }

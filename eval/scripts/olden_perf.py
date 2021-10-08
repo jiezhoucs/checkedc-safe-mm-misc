@@ -80,17 +80,20 @@ def write_result():
 
         for prog in benchmarks:
             row = [prog]
-            row += [exec_time_baseline[prog]]
-            row += [exec_time_checked[prog]]
+            row += [round(exec_time_baseline[prog], 2)]
+            row += [round(exec_time_checked[prog], 2)]
             row += [round(normalized_checked[prog], 3)]
             row += [round((row[-1] - 1) * 100, 1)]
             writer.writerow(row)
         # Write the geo.mean
-        normalized = []
+        norm, norm_checked_cets = [], []
         for prog in benchmarks:
-            normalized += [normalized_checked[prog]]
-        geomean_checked = round(np.array(normalized).prod() ** (1.0 / len(benchmarks)), 3)
-        min_checked, max_checked = min(normalized), max(normalized)
+            norm += [normalized_checked[prog]]
+            if prog not in CETS_SKIPPED:
+                norm_checked_cets += [norm[-1]]
+        geomean_checked = round(np.array(norm).prod() ** (1.0 / len(benchmarks)), 3)
+        geomean_checked_cets = round(np.array(norm_checked_cets).prod() ** (1.0 / len(norm_checked_cets)), 3)
+        min_checked, max_checked = min(norm), max(norm)
         row = ["Geomean", '', '', geomean_checked, round((geomean_checked - 1) * 100, 1)]
         writer.writerow(row)
 
@@ -105,8 +108,8 @@ def write_result():
             if prog in CETS_SKIPPED:
                 row += ['', '', '', '']
             else:
-                row += [exec_time_baseline[prog]]
-                row += [exec_time_cets[prog]]
+                row += [round(exec_time_baseline[prog], 2)]
+                row += [round(exec_time_cets[prog], 2)]
                 row += [round(normalized_cets[prog], 3)]
                 row += [round((row[-1] - 1) * 100, 1)]
             writer.writerow(row)
@@ -128,14 +131,14 @@ def write_result():
 
         for prog in benchmarks:
             row = [prog]
-            if prog in CETS_SKIPPED:
-                row += ['', '', '', '', '']
-            else:
-                row += [exec_time_baseline[prog]]
-                row += [exec_time_checked[prog]]
-                row += [round(normalized_checked[prog], 3)]
-                row += [exec_time_cets[prog]]
+            row += [round(exec_time_baseline[prog], 2)]
+            row += [round(exec_time_checked[prog], 2)]
+            row += [round(normalized_checked[prog], 3)]
+            if prog not in CETS_SKIPPED:
+                row += [round(exec_time_cets[prog], 2)]
                 row += [round(normalized_cets[prog], 3)]
+            else:
+                row += ["", ""]
             writer.writerow(row)
         row = ['Geomean', '', '', geomean_checked, '', geomean_cets]
         writer.writerow(row)
@@ -144,7 +147,8 @@ def write_result():
     print("For Checked C:")
     print("Min = " + str(round((min_checked - 1) * 100, 1)) + "%")
     print("Max = " + str(round((max_checked - 1) * 100, 1)) + "%")
-    print("Geomean " + str(round((geomean_checked - 1) * 100, 1)) + "%")
+    print("Geomean = " + str(round((geomean_checked - 1) * 100, 1)) + "%")
+    print("CETS-only Geomean = " + str(round((geomean_checked_cets - 1) * 100, 1)) + "%")
     print("")
     print("For CETS:")
     print("Min = " + str(round((min_cets - 1) * 100, 1)) + "%")

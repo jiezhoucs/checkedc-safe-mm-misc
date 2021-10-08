@@ -4,16 +4,16 @@
     8, 
     0
   ], 
-  "elapsed": 26.646088123321533, 
+  "elapsed": 26.244661808013916, 
   "tests": [
     {
       "code": "PASS", 
-      "elapsed": 26.598577976226807, 
+      "elapsed": 26.214468002319336, 
       "metrics": {
-        "compile_time": 0.052, 
-        "exec_time": 26.2353, 
+        "compile_time": 0.0474, 
+        "exec_time": 25.9198, 
         "hash": "eb655e8eec38e2cebfc0038e7c57d263", 
-        "link_time": 0.0435, 
+        "link_time": 0.0586, 
         "size": 17336, 
         "size..bss": 28, 
         "size..comment": 517, 
