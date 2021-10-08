@@ -43,9 +43,9 @@ static uint64_t exe_time;
 /* Data files that only take very short time to be processed. */
 const char *short_data[] = {
     "albums", "books", "covers", "countries-small", "profiles", "restaurant",
-    "countries-big",
+    "countries-big", "zips",
 };
-const int SHORT_DATA_NUM = 7;
+const int SHORT_DATA_NUM = 8;
 
 /* Some data files only takes very short time to be processed. We need let
  * the program sleep for a while so that wss.pl would have the time to
@@ -140,8 +140,10 @@ void eval(const char *file_name) {
     json_free_serialized_string(serialized_pretty);
     if (val) { json_value_free(val); }
 
+#ifdef MEM_OVERHEAD
     // For memory consumption measurement.
-    sleep_for_mem_measure(file_name);
+    sleep(1);
+#endif
 
     /* Finished parsing; record time. */
     if (clock_gettime(CLOCK_MONOTONIC, &timer_end) == -1) {

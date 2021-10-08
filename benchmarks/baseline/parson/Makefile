@@ -25,6 +25,9 @@ lto: $(EVAL_SRC)
 eval: $(EVAL_SRC)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
+eval_mem: $(EVAL_SRC)
+	$(CC) -DMEM_OVERHEAD $(CFLAGS) -o eval $^ $(LDFLAGS)
+
 clean:
 	rm -f eval test *.o
 
