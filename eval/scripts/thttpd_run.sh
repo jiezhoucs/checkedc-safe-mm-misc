@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# This script runs ab to test the performance of the thttpd server.
+# This script runs ab to evaluate the performance of the thttpd server.
 #
 # $1 - (optional) "baseline". Without which this script will run the checked thttpd.
 #
@@ -70,6 +70,8 @@ init() {
 # Start benchmarking.
 #
 run() {
+    init $1
+
     cd "$DATA_DIR"
     for ii in {12..25}; do
         # For each iteration, file size is 2 to the power of i
@@ -77,12 +79,6 @@ run() {
 
         echo "Testing size $i with file-$i"
         echo "---------------"
-
-        # Check if the server started successfully
-        if [[ ! `pgrep "thttpd"` ]]; then
-            echo "thttpd failed to start!"
-            exit
-        fi
 
         # Run the test appending the output to the file
         for j in $(seq 1 $ITERATIONS); do
@@ -115,8 +111,6 @@ collect_results() {
 #
 # Entrance of this script
 #
-init $1
-
-run
+run $1
 
 collect_results
