@@ -91,8 +91,8 @@ def perf():
     with open(DATA_DIR + "perf.csv", 'w') as perf_csv:
         writer = csv.writer(perf_csv)
         header = ["file", "size(MB)",
-                  "en_baseline(MB/s)", "en_checked(MB/s)", "en_overhead(%)",
-                  "de_baseline(MB/s)", "de_checked(MB/s)", "de_overhead(%)"]
+                  "en_base(MB/s)", "en_check(MB/s)", "en_norm(%)",
+                  "de_base(MB/s)", "de_check(MB/s)", "de_norm(%)"]
         writer.writerow(header)
 
         en_normalized, de_normalized = [], []
@@ -106,8 +106,8 @@ def perf():
             de_overhead = round((de_baseline - de_checked) / de_baseline * 100, 1)
             en_normalized += [en_checked / en_baseline]
             de_normalized += [de_checked / de_baseline]
-            row += [en_baseline, en_checked, en_overhead,
-                    de_baseline, de_checked, de_overhead]
+            row += [en_baseline, en_checked, round(en_normalized[-1], 2),
+                    de_baseline, de_checked, round(de_normalized[-1], 2)]
             writer.writerow(row)
 
         en_geomean = round((1 - np.array(en_normalized).prod() ** (1.0 / len(INPUTS))) * 100, 1)
