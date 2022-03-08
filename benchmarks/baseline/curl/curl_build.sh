@@ -39,7 +39,7 @@ config_configure() {
                  --disable-threaded-resolver                                   \
                  --with-openssl="$OPENSSL_DIR"                                 \
                  CC="$CC"                                                      \
-                 CFLAGS="$CFLAGS"                                              \
+                 CFLAGS="$CFLAGS"
 }
 
 #
