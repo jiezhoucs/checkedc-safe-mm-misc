@@ -133,7 +133,7 @@ char *add_file_name_to_url(char *url, const char *filename)
  * Returns a pointer to a heap-allocated string or NULL if
  * no name part, at location indicated by first argument.
  */
-CURLcode get_url_file_name(char **filename, const char *url)
+CURLcode get_url_file_name(mm_ptr<char *> filename, const char *url)
 {
   const char *pc, *pc2;
 

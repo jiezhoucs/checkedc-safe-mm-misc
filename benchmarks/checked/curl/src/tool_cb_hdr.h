@@ -23,6 +23,8 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
+#include "safe_mm_checked.h"
+
 /*
  * curl operates using a single HdrCbData struct variable, a
  * pointer to this is passed as userdata pointer to tool_header_cb.
@@ -41,9 +43,9 @@
 struct HdrCbData {
   struct GlobalConfig *global;
   struct OperationConfig *config;
-  struct OutStruct *outs;
-  struct OutStruct *heads;
-  struct OutStruct *etag_save;
+  mm_ptr<struct OutStruct> outs;
+  mm_ptr<struct OutStruct> heads;
+  mm_ptr<struct OutStruct> etag_save;
   bool honor_cd_filename;
 };
 

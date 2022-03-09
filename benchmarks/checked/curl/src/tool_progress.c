@@ -191,7 +191,7 @@ bool progress_meter(struct GlobalConfig *global,
     curl_off_t spent = tvdiff(now, *start)/1000;
     char dlpercen[4]="--";
     char ulpercen[4]="--";
-    struct per_transfer *per;
+    mm_ptr<struct per_transfer> per = NULL;
     curl_off_t all_dlnow = 0;
     curl_off_t all_ulnow = 0;
     bool dlknown = TRUE;
@@ -316,7 +316,7 @@ bool progress_meter(struct GlobalConfig *global,
   return FALSE;
 }
 
-void progress_finalize(struct per_transfer *per)
+void progress_finalize(mm_ptr<struct per_transfer> per)
 {
   /* get the numbers before this transfer goes away */
   all_dlalready += per->dlnow;

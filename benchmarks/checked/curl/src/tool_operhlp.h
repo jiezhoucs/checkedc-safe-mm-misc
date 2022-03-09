@@ -33,6 +33,6 @@ bool stdin_upload(const char *uploadfile);
 
 char *add_file_name_to_url(char *url, const char *filename);
 
-CURLcode get_url_file_name(char **filename, const char *url);
+CURLcode get_url_file_name(mm_ptr<char *> filename, const char *url);
 
 #endif /* HEADER_CURL_TOOL_OPERHLP_H */

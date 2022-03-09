@@ -28,8 +28,8 @@
 
 struct per_transfer {
   /* double linked */
-  struct per_transfer *next;
-  struct per_transfer *prev;
+  mm_ptr<struct per_transfer> next;
+  mm_ptr<struct per_transfer> prev;
   mm_ptr<struct OperationConfig> config; /* for this transfer */
   CURL *curl;
   long retry_numretries;
@@ -76,6 +76,6 @@ struct per_transfer {
 
 CURLcode operate(struct GlobalConfig *config, int argc, argv_item_t argv[]);
 
-extern struct per_transfer *transfers; /* first node */
+extern mm_ptr<struct per_transfer> transfers; /* first node */
 
 #endif /* HEADER_CURL_TOOL_OPERATE_H */

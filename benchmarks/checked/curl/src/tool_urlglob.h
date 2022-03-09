@@ -71,8 +71,8 @@ struct URLGlob {
 };
 
 CURLcode glob_url(mm_ptr<struct URLGlob*>, char *, mm_ptr<unsigned long>, FILE *);
-CURLcode glob_next_url(char **, struct URLGlob *);
-CURLcode glob_match_url(char **, char *, struct URLGlob *);
+CURLcode glob_next_url(mm_ptr<char *>, struct URLGlob *);
+CURLcode glob_match_url(mm_ptr<char *>, char *, struct URLGlob *);
 void glob_cleanup(struct URLGlob *glob);
 
 #endif /* HEADER_CURL_TOOL_URLGLOB_H */

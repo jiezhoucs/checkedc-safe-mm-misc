@@ -49,7 +49,7 @@
 #endif
 
 /* create a local file for writing, return TRUE on success */
-bool tool_create_output_file(struct OutStruct *outs,
+bool tool_create_output_file(mm_ptr<struct OutStruct> outs,
                              mm_ptr<struct OperationConfig> config)
 {
   struct GlobalConfig *global;
@@ -99,6 +99,59 @@ bool tool_create_output_file(struct OutStruct *outs,
   outs->init = 0;
   return TRUE;
 }
+
+/* create a local file for writing, return TRUE on success */
+bool tool_create_output_file_unchecked(struct OutStruct *outs,
+                             mm_ptr<struct OperationConfig> config)
+{
+  struct GlobalConfig *global;
+  FILE *file = NULL;
+  DEBUGASSERT(outs);
+  DEBUGASSERT(config);
+  global = config->global;
+  if(!outs->filename || !*outs->filename) {
+    warnf(global, "Remote filename has no length!\n");
+    return FALSE;
+  }
+
+  if(outs->is_cd_filename) {
+    /* don't overwrite existing files */
+    int fd;
+    char *name = outs->filename;
+    char *aname = NULL;
+    if(config->output_dir) {
+      aname = aprintf("%s/%s", config->output_dir, name);
+      if(!aname) {
+        errorf(global, "out of memory\n");
+        return FALSE;
+      }
+      name = aname;
+    }
+    fd = open(name, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, OPENMODE);
+    if(fd != -1) {
+      file = fdopen(fd, "wb");
+      if(!file)
+        close(fd);
+    }
+    free(aname);
+  }
+  else
+    /* open file for writing */
+    file = fopen(outs->filename, "wb");
+
+  if(!file) {
+    warnf(global, "Failed to create the file %s: %s\n", outs->filename,
+          strerror(errno));
+    return FALSE;
+  }
+  outs->s_isreg = TRUE;
+  outs->fopened = TRUE;
+  outs->stream = file;
+  outs->bytes = 0;
+  outs->init = 0;
+  return TRUE;
+}
+
 
 /*
 ** callback for CURLOPT_WRITEFUNCTION
@@ -179,7 +232,7 @@ size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
   }
 #endif
 
-  if(!outs->stream && !tool_create_output_file(outs, per->config))
+  if(!outs->stream && !tool_create_output_file_unchecked(outs, per->config))
     return failure;
 
   if(is_tty && (outs->bytes < 2000) && !config->terminal_binary_ok) {

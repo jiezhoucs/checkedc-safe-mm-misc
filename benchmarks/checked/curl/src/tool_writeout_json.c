@@ -71,7 +71,7 @@ void jsonWriteString(FILE *stream, const char *in)
 }
 
 void ourWriteOutJSON(FILE *stream, const struct writeoutvar mappings[],
-                     struct per_transfer *per, CURLcode per_result)
+                     mm_ptr<struct per_transfer> per, CURLcode per_result)
 {
   int i;
 

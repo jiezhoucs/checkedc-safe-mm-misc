@@ -210,11 +210,11 @@ int tool_progress_cb(void *clientp,
   return 0;
 }
 
-void progressbarinit(struct ProgressData *bar,
+void progressbarinit(mm_ptr<struct ProgressData> bar,
                      mm_ptr<struct OperationConfig> config)
 {
   char *colp;
-  memset(bar, 0, sizeof(struct ProgressData));
+  memset(_GETPTR(struct ProgressData, bar), 0, sizeof(struct ProgressData));
 
   /* pass this through to progress function so
    * it can display progress towards total file

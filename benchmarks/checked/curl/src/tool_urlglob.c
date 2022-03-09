@@ -514,7 +514,7 @@ void glob_cleanup(struct URLGlob *glob)
   Curl_safefree(glob);
 }
 
-CURLcode glob_next_url(char **globbed, struct URLGlob *glob)
+CURLcode glob_next_url(mm_ptr<char *> globbed, struct URLGlob *glob)
 {
   struct URLPattern *pat;
   size_t i;
@@ -610,7 +610,7 @@ CURLcode glob_next_url(char **globbed, struct URLGlob *glob)
 
 #define MAX_OUTPUT_GLOB_LENGTH (10*1024)
 
-CURLcode glob_match_url(char **result, char *filename, struct URLGlob *glob)
+CURLcode glob_match_url(mm_ptr<char *> result, char *filename, struct URLGlob *glob)
 {
   char numbuf[18];
   char *appendthis = (char *)"";

@@ -30,19 +30,19 @@
 #include "memdebug.h" /* keep this as LAST include */
 
 static int writeTime(FILE *stream, const struct writeoutvar *wovar,
-                     struct per_transfer *per, CURLcode per_result,
+                     mm_ptr<struct per_transfer> per, CURLcode per_result,
                      bool use_json);
 
 static int writeString(FILE *stream, const struct writeoutvar *wovar,
-                       struct per_transfer *per, CURLcode per_result,
+                       mm_ptr<struct per_transfer> per, CURLcode per_result,
                        bool use_json);
 
 static int writeLong(FILE *stream, const struct writeoutvar *wovar,
-                     struct per_transfer *per, CURLcode per_result,
+                     mm_ptr<struct per_transfer> per, CURLcode per_result,
                      bool use_json);
 
 static int writeOffset(FILE *stream, const struct writeoutvar *wovar,
-                       struct per_transfer *per, CURLcode per_result,
+                       mm_ptr<struct per_transfer> per, CURLcode per_result,
                        bool use_json);
 
 static const char *http_version[] = {
@@ -117,7 +117,7 @@ static const struct writeoutvar variables[] = {
 };
 
 static int writeTime(FILE *stream, const struct writeoutvar *wovar,
-                     struct per_transfer *per, CURLcode per_result,
+                     mm_ptr<struct per_transfer> per, CURLcode per_result,
                      bool use_json)
 {
   bool valid = false;
@@ -154,7 +154,7 @@ static int writeTime(FILE *stream, const struct writeoutvar *wovar,
 }
 
 static int writeString(FILE *stream, const struct writeoutvar *wovar,
-                       struct per_transfer *per, CURLcode per_result,
+                       mm_ptr<struct per_transfer> per, CURLcode per_result,
                        bool use_json)
 {
   bool valid = false;
@@ -223,7 +223,7 @@ static int writeString(FILE *stream, const struct writeoutvar *wovar,
 }
 
 static int writeLong(FILE *stream, const struct writeoutvar *wovar,
-                     struct per_transfer *per, CURLcode per_result,
+                     mm_ptr<struct per_transfer> per, CURLcode per_result,
                      bool use_json)
 {
   bool valid = false;
@@ -276,7 +276,7 @@ static int writeLong(FILE *stream, const struct writeoutvar *wovar,
 }
 
 static int writeOffset(FILE *stream, const struct writeoutvar *wovar,
-                       struct per_transfer *per, CURLcode per_result,
+                       mm_ptr<struct per_transfer> per, CURLcode per_result,
                        bool use_json)
 {
   bool valid = false;
@@ -308,7 +308,7 @@ static int writeOffset(FILE *stream, const struct writeoutvar *wovar,
   return 1; /* return 1 if anything was written */
 }
 
-void ourWriteOut(const char *writeinfo, struct per_transfer *per,
+void ourWriteOut(const char *writeinfo, mm_ptr<struct per_transfer> per,
                  CURLcode per_result)
 {
   FILE *stream = stdout;
@@ -356,6 +356,7 @@ void ourWriteOut(const char *writeinfo, struct per_transfer *per,
                 ourWriteOutJSON(stream, variables, per, per_result);
                 break;
               default:
+                // TODO
                 (void)variables[i].writefunc(stream, &variables[i],
                                              per, per_result, false);
                 break;

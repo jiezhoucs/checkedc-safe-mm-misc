@@ -203,15 +203,15 @@ static curl_off_t VmsSpecialSize(const char *name,
 
 #define BUFFER_SIZE (100*1024)
 
-struct per_transfer *transfers; /* first node */
-static struct per_transfer *transfersl; /* last node */
+mm_ptr<struct per_transfer> transfers; /* first node */
+static mm_ptr<struct per_transfer> transfersl; /* last node */
 
 /* add_per_transfer creates a new 'per_transfer' node in the linked
    list of transfers */
-static CURLcode add_per_transfer(struct per_transfer **per)
+static CURLcode add_per_transfer(mm_ptr<struct per_transfer> *per)
 {
-  struct per_transfer *p;
-  p = calloc(sizeof(struct per_transfer), 1);
+  mm_ptr<struct per_transfer> p = MM_ALLOC(struct per_transfer);
+  memset(_GETPTR(struct per_transfer, p), 0, sizeof(struct per_transfer));
   if(!p)
     return CURLE_OUT_OF_MEMORY;
   if(!transfers)
@@ -232,10 +232,10 @@ static CURLcode add_per_transfer(struct per_transfer **per)
 
 /* Remove the specified transfer from the list (and free it), return the next
    in line */
-static struct per_transfer *del_per_transfer(struct per_transfer *per)
+static mm_ptr<struct per_transfer> del_per_transfer(mm_ptr<struct per_transfer> per)
 {
-  struct per_transfer *n;
-  struct per_transfer *p;
+  mm_ptr<struct per_transfer> n = NULL;
+  mm_ptr<struct per_transfer> p = NULL;
   DEBUGASSERT(transfers);
   DEBUGASSERT(transfersl);
   DEBUGASSERT(per);
@@ -253,13 +253,13 @@ static struct per_transfer *del_per_transfer(struct per_transfer *per)
   else
     transfersl = p;
 
-  free(per);
+  MM_FREE(struct per_transfer, per);
 
   return n;
 }
 
 static CURLcode pre_transfer(struct GlobalConfig *global,
-                             struct per_transfer *per)
+                             mm_ptr<struct per_transfer> per)
 {
   curl_off_t uploadfilesize = -1;
   struct_stat fileinfo;
@@ -336,12 +336,12 @@ static CURLcode pre_transfer(struct GlobalConfig *global,
  * Call this after a transfer has completed.
  */
 static CURLcode post_per_transfer(struct GlobalConfig *global,
-                                  struct per_transfer *per,
+                                  mm_ptr<struct per_transfer> per,
                                   CURLcode result,
                                   bool *retryp,
                                   long *delay) /* milliseconds! */
 {
-  struct OutStruct *outs = &per->outs;
+  mm_ptr<struct OutStruct> outs = &per->outs;
   CURL *curl = per->curl;
   mm_ptr<struct OperationConfig> config = per->config;
 
@@ -757,8 +757,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
       else {
         if(!state->uploadfile) {
           if(inglob) {
-            // TODO
-            result = glob_next_url(_GETPTR(char *, &state->uploadfile), inglob);
+            result = glob_next_url(&state->uploadfile, inglob);
             if(result == CURLE_OUT_OF_MEMORY)
               errorf(global, "out of memory\n");
           }
@@ -796,12 +795,12 @@ static CURLcode single_transfer(struct GlobalConfig *global,
                     !strcmp(state->outfiles, "-")) && urlnum > 1);
 
       if(state->up < state->infilenum) {
-        struct per_transfer *per;
-        struct OutStruct *outs;
-        struct InStruct *input;
-        struct OutStruct *heads;
-        struct OutStruct *etag_save;
-        struct HdrCbData *hdrcbdata = NULL;
+        mm_ptr<struct per_transfer> per = NULL;
+        mm_ptr<struct OutStruct> outs = NULL;
+        mm_ptr<struct InStruct> input = NULL;
+        mm_ptr<struct OutStruct> heads = NULL;
+        mm_ptr<struct OutStruct> etag_save = NULL;
+        mm_ptr<struct HdrCbData> hdrcbdata = NULL;
         CURL *curl = curl_easy_init();
         result = add_per_transfer(&per);
         if(result || !curl) {
@@ -1192,8 +1191,8 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           my_setopt(curl, CURLOPT_TCP_FASTOPEN, 1L);
 
         /* where to store */
-        my_setopt(curl, CURLOPT_WRITEDATA, per);
-        my_setopt(curl, CURLOPT_INTERLEAVEDATA, per);
+        my_setopt(curl, CURLOPT_WRITEDATA, _GETPTR(struct per_transfer, per));
+        my_setopt(curl, CURLOPT_INTERLEAVEDATA, _GETPTR(struct per_transfer, per));
 
         /* what call to write */
         my_setopt(curl, CURLOPT_WRITEFUNCTION, tool_write_cb);
@@ -1208,13 +1207,13 @@ static CURLcode single_transfer(struct GlobalConfig *global,
          * behavior, by omitting to set the READFUNCTION & READDATA options,
          * have not been determined.
          */
-        my_setopt(curl, CURLOPT_READDATA, input);
+        my_setopt(curl, CURLOPT_READDATA, _GETPTR(struct per_transfer, input));
         /* what call to read */
         my_setopt(curl, CURLOPT_READFUNCTION, tool_read_cb);
 
         /* in 7.18.0, the CURLOPT_SEEKFUNCTION/DATA pair is taking over what
            CURLOPT_IOCTLFUNCTION/DATA pair previously provided for seeking */
-        my_setopt(curl, CURLOPT_SEEKDATA, input);
+        my_setopt(curl, CURLOPT_SEEKDATA, _GETPTR(struct per_transfer, input));
         my_setopt(curl, CURLOPT_SEEKFUNCTION, tool_seek_cb);
 
         if(config->recvpersecond &&
@@ -1748,14 +1747,14 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           /* we want the alternative style, then we have to implement it
              ourselves! */
           my_setopt(curl, CURLOPT_XFERINFOFUNCTION, tool_progress_cb);
-          my_setopt(curl, CURLOPT_XFERINFODATA, per);
+          my_setopt(curl, CURLOPT_XFERINFODATA, _GETPTR(struct per_transfer, per));
         }
         else if(per->uploadfile && !strcmp(per->uploadfile, ".")) {
           /* when reading from stdin in non-blocking mode, we use the progress
              function to unpause a busy read */
           my_setopt(curl, CURLOPT_NOPROGRESS, 0L);
           my_setopt(curl, CURLOPT_XFERINFOFUNCTION, tool_readbusy_cb);
-          my_setopt(curl, CURLOPT_XFERINFODATA, per);
+          my_setopt(curl, CURLOPT_XFERINFODATA, _GETPTR(struct per_transfer, per));
         }
 
         /* new in libcurl 7.24.0: */
@@ -1952,7 +1951,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         hdrcbdata->config = _GETPTR(struct OperationConfig, config);
 
         my_setopt(curl, CURLOPT_HEADERFUNCTION, tool_header_cb);
-        my_setopt(curl, CURLOPT_HEADERDATA, per);
+        my_setopt(curl, CURLOPT_HEADERDATA, _GETPTR(struct per_transfer, per));
 
         if(config->resolve)
           /* new in 7.21.3 */
@@ -2114,7 +2113,7 @@ static CURLcode add_parallel_transfers(struct GlobalConfig *global,
                                        bool *morep,
                                        bool *addedp)
 {
-  struct per_transfer *per;
+  mm_ptr<struct per_transfer> per = NULL;
   CURLcode result = CURLE_OK;
   CURLMcode mcode;
   bool sleeping = FALSE;
@@ -2143,9 +2142,9 @@ static CURLcode add_parallel_transfers(struct GlobalConfig *global,
        will make libcurl prefer multiplexing */
     (void)curl_easy_setopt(per->curl, CURLOPT_PIPEWAIT,
                            global->parallel_connect ? 0L : 1L);
-    (void)curl_easy_setopt(per->curl, CURLOPT_PRIVATE, per);
+    (void)curl_easy_setopt(per->curl, CURLOPT_PRIVATE, _GETPTR(struct per_transfer, per));
     (void)curl_easy_setopt(per->curl, CURLOPT_XFERINFOFUNCTION, xferinfo_cb);
-    (void)curl_easy_setopt(per->curl, CURLOPT_XFERINFODATA, per);
+    (void)curl_easy_setopt(per->curl, CURLOPT_XFERINFODATA, _GETPTR(struct per_transfer, per));
     (void)curl_easy_setopt(per->curl, CURLOPT_NOPROGRESS, 0L);
 
     mcode = curl_multi_add_handle(multi, per->curl);
@@ -2197,7 +2196,7 @@ static CURLcode parallel_transfers(struct GlobalConfig *global,
       if(!still_running)
         break;
       if(!wrapitup_processed) {
-        struct per_transfer *per;
+        mm_ptr<struct per_transfer> per = NULL;
         for(per = transfers; per; per = per->next) {
           if(per->added)
             per->abort = TRUE;
@@ -2221,14 +2220,14 @@ static CURLcode parallel_transfers(struct GlobalConfig *global,
         if(msg) {
           bool retry;
           long delay;
-          struct per_transfer *ended;
+          mm_ptr<struct per_transfer> ended = NULL;
           CURL *easy = msg->easy_handle;
           CURLcode tres = msg->data.result;
           curl_easy_getinfo(easy, CURLINFO_PRIVATE, (void *)&ended);
           curl_multi_remove_handle(multi, easy);
 
           if(ended->abort && tres == CURLE_ABORTED_BY_CALLBACK) {
-            msnprintf(ended->errorbuffer, sizeof(ended->errorbuffer),
+            msnprintf((char *)(ended->errorbuffer), sizeof(ended->errorbuffer),
               "Transfer aborted due to critical error in another transfer");
           }
           tres = post_per_transfer(global, ended, tres, &retry, &delay);
@@ -2300,7 +2299,7 @@ static CURLcode serial_transfers(struct GlobalConfig *global,
 {
   CURLcode returncode = CURLE_OK;
   CURLcode result = CURLE_OK;
-  struct per_transfer *per;
+  mm_ptr<struct per_transfer> per = NULL;
   bool added = FALSE;
 
   result = create_transfer(global, share, &added);
@@ -2490,7 +2489,7 @@ static CURLcode run_all_transfers(struct GlobalConfig *global,
   /* Save the values of noprogress and isatty to restore them later on */
   bool orig_noprogress = global->noprogress;
   bool orig_isatty = global->isatty;
-  struct per_transfer *per;
+  mm_ptr<struct per_transfer> per = NULL;
 
   /* Time to actually do the transfers */
   if(!result) {

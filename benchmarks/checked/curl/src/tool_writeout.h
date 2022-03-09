@@ -75,11 +75,11 @@ struct writeoutvar {
   writeoutid id;
   CURLINFO ci;
   int (*writefunc)(FILE *stream, const struct writeoutvar *wovar,
-                   struct per_transfer *per, CURLcode per_result,
+                   mm_ptr<struct per_transfer> per, CURLcode per_result,
                    bool use_json);
 };
 
-void ourWriteOut(const char *writeinfo, struct per_transfer *per,
+void ourWriteOut(const char *writeinfo, mm_ptr<struct per_transfer> per,
                  CURLcode per_result);
 
 #endif /* HEADER_CURL_TOOL_WRITEOUT_H */
