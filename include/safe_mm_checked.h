@@ -18,6 +18,7 @@
 /* These macros provide convenience for programmers to type a little less. */
 #define MM_ALLOC(T) mm_alloc<T>(sizeof(T))
 #define MM_ARRAY_ALLOC(T, n) mm_array_alloc<T>(sizeof(T) * n)
+#define MM_CALLOC(s, T) mm_calloc<T>(s, sizeof(T))
 #define MM_FREE(T, p) mm_free<T>(p)
 #define MM_ARRAY_FREE(T, p) mm_array_free<T>(p)
 #define MM_CHECKED(T, p) mm_checked<T>(p);
@@ -28,6 +29,7 @@ for_any(T) void mm_free(mm_ptr<const T> const p);
 
 for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size);
 for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size);
+for_any(T) mm_array_ptr<T> mm_calloc(size_t nmemb, size_t size);
 for_any(T) void mm_array_free(mm_array_ptr<const T> const p);
 
 /* Extract the raw pointer from a checked pointer. */
