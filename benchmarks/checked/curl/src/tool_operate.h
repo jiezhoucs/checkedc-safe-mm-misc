@@ -30,7 +30,7 @@ struct per_transfer {
   /* double linked */
   struct per_transfer *next;
   struct per_transfer *prev;
-  struct OperationConfig *config; /* for this transfer */
+  mm_ptr<struct OperationConfig> config; /* for this transfer */
   CURL *curl;
   long retry_numretries;
   long retry_sleep_default;

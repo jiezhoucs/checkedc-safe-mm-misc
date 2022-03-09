@@ -23,6 +23,8 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
+#include "safe_mm_checked.h"
+
 #define CURL_PROGRESS_STATS 0 /* default progress display */
 #define CURL_PROGRESS_BAR   1
 
@@ -39,7 +41,7 @@ struct ProgressData {
 };
 
 void progressbarinit(struct ProgressData *bar,
-                     struct OperationConfig *config);
+                     mm_ptr<struct OperationConfig> config);
 
 /*
 ** callback for CURLOPT_PROGRESSFUNCTION

@@ -158,7 +158,7 @@ static CURLcode main_init(struct GlobalConfig *config)
   config->parallel_max = PARALLEL_DEFAULT;
 
   /* Allocate the initial operate config */
-  config->first = config->last = malloc(sizeof(struct OperationConfig));
+  config->first = config->last = MM_ALLOC(struct OperationConfig);
   if(config->first) {
     /* Perform the libcurl initialization */
     result = curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -173,12 +173,12 @@ static CURLcode main_init(struct GlobalConfig *config)
       }
       else {
         errorf(config, "error retrieving curl library information\n");
-        free(config->first);
+        MM_FREE(struct OperationConfig, config->first);
       }
     }
     else {
       errorf(config, "error initializing curl library\n");
-      free(config->first);
+      MM_FREE(struct OperationConfig, config->first);
     }
   }
   else {

@@ -106,7 +106,7 @@ CURLcode curl_easy_perform_ev(CURL *easy);
   "above.\n"
 
 static CURLcode single_transfer(struct GlobalConfig *global,
-                                struct OperationConfig *config,
+                                mm_ptr<struct OperationConfig> config,
                                 CURLSH *share,
                                 bool capath_from_env,
                                 bool *added);
@@ -321,7 +321,7 @@ static CURLcode pre_transfer(struct GlobalConfig *global,
       uploadfilesize = fileinfo.st_size;
 
     if(uploadfilesize != -1) {
-      struct OperationConfig *config = per->config; /* for the macro below */
+      mm_ptr<struct OperationConfig> config = per->config; /* for the macro below */
 #ifdef CURL_DISABLE_LIBCURL_OPTION
       (void)config;
 #endif
@@ -343,7 +343,7 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
 {
   struct OutStruct *outs = &per->outs;
   CURL *curl = per->curl;
-  struct OperationConfig *config = per->config;
+  mm_ptr<struct OperationConfig> config = per->config;
 
   if(!curl || !config)
     return result;
@@ -641,10 +641,10 @@ static CURLcode post_per_transfer(struct GlobalConfig *global,
   return result;
 }
 
-static void single_transfer_cleanup(struct OperationConfig *config)
+static void single_transfer_cleanup(mm_ptr<struct OperationConfig> config)
 {
   if(config) {
-    struct State *state = &config->state;
+    mm_ptr<struct State> state = &config->state;
     if(state->urls) {
       /* Free list of remaining URLs */
       glob_cleanup(state->urls);
@@ -664,7 +664,7 @@ static void single_transfer_cleanup(struct OperationConfig *config)
 /* create the next (singular) transfer */
 
 static CURLcode single_transfer(struct GlobalConfig *global,
-                                struct OperationConfig *config,
+                                mm_ptr<struct OperationConfig> config,
                                 CURLSH *share,
                                 bool capath_from_env,
                                 bool *added)
@@ -673,7 +673,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
   struct getout *urlnode;
   bool orig_noprogress = global->noprogress;
   bool orig_isatty = global->isatty;
-  struct State *state = &config->state;
+  mm_ptr<struct State> state = &config->state;
   char *httpgetfields = state->httpgetfields;
   *added = FALSE; /* not yet */
 
@@ -757,7 +757,8 @@ static CURLcode single_transfer(struct GlobalConfig *global,
       else {
         if(!state->uploadfile) {
           if(inglob) {
-            result = glob_next_url(&state->uploadfile, inglob);
+            // TODO
+            result = glob_next_url(_GETPTR(char *, &state->uploadfile), inglob);
             if(result == CURLE_OUT_OF_MEMORY)
               errorf(global, "out of memory\n");
           }
@@ -777,6 +778,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         if(!config->globoff) {
           /* Unless explicitly shut off, we expand '{...}' and '[...]'
              expressions and return total number of URLs in pattern set */
+          // TODO
           result = glob_url(&state->urls, urlnode->url, &state->urlnum,
                             global->showerror?global->errors:NULL);
           if(result)
@@ -1197,7 +1199,8 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         my_setopt(curl, CURLOPT_WRITEFUNCTION, tool_write_cb);
 
         /* for uploads */
-        input->config = config;
+        // TODO
+        input->config = _GETPTR(struct OperationConfig, config);
         /* Note that if CURLOPT_READFUNCTION is fread (the default), then
          * lib/telnet.c will Curl_poll() on the input file descriptor
          * rather than calling the READFUNCTION at regular intervals.
@@ -1303,7 +1306,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           /* free previous remainders */
           curl_mime_free(config->mimepost);
           config->mimepost = NULL;
-          result = tool2curlmime(curl, config->mimeroot, &config->mimepost);
+          result = tool2curlmime(curl, config->mimeroot, _GETPTR(curl_mime*, &config->mimepost));
           if(result)
             break;
           my_setopt_mimepost(curl, CURLOPT_MIMEPOST, config->mimepost);
@@ -1805,7 +1808,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
 
         if(global->tracetype != TRACE_NONE) {
           my_setopt(curl, CURLOPT_DEBUGFUNCTION, tool_debug_cb);
-          my_setopt(curl, CURLOPT_DEBUGDATA, config);
+          my_setopt(curl, CURLOPT_DEBUGDATA, _GETPTR(struct OperationConfig, config));
           my_setopt(curl, CURLOPT_VERBOSE, 1L);
         }
 
@@ -1945,7 +1948,8 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         hdrcbdata->heads = heads;
         hdrcbdata->etag_save = etag_save;
         hdrcbdata->global = global;
-        hdrcbdata->config = config;
+        // TODO
+        hdrcbdata->config = _GETPTR(struct OperationConfig, config);
 
         my_setopt(curl, CURLOPT_HEADERFUNCTION, tool_header_cb);
         my_setopt(curl, CURLOPT_HEADERDATA, per);
@@ -2357,7 +2361,7 @@ static CURLcode serial_transfers(struct GlobalConfig *global,
 
 /* setup a transfer for the given config */
 static CURLcode transfer_per_config(struct GlobalConfig *global,
-                                    struct OperationConfig *config,
+                                    mm_ptr<struct OperationConfig> config,
                                     CURLSH *share,
                                     bool *added)
 {
@@ -2578,7 +2582,7 @@ CURLcode operate(struct GlobalConfig *global, int argc, argv_item_t argv[])
       /* Perform the main operations */
       if(!result) {
         size_t count = 0;
-        struct OperationConfig *operation = global->first;
+        mm_ptr<struct OperationConfig> operation = global->first;
         CURLSH *share = curl_share_init();
         if(!share) {
 #ifndef CURL_DISABLE_LIBCURL_OPTION

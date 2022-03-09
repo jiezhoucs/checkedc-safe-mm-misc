@@ -50,7 +50,7 @@
 
 /* create a local file for writing, return TRUE on success */
 bool tool_create_output_file(struct OutStruct *outs,
-                             struct OperationConfig *config)
+                             mm_ptr<struct OperationConfig> config)
 {
   struct GlobalConfig *global;
   FILE *file = NULL;
@@ -109,7 +109,8 @@ size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
   size_t rc;
   struct per_transfer *per = userdata;
   struct OutStruct *outs = &per->outs;
-  struct OperationConfig *config = per->config;
+  // TODO
+  struct OperationConfig *config = _GETPTR(struct OperationConfig, per->config);
   size_t bytes = sz * nmemb;
   bool is_tty = config->global->isatty;
 #ifdef WIN32

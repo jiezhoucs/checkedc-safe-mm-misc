@@ -471,7 +471,7 @@ static size_t replace_url_encoded_space_by_plus(char *url)
 }
 
 static void
-GetFileAndPassword(char *nextarg, char **file, char **password)
+GetFileAndPassword(char *nextarg, mm_ptr<char *> file, mm_ptr<char *> password)
 {
   char *certname, *passphrase;
   parse_cert_parameter(nextarg, &certname, &passphrase);
@@ -541,7 +541,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
                             bool *usedarg,    /* set to TRUE if the arg
                                                  has been used */
                             struct GlobalConfig *global,
-                            struct OperationConfig *config)
+                            mm_ptr<struct OperationConfig> config)
 {
   char letter;
   char subletter = '\0'; /* subletters can only occur on long options */
@@ -808,7 +808,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
 
       case 'R': /* --create-file-mode */
-        err = oct2nummax(&config->create_file_mode, nextarg, 0777);
+        err = oct2nummax(_GETPTR(long, &config->create_file_mode), nextarg, 0777);
         if(err)
           return err;
         break;
@@ -816,7 +816,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       case 's': /* --max-redirs */
         /* specified max no of redirects (http(s)), this accepts -1 as a
            special condition */
-        err = str2num(&config->maxredirs, nextarg);
+        err = str2num(_GETPTR(long, &config->maxredirs), nextarg);
         if(err)
           return err;
         if(config->maxredirs < -1)
@@ -959,7 +959,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         config->proxybasic = toggle;
         break;
       case 'g': /* --retry */
-        err = str2unum(&config->req_retry, nextarg);
+        err = str2unum(_GETPTR(long, &config->req_retry), nextarg);
         if(err)
           return err;
         break;
@@ -967,12 +967,12 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         config->retry_connrefused = toggle;
         break;
       case 'h': /* --retry-delay */
-        err = str2unummax(&config->retry_delay, nextarg, LONG_MAX/1000);
+        err = str2unummax(_GETPTR(long, &config->retry_delay), nextarg, LONG_MAX/1000);
         if(err)
           return err;
         break;
       case 'i': /* --retry-max-time */
-        err = str2unummax(&config->retry_maxtime, nextarg, LONG_MAX/1000);
+        err = str2unummax(_GETPTR(long, &config->retry_maxtime), nextarg, LONG_MAX/1000);
         if(err)
           return err;
         break;
@@ -1003,7 +1003,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         config->ftp_skip_ip = toggle;
         break;
       case 'r': /* --ftp-method (undocumented at this point) */
-        config->ftp_filemethod = ftpfilemethod(config, nextarg);
+        config->ftp_filemethod = ftpfilemethod(_GETPTR(struct OperationConfig, config), nextarg);
         break;
       case 's': { /* --local-port */
         /* 16bit base 10 is 5 digits, but we allow 6 so that this catches
@@ -1020,13 +1020,13 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         else
           rc = 0;
 
-        err = str2unum(&config->localport, nextarg);
+        err = str2unum(_GETPTR(long, &config->localport), nextarg);
         if(err || (config->localport > 65535))
           return PARAM_BAD_USE;
         if(!rc)
           config->localportrange = 1; /* default number of ports to try */
         else {
-          err = str2unum(&config->localportrange, lrange);
+          err = str2unum(_GETPTR(long, &config->localportrange), lrange);
           if(err || (config->localportrange > 65535))
             return PARAM_BAD_USE;
           config->localportrange -= (config->localport-1);
@@ -1058,7 +1058,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
       case 'j': /* --ftp-ssl-ccc-mode */
         config->ftp_ssl_ccc = TRUE;
-        config->ftp_ssl_ccc_mode = ftpcccmethod(config, nextarg);
+        config->ftp_ssl_ccc_mode = ftpcccmethod(_GETPTR(struct OperationConfig, config), nextarg);
         break;
       case 'z': /* --libcurl */
 #ifdef CURL_DISABLE_LIBCURL_OPTION
@@ -1079,7 +1079,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         config->nokeepalive = (!toggle)?TRUE:FALSE;
         break;
       case '3': /* --keepalive-time */
-        err = str2unum(&config->alivetime, nextarg);
+        err = str2unum(_GETPTR(long, &config->alivetime), nextarg);
         if(err)
           return err;
         break;
@@ -1102,7 +1102,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         config->proxyver = CURLPROXY_HTTP_1_0;
         break;
       case '9': /* --tftp-blksize */
-        err = str2unum(&config->tftp_blksize, nextarg);
+        err = str2unum(_GETPTR(long, &config->tftp_blksize), nextarg);
         if(err)
           return err;
         break;
@@ -1203,7 +1203,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         config->ssh_compression = toggle;
         break;
       case '~': /* --happy-eyeballs-timeout-ms */
-        err = str2unum(&config->happy_eyeballs_timeout_ms, nextarg);
+        err = str2unum(_GETPTR(long, &config->happy_eyeballs_timeout_ms), nextarg);
         if(err)
           return err;
         /* 0 is a valid value for this timeout */
@@ -2232,7 +2232,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       break;
     case 'y':
       /* low speed time */
-      err = str2unum(&config->low_speed_time, nextarg);
+      err = str2unum(_GETPTR(long, &config->low_speed_time), nextarg);
       if(err)
         return err;
       if(!config->low_speed_limit)
@@ -2240,7 +2240,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       break;
     case 'Y':
       /* low speed limit */
-      err = str2unum(&config->low_speed_limit, nextarg);
+      err = str2unum(_GETPTR(long, &config->low_speed_limit), nextarg);
       if(err)
         return err;
       if(!config->low_speed_time)
@@ -2252,7 +2252,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         global->parallel = toggle;
         break;
       case 'b':   /* --parallel-max */
-        err = str2unum(&global->parallel_max, nextarg);
+        err = str2unum(_GETPTR(long, &global->parallel_max), nextarg);
         if(err)
           return err;
         if((global->parallel_max > MAX_PARALLEL) ||
@@ -2320,7 +2320,7 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
   bool stillflags;
   char *orig_opt = NULL;
   ParameterError result = PARAM_OK;
-  struct OperationConfig *config = global->first;
+  mm_ptr<struct OperationConfig> config = global->first;
 
   for(i = 1, stillflags = TRUE; i < argc && !result; i++) {
     orig_opt = curlx_convert_tchar_to_UTF8(argv[i]);
@@ -2349,7 +2349,7 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
 
           if(config->url_list && config->url_list->url) {
             /* Allocate the next config */
-            config->next = malloc(sizeof(struct OperationConfig));
+            config->next = MM_ALLOC(struct OperationConfig);
             if(config->next) {
               /* Initialise the newly created config */
               config_init(config->next);

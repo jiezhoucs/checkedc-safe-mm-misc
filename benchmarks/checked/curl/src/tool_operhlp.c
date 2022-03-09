@@ -34,7 +34,7 @@
 
 #include "memdebug.h" /* keep this as LAST include */
 
-void clean_getout(struct OperationConfig *config)
+void clean_getout(mm_ptr<struct OperationConfig> config)
 {
   if(config) {
     struct getout *next;

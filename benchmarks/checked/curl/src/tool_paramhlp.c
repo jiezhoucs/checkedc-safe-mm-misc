@@ -38,8 +38,9 @@
 
 #include "memdebug.h" /* keep this as LAST include */
 
-struct getout *new_getout(struct OperationConfig *config)
+struct getout *new_getout(mm_ptr<struct OperationConfig> config)
 {
+  // TODO
   struct getout *node = calloc(1, sizeof(struct getout));
   struct getout *last = config->url_last;
   if(node) {
@@ -62,7 +63,7 @@ struct getout *new_getout(struct OperationConfig *config)
 
 #define MAX_FILE2STRING (256*1024*1024) /* big enough ? */
 
-ParameterError file2string(char **bufp, FILE *file)
+ParameterError file2string(mm_ptr<char *> bufp, FILE *file)
 {
   struct curlx_dynbuf dyn;
   curlx_dyn_init(&dyn, MAX_FILE2STRING);
@@ -132,6 +133,7 @@ void cleanarg(char *str)
  * getparameter a lot, we must check it for NULL before accessing the str
  * data.
  */
+/* No need to convert long *val to mm_ptr type. */
 static ParameterError getnum(long *val, const char *str, int base)
 {
   if(str) {
@@ -149,6 +151,7 @@ static ParameterError getnum(long *val, const char *str, int base)
   return PARAM_BAD_NUMERIC; /* badness */
 }
 
+/* No need to convert long *val to mm_ptr type. */
 ParameterError str2num(long *val, const char *str)
 {
   return getnum(val, str, 10);
@@ -176,6 +179,7 @@ ParameterError oct2nummax(long *val, const char *str, long max)
  * data.
  */
 
+/* No need to convert long *val to mm_ptr type. */
 ParameterError str2unum(long *val, const char *str)
 {
   ParameterError result = getnum(val, str, 10);
@@ -197,6 +201,7 @@ ParameterError str2unum(long *val, const char *str)
  * data.
  */
 
+/* No need to convert long *val to mm_ptr type. */
 ParameterError str2unummax(long *val, const char *str, long max)
 {
   ParameterError result = str2unum(val, str);
@@ -254,7 +259,7 @@ static ParameterError str2double(double *val, const char *str, long max)
  * data.
  */
 
-ParameterError str2udouble(double *valp, const char *str, long max)
+ParameterError str2udouble(mm_ptr<double> valp, const char *str, long max)
 {
   double value;
   ParameterError result = str2double(&value, str, max);
@@ -278,7 +283,7 @@ ParameterError str2udouble(double *valp, const char *str, long max)
  * data.
  */
 
-long proto2num(struct OperationConfig *config, long *val, const char *str)
+long proto2num(mm_ptr<struct OperationConfig> config, mm_ptr<long> val, const char *str)
 {
   char *buffer;
   const char *sep = ",";
@@ -406,7 +411,7 @@ int check_protocol(const char *str)
  * @param str  the buffer containing the offset
  * @return PARAM_OK if successful, a parameter specific error enum if failure.
  */
-ParameterError str2offset(curl_off_t *val, const char *str)
+ParameterError str2offset(mm_ptr<curl_off_t> val, const char *str)
 {
   char *endptr;
   if(str[0] == '-')
@@ -437,7 +442,7 @@ ParameterError str2offset(curl_off_t *val, const char *str)
 static CURLcode checkpasswd(const char *kind, /* for what purpose */
                             const size_t i,   /* operation index */
                             const bool last,  /* TRUE if last operation */
-                            char **userpwd)   /* pointer to allocated string */
+                            mm_ptr<char *> userpwd)   /* pointer to allocated string */
 {
   char *psep;
   char *osep;
@@ -487,7 +492,7 @@ static CURLcode checkpasswd(const char *kind, /* for what purpose */
   return CURLE_OK;
 }
 
-ParameterError add2list(struct curl_slist **list, const char *ptr)
+ParameterError add2list(mm_ptr<struct curl_slist *> list, const char *ptr)
 {
   struct curl_slist *newlist = curl_slist_append(*list, ptr);
   if(newlist)
@@ -526,7 +531,7 @@ int ftpcccmethod(struct OperationConfig *config, const char *str)
   return CURLFTPSSL_CCC_PASSIVE;
 }
 
-long delegation(struct OperationConfig *config, const char *str)
+long delegation(mm_ptr<struct OperationConfig> config, const char *str)
 {
   if(curl_strequal("none", str))
     return CURLGSSAPI_DELEGATION_NONE;
@@ -549,7 +554,7 @@ static char *my_useragent(void)
   return strdup(CURL_NAME "/" CURL_VERSION);
 }
 
-CURLcode get_args(struct OperationConfig *config, const size_t i)
+CURLcode get_args(mm_ptr<struct OperationConfig> config, const size_t i)
 {
   CURLcode result = CURLE_OK;
   bool last = (config->next ? FALSE : TRUE);
@@ -589,7 +594,7 @@ CURLcode get_args(struct OperationConfig *config, const size_t i)
  * data.
  */
 
-ParameterError str2tls_max(long *val, const char *str)
+ParameterError str2tls_max(mm_ptr<long> val, const char *str)
 {
    static struct s_tls_max {
     const char *tls_max_str;

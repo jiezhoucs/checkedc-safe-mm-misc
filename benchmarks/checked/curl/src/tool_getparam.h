@@ -53,7 +53,7 @@ struct OperationConfig;
 
 ParameterError getparameter(const char *flag, char *nextarg, bool *usedarg,
                             struct GlobalConfig *global,
-                            struct OperationConfig *operation);
+                            mm_ptr<struct OperationConfig> operation);
 
 #ifdef UNITTESTS
 void parse_cert_parameter(const char *cert_parameter,

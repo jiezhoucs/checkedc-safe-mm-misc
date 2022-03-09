@@ -79,7 +79,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
   FILE *file = NULL;
   bool usedarg = FALSE;
   int rc = 0;
-  struct OperationConfig *operation = global->last;
+  mm_ptr<struct OperationConfig> operation = global->last;
   char *pathalloc = NULL;
 
   if(!filename || !*filename) {
@@ -250,7 +250,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
       if(res == PARAM_NEXT_OPERATION) {
         if(operation->url_list && operation->url_list->url) {
           /* Allocate the next config */
-          operation->next = malloc(sizeof(struct OperationConfig));
+          operation->next = MM_ALLOC(struct OperationConfig);
           if(operation->next) {
             /* Initialise the newly created config */
             config_init(operation->next);

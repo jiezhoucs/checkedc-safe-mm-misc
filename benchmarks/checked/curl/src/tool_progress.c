@@ -95,7 +95,7 @@ int xferinfo_cb(void *clientp,
                 curl_off_t ulnow)
 {
   struct per_transfer *per = clientp;
-  struct OperationConfig *config = per->config;
+  mm_ptr<struct OperationConfig> config = per->config;
   per->dltotal = dltotal;
   per->dlnow = dlnow;
   per->ultotal = ultotal;

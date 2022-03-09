@@ -25,10 +25,10 @@
 
 const char *param2text(int res);
 
-int SetHTTPrequest(struct OperationConfig *config, HttpReq req,
-                   HttpReq *store);
+int SetHTTPrequest(mm_ptr<struct OperationConfig> config, HttpReq req,
+                   mm_ptr<HttpReq> store);
 
-void customrequest_helper(struct OperationConfig *config, HttpReq req,
+void customrequest_helper(mm_ptr<struct OperationConfig> config, HttpReq req,
                           char *method);
 
 #endif /* HEADER_CURL_TOOL_HELPERS_H */

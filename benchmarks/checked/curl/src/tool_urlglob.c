@@ -435,7 +435,7 @@ static CURLcode glob_parse(struct URLGlob *glob, char *pattern,
   return res;
 }
 
-CURLcode glob_url(struct URLGlob **glob, char *url, unsigned long *urlnum,
+CURLcode glob_url(mm_ptr<struct URLGlob *> glob, char *url, mm_ptr<unsigned long> urlnum,
                   FILE *error)
 {
   /*

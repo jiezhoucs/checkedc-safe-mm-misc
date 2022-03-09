@@ -26,6 +26,8 @@
 #include "tool_urlglob.h"
 #include "tool_formparse.h"
 
+#include "safe_mm_checked.h"
+
 typedef enum {
   ERR_NONE,
   ERR_BINARY_TERMINAL = 1, /* binary to terminal detected */
@@ -288,8 +290,8 @@ struct OperationConfig {
   bool disallow_username_in_url;  /* disallow usernames in URLs */
   char *aws_sigv4;
   struct GlobalConfig *global;
-  struct OperationConfig *prev;
-  struct OperationConfig *next;   /* Always last in the struct */
+  mm_ptr<struct OperationConfig> prev;
+  mm_ptr<struct OperationConfig> next;   /* Always last in the struct */
   struct State state;             /* for create_transfer() */
 };
 
@@ -318,12 +320,12 @@ struct GlobalConfig {
   long parallel_max;
   bool parallel_connect;
   char *help_category;            /* The help category, if set */
-  struct OperationConfig *first;
-  struct OperationConfig *current;
-  struct OperationConfig *last;   /* Always last in the struct */
+  mm_ptr<struct OperationConfig> first;
+  mm_ptr<struct OperationConfig> current;
+  mm_ptr<struct OperationConfig> last;   /* Always last in the struct */
 };
 
-void config_init(struct OperationConfig *config);
-void config_free(struct OperationConfig *config);
+void config_init(mm_ptr<struct OperationConfig> config);
+void config_free(mm_ptr<struct OperationConfig> config);
 
 #endif /* HEADER_CURL_TOOL_CFGABLE_H */

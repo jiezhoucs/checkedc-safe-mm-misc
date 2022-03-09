@@ -26,9 +26,9 @@
 
 #include "memdebug.h" /* keep this as LAST include */
 
-void config_init(struct OperationConfig *config)
+void config_init(mm_ptr<struct OperationConfig> config)
 {
-  memset(config, 0, sizeof(struct OperationConfig));
+  memset(_GETPTR(struct OperationConfig, config), 0, sizeof(struct OperationConfig));
 
   config->postfieldsize = -1;
   config->use_httpget = FALSE;
@@ -47,7 +47,7 @@ void config_init(struct OperationConfig *config)
   config->ftp_skip_ip = TRUE;
 }
 
-static void free_config_fields(struct OperationConfig *config)
+static void free_config_fields(mm_ptr<struct OperationConfig> config)
 {
   struct getout *urlnode;
 
@@ -172,16 +172,16 @@ static void free_config_fields(struct OperationConfig *config)
   Curl_safefree(config->aws_sigv4);
 }
 
-void config_free(struct OperationConfig *config)
+void config_free(mm_ptr<struct OperationConfig> config)
 {
-  struct OperationConfig *last = config;
+  mm_ptr<struct OperationConfig> last = config;
 
   /* Free each of the structures in reverse order */
   while(last) {
-    struct OperationConfig *prev = last->prev;
+    mm_ptr<struct OperationConfig> prev = last->prev;
 
     free_config_fields(last);
-    free(last);
+    MM_FREE(struct OperationConfig, last);
 
     last = prev;
   }

@@ -23,6 +23,8 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
+#include "safe_mm_checked.h"
+
 /* Private structure for mime/parts. */
 
 typedef enum {
@@ -60,10 +62,10 @@ size_t tool_mime_stdin_read(char *buffer,
                             size_t size, size_t nitems, void *arg);
 int tool_mime_stdin_seek(void *instream, curl_off_t offset, int whence);
 
-int formparse(struct OperationConfig *config,
+int formparse(mm_ptr<struct OperationConfig> config,
               const char *input,
-              struct tool_mime **mimeroot,
-              struct tool_mime **mimecurrent,
+              mm_ptr<struct tool_mime *> mimeroot,
+              mm_ptr<struct tool_mime *> mimecurrent,
               bool literal_value);
 CURLcode tool2curlmime(CURL *curl, struct tool_mime *m, curl_mime **mime);
 void tool_mime_free(struct tool_mime *mime);

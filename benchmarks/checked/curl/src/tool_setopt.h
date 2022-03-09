@@ -102,7 +102,7 @@ CURLcode tool_setopt_slist(CURL *curl, struct GlobalConfig *config,
                            const char *name, CURLoption tag,
                            struct curl_slist *list);
 CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
-                     struct OperationConfig *config,
+                     mm_ptr<struct OperationConfig> config,
                      const char *name, CURLoption tag, ...);
 
 #define my_setopt(x,y,z) \

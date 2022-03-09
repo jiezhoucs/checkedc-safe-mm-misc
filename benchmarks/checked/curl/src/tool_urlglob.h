@@ -23,6 +23,8 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
+#include "safe_mm_checked.h"
+
 typedef enum {
   UPTSet = 1,
   UPTCharRange,
@@ -68,7 +70,7 @@ struct URLGlob {
   size_t pos;        /* column position of error or 0 */
 };
 
-CURLcode glob_url(struct URLGlob**, char *, unsigned long *, FILE *);
+CURLcode glob_url(mm_ptr<struct URLGlob*>, char *, mm_ptr<unsigned long>, FILE *);
 CURLcode glob_next_url(char **, struct URLGlob *);
 CURLcode glob_match_url(char **, char *, struct URLGlob *);
 void glob_cleanup(struct URLGlob *glob);

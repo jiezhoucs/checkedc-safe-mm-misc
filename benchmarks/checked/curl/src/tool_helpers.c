@@ -77,7 +77,7 @@ const char *param2text(int res)
   }
 }
 
-int SetHTTPrequest(struct OperationConfig *config, HttpReq req, HttpReq *store)
+int SetHTTPrequest(mm_ptr<struct OperationConfig> config, HttpReq req, mm_ptr<HttpReq> store)
 {
   /* this mirrors the HttpReq enum in tool_sdecls.h */
   const char *reqname[]= {
@@ -100,7 +100,7 @@ int SetHTTPrequest(struct OperationConfig *config, HttpReq req, HttpReq *store)
   return 1;
 }
 
-void customrequest_helper(struct OperationConfig *config, HttpReq req,
+void customrequest_helper(mm_ptr<struct OperationConfig> config, HttpReq req,
                           char *method)
 {
   /* this mirrors the HttpReq enum in tool_sdecls.h */

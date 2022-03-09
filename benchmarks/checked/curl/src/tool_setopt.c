@@ -645,7 +645,7 @@ CURLcode tool_setopt_slist(CURL *curl, struct GlobalConfig *config,
 /* generic setopt wrapper for all other options.
  * Some type information is encoded in the tag value. */
 CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
-                     struct OperationConfig *config,
+                     mm_ptr<struct OperationConfig> config,
                      const char *name, CURLoption tag, ...)
 {
   va_list arg;

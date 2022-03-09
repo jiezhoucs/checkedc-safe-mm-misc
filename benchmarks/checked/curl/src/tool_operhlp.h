@@ -25,7 +25,7 @@
 
 struct OperationConfig;
 
-void clean_getout(struct OperationConfig *config);
+void clean_getout(mm_ptr<struct OperationConfig> config);
 
 bool output_expected(const char *url, const char *uploadfile);
 

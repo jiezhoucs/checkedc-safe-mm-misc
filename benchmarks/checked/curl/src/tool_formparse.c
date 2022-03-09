@@ -347,7 +347,7 @@ CURLcode tool2curlmime(CURL *curl, struct tool_mime *m, curl_mime **mime)
  * after call get_parm_word, str either point to string end
  * or point to any of end chars.
  */
-static char *get_param_word(struct OperationConfig *config, char **str,
+static char *get_param_word(mm_ptr<struct OperationConfig> config, char **str,
                             char **end_pos, char endchar)
 {
   char *ptr = *str;
@@ -419,7 +419,7 @@ static int slist_append(struct curl_slist **plist, const char *data)
 }
 
 /* Read headers from a file and append to list. */
-static int read_field_headers(struct OperationConfig *config,
+static int read_field_headers(mm_ptr<struct OperationConfig> config,
                               const char *filename, FILE *fp,
                               struct curl_slist **pheaders)
 {
@@ -481,7 +481,7 @@ static int read_field_headers(struct OperationConfig *config,
   /* NOTREACHED */
 }
 
-static int get_param_part(struct OperationConfig *config, char endchar,
+static int get_param_part(mm_ptr<struct OperationConfig> config, char endchar,
                           char **str, char **pdata, char **ptype,
                           char **pfilename, char **pencoder,
                           struct curl_slist **pheaders)
@@ -745,10 +745,10 @@ static int get_param_part(struct OperationConfig *config, char endchar,
       NULL_CHECK((m)->field, strdup(field), retcode);                   \
   } while(0)
 
-int formparse(struct OperationConfig *config,
+int formparse(mm_ptr<struct OperationConfig> config,
               const char *input,
-              struct tool_mime **mimeroot,
-              struct tool_mime **mimecurrent,
+              mm_ptr<struct tool_mime *> mimeroot,
+              mm_ptr<struct tool_mime *> mimecurrent,
               bool literal_value)
 {
   /* input MUST be a string in the format 'name=contents' and we'll
