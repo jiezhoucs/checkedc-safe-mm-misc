@@ -63,8 +63,7 @@ int tool_readbusy_cb(void *clientp,
                      curl_off_t ultotal, curl_off_t ulnow)
 {
   struct per_transfer *per = clientp;
-  // TODO
-  struct OperationConfig *config = _GETPTR(struct OperationConfig, per->config);
+  mm_ptr<struct OperationConfig> config = per->config;
 
   (void)dltotal;  /* unused */
   (void)dlnow;  /* unused */

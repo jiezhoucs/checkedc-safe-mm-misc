@@ -160,10 +160,11 @@ bool tool_create_output_file_unchecked(struct OutStruct *outs,
 size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
 {
   size_t rc;
+  // TODO: Not sure if it is safe to convert (and how?) void *userdata to
+  // mm_ptr<struct per_transfer>.
   struct per_transfer *per = userdata;
   struct OutStruct *outs = &per->outs;
-  // TODO
-  struct OperationConfig *config = _GETPTR(struct OperationConfig, per->config);
+  mm_ptr<struct OperationConfig> config = per->config;
   size_t bytes = sz * nmemb;
   bool is_tty = config->global->isatty;
 #ifdef WIN32

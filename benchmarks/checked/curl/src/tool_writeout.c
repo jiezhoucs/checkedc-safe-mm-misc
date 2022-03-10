@@ -356,7 +356,6 @@ void ourWriteOut(const char *writeinfo, mm_ptr<struct per_transfer> per,
                 ourWriteOutJSON(stream, variables, per, per_result);
                 break;
               default:
-                // TODO
                 (void)variables[i].writefunc(stream, &variables[i],
                                              per, per_result, false);
                 break;

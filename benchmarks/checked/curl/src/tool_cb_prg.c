@@ -130,8 +130,7 @@ int tool_progress_cb(void *clientp,
 
   struct timeval now = tvnow();
   struct per_transfer *per = clientp;
-  // TODO
-  struct OperationConfig *config = _GETPTR(struct OperationConfig, per->config);
+  mm_ptr<struct OperationConfig> config = per->config;
   struct ProgressData *bar = &per->progressbar;
   curl_off_t total;
   curl_off_t point;

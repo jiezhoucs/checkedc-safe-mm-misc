@@ -42,7 +42,7 @@
 
 struct HdrCbData {
   struct GlobalConfig *global;
-  struct OperationConfig *config;
+  mm_ptr<struct OperationConfig> config;
   mm_ptr<struct OutStruct> outs;
   mm_ptr<struct OutStruct> heads;
   mm_ptr<struct OutStruct> etag_save;

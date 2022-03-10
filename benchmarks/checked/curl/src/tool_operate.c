@@ -777,7 +777,6 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         if(!config->globoff) {
           /* Unless explicitly shut off, we expand '{...}' and '[...]'
              expressions and return total number of URLs in pattern set */
-          // TODO
           result = glob_url(&state->urls, urlnode->url, &state->urlnum,
                             global->showerror?global->errors:NULL);
           if(result)
@@ -1198,8 +1197,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         my_setopt(curl, CURLOPT_WRITEFUNCTION, tool_write_cb);
 
         /* for uploads */
-        // TODO
-        input->config = _GETPTR(struct OperationConfig, config);
+        input->config = config;
         /* Note that if CURLOPT_READFUNCTION is fread (the default), then
          * lib/telnet.c will Curl_poll() on the input file descriptor
          * rather than calling the READFUNCTION at regular intervals.
@@ -1947,8 +1945,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         hdrcbdata->heads = heads;
         hdrcbdata->etag_save = etag_save;
         hdrcbdata->global = global;
-        // TODO
-        hdrcbdata->config = _GETPTR(struct OperationConfig, config);
+        hdrcbdata->config = config;
 
         my_setopt(curl, CURLOPT_HEADERFUNCTION, tool_header_cb);
         my_setopt(curl, CURLOPT_HEADERDATA, _GETPTR(struct per_transfer, per));

@@ -23,6 +23,8 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
+#include "safe_mm_checked.h"
+
 /*
  * OutStruct variables keep track of information relative to curl's
  * output writing, which may take place to a standard stream or a file.
@@ -81,7 +83,7 @@ struct OutStruct {
 
 struct InStruct {
   int fd;
-  struct OperationConfig *config;
+  mm_ptr<struct OperationConfig> config;
 };
 
 
