@@ -26,6 +26,7 @@
 /* The real lock size is 4 bytes but we allocate 8 bytes for it for alignment. */
 #define LOCK_MEM 8
 #define HEAP_PADDING 8
+#define EXTRA_HEAP_MEM 16
 #define KEY_MASK 0x00000000ffffffff
 
 #define GET_KEY(key_offset) (uint32_t)(key_offset >> 32)
@@ -165,7 +166,7 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     // Get the original raw pointer.
     _MMSafe_ptr_Rep *safeptr_ptr = (_MMSafe_ptr_Rep *)&p;
     void * old_raw_ptr = safeptr_ptr->p;
-    old_raw_ptr = old_raw_ptr - LOCK_MEM - HEAP_PADDING;
+    old_raw_ptr -= EXTRA_HEAP_MEM;
 
     // In case realloc() reallocates the memory to a new starting address,
     // we need invalidate the old lock before calling realloc because
@@ -173,15 +174,14 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     // Invalidating the old lock after calling realloc may corrupt valid memory.
     *((uint32_t *)(old_raw_ptr + HEAP_PADDING)) = 0;
 
-    void *new_raw_ptr = realloc(old_raw_ptr, size);
+    void *new_raw_ptr = realloc(old_raw_ptr, size + EXTRA_HEAP_MEM);
     if (new_raw_ptr == old_raw_ptr) {
         /* Recover the invalidated lock */
         *((uint32_t *)(old_raw_ptr + HEAP_PADDING)) = GET_KEY(safeptr_ptr->key_offset);
         return p;
     }
 
-    // The new object is placed in a different location and the old one
-    // is freed. The old object's lock needs to be invalidated.
+    // The new object is placed in a different location and the old one is freed.
     new_raw_ptr += HEAP_PADDING;
     *((uint32_t *)new_raw_ptr) = key;
     _MMSafe_ptr_Rep safe_ptr = {.p = new_raw_ptr + LOCK_MEM, .key_offset = key};
