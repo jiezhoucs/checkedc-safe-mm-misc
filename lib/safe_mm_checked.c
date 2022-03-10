@@ -133,11 +133,11 @@ for_any(T) mm_ptr<T> mm_alloc(size_t size) {
 //
 __attribute__ ((noinline))
 for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
-  void *raw_ptr = malloc(array_size + LOCK_MEM + HEAP_PADDING);
-  if (raw_ptr == NULL) return NULL;
+    void *raw_ptr = malloc(array_size + LOCK_MEM + HEAP_PADDING);
+    if (raw_ptr == NULL) return NULL;
 
-  raw_ptr += HEAP_PADDING;
-  *((uint32_t *)(raw_ptr)) = key;
+    raw_ptr += HEAP_PADDING;
+    *((uint32_t *)(raw_ptr)) = key;
 
     // Create a helper struct to initialize the mm_array_ptr.
     _MMSafe_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_MEM, .key_offset = key };
@@ -146,7 +146,7 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
 
     key++;
 
-  return *((mm_array_ptr<T> *)&safe_ptr);
+    return *((mm_array_ptr<T> *)&safe_ptr);
 }
 
 //
@@ -195,7 +195,7 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
 
 
 //
-// Function: mmcalloc()
+// Function: mm_calloc()
 //
 // The mm-safe version of calloc().
 //
@@ -203,7 +203,7 @@ __attribute__ ((noinline))
 for_any(T) mm_array_ptr<T> mm_calloc(size_t nmemb, size_t size) {
     if (nmemb == 0 || size == 0) return NULL;
 
-    void *raw_ptr = calloc(nmemb * size + LOCK_MEM + HEAP_PADDING, 1);
+    void *raw_ptr = calloc(1, nmemb * size + EXTRA_HEAP_MEM);
     if (raw_ptr == NULL) return NULL;
 
     raw_ptr += HEAP_PADDING;
@@ -213,7 +213,28 @@ for_any(T) mm_array_ptr<T> mm_calloc(size_t nmemb, size_t size) {
     // Move the key to the highest 32 bits and make the offset 0.
     safe_ptr.key_offset <<= 32;
     key++;
-  
+
+    return *((mm_array_ptr<T> *)&safe_ptr);
+}
+
+//
+// Function: mm_single_calloc()
+//
+// calloc() a single heap object.
+//
+for_any(T) mm_ptr<T> mm_single_calloc(size_t size) {
+    void *raw_ptr = calloc(1, size + EXTRA_HEAP_MEM);
+    if (raw_ptr == NULL) return NULL;
+
+    // The lock is located before the first field of the referent.
+    raw_ptr += HEAP_PADDING;
+    *((uint32_t *)(raw_ptr)) = key;
+    // Create a helper struct to initialize the mm_array_ptr.
+    _MMSafe_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_MEM, .key_offset = key };
+    // Move the key to the highest 32 bits and make the offset 0.
+    safe_ptr.key_offset <<= 32;
+    key++;
+
     return *((mm_array_ptr<T> *)&safe_ptr);
 }
 
