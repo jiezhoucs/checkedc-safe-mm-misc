@@ -32,22 +32,26 @@
 
 #include "memdebug.h" /* keep this as LAST include */
 
+#include "debug.h"
+
 #define GLOBERROR(string, column, code) \
   glob->error = string, glob->pos = column, code
 
-static CURLcode glob_fixed(struct URLGlob *glob, char *fixed, size_t len)
+static CURLcode glob_fixed(mm_ptr<struct URLGlob> glob, char *fixed, size_t len)
 {
-  struct URLPattern *pat = &glob->pattern[glob->size];
+  mm_ptr<struct URLPattern> pat = &glob->pattern[glob->size];
   pat->type = UPTSet;
   pat->content.Set.size = 1;
   pat->content.Set.ptr_s = 0;
   pat->globindex = -1;
 
-  pat->content.Set.elements = malloc(sizeof(char *));
+  pat->content.Set.elements = MM_ARRAY_ALLOC(char*, 1);
 
   if(!pat->content.Set.elements)
     return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
 
+  /* Checked C: We need use malloc here because later elements[i] is assigned to
+   * the retrun value from strdup(). Maybe we should make strdup mmsafe. */
   pat->content.Set.elements[0] = malloc(len + 1);
   if(!pat->content.Set.elements[0])
     return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
@@ -75,16 +79,16 @@ static int multiply(unsigned long *amount, long with)
   return 0;
 }
 
-static CURLcode glob_set(struct URLGlob *glob, char **patternp,
+static CURLcode glob_set(mm_ptr<struct URLGlob> glob, char **patternp,
                          size_t *posp, unsigned long *amount,
                          int globindex)
 {
   /* processes a set expression with the point behind the opening '{'
      ','-separated elements are collected until the next closing '}'
   */
-  struct URLPattern *pat;
+  mm_ptr<struct URLPattern> pat = NULL;
   bool done = FALSE;
-  char *buf = glob->glob_buffer;
+  mm_array_ptr<char> buf = glob->glob_buffer;
   char *pattern = *patternp;
   char *opattern = pattern;
   size_t opos = *posp-1;
@@ -117,24 +121,23 @@ static CURLcode glob_set(struct URLGlob *glob, char **patternp,
 
       /* FALLTHROUGH */
     case ',':
-
       *buf = '\0';
       if(pat->content.Set.elements) {
-        char **new_arr = realloc(pat->content.Set.elements,
-                                 (pat->content.Set.size + 1) * sizeof(char *));
+         mm_array_ptr<char *> new_arr = mm_array_realloc<char*>(pat->content.Set.elements,
+             (pat->content.Set.size + 1) * sizeof(char*));
         if(!new_arr)
           return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
 
         pat->content.Set.elements = new_arr;
       }
       else
-        pat->content.Set.elements = malloc(sizeof(char *));
+        pat->content.Set.elements = MM_ARRAY_ALLOC(char *, 1);
 
       if(!pat->content.Set.elements)
         return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
 
       pat->content.Set.elements[pat->content.Set.size] =
-        strdup(glob->glob_buffer);
+        strdup(_GETARRAYPTR(char, glob->glob_buffer));
       if(!pat->content.Set.elements[pat->content.Set.size])
         return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
       ++pat->content.Set.size;
@@ -169,7 +172,7 @@ static CURLcode glob_set(struct URLGlob *glob, char **patternp,
   return CURLE_OK;
 }
 
-static CURLcode glob_range(struct URLGlob *glob, char **patternp,
+static CURLcode glob_range(mm_ptr<struct URLGlob> glob, char **patternp,
                            size_t *posp, unsigned long *amount,
                            int globindex)
 {
@@ -179,7 +182,7 @@ static CURLcode glob_range(struct URLGlob *glob, char **patternp,
      - num range with leading zeros: e.g. "001-999]"
      expression is checked for well-formedness and collected until the next ']'
   */
-  struct URLPattern *pat;
+  mm_ptr<struct URLPattern> pat = NULL;
   int rc;
   char *pattern = *patternp;
   char *c;
@@ -357,7 +360,7 @@ static bool peek_ipv6(const char *str, size_t *skip)
   return rc ? FALSE : TRUE;
 }
 
-static CURLcode glob_parse(struct URLGlob *glob, char *pattern,
+static CURLcode glob_parse(mm_ptr<struct URLGlob> glob, char *pattern,
                            size_t pos, unsigned long *amount)
 {
   /* processes a literal string component of a URL
@@ -369,7 +372,7 @@ static CURLcode glob_parse(struct URLGlob *glob, char *pattern,
   *amount = 1;
 
   while(*pattern && !res) {
-    char *buf = glob->glob_buffer;
+    mm_array_ptr<char> buf = glob->glob_buffer;
     size_t sublen = 0;
     while(*pattern && *pattern != '{') {
       if(*pattern == '[') {
@@ -378,7 +381,7 @@ static CURLcode glob_parse(struct URLGlob *glob, char *pattern,
         if(!peek_ipv6(pattern, &skip) && (pattern[1] == ']'))
           skip = 2;
         if(skip) {
-          memcpy(buf, pattern, skip);
+          memcpy(_GETARRAYPTR(char, buf), pattern, skip);
           buf += skip;
           pattern += skip;
           sublen += skip;
@@ -406,7 +409,7 @@ static CURLcode glob_parse(struct URLGlob *glob, char *pattern,
     if(sublen) {
       /* we got a literal string, add it as a single-item list */
       *buf = '\0';
-      res = glob_fixed(glob, glob->glob_buffer, sublen);
+      res = glob_fixed(glob, _GETARRAYPTR(char, glob->glob_buffer), sublen);
     }
     else {
       switch (*pattern) {
@@ -435,28 +438,28 @@ static CURLcode glob_parse(struct URLGlob *glob, char *pattern,
   return res;
 }
 
-CURLcode glob_url(mm_ptr<struct URLGlob *> glob, char *url, mm_ptr<unsigned long> urlnum,
+CURLcode glob_url(mm_ptr<mm_ptr<struct URLGlob>> glob, char *url, mm_ptr<unsigned long> urlnum,
                   FILE *error)
 {
   /*
    * We can deal with any-size, just make a buffer with the same length
    * as the specified URL!
    */
-  struct URLGlob *glob_expand;
+  mm_ptr<struct URLGlob> glob_expand = NULL;
   unsigned long amount = 0;
-  char *glob_buffer;
+  mm_array_ptr<char> glob_buffer = NULL;
   CURLcode res;
 
   *glob = NULL;
 
-  glob_buffer = malloc(strlen(url) + 1);
+  glob_buffer = MM_ARRAY_ALLOC(char, strlen(url) + 1);
   if(!glob_buffer)
     return CURLE_OUT_OF_MEMORY;
   glob_buffer[0] = 0;
 
-  glob_expand = calloc(1, sizeof(struct URLGlob));
+  glob_expand = MM_SINGLE_CALLOC(struct URLGlob);
   if(!glob_expand) {
-    Curl_safefree(glob_buffer);
+     MM_FREE(char, glob_buffer);
     return CURLE_OUT_OF_MEMORY;
   }
   glob_expand->urllen = strlen(url);
@@ -491,7 +494,7 @@ CURLcode glob_url(mm_ptr<struct URLGlob *> glob, char *url, mm_ptr<unsigned long
   return CURLE_OK;
 }
 
-void glob_cleanup(struct URLGlob *glob)
+void glob_cleanup(mm_ptr<struct URLGlob> glob)
 {
   size_t i;
   int elem;
@@ -507,20 +510,20 @@ void glob_cleanup(struct URLGlob *glob)
           --elem) {
         Curl_safefree(glob->pattern[i].content.Set.elements[elem]);
       }
-      Curl_safefree(glob->pattern[i].content.Set.elements);
+      MM_FREE(char *, glob->pattern[i].content.Set.elements);
     }
   }
-  Curl_safefree(glob->glob_buffer);
-  Curl_safefree(glob);
+  MM_FREE(char, glob->glob_buffer);
+  MM_FREE(struct URLGlob, glob);
 }
 
-CURLcode glob_next_url(mm_ptr<char *> globbed, struct URLGlob *glob)
+CURLcode glob_next_url(mm_ptr<char *> globbed, mm_ptr<struct URLGlob> glob)
 {
-  struct URLPattern *pat;
+  mm_ptr<struct URLPattern> pat = NULL;
   size_t i;
   size_t len;
   size_t buflen = glob->urllen + 1;
-  char *buf = glob->glob_buffer;
+  mm_array_ptr<char> buf = glob->glob_buffer;
 
   *globbed = NULL;
 
@@ -573,9 +576,9 @@ CURLcode glob_next_url(mm_ptr<char *> globbed, struct URLGlob *glob)
     switch(pat->type) {
     case UPTSet:
       if(pat->content.Set.elements) {
-        msnprintf(buf, buflen, "%s",
+        msnprintf(_GETARRAYPTR(char, buf), buflen, "%s",
                   pat->content.Set.elements[pat->content.Set.ptr_s]);
-        len = strlen(buf);
+        len = strlen(_GETARRAYPTR(char, buf));
         buf += len;
         buflen -= len;
       }
@@ -588,10 +591,10 @@ CURLcode glob_next_url(mm_ptr<char *> globbed, struct URLGlob *glob)
       }
       break;
     case UPTNumRange:
-      msnprintf(buf, buflen, "%0*lu",
+      msnprintf(_GETARRAYPTR(char, buf), buflen, "%0*lu",
                 pat->content.NumRange.padlength,
                 pat->content.NumRange.ptr_n);
-      len = strlen(buf);
+      len = strlen(_GETARRAYPTR(char, buf));
       buf += len;
       buflen -= len;
       break;
@@ -601,7 +604,7 @@ CURLcode glob_next_url(mm_ptr<char *> globbed, struct URLGlob *glob)
     }
   }
 
-  *globbed = strdup(glob->glob_buffer);
+  *globbed = strdup(_GETARRAYPTR(char, glob->glob_buffer));
   if(!*globbed)
     return CURLE_OUT_OF_MEMORY;
 
@@ -610,7 +613,7 @@ CURLcode glob_next_url(mm_ptr<char *> globbed, struct URLGlob *glob)
 
 #define MAX_OUTPUT_GLOB_LENGTH (10*1024)
 
-CURLcode glob_match_url(mm_ptr<char *> result, char *filename, struct URLGlob *glob)
+CURLcode glob_match_url(mm_ptr<char *> result, char *filename, mm_ptr<struct URLGlob> glob)
 {
   char numbuf[18];
   char *appendthis = (char *)"";
@@ -628,7 +631,7 @@ CURLcode glob_match_url(mm_ptr<char *> result, char *filename, struct URLGlob *g
     if(*filename == '#' && ISDIGIT(filename[1])) {
       char *ptr = filename;
       unsigned long num = strtoul(&filename[1], &filename, 10);
-      struct URLPattern *pat = NULL;
+      mm_ptr<struct URLPattern> pat = NULL;
 
       if(num && (num < glob->size)) {
         unsigned long i;

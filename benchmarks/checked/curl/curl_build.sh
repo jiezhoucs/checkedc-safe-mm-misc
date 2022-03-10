@@ -42,7 +42,7 @@ config_configure() {
                  CC="$CC"                                                      \
                  CFLAGS="$CFLAGS"                                              \
                  LD="$CC"                                                      \
-                 LDFLAGS="$LDFLAGS"                                            \
+                 LDFLAGS="$LDFLAGS"
 }
 
 #

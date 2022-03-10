@@ -37,7 +37,7 @@ struct URLPattern {
                     within {} or [] */
   union {
     struct {
-      char **elements;
+      mm_array_ptr<char *> elements;
       int size;
       int ptr_s;
     } Set;
@@ -64,15 +64,15 @@ struct URLGlob {
   struct URLPattern pattern[GLOB_PATTERN_NUM];
   size_t size;
   size_t urllen;
-  char *glob_buffer;
+  mm_array_ptr<char> glob_buffer;
   char beenhere;
   const char *error; /* error message */
   size_t pos;        /* column position of error or 0 */
 };
 
-CURLcode glob_url(mm_ptr<struct URLGlob*>, char *, mm_ptr<unsigned long>, FILE *);
-CURLcode glob_next_url(mm_ptr<char *>, struct URLGlob *);
-CURLcode glob_match_url(mm_ptr<char *>, char *, struct URLGlob *);
-void glob_cleanup(struct URLGlob *glob);
+CURLcode glob_url(mm_ptr<mm_ptr<struct URLGlob>>, char *, mm_ptr<unsigned long>, FILE *);
+CURLcode glob_next_url(mm_ptr<char *>, mm_ptr<struct URLGlob>);
+CURLcode glob_match_url(mm_ptr<char *>, char *, mm_ptr<struct URLGlob>);
+void glob_cleanup(mm_ptr<struct URLGlob> glob);
 
 #endif /* HEADER_CURL_TOOL_URLGLOB_H */

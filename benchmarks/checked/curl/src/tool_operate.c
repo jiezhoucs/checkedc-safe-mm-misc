@@ -210,8 +210,7 @@ static mm_ptr<struct per_transfer> transfersl; /* last node */
    list of transfers */
 static CURLcode add_per_transfer(mm_ptr<struct per_transfer> *per)
 {
-  mm_ptr<struct per_transfer> p = MM_ALLOC(struct per_transfer);
-  memset(_GETPTR(struct per_transfer, p), 0, sizeof(struct per_transfer));
+  mm_ptr<struct per_transfer> p = MM_SINGLE_CALLOC(struct per_transfer);
   if(!p)
     return CURLE_OUT_OF_MEMORY;
   if(!transfers)
@@ -711,7 +710,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
 
   while(config->state.urlnode) {
     char *infiles; /* might be a glob pattern */
-    struct URLGlob *inglob = state->inglob;
+    mm_ptr<struct URLGlob> inglob = state->inglob;
     urlnode = config->state.urlnode;
 
     /* urlnode->url is the full URL (it might be NULL) */

@@ -38,8 +38,8 @@ struct GlobalConfig;
 
 struct State {
   struct getout *urlnode;
-  struct URLGlob *inglob;
-  struct URLGlob *urls;
+  mm_ptr<struct URLGlob> inglob;
+  mm_ptr<struct URLGlob> urls;
   char *outfiles;
   char *httpgetfields;
   char *uploadfile;
