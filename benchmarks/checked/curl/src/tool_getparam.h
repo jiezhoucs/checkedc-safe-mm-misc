@@ -57,7 +57,7 @@ ParameterError getparameter(const char *flag, char *nextarg, bool *usedarg,
 
 #ifdef UNITTESTS
 void parse_cert_parameter(const char *cert_parameter,
-                          char **certname,
+                          mm_array_ptr<char> *certname,
                           char **passphrase);
 #endif
 

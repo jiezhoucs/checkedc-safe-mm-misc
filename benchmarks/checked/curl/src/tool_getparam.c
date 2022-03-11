@@ -348,13 +348,13 @@ static const struct LongShort aliases[]= {
 static
 #endif
 void parse_cert_parameter(const char *cert_parameter,
-                          char **certname,
+                          mm_array_ptr<char> *certname,
                           char **passphrase)
 {
   size_t param_length = strlen(cert_parameter);
   size_t span;
   const char *param_place = NULL;
-  char *certname_place = NULL;
+  mm_array_ptr<char> certname_place = NULL;
   *certname = NULL;
   *passphrase = NULL;
 
@@ -368,11 +368,11 @@ void parse_cert_parameter(const char *cert_parameter,
    * means no passphrase was given and no characters escaped */
   if(curl_strnequal(cert_parameter, "pkcs11:", 7) ||
      !strpbrk(cert_parameter, ":\\")) {
-    *certname = strdup(cert_parameter);
+    *certname = mm_strdup_from_raw(cert_parameter);
     return;
   }
   /* deal with escaped chars; find unescaped colon if it exists */
-  certname_place = malloc(param_length + 1);
+  certname_place = MM_ARRAY_ALLOC(char, param_length + 1);
   if(!certname_place)
     return;
 
@@ -380,7 +380,7 @@ void parse_cert_parameter(const char *cert_parameter,
   param_place = cert_parameter;
   while(*param_place) {
     span = strcspn(param_place, ":\\");
-    strncpy(certname_place, param_place, span);
+    strncpy(_GETCHARPTR(certname_place), param_place, span);
     param_place += span;
     certname_place += span;
     /* we just ate all the non-special chars. now we're on either a special
@@ -471,11 +471,12 @@ static size_t replace_url_encoded_space_by_plus(char *url)
 }
 
 static void
-GetFileAndPassword(char *nextarg, mm_ptr<char *> file, mm_ptr<char *> password)
+GetFileAndPassword(char *nextarg, mm_ptr<mm_array_ptr<char>> file, mm_ptr<char *> password)
 {
-  char *certname, *passphrase;
+  mm_array_ptr<char> certname = NULL;
+  char *passphrase;
   parse_cert_parameter(nextarg, &certname, &passphrase);
-  Curl_safefree(*file);
+  MM_ARRAY_FREE(char, *file);
   *file = certname;
   if(passphrase) {
     Curl_safefree(*password);
