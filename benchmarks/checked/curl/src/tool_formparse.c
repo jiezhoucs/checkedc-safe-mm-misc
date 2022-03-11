@@ -272,6 +272,7 @@ static CURLcode tool2curlparts(CURL *curl, struct tool_mime *m,
         /* Our data is always textual: convert it to ASCII. */
         {
           size_t size = strlen(m->data);
+          /* Checked C: Omit changing the next line as it is MIME related. */
           char *cp = malloc(size + 1);
 
           if(!cp)

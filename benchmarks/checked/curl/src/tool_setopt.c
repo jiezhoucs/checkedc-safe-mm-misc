@@ -483,6 +483,7 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
     /* Our data is always textual: convert it to ASCII. */
     {
       size_t size = strlen(part->data);
+      /* Checked C: Omit porting this malloc as it is in an MIME related fn. */
       char *cp = malloc(size + 1);
 
       NULL_CHECK(cp);

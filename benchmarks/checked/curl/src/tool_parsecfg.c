@@ -196,6 +196,10 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
       if(*line == '\"') {
         /* quoted parameter, do the quote dance */
         line++;
+        /* Checked C: TODO? If we change the next line, we have to change
+         * char *line defined at line 140, which is set as the return value of
+         * curlx_dyn_ptr() at line 153. Touching curlx_dynbuf will affect too
+         * much code. We should wait to see if changing it is feasible. */
         param = malloc(strlen(line) + 1); /* parameter */
         if(!param) {
           /* out of memory */

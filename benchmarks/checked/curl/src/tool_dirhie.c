@@ -113,6 +113,8 @@ CURLcode create_dir_hierarchy(const char *outfile, FILE *errors)
   if(!outdup)
     return CURLE_OUT_OF_MEMORY;
 
+  /* Checked C: No need to port the next line as it is only passed to libc fn
+   * and show_dir_errno() which just prints stuffs, i.e., no escaping. */
   dirbuildup = malloc(outlen + 1);
   if(!dirbuildup) {
     Curl_safefree(outdup);
