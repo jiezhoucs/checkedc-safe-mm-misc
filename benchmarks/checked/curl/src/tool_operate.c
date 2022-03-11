@@ -669,7 +669,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
                                 bool *added)
 {
   CURLcode result = CURLE_OK;
-  struct getout *urlnode;
+  mm_ptr<struct getout> urlnode = NULL;
   bool orig_noprogress = global->noprogress;
   bool orig_isatty = global->isatty;
   mm_ptr<struct State> state = &config->state;

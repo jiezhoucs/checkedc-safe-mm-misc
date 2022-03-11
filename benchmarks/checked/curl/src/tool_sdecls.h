@@ -94,7 +94,7 @@ struct InStruct {
  */
 
 struct getout {
-  struct getout *next;      /* next one */
+  mm_ptr<struct getout> next;      /* next one */
   char          *url;       /* the URL we deal with */
   char          *outfile;   /* where to store the output */
   char          *infile;    /* file to upload, if GETOUT_UPLOAD is set */

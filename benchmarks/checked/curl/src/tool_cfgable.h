@@ -37,7 +37,7 @@ typedef enum {
 struct GlobalConfig;
 
 struct State {
-  struct getout *urlnode;
+  mm_ptr<struct getout> urlnode;
   mm_ptr<struct URLGlob> inglob;
   mm_ptr<struct URLGlob> urls;
   char *outfiles;
@@ -130,11 +130,11 @@ struct OperationConfig {
   bool netrc_opt;
   bool netrc;
   char *netrc_file;
-  struct getout *url_list;  /* point to the first node */
-  struct getout *url_last;  /* point to the last/current node */
-  struct getout *url_get;   /* point to the node to fill in URL */
-  struct getout *url_out;   /* point to the node to fill in outfile */
-  struct getout *url_ul;    /* point to the node to fill in upload */
+  mm_ptr<struct getout> url_list;  /* point to the first node */
+  mm_ptr<struct getout> url_last;  /* point to the last/current node */
+  mm_ptr<struct getout> url_get;   /* point to the node to fill in URL */
+  mm_ptr<struct getout> url_out;   /* point to the node to fill in outfile */
+  mm_ptr<struct getout> url_ul;    /* point to the node to fill in upload */
   char *doh_url;
   char *cipher_list;
   char *proxy_cipher_list;

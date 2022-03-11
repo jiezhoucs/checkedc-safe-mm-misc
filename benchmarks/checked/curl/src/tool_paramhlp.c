@@ -38,11 +38,10 @@
 
 #include "memdebug.h" /* keep this as LAST include */
 
-struct getout *new_getout(mm_ptr<struct OperationConfig> config)
+mm_ptr<struct getout> new_getout(mm_ptr<struct OperationConfig> config)
 {
-  // TODO
-  struct getout *node = calloc(1, sizeof(struct getout));
-  struct getout *last = config->url_last;
+  mm_ptr<struct getout> node = MM_SINGLE_CALLOC(struct getout);
+  mm_ptr<struct getout> last = config->url_last;
   if(node) {
     static int outnum = 0;
 

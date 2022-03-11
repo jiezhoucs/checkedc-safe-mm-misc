@@ -37,15 +37,15 @@
 void clean_getout(mm_ptr<struct OperationConfig> config)
 {
   if(config) {
-    struct getout *next;
-    struct getout *node = config->url_list;
+    mm_ptr<struct getout> next = NULL;
+    mm_ptr<struct getout> node = config->url_list;
 
     while(node) {
       next = node->next;
       Curl_safefree(node->url);
       Curl_safefree(node->outfile);
       Curl_safefree(node->infile);
-      Curl_safefree(node);
+      MM_FREE(struct getout, node);
       node = next;
     }
     config->url_list = NULL;

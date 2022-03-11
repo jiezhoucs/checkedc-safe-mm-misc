@@ -49,7 +49,7 @@ void config_init(mm_ptr<struct OperationConfig> config)
 
 static void free_config_fields(mm_ptr<struct OperationConfig> config)
 {
-  struct getout *urlnode;
+  mm_ptr<struct getout> urlnode = NULL;
 
   Curl_safefree(config->random_file);
   Curl_safefree(config->egd_file);
@@ -95,11 +95,11 @@ static void free_config_fields(mm_ptr<struct OperationConfig> config)
 
   urlnode = config->url_list;
   while(urlnode) {
-    struct getout *next = urlnode->next;
+    mm_ptr<struct getout> next = urlnode->next;
     Curl_safefree(urlnode->url);
     Curl_safefree(urlnode->outfile);
     Curl_safefree(urlnode->infile);
-    Curl_safefree(urlnode);
+    MM_FREE(struct getout, urlnode);
     urlnode = next;
   }
   config->url_list = NULL;

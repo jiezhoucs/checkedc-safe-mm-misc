@@ -891,7 +891,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         break;
       case '@': /* the URL! */
       {
-        struct getout *url;
+        mm_ptr<struct getout> url = NULL;
 
         if(!config->url_get)
           config->url_get = config->url_list;
@@ -1984,7 +1984,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
     case 'o': /* --output */
       /* output file */
     {
-      struct getout *url;
+      mm_ptr<struct getout> url = NULL;
       if(!config->url_out)
         config->url_out = config->url_list;
       if(config->url_out) {
@@ -2124,7 +2124,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
     case 'T':
       /* we are uploading */
     {
-      struct getout *url;
+      mm_ptr<struct getout> url = NULL;
       if(!config->url_ul)
         config->url_ul = config->url_list;
       if(config->url_ul) {
