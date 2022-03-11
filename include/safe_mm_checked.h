@@ -14,6 +14,7 @@
 /* Extract the raw pointer from a checked pointer. */
 #define _GETPTR(T, p) ((T *)(p))
 #define _GETARRAYPTR(T, p) ((T *)p)
+#define _GETCHARPTR(p) ((char *)p)
 
 /* These macros provide convenience for programmers to type a little less. */
 #define MM_ALLOC(T) mm_alloc<T>(sizeof(T))
@@ -29,11 +30,16 @@
 for_any(T) mm_ptr<T> mm_alloc(size_t size);
 for_any(T) void mm_free(mm_ptr<const T> const p);
 
+/* mmsafe version of heap allocators and free() */
 for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size);
 for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size);
 for_any(T) mm_array_ptr<T> mm_calloc(size_t nmemb, size_t size);
 for_any(T) mm_ptr<T> mm_single_calloc(size_t size);
 for_any(T) void mm_array_free(mm_array_ptr<const T> const p);
+
+/* mmsafe strdup/strndup */
+mm_array_ptr<char> mm_strdup(mm_array_ptr<char> p);
+mm_array_ptr<char> mm_strdup_from_raw(const char *p);
 
 /* Extract the raw pointer from a checked pointer. */
 /* Deprecated */

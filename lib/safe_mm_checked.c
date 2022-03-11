@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <immintrin.h>   /* for _rdrand32_step() */
 
 #define __INLINE __attribute__((always_inline))
@@ -236,6 +237,41 @@ for_any(T) mm_ptr<T> mm_single_calloc(size_t size) {
     key++;
 
     return *((mm_array_ptr<T> *)&safe_ptr);
+}
+
+/*
+ * Function: mm_strdup().
+ *
+ * An mmsafe version of strdup. It accepts an mm_array_ptr and returns an
+ * mm_array_ptr.
+ * */
+mm_array_ptr<char> mm_strdup(mm_array_ptr<char> p) {
+    if (p == NULL) return NULL;
+
+    size_t len = strlen(_GETCHARPTR(p)) + 1;
+    mm_array_ptr<char> new_p = MM_ARRAY_ALLOC(char, len);
+    if (new_p == NULL) return NULL;
+
+    memcpy(_GETCHARPTR(new_p), _GETCHARPTR(p), len);
+    return new_p;
+}
+
+/*
+ * Function: mm_strdup_from_raw().
+ *
+ * An mmsafe version of strdup. It accepts a raw pointer to char and returns an
+ * mm_array_ptr.
+ * */
+mm_array_ptr<char> mm_strdup_from_raw(const char *p) {
+    if (p == NULL) return NULL;
+
+    size_t len = strlen(p) + 1;
+    mm_array_ptr<char> new_p = MM_ARRAY_ALLOC(char, len);
+    if (new_p == NULL) return NULL;
+
+    memcpy(_GETCHARPTR(new_p), p, len);
+    return new_p;
+
 }
 
 //
