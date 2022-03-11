@@ -69,7 +69,7 @@ static SANITIZEcode msdosify(char **const sanitized, const char *file_name,
                              int flags);
 #endif
 static SANITIZEcode rename_if_reserved_dos_device_name(char **const sanitized,
-                                                       const char *file_name,
+                                                       const mm_array_ptr<char> file_name,
                                                        int flags);
 #endif /* !UNITTESTS (static declarations used if no unit tests) */
 
@@ -111,7 +111,7 @@ Failure: (!= SANITIZE_ERR_OK) *sanitized is NULL.
 SANITIZEcode sanitize_file_name(char **const sanitized, const char *file_name,
                                 int flags)
 {
-  char *p, *target;
+  mm_array_ptr<char> p = NULL, target = NULL;
   size_t len;
   SANITIZEcode sc;
   size_t max_sanitized_len;
@@ -148,15 +148,15 @@ SANITIZEcode sanitize_file_name(char **const sanitized, const char *file_name,
     len = max_sanitized_len;
   }
 
-  target = malloc(len + 1);
+  target = MM_ARRAYL_ALLOC(char, len + 1);
   if(!target)
     return SANITIZE_ERR_OUT_OF_MEMORY;
 
-  strncpy(target, file_name, len);
+  strncpy(_GETCHARPTR(target), file_name, len);
   target[len] = '\0';
 
 #ifndef MSDOS
-  if((flags & SANITIZE_ALLOW_PATH) && !strncmp(target, "\\\\?\\", 4))
+  if((flags & SANITIZE_ALLOW_PATH) && !strncmp(_GETCHARPTR(target), "\\\\?\\", 4))
     /* Skip the literal path prefix \\?\ */
     p = target + 4;
   else
@@ -202,28 +202,28 @@ SANITIZEcode sanitize_file_name(char **const sanitized, const char *file_name,
 
 #ifdef MSDOS
   sc = msdosify(&p, target, flags);
-  free(target);
+  MM_ARRAY_FREE(char, target);
   if(sc)
     return sc;
   target = p;
   len = strlen(target);
 
   if(len > max_sanitized_len) {
-    free(target);
+    MM_ARRAY_FREE(char, target);
     return SANITIZE_ERR_INVALID_PATH;
   }
 #endif
 
   if(!(flags & SANITIZE_ALLOW_RESERVED)) {
     sc = rename_if_reserved_dos_device_name(&p, target, flags);
-    free(target);
+    MM_ARRY_FREE(char, target);
     if(sc)
       return sc;
     target = p;
-    len = strlen(target);
+    len = strlen(_GETCHARPTR(target));
 
     if(len > max_sanitized_len) {
-      free(target);
+      MM_ARRAY_FREE(char, target);
       return SANITIZE_ERR_INVALID_PATH;
     }
   }
@@ -456,7 +456,7 @@ Success: (SANITIZE_ERR_OK) *sanitized points to a sanitized copy of file_name.
 Failure: (!= SANITIZE_ERR_OK) *sanitized is NULL.
 */
 SANITIZEcode rename_if_reserved_dos_device_name(char **const sanitized,
-                                                const char *file_name,
+                                                const mm_array_ptr<char> file_name,
                                                 int flags)
 {
   /* We could have a file whose name is a device on MS-DOS.  Trying to
