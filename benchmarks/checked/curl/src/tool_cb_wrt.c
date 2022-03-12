@@ -160,8 +160,7 @@ bool tool_create_output_file_unchecked(struct OutStruct *outs,
 size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
 {
   size_t rc;
-  // TODO: Not sure if it is safe to convert (and how?) void *userdata to
-  // mm_ptr<struct per_transfer>.
+  // Checked C: Is it possible to port the next line?
   struct per_transfer *per = userdata;
   struct OutStruct *outs = &per->outs;
   mm_ptr<struct OperationConfig> config = per->config;
@@ -252,32 +251,32 @@ size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata)
   if(isatty(fileno(outs->stream)) &&
      GetConsoleScreenBufferInfo((HANDLE)fhnd, &console_info)) {
     DWORD in_len = (DWORD)(sz * nmemb);
-    wchar_t* wc_buf;
+    mm_array_ptr<wchar_t* wc_buf = NULL;
     DWORD wc_len;
 
     /* calculate buffer size for wide characters */
     wc_len = MultiByteToWideChar(CP_UTF8, 0, buffer, in_len,  NULL, 0);
-    wc_buf = (wchar_t*) malloc(wc_len * sizeof(wchar_t));
+    wc_buf = MM_ARRAY_ALLOC(wchar_t, wc_len * sizeof(wchar_t));
     if(!wc_buf)
       return failure;
 
     /* calculate buffer size for multi-byte characters */
-    wc_len = MultiByteToWideChar(CP_UTF8, 0, buffer, in_len, wc_buf, wc_len);
+    wc_len = MultiByteToWideChar(CP_UTF8, 0, buffer, in_len, _GETARRAYPTR(wchar_t, wc_buf), wc_len);
     if(!wc_len) {
-      free(wc_buf);
+      MM_ARRAY_FREE(wchar_t, wc_buf);
       return failure;
     }
 
     if(!WriteConsoleW(
         (HANDLE) fhnd,
-        wc_buf,
+        _GETARRAYPTR(wchar_t, wc_buf),
         wc_len,
         &wc_len,
         NULL)) {
-      free(wc_buf);
+      MM_ARRAY_FREE(wchar_t, wc_buf);
       return failure;
     }
-    free(wc_buf);
+    MM_ARRAY_FREE(wchar_t, wc_buf);
     rc = bytes;
   }
   else

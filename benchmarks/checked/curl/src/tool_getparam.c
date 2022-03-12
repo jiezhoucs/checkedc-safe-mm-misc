@@ -1436,6 +1436,8 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
             /* now make a string with the name from above and append the
                encoded string */
             size_t outlen = nlen + enclen + 2;
+            /* Checked C: Cannot port the next line. If so, postdata's raw ptr
+             * will then be set to a ptr from curlx_dyn_len() in file2memory().*/
             char *n = malloc(outlen);
             if(!n) {
               curl_free(enc);
@@ -1517,6 +1519,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         char *oldpost = config->postfields;
         curl_off_t oldlen = config->postfieldsize;
         curl_off_t newlen = oldlen + curlx_uztoso(size) + 2;
+        /* Checked C: Cannot port next line. See comment for the melloc above */
         config->postfields = malloc((size_t)newlen);
         if(!config->postfields) {
           Curl_safefree(oldpost);

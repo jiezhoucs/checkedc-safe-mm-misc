@@ -224,6 +224,9 @@ static char *parse_filename(const char *ptr, size_t len)
   char  stop = '\0';
 
   /* simple implementation of strndup() */
+  /* Checked C: Cannot port the next line. copy will be returned and later
+   * its raw ptr will extracted and set to outs->filename (in tool_header_cb)
+   * which will be * freed and thus causing a free error. */
   copy = malloc(len + 1);
   if(!copy)
     return NULL;

@@ -481,7 +481,6 @@ SANITIZEcode rename_if_reserved_dos_device_name(mm_array_ptr<char> *const saniti
   if((flags & SANITIZE_ALLOW_PATH) &&
      file_name[0] == '\\' && file_name[1] == '\\') {
     size_t len = strlen(file_name);
-    /* *sanitized = malloc(len + 1); */
     *sanitized = MM_ARRAY_ALLOC(char, len + 1);
     if(!*sanitized)
       return SANITIZE_ERR_OUT_OF_MEMORY;
