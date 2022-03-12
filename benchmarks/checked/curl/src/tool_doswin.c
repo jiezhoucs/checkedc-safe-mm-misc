@@ -68,7 +68,7 @@ static SANITIZEcode truncate_dryrun(const char *path,
 static SANITIZEcode msdosify(char **const sanitized, const char *file_name,
                              int flags);
 #endif
-static SANITIZEcode rename_if_reserved_dos_device_name(char **const sanitized,
+static SANITIZEcode rename_if_reserved_dos_device_name(mm_array_ptr<char> *const sanitized,
                                                        const mm_array_ptr<char> file_name,
                                                        int flags);
 #endif /* !UNITTESTS (static declarations used if no unit tests) */
@@ -455,7 +455,7 @@ sanitize_file_name.
 Success: (SANITIZE_ERR_OK) *sanitized points to a sanitized copy of file_name.
 Failure: (!= SANITIZE_ERR_OK) *sanitized is NULL.
 */
-SANITIZEcode rename_if_reserved_dos_device_name(char **const sanitized,
+SANITIZEcode rename_if_reserved_dos_device_name(mm_array_ptr<char> *const sanitized,
                                                 const mm_array_ptr<char> file_name,
                                                 int flags)
 {
@@ -481,10 +481,11 @@ SANITIZEcode rename_if_reserved_dos_device_name(char **const sanitized,
   if((flags & SANITIZE_ALLOW_PATH) &&
      file_name[0] == '\\' && file_name[1] == '\\') {
     size_t len = strlen(file_name);
-    *sanitized = malloc(len + 1);
+    /* *sanitized = malloc(len + 1); */
+    *sanitized = MM_ARRAY_ALLOC(char, len + 1);
     if(!*sanitized)
       return SANITIZE_ERR_OUT_OF_MEMORY;
-    strncpy(*sanitized, file_name, len + 1);
+    strncpy(_GETCHARPTR(*sanitized), file_name, len + 1);
     return SANITIZE_ERR_OK;
   }
 #endif
@@ -578,7 +579,7 @@ SANITIZEcode rename_if_reserved_dos_device_name(char **const sanitized,
   }
 #endif
 
-  *sanitized = strdup(fname);
+  *sanitized = mm_strdup_from_raw(fname);
   return (*sanitized ? SANITIZE_ERR_OK : SANITIZE_ERR_OUT_OF_MEMORY);
 }
 
