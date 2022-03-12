@@ -50,8 +50,10 @@ static CURLcode glob_fixed(mm_ptr<struct URLGlob> glob, char *fixed, size_t len)
   if(!pat->content.Set.elements)
     return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
 
-  /* Checked C: We need use malloc here because later elements[i] is assigned to
-   * the retrun value from strdup(). Maybe we should make strdup mmsafe. */
+  /* Checked C: Cannot port the next line. It will lead to the
+   * "outs->filename = per->outfile;" in single_transfer(), and outs->filename
+   * must stay char * because it may get assigned from lib which calls
+   * tool_header_cb(), and outs->filename will be free'd and that'd be an error.*/
   pat->content.Set.elements[0] = malloc(len + 1);
   if(!pat->content.Set.elements[0])
     return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
