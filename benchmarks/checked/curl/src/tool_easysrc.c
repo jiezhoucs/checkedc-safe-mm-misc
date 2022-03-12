@@ -37,11 +37,11 @@
 
 /* global variable definitions, for easy-interface source code generation */
 
-struct slist_wc *easysrc_decl = NULL; /* Variable declarations */
-struct slist_wc *easysrc_data = NULL; /* Build slists, forms etc. */
-struct slist_wc *easysrc_code = NULL; /* Setopt calls */
-struct slist_wc *easysrc_toohard = NULL; /* Unconvertible setopt */
-struct slist_wc *easysrc_clean = NULL;  /* Clean up allocated data */
+mm_ptr<struct slist_wc> easysrc_decl = NULL; /* Variable declarations */
+mm_ptr<struct slist_wc> easysrc_data = NULL; /* Build slists, forms etc. */
+mm_ptr<struct slist_wc> easysrc_code = NULL; /* Setopt calls */
+mm_ptr<struct slist_wc> easysrc_toohard = NULL; /* Unconvertible setopt */
+mm_ptr<struct slist_wc> easysrc_clean = NULL;  /* Clean up allocated data */
 int easysrc_mime_count = 0;
 int easysrc_slist_count = 0;
 
@@ -92,10 +92,10 @@ static void easysrc_free(void)
 }
 
 /* Add a source line to the main code or remarks */
-CURLcode easysrc_add(struct slist_wc **plist, const char *line)
+CURLcode easysrc_add(mm_ptr<struct slist_wc> *plist, const char *line)
 {
   CURLcode ret = CURLE_OK;
-  struct slist_wc *list = slist_wc_append(*plist, line);
+  mm_ptr<struct slist_wc> list = slist_wc_append(*plist, line);
   if(!list) {
     easysrc_free();
     ret = CURLE_OUT_OF_MEMORY;
@@ -105,7 +105,7 @@ CURLcode easysrc_add(struct slist_wc **plist, const char *line)
   return ret;
 }
 
-CURLcode easysrc_addf(struct slist_wc **plist, const char *fmt, ...)
+CURLcode easysrc_addf(mm_ptr<struct slist_wc> *plist, const char *fmt, ...)
 {
   CURLcode ret;
   char *bufp;
