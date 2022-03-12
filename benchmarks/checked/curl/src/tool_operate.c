@@ -1508,7 +1508,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           if(config->cert && (strlen(config->cert) > 8) &&
              (memcmp(config->cert, "loadmem=",8) == 0)) {
             FILE *fInCert = fopen(config->cert + 8, "rb");
-            void *certdata = NULL;
+            mm_array_ptr<void> certdata = NULL;
             long filesize = 0;
             bool continue_reading = fInCert != NULL;
             if(continue_reading)
@@ -1520,23 +1520,23 @@ static CURLcode single_transfer(struct GlobalConfig *global,
             if(continue_reading)
               continue_reading = fseek(fInCert, 0, SEEK_SET) == 0;
             if(continue_reading)
-              certdata = malloc(((size_t)filesize) + 1);
+              certdata = MM_ARRAY_ALLOC(void, ((size_t)filesize) + 1);
             if((!certdata) ||
-                ((int)fread(certdata, (size_t)filesize, 1, fInCert) != 1))
+                ((int)fread(_GETARRAYPTR(void, certdata), (size_t)filesize, 1, fInCert) != 1))
               continue_reading = FALSE;
             if(fInCert)
               fclose(fInCert);
             if((filesize > 0) && continue_reading) {
               struct curl_blob structblob;
-              structblob.data = certdata;
+              structblob.data = _GETARRAYPTR(void, certdata);
               structblob.len = (size_t)filesize;
               structblob.flags = CURL_BLOB_COPY;
               my_setopt_str(curl, CURLOPT_SSLCERT_BLOB, &structblob);
               /* if test run well, we are sure we don't reuse
                * original mem pointer */
-              memset(certdata, 0, (size_t)filesize);
+              memset(_GETARRAYPTR(void, certdata), 0, (size_t)filesize);
             }
-            free(certdata);
+            MM_ARRAY_FREE(void, certdata);
           }
           else
 #endif
@@ -1551,7 +1551,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           if(config->key && (strlen(config->key) > 8) &&
              (memcmp(config->key, "loadmem=",8) == 0)) {
             FILE *fInCert = fopen(config->key + 8, "rb");
-            void *certdata = NULL;
+            mm_array_ptr<void> certdata = NULL;
             long filesize = 0;
             bool continue_reading = fInCert != NULL;
             if(continue_reading)
@@ -1563,23 +1563,23 @@ static CURLcode single_transfer(struct GlobalConfig *global,
             if(continue_reading)
               continue_reading = fseek(fInCert, 0, SEEK_SET) == 0;
             if(continue_reading)
-              certdata = malloc(((size_t)filesize) + 1);
+              certdata = MM_ARRAY_ALLOC(void, ((size_t)filesize) + 1);
             if((!certdata) ||
-                ((int)fread(certdata, (size_t)filesize, 1, fInCert) != 1))
+                ((int)fread(_GETARRAYPTR(void, certdata), (size_t)filesize, 1, fInCert) != 1))
               continue_reading = FALSE;
             if(fInCert)
               fclose(fInCert);
             if((filesize > 0) && continue_reading) {
               struct curl_blob structblob;
-              structblob.data = certdata;
+              structblob.data = _GETARRAYPTR(void, certdata);
               structblob.len = (size_t)filesize;
               structblob.flags = CURL_BLOB_COPY;
               my_setopt_str(curl, CURLOPT_SSLKEY_BLOB, &structblob);
               /* if test run well, we are sure we don't reuse
                * original mem pointer */
-              memset(certdata, 0, (size_t)filesize);
+              memset(_GETARRAYPTR(void, certdata), 0, (size_t)filesize);
             }
-            free(certdata);
+            MM_ARRAY_FREE(void, certdata);
           }
           else
 #endif
