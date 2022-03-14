@@ -33,6 +33,9 @@
 #define GET_KEY(key_offset) (uint32_t)(key_offset >> 32)
 #define GET_OFFSET(key_offset) (key_offset & KEY_MASK)
 
+#define DEBUG
+#undef DEBUG
+
 // A helper struct that has the same inner structure as an mmsafe ptr.
 typedef struct {
   void *p;
@@ -44,6 +47,18 @@ typedef struct {
 // to 40-bit key later.
 uint32_t key = 3;
 #endif
+
+/*
+ * print_ptr_info().
+ *
+ * For debugging purpose.
+ * */
+__INLINE
+static void print_ptr_info(char *caller, void *p, uint32_t key) {
+#ifdef DEBUG
+    printf("[%-16s] ptr = %p, key = %u\n", caller, p, key);
+#endif
+}
 
 //
 // Function: rand_keygen()
@@ -120,6 +135,8 @@ for_any(T) mm_ptr<T> mm_alloc(size_t size) {
     // Move the key to the highest 32 bits and make the offset 0.
     safe_ptr.key_offset <<= 32;
 
+    print_ptr_info("mm_alloc", safe_ptr.p, key);
+
     key++;
 
     return *((mm_ptr<T> *)&safe_ptr);
@@ -144,6 +161,8 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
     _MMSafe_ptr_Rep safe_ptr = { .p = raw_ptr + LOCK_MEM, .key_offset = key };
     // Move the key to the highest 32 bits and make the offset 0.
     safe_ptr.key_offset <<= 32;
+
+    print_ptr_info("mm_array_alloc", safe_ptr.p, key);
 
     key++;
 
@@ -215,6 +234,8 @@ for_any(T) mm_array_ptr<T> mm_calloc(size_t nmemb, size_t size) {
     safe_ptr.key_offset <<= 32;
     key++;
 
+    print_ptr_info("mm_calloc", safe_ptr.p, key - 1);
+
     return *((mm_array_ptr<T> *)&safe_ptr);
 }
 
@@ -235,6 +256,8 @@ for_any(T) mm_ptr<T> mm_single_calloc(size_t size) {
     // Move the key to the highest 32 bits and make the offset 0.
     safe_ptr.key_offset <<= 32;
     key++;
+
+    print_ptr_info("mm_single_calloc", safe_ptr.p, key - 1);
 
     return *((mm_array_ptr<T> *)&safe_ptr);
 }
@@ -290,6 +313,7 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
     // free() allows freeing a null ptr, in which case nothing is performed.
     if (p == NULL) return;
 
+
     // Without the "volatile" keyword, Clang may optimize away the next
     // statement.
     volatile _MMSafe_ptr_Rep *mm_ptr_ptr = (_MMSafe_ptr_Rep *)&p;
@@ -306,7 +330,9 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
     // Second, do a key checking. This would catch double free or UAF errors.
     void *lock_ptr = mm_ptr_ptr->p - LOCK_MEM;
     if (GET_KEY(key_offset) != *(uint32_t *)lock_ptr) {
-        fprintf(stderr, "Double Free or UAF\n");
+        fprintf(stderr, "Double Free or Invalid Free\n");
+        fprintf(stderr, "raw ptr = %p, ", lock_ptr + LOCK_MEM);
+        fprintf(stderr, "key = %u, lock = %u\n", GET_KEY(key_offset), *(uint32_t *)lock_ptr);
         abort();
     }
 
@@ -343,7 +369,8 @@ for_any(T) void mm_array_free(mm_array_ptr<const T> const p) {
     // Second, do a key checking. This would catch double free or UAF errors.
     void *lock_ptr = mm_array_ptr_ptr->p - LOCK_MEM;
     if (GET_KEY(key_offset) != *(uint32_t *)lock_ptr) {
-        fprintf(stderr, "Double Free or UAF\n");
+        fprintf(stderr, "Double Free or Invalid Free: ");
+        fprintf(stderr, "key = %u, lock = %u\n", GET_KEY(key_offset), *(uint32_t *)lock_ptr);
         abort();
     }
 
