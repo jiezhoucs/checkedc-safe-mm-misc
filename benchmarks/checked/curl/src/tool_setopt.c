@@ -424,7 +424,7 @@ static CURLcode libcurl_generate_slist(struct curl_slist *slist, int *slistno)
   CLEAN1("curl_slist_free_all(slist%d);", *slistno);
   CLEAN1("slist%d = NULL;", *slistno);
   for(; slist; slist = slist->next) {
-    MM_ARRAY_FREE(char, escaped);
+    MM_curl_free(char, escaped);
     escaped = c_escape(slist->data, ZERO_TERMINATED);
     if(!escaped)
       return CURLE_OUT_OF_MEMORY;
@@ -433,7 +433,7 @@ static CURLcode libcurl_generate_slist(struct curl_slist *slist, int *slistno)
   }
 
  nomem:
-  MM_ARRAY_FREE(char, escaped);
+  MM_curl_free(char, escaped);
   return ret;
 }
 
@@ -495,7 +495,7 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
     data = part->data;
 #endif
     if(!ret) {
-      MM_ARRAY_FREE(char, escaped);
+      MM_curl_free(char, escaped);
       escaped = c_escape(data, ZERO_TERMINATED);
       NULL_CHECK(escaped);
       CODE2("curl_mime_data(part%d, \"%s\", CURL_ZERO_TERMINATED);",
@@ -529,28 +529,28 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
   }
 
   if(!ret && part->encoder) {
-    MM_ARRAY_FREE(char, escaped);
+    MM_curl_free(char, escaped);
     escaped = c_escape(part->encoder, ZERO_TERMINATED);
     NULL_CHECK(escaped);
     CODE2("curl_mime_encoder(part%d, \"%s\");", mimeno, _GETCHARPTR(escaped));
   }
 
   if(!ret && filename) {
-    MM_ARRAY_FREE(char, escaped);
+    MM_curl_free(char, escaped);
     escaped = c_escape(filename, ZERO_TERMINATED);
     NULL_CHECK(escaped);
     CODE2("curl_mime_filename(part%d, \"%s\");", mimeno, _GETCHARPTR(escaped));
   }
 
   if(!ret && part->name) {
-    MM_ARRAY_FREE(char, escaped);
+    MM_curl_free(char, escaped);
     escaped = c_escape(part->name, ZERO_TERMINATED);
     NULL_CHECK(escaped);
     CODE2("curl_mime_name(part%d, \"%s\");", mimeno, _GETCHARPTR(escaped));
   }
 
   if(!ret && part->type) {
-    MM_ARRAY_FREE(char, escaped);
+    MM_curl_free(char, escaped);
     escaped = c_escape(part->type, ZERO_TERMINATED);
     NULL_CHECK(escaped);
     CODE2("curl_mime_type(part%d, \"%s\");", mimeno, _GETCHARPTR(escaped));
@@ -572,7 +572,7 @@ nomem:
     free((char *) data);
 #endif
 
-  MM_ARRAY_FREE(char, escaped);
+  MM_curl_free(char, escaped);
   return ret;
 }
 
@@ -754,7 +754,7 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
   }
 
  nomem:
-  MM_ARRAY_FREE(char, escaped);
+  MM_curl_free(char, escaped);
   return ret;
 }
 

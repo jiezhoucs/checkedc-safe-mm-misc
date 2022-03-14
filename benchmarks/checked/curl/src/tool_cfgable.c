@@ -99,7 +99,7 @@ static void free_config_fields(mm_ptr<struct OperationConfig> config)
     Curl_safefree(urlnode->url);
     Curl_safefree(urlnode->outfile);
     Curl_safefree(urlnode->infile);
-    MM_FREE(struct getout, urlnode);
+    MM_curl_free(struct getout, urlnode);
     urlnode = next;
   }
   config->url_list = NULL;
