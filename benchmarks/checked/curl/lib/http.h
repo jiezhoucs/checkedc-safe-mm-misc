@@ -23,6 +23,8 @@
  ***************************************************************************/
 #include "curl_setup.h"
 
+#include "safe_mm_checked.h"
+
 typedef enum {
   HTTPREQ_GET,
   HTTPREQ_POST,
@@ -163,6 +165,8 @@ CURLcode Curl_http_auth_act(struct Curl_easy *data);
 #ifdef USE_NGHTTP3
 struct h3out; /* see ngtcp2 */
 #endif
+
+#define _GETDYNBUFPTR(p) _GETPTR(struct dynbuf, p)
 
 /****************************************************************************
  * HTTP unique setup

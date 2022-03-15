@@ -120,10 +120,11 @@ const struct Curl_handler Curl_handler_rtsp = {
 static CURLcode rtsp_setup_connection(struct Curl_easy *data,
                                       struct connectdata *conn)
 {
-  struct RTSP *rtsp;
+  mm_ptr<struct RTSP> rtsp = NULL;
   (void)conn;
 
-  data->req.p.rtsp = rtsp = calloc(1, sizeof(struct RTSP));
+  /* Checked C: Has to port this because it can be used as an struct HTTP* */
+  data->req.p.rtsp = rtsp = MM_SINGLE_CALLOC(struct RTSP);
   if(!rtsp)
     return CURLE_OUT_OF_MEMORY;
 
@@ -210,7 +211,7 @@ static CURLcode rtsp_disconnect(struct Curl_easy *data,
 static CURLcode rtsp_done(struct Curl_easy *data,
                           CURLcode status, bool premature)
 {
-  struct RTSP *rtsp = data->req.p.rtsp;
+  mm_ptr<struct RTSP> rtsp = data->req.p.rtsp;
   CURLcode httpStatus;
 
   /* Bypass HTTP empty-reply checks on receive */
@@ -243,7 +244,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   struct connectdata *conn = data->conn;
   CURLcode result = CURLE_OK;
   Curl_RtspReq rtspreq = data->set.rtspreq;
-  struct RTSP *rtsp = data->req.p.rtsp;
+  mm_ptr<struct RTSP> rtsp = data->req.p.rtsp;
   struct dynbuf req_buffer;
   curl_off_t postsize = 0; /* for ANNOUNCE and SET_PARAMETER */
   curl_off_t putsize = 0; /* for ANNOUNCE and SET_PARAMETER */
@@ -773,7 +774,7 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
     /* Store the received CSeq. Match is verified in rtsp_done */
     int nc = sscanf(&header[4], ": %ld", &CSeq);
     if(nc == 1) {
-      struct RTSP *rtsp = data->req.p.rtsp;
+      mm_ptr<struct RTSP> rtsp = data->req.p.rtsp;
       rtsp->CSeq_recv = CSeq; /* mark the request */
       data->state.rtsp_CSeq_recv = CSeq; /* update the handle */
     }

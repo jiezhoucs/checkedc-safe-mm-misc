@@ -54,7 +54,7 @@ void Curl_connect_done(struct Curl_easy *data);
 /* struct for HTTP CONNECT state data */
 struct http_connect_state {
   struct HTTP http_proxy;
-  struct HTTP *prot_save;
+  mm_ptr<struct HTTP> prot_save;
   struct dynbuf rcvbuf;
   struct dynbuf req;
   size_t nsend;

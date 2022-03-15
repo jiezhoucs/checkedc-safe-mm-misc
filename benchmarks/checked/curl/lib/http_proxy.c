@@ -143,7 +143,7 @@ bool Curl_connect_ongoing(struct connectdata *conn)
    we're still sending the request, wait for write. */
 int Curl_connect_getsock(struct connectdata *conn)
 {
-  struct HTTP *http;
+  mm_ptr<struct HTTP> http = NULL;
   DEBUGASSERT(conn);
   DEBUGASSERT(conn->connect_state);
   http = &conn->connect_state->http_proxy;
@@ -156,7 +156,7 @@ int Curl_connect_getsock(struct connectdata *conn)
 
 static CURLcode connect_init(struct Curl_easy *data, bool reinit)
 {
-  struct http_connect_state *s;
+  mm_ptr<struct http_connect_state> s = NULL;
   struct connectdata *conn = data->conn;
   if(!reinit) {
     CURLcode result;
@@ -166,12 +166,13 @@ static CURLcode connect_init(struct Curl_easy *data, bool reinit)
     if(result)
       return result;
 
-    s = calloc(1, sizeof(struct http_connect_state));
+    s = MM_SINGLE_CALLOC(struct http_connect_state);
     if(!s)
       return CURLE_OUT_OF_MEMORY;
     infof(data, "allocate connect buffer!");
+    // TODO
     conn->connect_state = s;
-    Curl_dyn_init(&s->rcvbuf, DYN_PROXY_CONNECT_HEADERS);
+    Curl_dyn_init(_GETDYNBUFPTR(&s->rcvbuf), DYN_PROXY_CONNECT_HEADERS);
 
     /* Curl_proxyCONNECT is based on a pointer to a struct HTTP at the
      * member conn->proto.http; we want [protocol] through HTTP and we have
@@ -189,7 +190,8 @@ static CURLcode connect_init(struct Curl_easy *data, bool reinit)
   else {
     DEBUGASSERT(conn->connect_state);
     s = conn->connect_state;
-    Curl_dyn_reset(&s->rcvbuf);
+    // TODO
+    Curl_dyn_reset(_GETDYNBUFPTR(&s->rcvbuf));
   }
   s->tunnel_state = TUNNEL_INIT;
   s->keepon = KEEPON_CONNECT;
@@ -201,11 +203,12 @@ static CURLcode connect_init(struct Curl_easy *data, bool reinit)
 static void connect_done(struct Curl_easy *data)
 {
   struct connectdata *conn = data->conn;
-  struct http_connect_state *s = conn->connect_state;
+  mm_ptr<struct http_connect_state> s = conn->connect_state;
   if(s->tunnel_state != TUNNEL_EXIT) {
     s->tunnel_state = TUNNEL_EXIT;
-    Curl_dyn_free(&s->rcvbuf);
-    Curl_dyn_free(&s->req);
+    // TODO
+    Curl_dyn_free(_GETDYNBUFPTR(&s->rcvbuf));
+    Curl_dyn_free(_GETDYNBUFPTR(&s->req));
 
     /* retore the protocol pointer */
     data->req.p.http = s->prot_save;
@@ -257,8 +260,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
   CURLcode result;
   struct connectdata *conn = data->conn;
   curl_socket_t tunnelsocket = conn->sock[sockindex];
-  struct http_connect_state *s = conn->connect_state;
-  struct HTTP *http = data->req.p.http;
+  mm_ptr<struct http_connect_state> s = conn->connect_state;
+  mm_ptr<struct HTTP> http = data->req.p.http;
   char *linep;
   size_t perline;
 
@@ -274,7 +277,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
     timediff_t check;
     if(TUNNEL_INIT == s->tunnel_state) {
       /* BEGIN CONNECT PHASE */
-      struct dynbuf *req = &s->req;
+      // TODO
+      struct dynbuf *req = GETPTR(struct dynbuf, &s->req);
       char *hostheader = NULL;
       char *host = NULL;
 
@@ -459,7 +463,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
           continue;
         }
 
-        if(Curl_dyn_addn(&s->rcvbuf, &byte, 1)) {
+        // TODO
+        if(Curl_dyn_addn(_GETDYNBUFPTR(&s->rcvbuf), &byte, 1)) {
           failf(data, "CONNECT response too large!");
           return CURLE_RECV_ERROR;
         }
@@ -468,8 +473,9 @@ static CURLcode CONNECT(struct Curl_easy *data,
         if(byte != 0x0a)
           continue;
 
-        linep = Curl_dyn_ptr(&s->rcvbuf);
-        perline = Curl_dyn_len(&s->rcvbuf); /* amount of bytes in this line */
+        // TODO
+        linep = Curl_dyn_ptr(_GETDYNBUFPTR(&s->rcvbuf));
+        perline = Curl_dyn_len(_GETDYNBUFPTR(&s->rcvbuf)); /* amount of bytes in this line */
 
         /* convert from the network encoding */
         result = Curl_convert_from_network(data, linep, perline);
@@ -582,8 +588,9 @@ static CURLcode CONNECT(struct Curl_easy *data,
                   k->httpcode);
           }
           else {
+            // TODO
             (void)curlx_strtoofft(linep +
-                                  strlen("Content-Length:"), NULL, 10, &s->cl);
+                                  strlen("Content-Length:"), NULL, 10, _GETPTR(curl_off_t, &s->cl));
           }
         }
         else if(Curl_compareheader(linep, "Connection:", "close"))
@@ -613,7 +620,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
           data->info.httpproxycode = k->httpcode;
         }
 
-        Curl_dyn_reset(&s->rcvbuf);
+        // TODO
+        Curl_dyn_reset(_GETDYNBUFPTR(&s->rcvbuf));
       } /* while there's buffer left and loop is requested */
 
       if(Curl_pgrsUpdate(data))
@@ -674,7 +682,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
     if(conn->bits.proxy_connect_closed)
       /* this is not an error, just part of the connection negotiation */
       return CURLE_OK;
-    Curl_dyn_free(&s->rcvbuf);
+    // TODO
+    Curl_dyn_free(_GETDYNBUFPTR(&s->rcvbuf));
     failf(data, "Received HTTP code %d from proxy after CONNECT",
           data->req.httpcode);
     return CURLE_RECV_ERROR;
@@ -696,7 +705,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
   data->req.ignorebody = FALSE; /* put it (back) to non-ignore state */
   conn->bits.rewindaftersend = FALSE; /* make sure this isn't set for the
                                          document request  */
-  Curl_dyn_free(&s->rcvbuf);
+  // TODO
+  Curl_dyn_free(_GETDYNBUFPTR(&s->rcvbuf));
   return CURLE_OK;
 }
 #else
@@ -963,9 +973,9 @@ static CURLcode CONNECT(struct Curl_easy *data,
 void Curl_connect_free(struct Curl_easy *data)
 {
   struct connectdata *conn = data->conn;
-  struct http_connect_state *s = conn->connect_state;
+  mm_ptr<struct http_connect_state> s = conn->connect_state;
   if(s) {
-    free(s);
+    MM_FREE(struct http_connect_state, s);
     conn->connect_state = NULL;
   }
 }

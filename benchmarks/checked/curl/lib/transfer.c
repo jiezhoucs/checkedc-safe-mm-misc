@@ -429,7 +429,7 @@ CURLcode Curl_readrewind(struct Curl_easy *data)
      CURLOPT_HTTPPOST, call app to rewind
   */
   if(conn->handler->protocol & PROTO_FAMILY_HTTP) {
-    struct HTTP *http = data->req.p.http;
+    mm_ptr<struct HTTP> http = data->req.p.http;
 
     if(http->sendit)
       mimepart = http->sendit;
@@ -979,7 +979,7 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
         /* HTTP pollution, this should be written nicer to become more
            protocol agnostic. */
         size_t fillcount;
-        struct HTTP *http = k->p.http;
+        mm_ptr<struct HTTP> http = k->p.http;
 
         if((k->exp100 == EXP100_SENDING_REQUEST) &&
            (http->sending == HTTPSEND_BODY)) {
@@ -1881,7 +1881,7 @@ Curl_setup_transfer(
 {
   struct SingleRequest *k = &data->req;
   struct connectdata *conn = data->conn;
-  struct HTTP *http = data->req.p.http;
+  mm_ptr<struct HTTP> http = data->req.p.http;
   bool httpsending = ((conn->handler->protocol&PROTO_FAMILY_HTTP) &&
                       (http->sending == HTTPSEND_REQUEST));
   DEBUGASSERT(conn != NULL);

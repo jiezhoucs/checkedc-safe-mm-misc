@@ -26,6 +26,8 @@
 
 #include "curl_setup.h"
 
+#include "safe_mm_checked.h"
+
 #define PORT_FTP 21
 #define PORT_FTPS 990
 #define PORT_TELNET 23
@@ -690,12 +692,12 @@ struct SingleRequest {
   union {
     struct FILEPROTO *file;
     struct FTP *ftp;
-    struct HTTP *http;
+    mm_ptr<struct HTTP> http;
     struct IMAP *imap;
     struct ldapreqinfo *ldap;
     struct MQTT *mqtt;
     struct POP3 *pop3;
-    struct RTSP *rtsp;
+    mm_ptr<struct RTSP> rtsp;
     struct smb_request *smb;
     struct SMTP *smtp;
     struct SSHPROTO *ssh;
@@ -1099,7 +1101,7 @@ struct connectdata {
     struct mqtt_conn mqtt;
   } proto;
 
-  struct http_connect_state *connect_state; /* for HTTP CONNECT */
+  mm_ptr<struct http_connect_state> connect_state; /* for HTTP CONNECT */
   struct connectbundle *bundle; /* The bundle we are member of */
 #ifdef USE_UNIX_SOCKETS
   char *unix_domain_socket;

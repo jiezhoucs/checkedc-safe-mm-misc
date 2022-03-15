@@ -175,14 +175,15 @@ static CURLcode http_setup_conn(struct Curl_easy *data,
 {
   /* allocate the HTTP-specific struct for the Curl_easy, only to survive
      during this request */
-  struct HTTP *http;
+  mm_ptr<struct HTTP> http = NULL;
   DEBUGASSERT(data->req.p.http == NULL);
 
-  http = calloc(1, sizeof(struct HTTP));
+  http = MM_SINGLE_CALLOC(struct HTTP);
   if(!http)
     return CURLE_OUT_OF_MEMORY;
 
-  Curl_mime_initpart(&http->form, data);
+  // TODO?
+  Curl_mime_initpart(_GETPTR(curl_mimepart, &http->form), data);
   data->req.p.http = http;
 
   if(data->state.httpwant == CURL_HTTP_VERSION_3) {
@@ -441,7 +442,7 @@ static bool pickoneauth(struct auth *pick, unsigned long mask)
 static CURLcode http_perhapsrewind(struct Curl_easy *data,
                                    struct connectdata *conn)
 {
-  struct HTTP *http = data->req.p.http;
+  mm_ptr<struct HTTP> http = data->req.p.http;
   curl_off_t bytessent;
   curl_off_t expectsend = -1; /* default is unknown */
 
@@ -1168,7 +1169,7 @@ static size_t readmoredata(char *buffer,
                            void *userp)
 {
   struct Curl_easy *data = (struct Curl_easy *)userp;
-  struct HTTP *http = data->req.p.http;
+  mm_ptr<struct HTTP> http = data->req.p.http;
   size_t fullsize = size * nitems;
 
   if(!http->postsize)
@@ -1232,7 +1233,7 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
   char *ptr;
   size_t size;
   struct connectdata *conn = data->conn;
-  struct HTTP *http = data->req.p.http;
+  mm_ptr<struct HTTP> http = data->req.p.http;
   size_t sendsize;
   curl_socket_t sockfd;
   size_t headersize;
@@ -1615,7 +1616,7 @@ CURLcode Curl_http_done(struct Curl_easy *data,
                         CURLcode status, bool premature)
 {
   struct connectdata *conn = data->conn;
-  struct HTTP *http = data->req.p.http;
+  mm_ptr<struct HTTP> http = data->req.p.http;
 
   /* Clear multipass flag. If authentication isn't done yet, then it will get
    * a chance to be set back to true when we output the next auth header */
@@ -1631,10 +1632,12 @@ CURLcode Curl_http_done(struct Curl_easy *data,
   if(!http)
     return CURLE_OK;
 
-  Curl_dyn_free(&http->send_buffer);
+  // TODO
+  Curl_dyn_free(_GETPTR(struct dynbuf, &http->send_buffer));
   Curl_http2_done(data, premature);
   Curl_quic_done(data, premature);
-  Curl_mime_cleanpart(&http->form);
+  // TODO
+  Curl_mime_cleanpart(_GETPTR(curl_mimepart, &http->form));
   Curl_dyn_reset(&data->state.headerb);
   Curl_hyper_done(data);
 
@@ -2286,7 +2289,7 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
 {
   CURLcode result = CURLE_OK;
   const char *ptr;
-  struct HTTP *http = data->req.p.http;
+  mm_ptr<struct HTTP> http = data->req.p.http;
   http->postsize = 0;
 
   switch(httpreq) {
@@ -2295,12 +2298,13 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
     break;
   case HTTPREQ_POST_FORM:
     /* Convert the form structure into a mime structure. */
-    Curl_mime_cleanpart(&http->form);
-    result = Curl_getformdata(data, &http->form, data->set.httppost,
+    Curl_mime_cleanpart(_GETPTR(curl_mimepart, &http->form));
+    result = Curl_getformdata(data, _GETPTR(curl_mimepart, &http->form), data->set.httppost,
                               data->state.fread_func);
     if(result)
       return result;
-    http->sendit = &http->form;
+    // Checked C: FIXME: _GETPTR() breaks the compilation for the next line.
+    http->sendit = GETPTR(curl_mimepart, &http->form);
     break;
   default:
     http->sendit = NULL;
@@ -2377,7 +2381,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
   curl_off_t included_body = 0;
 #endif
   CURLcode result = CURLE_OK;
-  struct HTTP *http = data->req.p.http;
+  mm_ptr<struct HTTP> http = data->req.p.http;
   const char *ptr;
 
   /* If 'authdone' is FALSE, we must not set the write socket index to the
@@ -3017,7 +3021,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
 {
   struct connectdata *conn = data->conn;
   CURLcode result = CURLE_OK;
-  struct HTTP *http;
+  mm_ptr<struct HTTP> http = NULL;
   Curl_HttpReq httpreq;
   const char *te = ""; /* transfer-encoding */
   const char *request;

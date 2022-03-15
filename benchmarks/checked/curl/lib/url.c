@@ -740,7 +740,7 @@ static void conn_shutdown(struct Curl_easy *data, struct connectdata *conn)
     /* If this was closed with a CONNECT in progress, cleanup this temporary
        struct arrangement */
     data->req.p.http = NULL;
-    Curl_safefree(conn->connect_state->prot_save);
+    MM_curl_free(struct HTTP, conn->connect_state->prot_save);
   }
 #endif
 
@@ -789,7 +789,7 @@ static void conn_free(struct connectdata *conn)
   Curl_safefree(conn->conn_to_host.rawalloc); /* host name buffer */
   Curl_safefree(conn->hostname_resolve);
   Curl_safefree(conn->secondaryhostname);
-  Curl_safefree(conn->connect_state);
+  MM_ARRAY_FREE(struct http_connect_state, conn->connect_state);
 
   conn_reset_all_postponed_data(conn);
   Curl_llist_destroy(&conn->easyq, NULL);
@@ -2185,7 +2185,7 @@ static CURLcode setup_connection_internals(struct Curl_easy *data,
 
 void Curl_free_request_state(struct Curl_easy *data)
 {
-  Curl_safefree(data->req.p.http);
+  MM_curl_free(struct HTTP, data->req.p.http);
   Curl_safefree(data->req.newurl);
 
 #ifndef CURL_DISABLE_DOH
