@@ -20,7 +20,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include <immintrin.h>   /* for _rdrand32_step() */
+
+#include "porting_helper.h"
 
 #define __INLINE __attribute__((always_inline))
 
@@ -137,6 +140,8 @@ for_any(T) mm_ptr<T> mm_alloc(size_t size) {
 
     print_ptr_info("mm_alloc", safe_ptr.p, key);
 
+    insert_mmsafe_ptr(safe_ptr.p);
+
     key++;
 
     return *((mm_ptr<T> *)&safe_ptr);
@@ -163,6 +168,8 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
     safe_ptr.key_offset <<= 32;
 
     print_ptr_info("mm_array_alloc", safe_ptr.p, key);
+
+    insert_mmsafe_ptr(safe_ptr.p);
 
     key++;
 
@@ -207,6 +214,8 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     _MMSafe_ptr_Rep safe_ptr = {.p = new_raw_ptr + LOCK_MEM, .key_offset = key};
     safe_ptr.key_offset <<= 32;
 
+    insert_mmsafe_ptr(safe_ptr.p);
+
     key++;
 
     mm_array_ptr<T> *mm_array_ptr_ptr = (mm_array_ptr<T> *)&safe_ptr;
@@ -234,6 +243,8 @@ for_any(T) mm_array_ptr<T> mm_calloc(size_t nmemb, size_t size) {
     safe_ptr.key_offset <<= 32;
     key++;
 
+    insert_mmsafe_ptr(safe_ptr.p);
+
     print_ptr_info("mm_calloc", safe_ptr.p, key - 1);
 
     return *((mm_array_ptr<T> *)&safe_ptr);
@@ -256,6 +267,8 @@ for_any(T) mm_ptr<T> mm_single_calloc(size_t size) {
     // Move the key to the highest 32 bits and make the offset 0.
     safe_ptr.key_offset <<= 32;
     key++;
+
+    insert_mmsafe_ptr(safe_ptr.p);
 
     print_ptr_info("mm_single_calloc", safe_ptr.p, key - 1);
 
@@ -313,10 +326,16 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
     // free() allows freeing a null ptr, in which case nothing is performed.
     if (p == NULL) return;
 
-
     // Without the "volatile" keyword, Clang may optimize away the next
     // statement.
     volatile _MMSafe_ptr_Rep *mm_ptr_ptr = (_MMSafe_ptr_Rep *)&p;
+
+    // Check if p actually points to something from the original malloc() etc.
+    // This may happen when a union has both checked and unchecked ptr.
+    if (!is_an_mmsafe_ptr(mm_ptr_ptr->p)) {
+      free(mm_ptr_ptr->p);
+      return;
+    }
 
     // Do two temporal memory safety checks.
     // First, check if the offset is zero. A non-zero offset means an invalid free.
@@ -356,6 +375,13 @@ for_any(T) void mm_array_free(mm_array_ptr<const T> const p) {
     if (p == NULL) return;
 
     volatile _MMSafe_ptr_Rep *mm_array_ptr_ptr = (_MMSafe_ptr_Rep *)&p;
+
+    // Check if p actually points to something from the original malloc() etc.
+    // This may happen when a union has both checked and unchecked ptr.
+    if (!is_an_mmsafe_ptr(mm_array_ptr_ptr->p)) {
+      free(mm_array_ptr_ptr->p);
+      return;
+    }
 
     // Do two temporal memory safety checks.
     // First, check if the offset is zero. A non-zero offset means an invalid free.

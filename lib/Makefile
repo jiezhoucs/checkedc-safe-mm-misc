@@ -36,6 +36,20 @@ lto: $(LIB_SRC)
 	$(RANLIB) $(LIB_SAFEMM_LTO).a
 	@rm -f *.o
 
+
+#
+# Compile the CPP lib for porting assistance.
+#
+# Have to use a native clang++; the one in the Checked C directory breaks.
+CXX := clang++
+CXXFLAGS := -fPIC -O3
+LIB_PORTING := libporting
+port: porting_helper.cpp
+	$(CXX) $(CXXFLAGS) -c $^ -o $(LIB_PORTING).o
+	llvm-ar -rc $(LIB_PORTING).a $(LIB_PORTING).o
+	llvm-ranlib $(LIB_PORTING).a
+	@rm -f *.o
+
 #
 # Compile the lib to a shared libray. Note that on MacOS .dylib is the
 # native format for shared library, and .so is for compatibility.
