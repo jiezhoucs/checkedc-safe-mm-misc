@@ -41,6 +41,20 @@ void erase_mmsafe_ptr(void *p) {
   mmsafe_ptrs.erase(p);
 }
 
+// Use this to replace original free() calls. This will handle the case when
+// the raw pointer of an mmsafe pointer is passed to free().
+void uncertain_free(void *p) {
+  if (is_an_mmsafe_ptr(p)) {
+    // From calling free() on the raw pointer of an mmsafe pointer.
+    // Invalidate the lock and then do the real free.
+    *((uint32_t *)((char *)p - 8)) = 0;
+    erase_mmsafe_ptr(p);
+    free((char *)p - 16);
+  } else {
+    free(p);
+  }
+}
+
 #if defined __cplusplus
 }
 #endif

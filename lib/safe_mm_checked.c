@@ -361,6 +361,8 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
     *(uint32_t *)lock_ptr = 0;
 
     free(lock_ptr - HEAP_PADDING);
+
+    erase_mmsafe_ptr(mm_ptr_ptr->p);
 }
 
 //
@@ -406,6 +408,8 @@ for_any(T) void mm_array_free(mm_array_ptr<const T> const p) {
     *(uint32_t *)lock_ptr = 0;
 
     free(lock_ptr - HEAP_PADDING);
+
+    erase_mmsafe_ptr(mm_array_ptr_ptr->p);
 }
 
 
