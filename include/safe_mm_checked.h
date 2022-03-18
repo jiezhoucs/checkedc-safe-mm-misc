@@ -13,6 +13,7 @@
 
 /* Extract the raw pointer from a checked pointer. */
 #define _GETPTR(T, p) ((T *)(p))
+#define GETPTR(T, p) _getptr_mm<T>(p)
 #define _GETARRAYPTR(T, p) ((T *)p)
 #define _GETCHARPTR(p) ((char *)(p))
 
@@ -26,6 +27,10 @@
 #define MM_ARRAY_FREE(T, p) mm_array_free<T>(p)
 #define MM_CHECKED(T, p) mm_checked<T>(p);
 #define MM_ARRAY_CHECKED(T, p) mmarray_checked<T>(p);
+
+// For debug
+#define _GETKEY(p) ((uint32_t)((*(((uint64_t *)p) + 1)) >> 32))
+#define _GETLOCK(p) ((*(((uint32_t *)p) - 2)))
 
 for_any(T) mm_ptr<T> mm_alloc(size_t size);
 for_any(T) void mm_free(mm_ptr<const T> const p);
@@ -61,5 +66,9 @@ for_any(T) void mmarray_checked(mm_array_ptr<T> p);
 
 /* Marshaling an array of mm_array_ptr to an array of raw pointers. */
 for_any(T) void **_marshal_shared_array_ptr(mm_array_ptr<mm_array_ptr<T>> p);
+
+/* Checked C version of regular common libc functions. */
+mm_array_ptr<char> mm_strchr(mm_array_ptr<const char> p, int c);
+mm_array_ptr<char> mm_strpbrk(mm_array_ptr<const char> p, const char *accept);
 
 #endif

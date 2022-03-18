@@ -3,7 +3,7 @@
 LLVM_DIR = ../../build/bin
 
 OPT=-O3
-CFLAGS = $(OPT) -I../include -Wall -mrdrnd -fPIC
+CFLAGS = $(OPT) -I../include -Wall -mrdrnd -fPIC -g
 
 #
 # Checked-C Clang
@@ -11,28 +11,28 @@ CC = $(LLVM_DIR)/clang $(CFLAGS)
 AR = $(LLVM_DIR)/llvm-ar
 RANLIB = $(LLVM_DIR)/llvm-ranlib
 
-LIB_SRC = safe_mm_checked.c
+LIB_SRC = safe_mm_checked.c mm_libc.c
 LIB_SAFEMM = libsafemm
 LIB_SAFEMM_LTO = $(LIB_SAFEMM)_lto
 
 .PHONY: libsafemm clean
 
 # Compile both a static library and a dynamic library.
-libsafemm: a lto
+libsafemm: a # lto
 
 #
 # Compile the lib to a static library.
 a: $(LIB_SRC)
-	rm -f $(LIB_SAFEMM).a $(LIB_SAFEMM).so
-	$(CC) -c $(LIB_SRC) -o $(LIB_SAFEMM).o
-	$(AR) -rc $(LIB_SAFEMM).a $(LIB_SAFEMM).o
+	rm -f $(LIB_SAFEMM).a $(LIB_SAFEMM).so *.o
+	$(CC) -c $(LIB_SRC)
+	$(AR) -rc $(LIB_SAFEMM).a *.o
 	$(RANLIB) $(LIB_SAFEMM).a
 	@rm -f $(LIB_SAFEMM).o
 
 lto: $(LIB_SRC)
 	rm -rf $(LIB_SAFEMM_LTO).a $(LIB_SAFEMM_LTO).so
-	$(CC) -flto -c $(LIB_SRC) -o $(LIB_SAFEMM_LTO).o
-	$(AR) -rc $(LIB_SAFEMM_LTO).a $(LIB_SAFEMM_LTO).o
+	$(CC) -flto -c $(LIB_SRC) # -o $(LIB_SAFEMM_LTO).o
+	$(AR) -rc $(LIB_SAFEMM_LTO).a *.o
 	$(RANLIB) $(LIB_SAFEMM_LTO).a
 	@rm -f *.o
 
@@ -42,7 +42,7 @@ lto: $(LIB_SRC)
 #
 # Have to use a native clang++; the one in the Checked C directory breaks.
 CXX := clang++
-CXXFLAGS := -fPIC -O3
+CXXFLAGS := -fPIC -O3 -g
 LIB_PORTING := libporting
 port: porting_helper.cpp
 	$(CXX) $(CXXFLAGS) -c $^ -o $(LIB_PORTING).o
