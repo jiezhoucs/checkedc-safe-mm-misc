@@ -71,4 +71,7 @@ for_any(T) void **_marshal_shared_array_ptr(mm_array_ptr<mm_array_ptr<T>> p);
 mm_array_ptr<char> mm_strchr(mm_array_ptr<const char> p, int c);
 mm_array_ptr<char> mm_strpbrk(mm_array_ptr<const char> p, const char *accept);
 
+/* Duplicate a string on the heap and return an mm_array_ptr<char> to it.*/
+mm_array_ptr<char> mmize_str(char *p);
+
 #endif
