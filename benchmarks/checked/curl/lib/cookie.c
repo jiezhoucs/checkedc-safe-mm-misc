@@ -332,7 +332,8 @@ void Curl_cookie_loadfiles(struct Curl_easy *data)
     Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
     while(list) {
       struct CookieInfo *newcookies = Curl_cookie_init(data,
-                                        list->data,
+          // TODO
+                                        _GETCHARPTR(list->data),
                                         data->cookies,
                                         data->set.cookiesession);
       if(!newcookies)
@@ -340,7 +341,7 @@ void Curl_cookie_loadfiles(struct Curl_easy *data)
          * Failure may be due to OOM or a bad cookie; both are ignored
          * but only the first should be
          */
-        infof(data, "ignoring failed cookie_init for %s", list->data);
+        infof(data, "ignoring failed cookie_init for %s", _GETCHARPTR(list->data));
       else
         data->cookies = newcookies;
       list = list->next;
@@ -1546,9 +1547,9 @@ void Curl_cookie_cleanup(struct CookieInfo *c)
  * Function returns a char * to a formatted line. The caller is responsible
  * for freeing the returned pointer.
  */
-static char *get_netscape_format(const struct Cookie *co)
+static mm_array_ptr<char> get_netscape_format(const struct Cookie *co)
 {
-  return aprintf(
+  return mmize_str(aprintf(
     "%s"     /* httponly preamble */
     "%s%s\t" /* domain */
     "%s\t"   /* tailmatch */
@@ -1569,7 +1570,7 @@ static char *get_netscape_format(const struct Cookie *co)
     co->secure?"TRUE":"FALSE",
     co->expires,
     co->name,
-    co->value?co->value:"");
+    co->value?co->value:""));
 }
 
 /*
@@ -1646,14 +1647,14 @@ static CURLcode cookie_output(struct Curl_easy *data,
     qsort(array, nvalid, sizeof(struct Cookie *), cookie_sort_ct);
 
     for(i = 0; i < nvalid; i++) {
-      char *format_ptr = get_netscape_format(array[i]);
+      mm_array_ptr<char> format_ptr = get_netscape_format(array[i]);
       if(!format_ptr) {
         free(array);
         error = CURLE_OUT_OF_MEMORY;
         goto error;
       }
-      fprintf(out, "%s\n", format_ptr);
-      free(format_ptr);
+      fprintf(out, "%s\n", _GETCHARPTR(format_ptr));
+      MM_FREE(char, format_ptr);
     }
 
     free(array);
@@ -1689,7 +1690,7 @@ static struct curl_slist *cookie_list(struct Curl_easy *data)
   struct curl_slist *list = NULL;
   struct curl_slist *beg;
   struct Cookie *c;
-  char *line;
+  mm_array_ptr<char> line = NULL;
   unsigned int i;
 
   if(!data->cookies || (data->cookies->numcookies == 0))
@@ -1706,7 +1707,7 @@ static struct curl_slist *cookie_list(struct Curl_easy *data)
       }
       beg = Curl_slist_append_nodup(list, line);
       if(!beg) {
-        free(line);
+        MM_FREE(char, line);
         curl_slist_free_all(list);
         return NULL;
       }

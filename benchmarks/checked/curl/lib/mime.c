@@ -309,8 +309,8 @@ static char *match_header(struct curl_slist *hdr, const char *lbl, size_t len)
 {
   char *value = NULL;
 
-  if(strncasecompare(hdr->data, lbl, len) && hdr->data[len] == ':')
-    for(value = hdr->data + len + 1; *value == ' '; value++)
+  if(strncasecompare(_GETCHARPTR(hdr->data), lbl, len) && hdr->data[len] == ':')
+    for(value = _GETCHARPTR(hdr->data) + len + 1; *value == ' '; value++)
       ;
   return value;
 }
@@ -931,7 +931,7 @@ static size_t readback_part(curl_mimepart *part,
         mimesetstate(&part->state, MIMESTATE_USERHEADERS, part->userheaders);
       else {
         sz = readback_bytes(&part->state, buffer, bufsize,
-                            hdr->data, strlen(hdr->data), "\r\n");
+                            _GETCHARPTR(hdr->data), strlen(_GETCHARPTR(hdr->data)), "\r\n");
         if(!sz)
           mimesetstate(&part->state, part->state.state, hdr->next);
       }
@@ -1657,7 +1657,7 @@ static size_t slist_size(struct curl_slist *s,
 
   for(; s; s = s->next)
     if(!skip || !match_header(s, skip, skiplen))
-      size += strlen(s->data) + overhead;
+      size += strlen(_GETCHARPTR(s->data)) + overhead;
   return size;
 }
 
@@ -1714,19 +1714,21 @@ curl_off_t Curl_mime_size(curl_mimepart *part)
 CURLcode Curl_mime_add_header(struct curl_slist **slp, const char *fmt, ...)
 {
   struct curl_slist *hdr = NULL;
-  char *s = NULL;
+  mm_array_ptr<char> s = NULL;
   va_list ap;
 
   va_start(ap, fmt);
-  s = curl_mvaprintf(fmt, ap);
+  /* s = mm_curl_mvaprintf(fmt, ap); */
+  char *tmp_s = curl_mvaprintf(fmt, ap);
+  s = mmize_str(tmp_s);
   va_end(ap);
 
   if(s) {
-    hdr = Curl_slist_append_nodup(*slp, s);
+    hdr = _GETPTR(struct curl_slist, Curl_slist_append_nodup(*slp, s));
     if(hdr)
       *slp = hdr;
     else
-      free(s);
+      MM_FREE(char, s);
   }
 
   return hdr? CURLE_OK: CURLE_OUT_OF_MEMORY;

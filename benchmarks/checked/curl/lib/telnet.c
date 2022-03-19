@@ -794,7 +794,7 @@ static CURLcode check_telnet_options(struct Curl_easy *data)
   }
 
   for(head = data->set.telnet_options; head; head = head->next) {
-    if(sscanf(head->data, "%127[^= ]%*[ =]%255s",
+    if(sscanf(_GETCHARPTR(head->data), "%127[^= ]%*[ =]%255s",
               option_keyword, option_arg) == 2) {
 
       /* Terminal type */
@@ -831,7 +831,7 @@ static CURLcode check_telnet_options(struct Curl_easy *data)
                   &tn->subopt_wsx, &tn->subopt_wsy) == 2)
           tn->us_preferred[CURL_TELOPT_NAWS] = CURL_YES;
         else {
-          failf(data, "Syntax error in telnet option: %s", head->data);
+          failf(data, "Syntax error in telnet option: %s", _GETCHARPTR(head->data));
           result = CURLE_SETOPT_OPTION_SYNTAX;
           break;
         }
@@ -848,11 +848,11 @@ static CURLcode check_telnet_options(struct Curl_easy *data)
         continue;
       }
 
-      failf(data, "Unknown telnet option %s", head->data);
+      failf(data, "Unknown telnet option %s", _GETCHARPTR(head->data));
       result = CURLE_UNKNOWN_OPTION;
       break;
     }
-    failf(data, "Syntax error in telnet option: %s", head->data);
+    failf(data, "Syntax error in telnet option: %s", _GETCHARPTR(head->data));
     result = CURLE_SETOPT_OPTION_SYNTAX;
     break;
   }
@@ -917,13 +917,13 @@ static void suboption(struct Curl_easy *data)
       len = 4;
 
       for(v = tn->telnet_vars; v; v = v->next) {
-        size_t tmplen = (strlen(v->data) + 1);
+        size_t tmplen = (strlen(_GETCHARPTR(v->data)) + 1);
         /* Add the variable only if it fits */
         if(len + tmplen < (int)sizeof(temp)-6) {
           int rv;
           char sep[2] = "";
           varval[0] = 0;
-          rv = sscanf(v->data, "%127[^,]%1[,]%127s", varname, sep, varval);
+          rv = sscanf(_GETCHARPTR(v->data), "%127[^,]%1[,]%127s", varname, sep, varval);
           if(rv == 1)
             len += msnprintf((char *)&temp[len], sizeof(temp) - len,
                              "%c%s", CURL_NEW_ENV_VAR, varname);

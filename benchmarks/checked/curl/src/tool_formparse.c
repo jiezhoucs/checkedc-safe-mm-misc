@@ -672,7 +672,7 @@ static int get_param_part(mm_ptr<struct OperationConfig> config, char endchar,
     *pheaders = headers;
   else if(headers) {
     warnf(config->global,
-          "Field headers not allowed here: %s\n", headers->data);
+          "Field headers not allowed here: %s\n", _GETCHARPTR(headers->data));
     curl_slist_free_all(headers);
   }
 

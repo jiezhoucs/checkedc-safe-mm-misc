@@ -778,13 +778,17 @@ static CURLcode connect_SOCKS(struct Curl_easy *data, int sockindex,
     /* for the secondary socket (FTP), use the "connect to host"
      * but ignore the "connect to port" (use the secondary port)
      */
-    const char * const host =
-      conn->bits.httpproxy ?
-      conn->http_proxy.host.name :
-      conn->bits.conn_to_host ?
-      conn->conn_to_host.name :
-      sockindex == SECONDARYSOCKET ?
-      conn->secondaryhostname : conn->host.name;
+    mm_array_ptr<const char> host = NULL;
+      /* conn->bits.httpproxy ? */
+      /* conn->http_proxy.host.name : */
+      /* conn->bits.conn_to_host ? */
+      /* conn->conn_to_host.name : */
+      /* sockindex == SECONDARYSOCKET ? */
+      /* conn->secondaryhostname : conn->host.name; */
+    if (conn->bits.httpproxy) host = conn->http_proxy.host.name;
+    else if (conn->bits.conn_to_host) host = conn->conn_to_host.name;
+    else if (sockindex == SECONDARYSOCKET) host = conn->secondaryhostname;
+    else host = conn->host.name;
     const int port =
       conn->bits.httpproxy ? (int)conn->http_proxy.port :
       sockindex == SECONDARYSOCKET ? conn->secondary_port :
@@ -793,13 +797,15 @@ static CURLcode connect_SOCKS(struct Curl_easy *data, int sockindex,
     switch(conn->socks_proxy.proxytype) {
     case CURLPROXY_SOCKS5:
     case CURLPROXY_SOCKS5_HOSTNAME:
+      // TODO
       pxresult = Curl_SOCKS5(conn->socks_proxy.user, conn->socks_proxy.passwd,
-                             host, port, sockindex, data, done);
+                             _GETCHARPTR(host), port, sockindex, data, done);
       break;
 
     case CURLPROXY_SOCKS4:
     case CURLPROXY_SOCKS4A:
-      pxresult = Curl_SOCKS4(conn->socks_proxy.user, host, port, sockindex,
+      // TODO
+      pxresult = Curl_SOCKS4(conn->socks_proxy.user, _GETCHARPTR(host), port, sockindex,
                              data, done);
       break;
 
@@ -1014,7 +1020,7 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
      (conn->tempsock[0] == CURL_SOCKET_BAD) &&
      (conn->tempsock[1] == CURL_SOCKET_BAD)) {
     /* no more addresses to try */
-    const char *hostname;
+    mm_array_ptr<const char> hostname = NULL;
     char buffer[STRERROR_LEN];
 
     /* if the first address family runs out of addresses to try before the
@@ -1037,7 +1043,8 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
 
     failf(data, "Failed to connect to %s port %u after "
                 "%" CURL_FORMAT_TIMEDIFF_T " ms: %s",
-        hostname, conn->port,
+                // TODO
+        _GETCHARPTR(hostname), conn->port,
         Curl_timediff(now, data->progress.t_startsingle),
         Curl_strerror(error, buffer, sizeof(buffer)));
 

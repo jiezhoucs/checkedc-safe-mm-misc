@@ -319,7 +319,8 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct Curl_easy *data,
   struct bufref resp;
   saslstate state1 = SASL_STOP;
   saslstate state2 = SASL_FINAL;
-  const char * const hostname = SSL_HOST_NAME();
+  // TODO
+  const char * const hostname = _GETCHARPTR(SSL_HOST_NAME());
   const long int port = SSL_HOST_PORT();
 #if defined(USE_KERBEROS5) || defined(USE_NTLM)
   const char *service = data->set.str[STRING_SERVICE_NAME] ?
@@ -504,7 +505,8 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
   CURLcode result = CURLE_OK;
   saslstate newstate = SASL_FINAL;
   struct bufref resp;
-  const char * const hostname = SSL_HOST_NAME();
+  // TODO
+  const char * const hostname = _GETCHARPTR(SSL_HOST_NAME());
   const long int port = SSL_HOST_PORT();
 #if !defined(CURL_DISABLE_CRYPTO_AUTH) || defined(USE_KERBEROS5) ||     \
   defined(USE_NTLM)

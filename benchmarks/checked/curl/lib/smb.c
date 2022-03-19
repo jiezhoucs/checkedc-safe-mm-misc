@@ -288,7 +288,7 @@ static CURLcode smb_connect(struct Curl_easy *data, bool *done)
   }
   else {
     smbc->user = conn->user;
-    smbc->domain = strdup(conn->host.name);
+    smbc->domain = strdup(_GETCHARPTR(conn->host.name));
     if(!smbc->domain)
       return CURLE_OUT_OF_MEMORY;
   }
@@ -500,7 +500,7 @@ static CURLcode smb_send_tree_connect(struct Curl_easy *data)
   struct smb_conn *smbc = &conn->proto.smbc;
   char *p = msg.bytes;
 
-  size_t byte_count = strlen(conn->host.name) + strlen(smbc->share);
+  size_t byte_count = strlen(_GETCHARPTR(conn->host.name)) + strlen(smbc->share);
   byte_count += strlen(SERVICENAME) + 5; /* 2 nulls and 3 backslashes */
   if(byte_count > sizeof(msg.bytes))
     return CURLE_FILESIZE_EXCEEDED;
@@ -510,7 +510,7 @@ static CURLcode smb_send_tree_connect(struct Curl_easy *data)
   msg.andx.command = SMB_COM_NO_ANDX_COMMAND;
   msg.pw_len = 0;
   MSGCAT("\\\\");
-  MSGCAT(conn->host.name);
+  MSGCAT(_GETCHARPTR(conn->host.name));
   MSGCAT("\\");
   MSGCATNULL(smbc->share);
   MSGCATNULL(SERVICENAME); /* Match any type of service */

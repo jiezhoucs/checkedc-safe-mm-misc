@@ -90,7 +90,7 @@ CURLcode Curl_proxy_connect(struct Curl_easy *data, int sockindex)
   if(conn->bits.tunnel_proxy && conn->bits.httpproxy) {
 #ifndef CURL_DISABLE_PROXY
     /* for [protocol] tunneled through HTTP proxy */
-    const char *hostname;
+    mm_array_ptr<const char> hostname = NULL;
     int remote_port;
     CURLcode result;
 
@@ -114,7 +114,8 @@ CURLcode Curl_proxy_connect(struct Curl_easy *data, int sockindex)
     else
       remote_port = conn->remote_port;
 
-    result = Curl_proxyCONNECT(data, sockindex, hostname, remote_port);
+    // TODO
+    result = Curl_proxyCONNECT(data, sockindex, _GETCHARPTR(hostname), remote_port);
     if(CURLE_OK != result)
       return result;
     Curl_safefree(data->state.aptr.proxyuserpwd);
@@ -229,8 +230,9 @@ static CURLcode CONNECT_host(struct Curl_easy *data,
   bool ipv6_ip = conn->bits.ipv6_ip;
 
   /* the hostname may be different */
-  if(hostname != conn->host.name)
-    ipv6_ip = (strchr(hostname, ':') != NULL);
+  // TODO
+  if(hostname != _GETCHARPTR(conn->host.name))
+    ipv6_ip = (strchr(_GETCHARPTR(hostname), ':') != NULL);
   hostheader = /* host:port with IPv6 support */
     aprintf("%s%s%s:%d", ipv6_ip?"[":"", hostname, ipv6_ip?"]":"",
             remote_port);
@@ -568,13 +570,14 @@ static CURLcode CONNECT(struct Curl_easy *data,
             (407 == k->httpcode))) {
 
           bool proxy = (k->httpcode == 407) ? TRUE : FALSE;
-          char *auth = Curl_copy_header_value(linep);
+          mm_array_ptr<char> auth = Curl_copy_header_value(linep);
           if(!auth)
             return CURLE_OUT_OF_MEMORY;
 
-          result = Curl_http_input_auth(data, proxy, auth);
+          // TODO
+          result = Curl_http_input_auth(data, proxy, _GETCHARPTR(auth));
 
-          free(auth);
+          MM_FREE(char, auth);
 
           if(result)
             return result;

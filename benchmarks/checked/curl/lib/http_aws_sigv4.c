@@ -79,7 +79,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   char *provider1_mid = NULL;
   char *region = NULL;
   char *service = NULL;
-  const char *hostname = conn->host.name;
+  mm_array_ptr<const char> hostname = conn->host.name;
 #ifdef DEBUGBUILD
   char *force_timestamp;
 #endif
@@ -87,7 +87,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   struct tm tm;
   char timestamp[17];
   char date[9];
-  const char *content_type = Curl_checkheaders(data, "Content-Type");
+  mm_array_ptr<const char> content_type = Curl_checkheaders(data, "Content-Type");
   char *canonical_headers = NULL;
   char *signed_headers = NULL;
   Curl_HttpReq httpreq;
@@ -199,7 +199,8 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   }
 
   if(!service) {
-    tmp0 = hostname;
+    // TODO
+    tmp0 = _GETCHARPTR(hostname);
     tmp1 = strchr(tmp0, '.');
     len = tmp1 - tmp0;
     if(!tmp1 || len < 1) {
@@ -250,7 +251,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   date[sizeof(date) - 1] = 0;
 
   if(content_type) {
-    content_type = strchr(content_type, ':');
+    content_type = mm_strchr(content_type, ':');
     if(!content_type) {
       ret = CURLE_FAILED_INIT;
       goto fail;
@@ -263,8 +264,8 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
     canonical_headers = curl_maprintf("content-type:%s\n"
                                       "host:%s\n"
                                       "x-%s-date:%s\n",
-                                      content_type,
-                                      hostname,
+                                      _GETCHARPTR(content_type),
+                                      _GETCHARPTR(hostname),
                                       provider1_low, timestamp);
     signed_headers = curl_maprintf("content-type;host;x-%s-date",
                                    provider1_low);
@@ -272,7 +273,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   else {
     canonical_headers = curl_maprintf("host:%s\n"
                                       "x-%s-date:%s\n",
-                                      hostname,
+                                      _GETCHARPTR(hostname),
                                       provider1_low, timestamp);
     signed_headers = curl_maprintf("host;x-%s-date", provider1_low);
   }

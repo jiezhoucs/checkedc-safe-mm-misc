@@ -146,7 +146,8 @@ CURLcode easysrc_perform(void)
     /* Each unconverted option */
     if(easysrc_toohard) {
       for(ptr = easysrc_toohard->first; ptr; ptr = ptr->next)
-        CHKRET(easysrc_add(&easysrc_code, ptr->data));
+          // TODO
+        CHKRET(easysrc_add(&easysrc_code, _GETCHARPTR(ptr->data)));
     }
     CHKRET(easysrc_add(&easysrc_code, ""));
     CHKRET(easysrc_add(&easysrc_code, "*/"));
@@ -195,7 +196,7 @@ void dumpeasysrc(struct GlobalConfig *config)
     /* Declare variables used for complex setopt values */
     if(easysrc_decl) {
       for(ptr = easysrc_decl->first; ptr; ptr = ptr->next)
-        fprintf(out, "  %s\n", ptr->data);
+        fprintf(out, "  %s\n", _GETCHARPTR(ptr->data));
     }
 
     /* Set up complex values for setopt calls */
@@ -203,14 +204,14 @@ void dumpeasysrc(struct GlobalConfig *config)
       fprintf(out, "\n");
 
       for(ptr = easysrc_data->first; ptr; ptr = ptr->next)
-        fprintf(out, "  %s\n", ptr->data);
+        fprintf(out, "  %s\n", _GETCHARPTR(ptr->data));
     }
 
     fprintf(out, "\n");
     if(easysrc_code) {
       for(ptr = easysrc_code->first; ptr; ptr = ptr->next) {
         if(ptr->data[0]) {
-          fprintf(out, "  %s\n", ptr->data);
+          fprintf(out, "  %s\n", _GETCHARPTR(ptr->data));
         }
         else {
           fprintf(out, "\n");
@@ -220,7 +221,7 @@ void dumpeasysrc(struct GlobalConfig *config)
 
     if(easysrc_clean) {
       for(ptr = easysrc_clean->first; ptr; ptr = ptr->next)
-        fprintf(out, "  %s\n", ptr->data);
+        fprintf(out, "  %s\n", _GETCHARPTR(ptr->data));
     }
 
     for(i = 0; ((c = srcend[i]) != NULL); i++)

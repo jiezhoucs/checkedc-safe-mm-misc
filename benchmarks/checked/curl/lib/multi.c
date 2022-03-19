@@ -1858,7 +1858,7 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
     {
       struct Curl_dns_entry *dns = NULL;
       struct connectdata *conn = data->conn;
-      const char *hostname;
+      mm_array_ptr<const char> hostname = NULL;
 
       DEBUGASSERT(conn);
 #ifndef CURL_DISABLE_PROXY
@@ -1872,7 +1872,8 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
         hostname = conn->host.name;
 
       /* check if we have the name resolved by now */
-      dns = Curl_fetch_addr(data, hostname, (int)conn->port);
+      // TODO
+      dns = Curl_fetch_addr(data, _GETCHARPTR(hostname), (int)conn->port);
 
       if(dns) {
 #ifdef CURLRES_ASYNCH
@@ -1880,7 +1881,8 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
         data->state.async.done = TRUE;
 #endif
         result = CURLE_OK;
-        infof(data, "Hostname '%s' was found in DNS cache", hostname);
+        // TODO
+        infof(data, "Hostname '%s' was found in DNS cache", _GETCHARPTR(hostname));
       }
 
       if(!dns)

@@ -1382,7 +1382,7 @@ static CURLcode tftp_setup_connection(struct Curl_easy *data,
   type = strstr(data->state.up.path, ";mode=");
 
   if(!type)
-    type = strstr(conn->host.rawalloc, ";mode=");
+    type = strstr(_GETCHARPTR(conn->host.rawalloc), ";mode=");
 
   if(type) {
     char command;

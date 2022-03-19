@@ -23,7 +23,7 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#include "safe_mm_checked.h"
+#include <safe_mm_checked.h>
 
 #define CURL_PROGRESS_STATS 0 /* default progress display */
 #define CURL_PROGRESS_BAR   1

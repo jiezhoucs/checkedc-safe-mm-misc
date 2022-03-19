@@ -425,7 +425,8 @@ static CURLcode libcurl_generate_slist(struct curl_slist *slist, int *slistno)
   CLEAN1("slist%d = NULL;", *slistno);
   for(; slist; slist = slist->next) {
     MM_curl_free(char, escaped);
-    escaped = c_escape(slist->data, ZERO_TERMINATED);
+    // TODO
+    escaped = c_escape(_GETCHARPTR(slist->data), ZERO_TERMINATED);
     if(!escaped)
       return CURLE_OUT_OF_MEMORY;
     DATA3("slist%d = curl_slist_append(slist%d, \"%s\");",

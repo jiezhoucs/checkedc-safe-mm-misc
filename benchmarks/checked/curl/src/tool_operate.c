@@ -1700,9 +1700,9 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           curlx_dyn_init(&cookies, 4096);
           for(cl = config->cookies; cl; cl = cl->next) {
             if(cl == config->cookies)
-              ret = curlx_dyn_addf(&cookies, "%s", cl->data);
+              ret = curlx_dyn_addf(&cookies, "%s", _GETCHARPTR(cl->data));
             else
-              ret = curlx_dyn_addf(&cookies, ";%s", cl->data);
+              ret = curlx_dyn_addf(&cookies, ";%s", _GETCHARPTR((cl->data)));
 
             if(ret) {
               result = CURLE_OUT_OF_MEMORY;
@@ -1718,7 +1718,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           struct curl_slist *cfl;
 
           for(cfl = config->cookiefiles; cfl; cfl = cfl->next)
-            my_setopt_str(curl, CURLOPT_COOKIEFILE, cfl->data);
+            my_setopt_str(curl, CURLOPT_COOKIEFILE, _GETCHARPTR(cfl->data));
         }
 
         /* new in libcurl 7.9 */

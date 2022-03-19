@@ -25,7 +25,7 @@
 #include "tool_setup.h"
 #ifndef CURL_DISABLE_LIBCURL_OPTION
 
-#include "safe_mm_checked.h"
+#include <safe_mm_checked.h>
 
 /* linked-list structure with last node cache for easysrc */
 struct slist_wc {

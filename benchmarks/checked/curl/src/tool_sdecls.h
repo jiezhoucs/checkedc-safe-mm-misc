@@ -23,7 +23,7 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#include "safe_mm_checked.h"
+#include <safe_mm_checked.h>
 
 /*
  * OutStruct variables keep track of information relative to curl's

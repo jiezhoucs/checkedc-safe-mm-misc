@@ -34,6 +34,8 @@
 #include "curlver.h"         /* libcurl version defines   */
 #include "system.h"          /* determine things run-time */
 
+#include <safe_mm_checked.h>
+
 /*
  * Define CURL_WIN32 when build target is Win32 API
  */
@@ -2603,7 +2605,7 @@ CURL_EXTERN void curl_global_cleanup(void);
 
 /* linked-list structure for the CURLOPT_QUOTE option (and other) */
 struct curl_slist {
-  char *data;
+  mm_array_ptr<char> data;
   struct curl_slist *next;
 };
 

@@ -50,7 +50,7 @@
 #include "tool_main.h"
 #include "tool_libinfo.h"
 
-#include "safe_mm_checked.h"
+#include <safe_mm_checked.h>
 
 /*
  * This is low-level hard-hacking memory leak tracking and similar. Using

@@ -341,7 +341,8 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   }
 
   /* Transport Header for SETUP requests */
-  p_transport = Curl_checkheaders(data, "Transport");
+  // TODO
+  p_transport = _GETCHARPTR(Curl_checkheaders(data, "Transport"));
   if(rtspreq == RTSPREQ_SETUP && !p_transport) {
     /* New Transport: setting? */
     if(data->set.str[STRING_RTSP_TRANSPORT]) {

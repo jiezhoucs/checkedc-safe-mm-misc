@@ -23,7 +23,7 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#include "safe_mm_checked.h"
+#include <safe_mm_checked.h>
 
 /*
  * curl operates using a single HdrCbData struct variable, a

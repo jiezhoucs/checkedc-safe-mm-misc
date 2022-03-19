@@ -22,6 +22,8 @@
 #include "test.h"
 #include "memdebug.h"
 
+#include <safe_mm_checked.h>
+
 static const char *HOSTHEADER = "Host: www.host.foo.com";
 static const char *JAR = "log/jar506";
 #define THREADS 2
@@ -341,7 +343,7 @@ int test(char *URL)
   printf("-----------------\n");
   next_cookie = cookies;
   while(next_cookie) {
-    printf("  %s\n", next_cookie->data);
+    printf("  %s\n", _GETCHARPTR(next_cookie->data));
     next_cookie = next_cookie->next;
   }
   printf("-----------------\n");

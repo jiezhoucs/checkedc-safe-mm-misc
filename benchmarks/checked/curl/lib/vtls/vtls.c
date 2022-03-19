@@ -405,7 +405,7 @@ bool Curl_ssl_getsessionid(struct Curl_easy *data,
     &conn->proxy_ssl_config :
     &conn->ssl_config;
   const char * const name = isProxy ?
-    conn->http_proxy.host.name : conn->host.name;
+    _GETCHARPTR(conn->http_proxy.host.name) : _GETCHARPTR(conn->host.name);
   int port = isProxy ? (int)conn->port : conn->remote_port;
 #else
   /* no proxy support */
@@ -442,7 +442,7 @@ bool Curl_ssl_getsessionid(struct Curl_easy *data,
     if(strcasecompare(name, check->name) &&
        ((!conn->bits.conn_to_host && !check->conn_to_host) ||
         (conn->bits.conn_to_host && check->conn_to_host &&
-         strcasecompare(conn->conn_to_host.name, check->conn_to_host))) &&
+         strcasecompare(_GETCHARPTR(conn->conn_to_host.name), check->conn_to_host))) &&
        ((!conn->bits.conn_to_port && check->conn_to_port == -1) ||
         (conn->bits.conn_to_port && check->conn_to_port != -1 &&
          conn->conn_to_port == check->conn_to_port)) &&
@@ -529,8 +529,8 @@ CURLcode Curl_ssl_addsessionid(struct Curl_easy *data,
   struct ssl_primary_config * const ssl_config = isProxy ?
     &conn->proxy_ssl_config :
     &conn->ssl_config;
-  const char *hostname = isProxy ? conn->http_proxy.host.name :
-    conn->host.name;
+  const char *hostname = isProxy ? _GETCHARPTR(conn->http_proxy.host.name) :
+    _GETCHARPTR(conn->host.name);
 #else
   struct ssl_primary_config * const ssl_config = &conn->ssl_config;
   const char *hostname = conn->host.name;
@@ -548,7 +548,7 @@ CURLcode Curl_ssl_addsessionid(struct Curl_easy *data,
     return CURLE_OUT_OF_MEMORY; /* bail out */
 
   if(conn->bits.conn_to_host) {
-    clone_conn_to_host = strdup(conn->conn_to_host.name);
+    clone_conn_to_host = strdup(_GETCHARPTR(conn->conn_to_host.name));
     if(!clone_conn_to_host) {
       free(clone_host);
       return CURLE_OUT_OF_MEMORY; /* bail out */
@@ -812,28 +812,28 @@ CURLcode Curl_ssl_push_certinfo_len(struct Curl_easy *data,
                                     size_t valuelen)
 {
   struct curl_certinfo *ci = &data->info.certs;
-  char *output;
+  mm_array_ptr<char> output = NULL;
   struct curl_slist *nl;
   CURLcode result = CURLE_OK;
   size_t labellen = strlen(label);
   size_t outlen = labellen + 1 + valuelen + 1; /* label:value\0 */
 
-  output = malloc(outlen);
+  output = MM_ARRAY_ALLOC(char, outlen);
   if(!output)
     return CURLE_OUT_OF_MEMORY;
 
   /* sprintf the label and colon */
-  msnprintf(output, outlen, "%s:", label);
+  msnprintf(_GETCHARPTR(output), outlen, "%s:", label);
 
   /* memcpy the value (it might not be null-terminated) */
-  memcpy(&output[labellen + 1], value, valuelen);
+  memcpy(_GETCHARPTR(&output[labellen + 1]), value, valuelen);
 
   /* null-terminate the output */
   output[labellen + 1 + valuelen] = 0;
 
   nl = Curl_slist_append_nodup(ci->certinfo[certnum], output);
   if(!nl) {
-    free(output);
+    MM_FREE(char, output);
     curl_slist_free_all(ci->certinfo[certnum]);
     result = CURLE_OUT_OF_MEMORY;
   }

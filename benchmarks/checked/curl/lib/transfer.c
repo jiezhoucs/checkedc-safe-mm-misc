@@ -94,7 +94,7 @@
  *
  * Returns a pointer to the first matching header or NULL if none matched.
  */
-char *Curl_checkheaders(const struct Curl_easy *data,
+mm_array_ptr<char> Curl_checkheaders(const struct Curl_easy *data,
                         const char *thisheader)
 {
   struct curl_slist *head;
@@ -103,7 +103,8 @@ char *Curl_checkheaders(const struct Curl_easy *data,
   DEBUGASSERT(thisheader[thislen-1] != ':');
 
   for(head = data->set.headers; head; head = head->next) {
-    if(strncasecompare(head->data, thisheader, thislen) &&
+      // TODO
+    if(strncasecompare(_GETCHARPTR(head->data), thisheader, thislen) &&
        Curl_headersep(head->data[thislen]) )
       return head->data;
   }

@@ -56,7 +56,7 @@ static struct curl_slist *slist_get_last(struct curl_slist *list)
  * If an error occurs, NULL is returned and the string argument is NOT
  * released.
  */
-struct curl_slist *Curl_slist_append_nodup(struct curl_slist *list, char *data)
+struct curl_slist *Curl_slist_append_nodup(struct curl_slist *list, mm_array_ptr<char> data)
 {
   struct curl_slist     *last;
   struct curl_slist     *new_item;
@@ -89,14 +89,15 @@ struct curl_slist *Curl_slist_append_nodup(struct curl_slist *list, char *data)
 struct curl_slist *curl_slist_append(struct curl_slist *list,
                                      const char *data)
 {
-  char *dupdata = strdup(data);
+  mm_array_ptr<char> dupdata = mm_strdup_from_raw(data);
 
   if(!dupdata)
     return NULL;
 
-  list = Curl_slist_append_nodup(list, dupdata);
+  // TODO
+  list = _GETPTR(struct curl_slist, Curl_slist_append_nodup(list, dupdata));
   if(!list)
-    free(dupdata);
+    MM_FREE(char, dupdata);
 
   return list;
 }
@@ -112,7 +113,8 @@ struct curl_slist *Curl_slist_duplicate(struct curl_slist *inlist)
   struct curl_slist *tmp;
 
   while(inlist) {
-    tmp = curl_slist_append(outlist, inlist->data);
+    // TODO
+    tmp = _GETPTR(struct curl_slist, curl_slist_append(outlist, _GETCHARPTR(inlist->data)));
 
     if(!tmp) {
       curl_slist_free_all(outlist);
@@ -137,7 +139,7 @@ void curl_slist_free_all(struct curl_slist *list)
   item = list;
   do {
     next = item->next;
-    Curl_safefree(item->data);
+    MM_FREE(char, item->data);
     free(item);
     item = next;
   } while(next);

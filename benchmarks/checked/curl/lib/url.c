@@ -70,6 +70,9 @@
   idn2_lookup_ul((const char *)name, (char **)host, flags)
 #endif
 
+#define MM_IDN2_LOOKUP(name, host, flags) \
+  mm_idn2_lookup_ul(
+
 #elif defined(USE_WIN32_IDN)
 /* prototype for curl_win32_idn_to_ascii() */
 bool curl_win32_idn_to_ascii(const char *in, char **out);
@@ -455,7 +458,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
   Curl_safefree(data->state.aptr.rangeline);
   Curl_safefree(data->state.aptr.ref);
   Curl_safefree(data->state.aptr.host);
-  Curl_safefree(data->state.aptr.cookiehost);
+  MM_FREE(char, data->state.aptr.cookiehost);
   Curl_safefree(data->state.aptr.rtsp_transport);
   Curl_safefree(data->state.aptr.user);
   Curl_safefree(data->state.aptr.passwd);
@@ -776,8 +779,8 @@ static void conn_free(struct connectdata *conn)
   Curl_safefree(conn->socks_proxy.user);
   Curl_safefree(conn->http_proxy.passwd);
   Curl_safefree(conn->socks_proxy.passwd);
-  Curl_safefree(conn->http_proxy.host.rawalloc); /* http proxy name buffer */
-  Curl_safefree(conn->socks_proxy.host.rawalloc); /* socks proxy name buffer */
+  MM_FREE(char, conn->http_proxy.host.rawalloc); /* http proxy name buffer */
+  MM_FREE(char, conn->socks_proxy.host.rawalloc); /* socks proxy name buffer */
   Curl_free_primary_ssl_config(&conn->proxy_ssl_config);
 #endif
   Curl_safefree(conn->user);
@@ -785,10 +788,10 @@ static void conn_free(struct connectdata *conn)
   Curl_safefree(conn->sasl_authzid);
   Curl_safefree(conn->options);
   Curl_dyn_free(&conn->trailer);
-  Curl_safefree(conn->host.rawalloc); /* host name buffer */
-  Curl_safefree(conn->conn_to_host.rawalloc); /* host name buffer */
+  MM_FREE(char, conn->host.rawalloc); /* host name buffer */
+  MM_FREE(char, conn->conn_to_host.rawalloc); /* host name buffer */
   Curl_safefree(conn->hostname_resolve);
-  Curl_safefree(conn->secondaryhostname);
+  MM_FREE(char, conn->secondaryhostname);
   MM_ARRAY_FREE(struct http_connect_state, conn->connect_state);
 
   conn_reset_all_postponed_data(conn);
@@ -924,7 +927,8 @@ proxy_info_matches(const struct proxy_info *data,
 {
   if((data->proxytype == needle->proxytype) &&
      (data->port == needle->port) &&
-     Curl_safe_strcasecompare(data->host.name, needle->host.name))
+     // TODO
+     Curl_safe_strcasecompare(_GETCHARPTR(data->host.name), _GETCHARPTR(needle->host.name)))
     return TRUE;
 
   return FALSE;
@@ -1358,10 +1362,11 @@ ConnectionExists(struct Curl_easy *data,
             (get_protocol_family(check->handler) ==
              needle->handler->protocol && check->bits.tls_upgraded)) &&
            (!needle->bits.conn_to_host || strcasecompare(
-            needle->conn_to_host.name, check->conn_to_host.name)) &&
+                                     // TODO
+            _GETCHARPTR(needle->conn_to_host.name), _GETCHARPTR(check->conn_to_host.name))) &&
            (!needle->bits.conn_to_port ||
              needle->conn_to_port == check->conn_to_port) &&
-           strcasecompare(needle->host.name, check->host.name) &&
+           strcasecompare(_GETCHARPTR(needle->host.name), _GETCHARPTR(check->host.name)) &&
            needle->remote_port == check->remote_port) {
           /* The schemes match or the protocol family is the same and the
              previous connection was TLS upgraded, and the hostname and host
@@ -1559,7 +1564,7 @@ static void strip_trailing_dot(struct hostname *host)
   size_t len;
   if(!host || !host->name)
     return;
-  len = strlen(host->name);
+  len = strlen(_GETCHARPTR(host->name));
   if(len && (host->name[len-1] == '.'))
     host->name[len-1] = 0;
 }
@@ -1578,13 +1583,15 @@ CURLcode Curl_idnconvert_hostname(struct Curl_easy *data,
 #endif
 
   /* set the name we use to display the host name */
-  host->dispname = host->name;
+  // TODO
+  host->dispname = _GETCHARPTR(host->name);
 
   /* Check name for non-ASCII and convert hostname to ACE form if we can */
-  if(!Curl_is_ASCII_name(host->name)) {
+  // TODO
+  if(!Curl_is_ASCII_name(_GETCHARPTR(host->name))) {
 #ifdef USE_LIBIDN2
     if(idn2_check_version(IDN2_VERSION)) {
-      char *ace_hostname = NULL;
+      mm_array_ptr<char> ace_hostname = NULL;
 #if IDN2_VERSION_NUMBER >= 0x00140000
       /* IDN2_NFC_INPUT: Normalize input string using normalization form C.
          IDN2_NONTRANSITIONAL: Perform Unicode TR46 non-transitional
@@ -1593,19 +1600,21 @@ CURLcode Curl_idnconvert_hostname(struct Curl_easy *data,
 #else
       int flags = IDN2_NFC_INPUT;
 #endif
-      int rc = IDN2_LOOKUP(host->name, &ace_hostname, flags);
+      char *tmp_ace_hostname;
+      int rc = IDN2_LOOKUP(host->name, (char *)&tmp_ace_hostname, flags);
+      ace_hostname = mmize_str(tmp_ace_hostname);
       if(rc != IDN2_OK)
         /* fallback to TR46 Transitional mode for better IDNA2003
            compatibility */
-        rc = IDN2_LOOKUP(host->name, &ace_hostname,
+        rc = IDN2_LOOKUP(host->name, (char *)&ace_hostname,
                          IDN2_TRANSITIONAL);
       if(rc == IDN2_OK) {
-        host->encalloc = (char *)ace_hostname;
+        host->encalloc = ace_hostname;
         /* change the name pointer to point to the encoded hostname */
         host->name = host->encalloc;
       }
       else {
-        failf(data, "Failed to convert %s to ACE; %s", host->name,
+        failf(data, "Failed to convert %s to ACE; %s", _GETCHARPTR(host->name),
               idn2_strerror(rc));
         return CURLE_URL_MALFORMAT;
       }
@@ -1638,7 +1647,7 @@ void Curl_free_idnconverted_hostname(struct hostname *host)
 {
 #if defined(USE_LIBIDN2)
   if(host->encalloc) {
-    idn2_free(host->encalloc); /* must be freed with idn2_free() since this was
+    MM_FREE(char, host->encalloc); /* must be freed with idn2_free() since this was
                                  allocated by libidn */
     host->encalloc = NULL;
   }
@@ -2098,7 +2107,7 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
   }
 
   /* make sure the connect struct gets its own copy of the host name */
-  conn->host.rawalloc = strdup(hostname ? hostname : "");
+  conn->host.rawalloc = mm_strdup_from_raw(hostname ? hostname : "");
   if(!conn->host.rawalloc)
     return CURLE_OUT_OF_MEMORY;
   conn->host.name = conn->host.rawalloc;
@@ -2372,7 +2381,7 @@ static CURLcode parse_proxy(struct Curl_easy *data,
   int port = -1;
   char *proxyuser = NULL;
   char *proxypasswd = NULL;
-  char *host;
+  mm_array_ptr<char> host = NULL;
   bool sockstype;
   CURLUcode uc;
   struct proxy_info *proxyinfo;
@@ -2493,16 +2502,18 @@ static CURLcode parse_proxy(struct Curl_easy *data,
   }
 
   /* now, clone the proxy host name */
-  uc = curl_url_get(uhp, CURLUPART_HOST, &host, CURLU_URLDECODE);
+  char *tmp_host = _GETCHARPTR(host);
+  uc = curl_url_get(uhp, CURLUPART_HOST, &tmp_host, CURLU_URLDECODE);
+  host = mmize_str(tmp_host);
   if(uc) {
     result = CURLE_OUT_OF_MEMORY;
     goto error;
   }
-  Curl_safefree(proxyinfo->host.rawalloc);
+  MM_FREE(char, proxyinfo->host.rawalloc);
   proxyinfo->host.rawalloc = host;
   if(host[0] == '[') {
     /* this is a numerical IPv6, strip off the brackets */
-    size_t len = strlen(host);
+    size_t len = strlen(_GETCHARPTR(host));
     host[len-1] = 0; /* clear the trailing bracket */
     host++;
     zonefrom_url(uhp, data, conn);
@@ -2600,7 +2611,8 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
     }
   }
 
-  if(check_noproxy(conn->host.name, data->set.str[STRING_NOPROXY] ?
+  // TODO
+  if(check_noproxy(_GETCHARPTR(conn->host.name), data->set.str[STRING_NOPROXY] ?
       data->set.str[STRING_NOPROXY] : no_proxy)) {
     Curl_safefree(proxy);
     Curl_safefree(socksproxy);
@@ -2913,13 +2925,14 @@ static CURLcode override_login(struct Curl_easy *data,
     bool netrc_passwd_changed = FALSE;
     int ret;
 
-    ret = Curl_parsenetrc(conn->host.name,
+    // TODO
+    ret = Curl_parsenetrc(_GETCHARPTR(conn->host.name),
                           userp, passwdp,
                           &netrc_user_changed, &netrc_passwd_changed,
                           data->set.str[STRING_NETRC_FILE]);
     if(ret > 0) {
       infof(data, "Couldn't find host %s in the %s file; using defaults",
-            conn->host.name, data->set.str[STRING_NETRC_FILE]);
+            _GETCHARPTR(conn->host.name), data->set.str[STRING_NETRC_FILE]);
     }
     else if(ret < 0) {
       return CURLE_OUT_OF_MEMORY;
@@ -3137,7 +3150,7 @@ static CURLcode parse_connect_to_string(struct Curl_easy *data,
     size_t hostname_to_match_len;
     char *hostname_to_match = aprintf("%s%s%s",
                                       conn->bits.ipv6_ip ? "[" : "",
-                                      conn->host.name,
+                                      _GETCHARPTR(conn->host.name),
                                       conn->bits.ipv6_ip ? "]" : "");
     if(!hostname_to_match)
       return CURLE_OUT_OF_MEMORY;
@@ -3188,12 +3201,15 @@ static CURLcode parse_connect_to_slist(struct Curl_easy *data,
                                        struct curl_slist *conn_to_host)
 {
   CURLcode result = CURLE_OK;
-  char *host = NULL;
+  mm_array_ptr<char> host = NULL;
   int port = -1;
 
   while(conn_to_host && !host && port == -1) {
-    result = parse_connect_to_string(data, conn, conn_to_host->data,
-                                     &host, &port);
+    char *tmp_host = _GETCHARPTR(host);
+      // TODO
+    result = parse_connect_to_string(data, conn, _GETCHARPTR(conn_to_host->data),
+                                     &tmp_host, &port);
+    host = mmize_str(tmp_host);
     if(result)
       return result;
 
@@ -3202,12 +3218,12 @@ static CURLcode parse_connect_to_slist(struct Curl_easy *data,
       conn->conn_to_host.name = host;
       conn->bits.conn_to_host = TRUE;
 
-      infof(data, "Connecting to hostname: %s", host);
+      infof(data, "Connecting to hostname: %s", _GETCHARPTR(host));
     }
     else {
       /* no "connect to host" */
       conn->bits.conn_to_host = FALSE;
-      Curl_safefree(host);
+      MM_FREE(char, host);
     }
 
     if(port >= 0) {
@@ -3251,21 +3267,23 @@ static CURLcode parse_connect_to_slist(struct Curl_easy *data,
 #ifdef USE_NGHTTP2
     /* with h2 support, check that first */
     srcalpnid = ALPN_h2;
+    // TODO
     hit = Curl_altsvc_lookup(data->asi,
-                             srcalpnid, host, conn->remote_port, /* from */
+                             srcalpnid, _GETCHARPTR(host), conn->remote_port, /* from */
                              &as /* to */,
                              allowed_versions);
     if(!hit)
 #endif
     {
       srcalpnid = ALPN_h1;
+      // TODO
       hit = Curl_altsvc_lookup(data->asi,
-                               srcalpnid, host, conn->remote_port, /* from */
+                               srcalpnid, _GETCHARPTR(host), conn->remote_port, /* from */
                                &as /* to */,
                                allowed_versions);
     }
     if(hit) {
-      char *hostd = strdup((char *)as->dst.host);
+      mm_array_ptr<char> hostd = mm_strdup_from_raw((char *)as->dst.host);
       if(!hostd)
         return CURLE_OUT_OF_MEMORY;
       conn->conn_to_host.rawalloc = hostd;
@@ -3275,8 +3293,8 @@ static CURLcode parse_connect_to_slist(struct Curl_easy *data,
       conn->bits.conn_to_port = TRUE;
       conn->bits.altused = TRUE;
       infof(data, "Alt-svc connecting from [%s]%s:%d to [%s]%s:%d",
-            Curl_alpnid2str(srcalpnid), host, conn->remote_port,
-            Curl_alpnid2str(as->dst.alpnid), hostd, as->dst.port);
+            Curl_alpnid2str(srcalpnid), _GETCHARPTR(host), conn->remote_port,
+            Curl_alpnid2str(as->dst.alpnid), _GETCHARPTR(hostd), as->dst.port);
       if(srcalpnid != as->dst.alpnid) {
         /* protocol version switch */
         switch(as->dst.alpnid) {
@@ -3374,7 +3392,8 @@ static CURLcode resolve_server(struct Curl_easy *data,
         conn->port = conn->remote_port;
 
       /* Resolve target host right on */
-      conn->hostname_resolve = strdup(connhost->name);
+      // TODO
+      conn->hostname_resolve = strdup(_GETCHARPTR(connhost->name));
       if(!conn->hostname_resolve)
         return CURLE_OUT_OF_MEMORY;
       rc = Curl_resolv_timeout(data, conn->hostname_resolve, (int)conn->port,
@@ -3402,7 +3421,8 @@ static CURLcode resolve_server(struct Curl_easy *data,
         &conn->socks_proxy.host : &conn->http_proxy.host;
 
       /* resolve proxy */
-      conn->hostname_resolve = strdup(host->name);
+      // TODO
+      conn->hostname_resolve = strdup(_GETCHARPTR(host->name));
       if(!conn->hostname_resolve)
         return CURLE_OUT_OF_MEMORY;
       rc = Curl_resolv_timeout(data, conn->hostname_resolve, (int)conn->port,
@@ -3446,8 +3466,8 @@ static void reuse_conn(struct Curl_easy *data,
   Curl_free_idnconverted_hostname(&old_conn->http_proxy.host);
   Curl_free_idnconverted_hostname(&old_conn->socks_proxy.host);
 
-  free(old_conn->http_proxy.host.rawalloc);
-  free(old_conn->socks_proxy.host.rawalloc);
+  MM_FREE(char, old_conn->http_proxy.host.rawalloc);
+  MM_FREE(char, old_conn->socks_proxy.host.rawalloc);
   Curl_free_primary_ssl_config(&old_conn->proxy_ssl_config);
 #endif
   /* free the SSL config struct from this connection struct as this was
@@ -3494,8 +3514,8 @@ static void reuse_conn(struct Curl_easy *data,
      different this time etc */
   Curl_free_idnconverted_hostname(&conn->host);
   Curl_free_idnconverted_hostname(&conn->conn_to_host);
-  Curl_safefree(conn->host.rawalloc);
-  Curl_safefree(conn->conn_to_host.rawalloc);
+  MM_FREE(char, conn->host.rawalloc);
+  MM_FREE(char, conn->conn_to_host.rawalloc);
   conn->host = old_conn->host;
   conn->conn_to_host = old_conn->conn_to_host;
   conn->conn_to_port = old_conn->conn_to_port;
@@ -3676,7 +3696,8 @@ static CURLcode create_conn(struct Curl_easy *data,
    * Do this after the hostnames have been IDN-converted.
    *************************************************************/
   if(conn->bits.conn_to_host &&
-     strcasecompare(conn->conn_to_host.name, conn->host.name)) {
+          // TODO
+     strcasecompare(_GETCHARPTR(conn->conn_to_host.name), _GETCHARPTR(conn->host.name))) {
     conn->bits.conn_to_host = FALSE;
   }
 

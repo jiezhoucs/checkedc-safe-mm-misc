@@ -26,7 +26,7 @@
 
 #include "curl_setup.h"
 
-#include "safe_mm_checked.h"
+#include <safe_mm_checked.h>
 
 #define PORT_FTP 21
 #define PORT_FTPS 990
@@ -532,9 +532,9 @@ struct ConnectBits {
 };
 
 struct hostname {
-  char *rawalloc; /* allocated "raw" version of the name */
-  char *encalloc; /* allocated IDN-encoded version of the name */
-  char *name;     /* name to use internally, might be encoded, might be raw */
+  mm_array_ptr<char> rawalloc; /* allocated "raw" version of the name */
+  mm_array_ptr<char> encalloc; /* allocated IDN-encoded version of the name */
+  mm_array_ptr<char> name;     /* name to use internally, might be encoded, might be raw */
   const char *dispname; /* name to display, as 'name' might be encoded */
 };
 
@@ -954,7 +954,7 @@ struct connectdata {
 
   struct hostname host;
   char *hostname_resolve; /* host name to resolve to address, allocated */
-  char *secondaryhostname; /* secondary socket host name (ftp) */
+  mm_array_ptr<char> secondaryhostname; /* secondary socket host name (ftp) */
   struct hostname conn_to_host; /* the host to connect to. valid only if
                                    bits.conn_to_host is set */
 #ifndef CURL_DISABLE_PROXY
@@ -1430,7 +1430,7 @@ struct UrlState {
     char *rangeline;
     char *ref;
     char *host;
-    char *cookiehost;
+    mm_array_ptr<char> cookiehost;
     char *rtsp_transport;
     char *te; /* TE: request header */
 

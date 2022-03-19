@@ -1011,7 +1011,7 @@ void tool_list_engines(void)
   puts("Build-time engines:");
   if(engines) {
     for(; engines; engines = engines->next)
-      printf("  %s\n", engines->data);
+      printf("  %s\n", _GETCHARPTR(engines->data));
   }
   else {
     puts("  <none>");

@@ -225,9 +225,11 @@ char *Curl_checkProxyheaders(struct Curl_easy *data,
   for(head = (conn->bits.proxy && data->set.sep_headers) ?
         data->set.proxyheaders : data->set.headers;
       head; head = head->next) {
-    if(strncasecompare(head->data, thisheader, thislen) &&
+      // TODO
+    if(strncasecompare(_GETCHARPTR(head->data), thisheader, thislen) &&
        Curl_headersep(head->data[thislen]))
-      return head->data;
+        // TODO
+      return _GETCHARPTR(head->data);
   }
 
   return NULL;
@@ -243,11 +245,11 @@ char *Curl_checkProxyheaders(struct Curl_easy *data,
  * case of allocation failure. Returns an empty string if the header value
  * consists entirely of whitespace.
  */
-char *Curl_copy_header_value(const char *header)
+mm_array_ptr<char> Curl_copy_header_value(const char *header)
 {
   const char *start;
   const char *end;
-  char *value;
+  mm_array_ptr<char> value = NULL;
   size_t len;
 
   /* Find the end of the header name */
@@ -280,11 +282,11 @@ char *Curl_copy_header_value(const char *header)
   /* get length of the type */
   len = end - start + 1;
 
-  value = malloc(len + 1);
+  value = MM_ARRAY_ALLOC(char, len + 1);
   if(!value)
     return NULL;
 
-  memcpy(value, start, len);
+  memcpy(_GETCHARPTR(value), start, len);
   value[len] = 0; /* null-terminate */
 
   return value;
@@ -856,7 +858,7 @@ Curl_http_output_auth(struct Curl_easy *data,
 #endif
      !data->state.first_host ||
      data->set.allow_auth_to_other_hosts ||
-     strcasecompare(data->state.first_host, conn->host.name)) {
+     strcasecompare(data->state.first_host, _GETCHARPTR(conn->host.name))) {
     result = output_auth_headers(data, conn, authhost, request, path, FALSE);
   }
   else
@@ -1719,10 +1721,11 @@ static CURLcode expect100(struct Curl_easy *data,
     /* if not doing HTTP 1.0 or version 2, or disabled explicitly, we add an
        Expect: 100-continue to the headers which actually speeds up post
        operations (as there is one packet coming back from the web server) */
-    const char *ptr = Curl_checkheaders(data, "Expect");
+    const mm_array_ptr<char> ptr = Curl_checkheaders(data, "Expect");
     if(ptr) {
       data->state.expect100header =
-        Curl_compareheader(ptr, "Expect:", "100-continue");
+          // TODO
+        Curl_compareheader(_GETCHARPTR(ptr), "Expect:", "100-continue");
     }
     else {
       result = Curl_dyn_add(req, "Expect: 100-continue\r\n");
@@ -1768,9 +1771,10 @@ CURLcode Curl_http_compile_trailers(struct curl_slist *trailers,
 
   while(trailers) {
     /* only add correctly formatted trailers */
-    ptr = strchr(trailers->data, ':');
+    ptr = strchr(_GETCHARPTR(trailers->data), ':');
     if(ptr && *(ptr + 1) == ' ') {
-      result = Curl_dyn_add(b, trailers->data);
+    // TODO
+      result = Curl_dyn_add(b, _GETCHARPTR(trailers->data));
       if(result)
         return result;
       result = Curl_dyn_add(b, endofline_native);
@@ -1839,11 +1843,11 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
 
     while(headers) {
       char *semicolonp = NULL;
-      ptr = strchr(headers->data, ':');
+      ptr = strchr(_GETCHARPTR(headers->data), ':');
       if(!ptr) {
         char *optr;
         /* no colon, semicolon? */
-        ptr = strchr(headers->data, ';');
+        ptr = strchr(_GETCHARPTR(headers->data), ';');
         if(ptr) {
           optr = ptr;
           ptr++; /* pass the semicolon */
@@ -1857,7 +1861,8 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
           else {
             if(*(--ptr) == ';') {
               /* copy the source */
-              semicolonp = strdup(headers->data);
+                // TODO
+              semicolonp = strdup(_GETCHARPTR(headers->data));
               if(!semicolonp) {
 #ifndef USE_HYPER
                 Curl_dyn_free(req);
@@ -1865,9 +1870,9 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
                 return CURLE_OUT_OF_MEMORY;
               }
               /* put a colon where the semicolon is */
-              semicolonp[ptr - headers->data] = ':';
+              semicolonp[ptr - _GETCHARPTR(headers->data)] = ':';
               /* point at the colon */
-              optr = &semicolonp [ptr - headers->data];
+              optr = &semicolonp [ptr - _GETCHARPTR(headers->data)];
             }
           }
           ptr = optr;
@@ -1883,7 +1888,8 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
         if(*ptr || semicolonp) {
           /* only send this if the contents was non-blank or done special */
           CURLcode result = CURLE_OK;
-          char *compare = semicolonp ? semicolonp : headers->data;
+          // TODO
+          char *compare = semicolonp ? semicolonp : _GETCHARPTR(headers->data);
 
           if(data->state.aptr.host &&
              /* a Host: header was sent already, don't pass on any custom Host:
@@ -1919,7 +1925,7 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
                   (data->state.this_is_a_follow &&
                    data->state.first_host &&
                    !data->set.allow_auth_to_other_hosts &&
-                   !strcasecompare(data->state.first_host, conn->host.name)))
+                   !strcasecompare(data->state.first_host, _GETCHARPTR(conn->host.name))))
             ;
           else {
 #ifdef USE_HYPER
@@ -2081,12 +2087,13 @@ CURLcode Curl_http_useragent(struct Curl_easy *data)
 
 CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn)
 {
-  const char *ptr;
+  mm_array_ptr<const char> ptr = NULL;
   if(!data->state.this_is_a_follow) {
     /* Free to avoid leaking memory on multiple requests*/
     free(data->state.first_host);
 
-    data->state.first_host = strdup(conn->host.name);
+    // TODO
+    data->state.first_host = strdup(_GETCHARPTR(conn->host.name));
     if(!data->state.first_host)
       return CURLE_OUT_OF_MEMORY;
 
@@ -2096,19 +2103,20 @@ CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn)
 
   ptr = Curl_checkheaders(data, "Host");
   if(ptr && (!data->state.this_is_a_follow ||
-             strcasecompare(data->state.first_host, conn->host.name))) {
+             strcasecompare(data->state.first_host, _GETCHARPTR(conn->host.name)))) {
 #if !defined(CURL_DISABLE_COOKIES)
     /* If we have a given custom Host: header, we extract the host name in
        order to possibly use it for cookie reasons later on. We only allow the
        custom Host: header if this is NOT a redirect, as setting Host: in the
        redirected request is being out on thin ice. Except if the host name
        is the same as the first one! */
-    char *cookiehost = Curl_copy_header_value(ptr);
+      // TODO
+    mm_array_ptr<char> cookiehost = Curl_copy_header_value(_GETCHARPTR(ptr));
     if(!cookiehost)
       return CURLE_OUT_OF_MEMORY;
     if(!*cookiehost)
       /* ignore empty data */
-      free(cookiehost);
+      MM_FREE(char, cookiehost);
     else {
       /* If the host begins with '[', we start searching for the port after
          the bracket has been closed */
@@ -2116,24 +2124,25 @@ CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn)
         char *closingbracket;
         /* since the 'cookiehost' is an allocated memory area that will be
            freed later we cannot simply increment the pointer */
-        memmove(cookiehost, cookiehost + 1, strlen(cookiehost) - 1);
-        closingbracket = strchr(cookiehost, ']');
+        memmove(_GETCHARPTR(cookiehost), _GETCHARPTR(cookiehost) + 1, strlen(_GETCHARPTR(cookiehost)) - 1);
+        closingbracket = strchr(_GETCHARPTR(cookiehost), ']');
         if(closingbracket)
           *closingbracket = 0;
       }
       else {
         int startsearch = 0;
-        char *colon = strchr(cookiehost + startsearch, ':');
+        char *colon = strchr(_GETCHARPTR(cookiehost) + startsearch, ':');
         if(colon)
           *colon = 0; /* The host must not include an embedded port number */
       }
-      Curl_safefree(data->state.aptr.cookiehost);
+      MM_ARRAY_FREE(char, data->state.aptr.cookiehost);
       data->state.aptr.cookiehost = cookiehost;
     }
 #endif
 
-    if(strcmp("Host:", ptr)) {
-      data->state.aptr.host = aprintf("Host:%s\r\n", &ptr[5]);
+    if(strcmp("Host:", _GETCHARPTR(ptr))) {
+        // TODO?
+      data->state.aptr.host = aprintf("Host:%s\r\n", _GETCHARPTR(&ptr[5]));
       if(!data->state.aptr.host)
         return CURLE_OUT_OF_MEMORY;
     }
@@ -2144,7 +2153,7 @@ CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn)
   else {
     /* When building Host: headers, we must put the host name within
        [brackets] if the host name is a plain IPv6-address. RFC2732-style. */
-    const char *host = conn->host.name;
+    mm_array_ptr<const char> host = conn->host.name;
 
     if(((conn->given->protocol&CURLPROTO_HTTPS) &&
         (conn->remote_port == PORT_HTTPS)) ||
@@ -2154,12 +2163,12 @@ CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn)
          the port number in the host string */
       data->state.aptr.host = aprintf("Host: %s%s%s\r\n",
                                     conn->bits.ipv6_ip?"[":"",
-                                    host,
+                                    _GETCHARPTR(host),
                                     conn->bits.ipv6_ip?"]":"");
     else
       data->state.aptr.host = aprintf("Host: %s%s%s:%d\r\n",
                                     conn->bits.ipv6_ip?"[":"",
-                                    host,
+                                    _GETCHARPTR(host),
                                     conn->bits.ipv6_ip?"]":"",
                                     conn->remote_port);
 
@@ -2201,8 +2210,9 @@ CURLcode Curl_http_target(struct Curl_easy *data,
     if(!h)
       return CURLE_OUT_OF_MEMORY;
 
-    if(conn->host.dispname != conn->host.name) {
-      uc = curl_url_set(h, CURLUPART_HOST, conn->host.name, 0);
+    // TODO
+    if(conn->host.dispname != _GETCHARPTR(conn->host.name)) {
+      uc = curl_url_set(h, CURLUPART_HOST, _GETCHARPTR(conn->host.name), 0);
       if(uc) {
         curl_url_cleanup(h);
         return CURLE_OUT_OF_MEMORY;
@@ -2288,7 +2298,7 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
                         Curl_HttpReq httpreq, const char **tep)
 {
   CURLcode result = CURLE_OK;
-  const char *ptr;
+  mm_array_ptr<const char> ptr = NULL;
   mm_ptr<struct HTTP> http = data->req.p.http;
   http->postsize = 0;
 
@@ -2312,7 +2322,7 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
 
 #ifndef CURL_DISABLE_MIME
   if(http->sendit) {
-    const char *cthdr = Curl_checkheaders(data, "Content-Type");
+    mm_array_ptr<const char> cthdr = Curl_checkheaders(data, "Content-Type");
 
     /* Read and seek body only. */
     http->sendit->flags |= MIME_BODY_ONLY;
@@ -2326,7 +2336,8 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
       cthdr = "multipart/form-data";
 
     curl_mime_headers(http->sendit, data->set.headers, 0);
-    result = Curl_mime_prepare_headers(http->sendit, cthdr,
+    // TODO
+    result = Curl_mime_prepare_headers(http->sendit, _GETCHARPTR(cthdr),
                                        NULL, MIMESTRATEGY_FORM);
     curl_mime_headers(http->sendit, NULL, 0);
     if(!result)
@@ -2341,7 +2352,8 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
   if(ptr) {
     /* Some kind of TE is requested, check if 'chunked' is chosen */
     data->req.upload_chunky =
-      Curl_compareheader(ptr, "Transfer-Encoding:", "chunked");
+        // TODO
+      Curl_compareheader(_GETCHARPTR(ptr), "Transfer-Encoding:", "chunked");
   }
   else {
     if((conn->handler->protocol & PROTO_FAMILY_HTTP) &&
@@ -2382,7 +2394,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
 #endif
   CURLcode result = CURLE_OK;
   mm_ptr<struct HTTP> http = data->req.p.http;
-  const char *ptr;
+  mm_array_ptr<const char> ptr = NULL;
 
   /* If 'authdone' is FALSE, we must not set the write socket index to the
      Curl_transfer() call below, as we're not ready to actually upload any
@@ -2474,7 +2486,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
       struct curl_slist *hdr;
 
       for(hdr = http->sendit->curlheaders; hdr; hdr = hdr->next) {
-        result = Curl_dyn_addf(r, "%s\r\n", hdr->data);
+        result = Curl_dyn_addf(r, "%s\r\n", _GETCHARPTR(hdr->data));
         if(result)
           return result;
       }
@@ -2488,7 +2500,8 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     ptr = Curl_checkheaders(data, "Expect");
     if(ptr) {
       data->state.expect100header =
-        Curl_compareheader(ptr, "Expect:", "100-continue");
+          // TODO
+        Curl_compareheader(_GETCHARPTR(ptr), "Expect:", "100-continue");
     }
     else if(http->postsize > EXPECT_100_THRESHOLD || http->postsize < 0) {
       result = expect100(data, conn, r);
@@ -2561,7 +2574,8 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     ptr = Curl_checkheaders(data, "Expect");
     if(ptr) {
       data->state.expect100header =
-        Curl_compareheader(ptr, "Expect:", "100-continue");
+          // TODO
+        Curl_compareheader(_GETCHARPTR(ptr), "Expect:", "100-continue");
     }
     else if(http->postsize > EXPECT_100_THRESHOLD || http->postsize < 0) {
       result = expect100(data, conn, r);
@@ -2715,15 +2729,15 @@ CURLcode Curl_http_cookies(struct Curl_easy *data,
     int count = 0;
 
     if(data->cookies && data->state.cookie_engine) {
-      const char *host = data->state.aptr.cookiehost ?
+      mm_array_ptr<const char> host = data->state.aptr.cookiehost ?
         data->state.aptr.cookiehost : conn->host.name;
       const bool secure_context =
         conn->handler->protocol&CURLPROTO_HTTPS ||
-        strcasecompare("localhost", host) ||
-        !strcmp(host, "127.0.0.1") ||
-        !strcmp(host, "[::1]") ? TRUE : FALSE;
+        strcasecompare("localhost", _GETCHARPTR(host)) ||
+        !strcmp(_GETCHARPTR(host), "127.0.0.1") ||
+        !strcmp(_GETCHARPTR(host), "[::1]") ? TRUE : FALSE;
       Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
-      co = Curl_cookie_getlist(data->cookies, host, data->state.up.path,
+      co = Curl_cookie_getlist(data->cookies, _GETCHARPTR(host), data->state.up.path,
                                secure_context);
       Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
     }
@@ -2988,22 +3002,24 @@ CURLcode Curl_transferencode(struct Curl_easy *data)
        Connection: header and prevent the original to get sent. Note that if
        the user has inserted his/her own TE: header we don't do this magic
        but then assume that the user will handle it all! */
-    char *cptr = Curl_checkheaders(data, "Connection");
+    mm_array_ptr<char> cptr = Curl_checkheaders(data, "Connection");
 #define TE_HEADER "TE: gzip\r\n"
 
     Curl_safefree(data->state.aptr.te);
 
     if(cptr) {
-      cptr = Curl_copy_header_value(cptr);
+      // TODO
+      cptr = Curl_copy_header_value(_GETCHARPTR(cptr));
       if(!cptr)
         return CURLE_OUT_OF_MEMORY;
     }
 
     /* Create the (updated) Connection: header */
     data->state.aptr.te = aprintf("Connection: %s%sTE\r\n" TE_HEADER,
-                                cptr ? cptr : "", (cptr && *cptr) ? ", ":"");
+                                _GETCHARPTR(cptr) ? _GETCHARPTR(cptr) : "",
+                                (_GETCHARPTR(cptr) && *cptr) ? ", ":"");
 
-    free(cptr);
+    MM_FREE(char, cptr);
     if(!data->state.aptr.te)
       return CURLE_OUT_OF_MEMORY;
   }
@@ -3168,7 +3184,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
 #ifndef CURL_DISABLE_ALTSVC
   if(conn->bits.altused && !Curl_checkheaders(data, "Alt-Used")) {
     altused = aprintf("Alt-Used: %s:%d\r\n",
-                      conn->conn_to_host.name, conn->conn_to_port);
+                      _GETCHARPTR(conn->conn_to_host.name), conn->conn_to_port);
     if(!altused) {
       Curl_dyn_free(&req);
       return CURLE_OUT_OF_MEMORY;
@@ -3343,7 +3359,8 @@ checkhttpprefix(struct Curl_easy *data,
 #endif /* CURL_DOES_CONVERSIONS */
 
   while(head) {
-    if(checkprefixmax(head->data, s, len)) {
+      // TODO
+    if(checkprefixmax(_GETCHARPTR(head->data), s, len)) {
       rc = onmatch;
       break;
     }
@@ -3441,15 +3458,16 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
   }
   /* check for Content-Type: header lines to get the MIME-type */
   else if(checkprefix("Content-Type:", headp)) {
-    char *contenttype = Curl_copy_header_value(headp);
+    mm_array_ptr<char> contenttype = Curl_copy_header_value(headp);
     if(!contenttype)
       return CURLE_OUT_OF_MEMORY;
     if(!*contenttype)
       /* ignore empty data */
-      free(contenttype);
+      MM_FREE(char, contenttype);
     else {
       Curl_safefree(data->info.contenttype);
-      data->info.contenttype = contenttype;
+      // TODO
+      data->info.contenttype = _GETCHARPTR(contenttype);
     }
   }
 #ifndef CURL_DISABLE_PROXY
@@ -3584,7 +3602,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
     /* If there is a custom-set Host: name, use it here, or else use real peer
        host name. */
     const char *host = data->state.aptr.cookiehost?
-      data->state.aptr.cookiehost:conn->host.name;
+      _GETCHARPTR(data->state.aptr.cookiehost):_GETCHARPTR(conn->host.name);
     const bool secure_context =
       conn->handler->protocol&CURLPROTO_HTTPS ||
       strcasecompare("localhost", host) ||
@@ -3611,13 +3629,14 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
            (407 == k->httpcode))) {
 
     bool proxy = (k->httpcode == 407) ? TRUE : FALSE;
-    char *auth = Curl_copy_header_value(headp);
+    mm_array_ptr<char> auth = Curl_copy_header_value(headp);
     if(!auth)
       return CURLE_OUT_OF_MEMORY;
 
-    result = Curl_http_input_auth(data, proxy, auth);
+    // TODO
+    result = Curl_http_input_auth(data, proxy, _GETCHARPTR(auth));
 
-    free(auth);
+    MM_FREE(char, auth);
 
     if(result)
       return result;
@@ -3630,7 +3649,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
       char *persistentauth = Curl_copy_header_value(headp);
       if(!persistentauth)
         return CURLE_OUT_OF_MEMORY;
-      negdata->noauthpersist = checkprefix("false", persistentauth)?
+      /* negdata->noauthpersist = checkprefix("false", persistentauth)? */
         TRUE:FALSE;
       negdata->havenoauthpersist = TRUE;
       infof(data, "Negotiate: noauthpersist -> %d, header part: %s",
@@ -3643,14 +3662,15 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
           checkprefix("Location:", headp) &&
           !data->req.location) {
     /* this is the URL that the server advises us to use instead */
-    char *location = Curl_copy_header_value(headp);
+    mm_array_ptr<char> location = Curl_copy_header_value(headp);
     if(!location)
       return CURLE_OUT_OF_MEMORY;
     if(!*location)
       /* ignore empty data */
-      free(location);
+      MM_FREE(char, location);
     else {
-      data->req.location = location;
+        // TODO
+      data->req.location = _GETCHARPTR(location);
 
       if(data->set.http_follow_location) {
         DEBUGASSERT(!data->req.newurl);
@@ -3698,7 +3718,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
     enum alpnid id = (conn->httpversion == 20) ? ALPN_h2 : ALPN_h1;
     result = Curl_altsvc_parse(data, data->asi,
                                headp + strlen("Alt-Svc:"),
-                               id, conn->host.name,
+                               // TOOD
+                               id, _GETCHARPTR(conn->host.name),
                                curlx_uitous(conn->remote_port));
     if(result)
       return result;

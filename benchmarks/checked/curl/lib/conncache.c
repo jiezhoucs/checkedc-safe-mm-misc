@@ -141,7 +141,7 @@ static void hashkey(struct connectdata *conn, char *buf,
                     size_t len,  /* something like 128 is fine */
                     const char **hostp)
 {
-  const char *hostname;
+  mm_array_ptr<const char> hostname = NULL;
   long port = conn->remote_port;
 
 #ifndef CURL_DISABLE_PROXY
@@ -158,10 +158,11 @@ static void hashkey(struct connectdata *conn, char *buf,
 
   if(hostp)
     /* report back which name we used */
-    *hostp = hostname;
+    // TODO
+    *hostp = _GETCHARPTR(hostname);
 
   /* put the number first so that the hostname gets cut off if too long */
-  msnprintf(buf, len, "%ld%s", port, hostname);
+  msnprintf(buf, len, "%ld%s", port, _GETCHARPTR(hostname));
   Curl_strntolower(buf, buf, len);
 }
 

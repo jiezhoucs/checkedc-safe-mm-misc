@@ -1021,9 +1021,9 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
     if(hostp->data[0] == '-') {
       size_t entry_len;
 
-      if(2 != sscanf(hostp->data + 1, "%255[^:]:%d", hostname, &port)) {
+      if(2 != sscanf(_GETCHARPTR(hostp->data) + 1, "%255[^:]:%d", hostname, &port)) {
         infof(data, "Couldn't parse CURLOPT_RESOLVE removal entry '%s'",
-              hostp->data);
+              _GETCHARPTR(hostp->data));
         continue;
       }
 
@@ -1058,7 +1058,7 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
       unsigned long tmp_port;
       bool error = true;
 
-      host_begin = hostp->data;
+      host_begin = _GETCHARPTR(hostp->data);
       if(host_begin[0] == '+') {
         host_begin++;
         permanent = FALSE;
@@ -1139,7 +1139,7 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
    err:
       if(error) {
         failf(data, "Couldn't parse CURLOPT_RESOLVE entry '%s'!",
-              hostp->data);
+              _GETCHARPTR(hostp->data));
         Curl_freeaddrinfo(head);
         return CURLE_SETOPT_OPTION_SYNTAX;
       }

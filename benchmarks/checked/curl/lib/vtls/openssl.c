@@ -25,6 +25,8 @@
  * but vtls.c should ever call or use these functions.
  */
 
+#include <safe_mm_checked.h>
+
 #include "curl_setup.h"
 
 #ifdef USE_OPENSSL
@@ -1655,7 +1657,7 @@ static CURLcode verifyhost(struct Curl_easy *data, struct connectdata *conn,
   CURLcode result = CURLE_OK;
   bool dNSName = FALSE; /* if a dNSName field exists in the cert */
   bool iPAddress = FALSE; /* if a iPAddress field exists in the cert */
-  const char * const hostname = SSL_HOST_NAME();
+  const char * const hostname = _GETCHARPTR(SSL_HOST_NAME());
   const char * const dispname = SSL_HOST_DISPNAME();
 
 #ifdef ENABLE_IPV6
@@ -2599,7 +2601,7 @@ static CURLcode ossl_connect_step1(struct Curl_easy *data,
 
 #ifdef SSL_CTRL_SET_TLSEXT_HOSTNAME
   bool sni;
-  const char * const hostname = SSL_HOST_NAME();
+  const char * const hostname = _GETCHARPTR(SSL_HOST_NAME());
 
 #ifdef ENABLE_IPV6
   struct in6_addr addr;
@@ -3385,7 +3387,7 @@ static CURLcode ossl_connect_step2(struct Curl_easy *data,
        * the SO_ERROR is also lost.
        */
       if(CURLE_SSL_CONNECT_ERROR == result && errdetail == 0) {
-        const char * const hostname = SSL_HOST_NAME();
+        const char * const hostname = _GETCHARPTR(SSL_HOST_NAME());
         const long int port = SSL_HOST_PORT();
         char extramsg[80]="";
         int sockerr = SOCKERRNO;

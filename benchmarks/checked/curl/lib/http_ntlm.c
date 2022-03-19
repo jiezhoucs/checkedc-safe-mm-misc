@@ -139,7 +139,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
   const char *userp;
   const char *passwdp;
   const char *service = NULL;
-  const char *hostname = NULL;
+  mm_array_ptr<const char> hostname = NULL;
 
   /* point to the correct struct with this */
   struct ntlmdata *ntlm;
@@ -202,8 +202,9 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
   case NTLMSTATE_TYPE1:
   default: /* for the weird cases we (re)start here */
     /* Create a type-1 message */
+    // TODO
     result = Curl_auth_create_ntlm_type1_message(data, userp, passwdp,
-                                                 service, hostname,
+                                                 service, _GETCHARPTR(hostname),
                                                  ntlm, &ntlmmsg);
     if(!result) {
       DEBUGASSERT(Curl_bufref_len(&ntlmmsg) != 0);

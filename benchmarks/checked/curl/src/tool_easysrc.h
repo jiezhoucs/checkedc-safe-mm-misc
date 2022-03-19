@@ -24,7 +24,7 @@
 #include "tool_setup.h"
 #ifndef CURL_DISABLE_LIBCURL_OPTION
 
-#include "safe_mm_checked.h"
+#include <safe_mm_checked.h>
 
 /* global variable declarations, for easy-interface source code generation */
 

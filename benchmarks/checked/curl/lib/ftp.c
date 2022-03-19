@@ -1717,7 +1717,7 @@ static CURLcode ftp_state_quote(struct Curl_easy *data,
       i++;
     }
     if(item) {
-      char *cmd = item->data;
+      char *cmd = _GETCHARPTR(item->data);
       if(cmd[0] == '*') {
         cmd++;
         ftpc->count2 = 1; /* the sent command is allowed to fail */
@@ -1825,7 +1825,7 @@ static char *control_address(struct connectdata *conn)
      not the ftp host. */
 #ifndef CURL_DISABLE_PROXY
   if(conn->bits.tunnel_proxy || conn->bits.socksproxy)
-    return conn->host.name;
+    return _GETCHARPTR(conn->host.name);
 #endif
   return conn->primary_ip;
 }
@@ -1923,7 +1923,7 @@ static CURLcode ftp_state_pasv_resp(struct Curl_easy *data,
          for the control connection */
       infof(data, "Skip %u.%u.%u.%u for data connection, re-use %s instead",
             ip[0], ip[1], ip[2], ip[3],
-            conn->host.name);
+            _GETCHARPTR(conn->host.name));
       ftpc->newhost = strdup(control_address(conn));
     }
     else
@@ -1951,7 +1951,7 @@ static CURLcode ftp_state_pasv_resp(struct Curl_easy *data,
      * expired now, instead we remake the lookup here and now!
      */
     const char * const host_name = conn->bits.socksproxy ?
-      conn->socks_proxy.host.name : conn->http_proxy.host.name;
+      _GETCHARPTR(conn->socks_proxy.host.name) : _GETCHARPTR(conn->http_proxy.host.name);
     rc = Curl_resolv(data, host_name, (int)conn->port, FALSE, &addr);
     if(rc == CURLRESOLV_PENDING)
       /* BLOCKING, ignores the return code but 'addr' will be NULL in
@@ -2018,9 +2018,9 @@ static CURLcode ftp_state_pasv_resp(struct Curl_easy *data,
 
   Curl_resolv_unlock(data, addr); /* we're done using this address */
 
-  Curl_safefree(conn->secondaryhostname);
+  MM_FREE(char, conn->secondaryhostname);
   conn->secondary_port = ftpc->newport;
-  conn->secondaryhostname = strdup(ftpc->newhost);
+  conn->secondaryhostname = mm_strdup_from_raw(ftpc->newhost);
   if(!conn->secondaryhostname)
     return CURLE_OUT_OF_MEMORY;
 
@@ -3439,7 +3439,7 @@ CURLcode ftp_sendquote(struct Curl_easy *data,
   while(item) {
     if(item->data) {
       ssize_t nread;
-      char *cmd = item->data;
+      char *cmd = _GETCHARPTR(item->data);
       bool acceptfail = FALSE;
       CURLcode result;
       int ftpcode = 0;
@@ -4366,7 +4366,7 @@ static CURLcode ftp_setup_connection(struct Curl_easy *data,
   type = strstr(ftp->path, ";type=");
 
   if(!type)
-    type = strstr(conn->host.rawalloc, ";type=");
+    type = strstr(_GETCHARPTR(conn->host.rawalloc), ";type=");
 
   if(type) {
     char command;
