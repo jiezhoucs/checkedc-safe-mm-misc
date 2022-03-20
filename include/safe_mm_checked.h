@@ -42,10 +42,6 @@ for_any(T) mm_array_ptr<T> mm_calloc(size_t nmemb, size_t size);
 for_any(T) mm_ptr<T> mm_single_calloc(size_t size);
 for_any(T) void mm_array_free(mm_array_ptr<const T> const p);
 
-/* mmsafe strdup/strndup */
-mm_array_ptr<char> mm_strdup(mm_array_ptr<char> p);
-mm_array_ptr<char> mm_strdup_from_raw(const char *p);
-
 /* Extract the raw pointer from a checked pointer. */
 /* Deprecated */
 for_any(T) void *_getptr_mm(mm_ptr<const T> const p);
@@ -68,8 +64,16 @@ for_any(T) void mmarray_checked(mm_array_ptr<T> p);
 for_any(T) void **_marshal_shared_array_ptr(mm_array_ptr<mm_array_ptr<T>> p);
 
 /* Checked C version of regular common libc functions. */
+/* mmsafe strdup/strndup */
+mm_array_ptr<char> mm_strdup(mm_array_ptr<char> p);
+mm_array_ptr<char> mm_strdup_from_raw(const char *p);
+
+/* strchr() and strpbrk() */
 mm_array_ptr<char> mm_strchr(mm_array_ptr<const char> p, int c);
 mm_array_ptr<char> mm_strpbrk(mm_array_ptr<const char> p, const char *accept);
+
+/* Others */
+mm_array_ptr<void> mm_memdup(mm_array_ptr<void> src, size_t len);
 
 /* Duplicate a string on the heap and return an mm_array_ptr<char> to it.*/
 mm_array_ptr<char> mmize_str(char *p);

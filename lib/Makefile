@@ -11,7 +11,7 @@ CC = $(LLVM_DIR)/clang $(CFLAGS)
 AR = $(LLVM_DIR)/llvm-ar
 RANLIB = $(LLVM_DIR)/llvm-ranlib
 
-LIB_SRC = safe_mm_checked.c mm_libc.c
+LIB_SRC = safe_mm_checked.c mm_libc.c mm_common.c
 LIB_SAFEMM = libsafemm
 LIB_SAFEMM_LTO = $(LIB_SAFEMM)_lto
 
