@@ -36,9 +36,6 @@
 #define GET_KEY(key_offset) (uint32_t)(key_offset >> 32)
 #define GET_OFFSET(key_offset) (key_offset & KEY_MASK)
 
-#define DEBUG
-#undef DEBUG
-
 // A helper struct that has the same inner structure as an mmsafe ptr.
 typedef struct {
   void *p;
@@ -58,7 +55,7 @@ uint32_t key = 3;
  * */
 __INLINE
 static void print_ptr_info(char *caller, void *p, uint32_t key) {
-#ifdef DEBUG
+#ifdef MM_DEBUG
     printf("[%-16s] ptr = %p, key = %u\n", caller, p, key);
 #endif
 }
@@ -66,7 +63,7 @@ static void print_ptr_info(char *caller, void *p, uint32_t key) {
 /* Print the pointer to be freed */
 __INLINE
 static void print_free_info(char *caller, void *p) {
-#ifdef DEBUG
+#ifdef MM_DEBUG
     fprintf(stdout, "[%-16s] Freeing %p\n", caller, p);
 #endif
 }
@@ -209,7 +206,7 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     void * old_raw_ptr = safeptr_ptr->p;
     old_raw_ptr -= EXTRA_HEAP_MEM;
 
-#ifdef DEBUG
+#ifdef MM_DEBUG
     fprintf(stdout, "[mm_array_realloc] Old raw ptr = %p, key = %u\n",
         old_raw_ptr, GET_KEY(safeptr_ptr->key_offset));
 #endif
@@ -434,6 +431,8 @@ for_any(T) void mm_array_free(mm_array_ptr<const T> const p) {
     *(uint32_t *)lock_ptr = 0;
 
     free(lock_ptr - HEAP_PADDING);
+
+    print_free_info("mm_array_free", mm_array_ptr_ptr->p);
 
     erase_mmsafe_ptr(mm_array_ptr_ptr->p);
 }
