@@ -190,10 +190,20 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
 //
 __attribute__ ((noinline))
 for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
+    if (p == NULL) {
+      mm_array_ptr<void> new_p = MM_ARRAY_ALLOC(void, size);
+      return *(mm_array_ptr<T> *)&new_p;
+    }
+
     // Get the original raw pointer.
     _MMSafe_ptr_Rep *safeptr_ptr = (_MMSafe_ptr_Rep *)&p;
     void * old_raw_ptr = safeptr_ptr->p;
     old_raw_ptr -= EXTRA_HEAP_MEM;
+
+#ifdef DEBUG
+    printf("[mm_array_realloc]: Old raw ptr = %p, key = %u",
+        old_raw_ptr, GET_KEY(safeptr_ptr->key_offset));
+#endif
 
     // In case realloc() reallocates the memory to a new starting address,
     // we need invalidate the old lock before calling realloc because
@@ -217,6 +227,8 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     insert_mmsafe_ptr(safe_ptr.p);
 
     key++;
+
+    print_ptr_info("mm_array_realloc", safe_ptr.p, key - 1);
 
     mm_array_ptr<T> *mm_array_ptr_ptr = (mm_array_ptr<T> *)&safe_ptr;
     return *mm_array_ptr_ptr;
