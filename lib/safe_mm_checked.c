@@ -63,6 +63,14 @@ static void print_ptr_info(char *caller, void *p, uint32_t key) {
 #endif
 }
 
+/* Print the pointer to be freed */
+__INLINE
+static void print_free_info(char *caller, void *p) {
+#ifdef DEBUG
+    fprintf(stdout, "[%-16s] Freeing %p\n", caller, p);
+#endif
+}
+
 //
 // Function: rand_keygen()
 //
@@ -192,6 +200,7 @@ __attribute__ ((noinline))
 for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     if (p == NULL) {
       mm_array_ptr<void> new_p = MM_ARRAY_ALLOC(void, size);
+      insert_mmsafe_ptr((void *)new_p);
       return *(mm_array_ptr<T> *)&new_p;
     }
 
@@ -201,7 +210,7 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     old_raw_ptr -= EXTRA_HEAP_MEM;
 
 #ifdef DEBUG
-    printf("[mm_array_realloc]: Old raw ptr = %p, key = %u",
+    fprintf(stdout, "[mm_array_realloc] Old raw ptr = %p, key = %u\n",
         old_raw_ptr, GET_KEY(safeptr_ptr->key_offset));
 #endif
 
@@ -217,6 +226,9 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
         *((uint32_t *)(old_raw_ptr + HEAP_PADDING)) = GET_KEY(safeptr_ptr->key_offset);
         return p;
     }
+
+    // Allocated to a new place. We need remove the old ptr from the set.
+    erase_mmsafe_ptr(old_raw_ptr + EXTRA_HEAP_MEM);
 
     // The new object is placed in a different location and the old one is freed.
     new_raw_ptr += HEAP_PADDING;
@@ -373,6 +385,8 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
     *(uint32_t *)lock_ptr = 0;
 
     free(lock_ptr - HEAP_PADDING);
+
+    print_free_info("mm_free", mm_ptr_ptr->p);
 
     erase_mmsafe_ptr(mm_ptr_ptr->p);
 }

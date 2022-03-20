@@ -17,6 +17,9 @@
 #include "porting_helper.h"
 #include <unordered_set>
 
+#define DEBUG
+#undef DEBUG
+
 using namespace std;
 
 unordered_set<void*> mmsafe_ptrs;
@@ -45,12 +48,18 @@ void erase_mmsafe_ptr(void *p) {
 // the raw pointer of an mmsafe pointer is passed to free().
 void uncertain_free(void *p) {
   if (is_an_mmsafe_ptr(p)) {
+#ifdef DEBUG
+    fprintf(stdout, "[uncertain_free  ] Freeing an mmsafe ptr %p\n", p);
+#endif
     // From calling free() on the raw pointer of an mmsafe pointer.
     // Invalidate the lock and then do the real free.
     *((uint32_t *)((char *)p - 8)) = 0;
     erase_mmsafe_ptr(p);
     free((char *)p - 16);
   } else {
+#ifdef DEBUG
+  printf(stdout, "[uncertain_free  ] Freeing a raw ptr %p\n", p);
+#endif
     free(p);
   }
 }
