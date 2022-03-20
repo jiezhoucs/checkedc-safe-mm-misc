@@ -762,7 +762,7 @@ static int on_frame_recv(nghttp2_session *session, const nghttp2_frame *frame,
     ncopy = CURLMIN(stream->len, left);
 
     memcpy(_GETCHARPTR(&stream->mem[stream->memlen]),
-           Curl_dyn_ptr(_GETPTR(struct dynbuf, &stream->header_recvbuf)) +
+           _GETCHARPTR(Curl_dyn_ptr(_GETPTR(struct dynbuf, &stream->header_recvbuf))) +
            stream->nread_header_recvbuf,
            ncopy);
     stream->nread_header_recvbuf += ncopy;
@@ -1538,7 +1538,8 @@ static ssize_t http2_handle_stream_close(struct connectdata *conn,
 
   // TODO
   if(Curl_dyn_len(_GETDYNBUFPTR(&stream->trailer_recvbuf))) {
-    char *trailp = Curl_dyn_ptr(_GETDYNBUFPTR(&stream->trailer_recvbuf));
+    // TODO
+    char *trailp = _GETCHARPTR(Curl_dyn_ptr(_GETDYNBUFPTR(&stream->trailer_recvbuf)));
     char *lf;
 
     do {
@@ -1658,7 +1659,7 @@ static ssize_t http2_recv(struct Curl_easy *data, int sockindex,
       // TODO
       Curl_dyn_len(_GETDYNBUFPTR(&stream->header_recvbuf)) - stream->nread_header_recvbuf;
     size_t ncopy = CURLMIN(len, left);
-    memcpy(mem, Curl_dyn_ptr(_GETDYNBUFPTR(&stream->header_recvbuf)) +
+    memcpy(mem, _GETCHARPTR((Curl_dyn_ptr(_GETDYNBUFPTR(&stream->header_recvbuf)))) +
            stream->nread_header_recvbuf, ncopy);
     stream->nread_header_recvbuf += ncopy;
 

@@ -622,7 +622,7 @@ static CURLcode multi_done(struct Curl_easy *data,
     conn->dns_entry = NULL;
   }
   Curl_hostcache_prune(data);
-  Curl_safefree(data->state.ulbuf);
+  MM_curl_free(char, data->state.ulbuf);
 
   /* if the transfer was completed in a paused state there can be buffered
      data left to free */

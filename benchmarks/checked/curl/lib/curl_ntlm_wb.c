@@ -295,7 +295,7 @@ static CURLcode ntlm_wb_response(struct Curl_easy *data, struct ntlmdata *ntlm,
       goto done;
 
     len_out = Curl_dyn_len(&b);
-    ptr = Curl_dyn_ptr(&b);
+    ptr = _GETCHARPTR(Curl_dyn_ptr(&b));
     if(len_out && ptr[len_out - 1] == '\n') {
       ptr[len_out - 1] = '\0';
       break; /* done! */

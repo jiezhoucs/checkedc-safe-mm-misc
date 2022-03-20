@@ -117,7 +117,8 @@ char *curl_easy_escape(struct Curl_easy *data, const char *string,
     string++;
   }
 
-  return Curl_dyn_ptr(&d);
+  // TODO
+  return _GETCHARPTR(Curl_dyn_ptr(&d));
 }
 
 /*

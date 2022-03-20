@@ -116,7 +116,7 @@ mm_array_ptr<char> Curl_checkheaders(const struct Curl_easy *data,
 CURLcode Curl_get_upload_buffer(struct Curl_easy *data)
 {
   if(!data->state.ulbuf) {
-    data->state.ulbuf = malloc(data->set.upload_buffer_size);
+    data->state.ulbuf = MM_ARRAY_ALLOC(char, data->set.upload_buffer_size);
     if(!data->state.ulbuf)
       return CURLE_OUT_OF_MEMORY;
   }
@@ -138,7 +138,8 @@ static size_t trailers_read(char *buffer, size_t size, size_t nitems,
   size_t to_copy = (size*nitems < bytes_left) ? size*nitems : bytes_left;
   if(to_copy) {
     memcpy(buffer,
-           Curl_dyn_ptr(trailers_buf) + data->state.trailers_bytes_sent,
+        // TODO
+           _GETCHARPTR(Curl_dyn_ptr(trailers_buf)) + data->state.trailers_bytes_sent,
            to_copy);
     data->state.trailers_bytes_sent += to_copy;
   }
@@ -726,7 +727,8 @@ static CURLcode readwrite_data(struct Curl_easy *data,
       if(data->set.verbose) {
         if(k->badheader) {
           Curl_debug(data, CURLINFO_DATA_IN,
-                     Curl_dyn_ptr(&data->state.headerb),
+              // TODO
+                     _GETCHARPTR(Curl_dyn_ptr(&data->state.headerb)),
                      Curl_dyn_len(&data->state.headerb));
           if(k->badheader == HEADER_PARTHEADER)
             Curl_debug(data, CURLINFO_DATA_IN,
@@ -817,11 +819,12 @@ static CURLcode readwrite_data(struct Curl_easy *data,
           /* Don't let excess data pollute body writes */
           if(k->maxdownload == -1 || (curl_off_t)headlen <= k->maxdownload)
             result = Curl_client_write(data, CLIENTWRITE_BODY,
-                                       Curl_dyn_ptr(&data->state.headerb),
+                // TODO
+                                       _GETCHARPTR(Curl_dyn_ptr(&data->state.headerb)),
                                        headlen);
           else
             result = Curl_client_write(data, CLIENTWRITE_BODY,
-                                       Curl_dyn_ptr(&data->state.headerb),
+                                       _GETCHARPTR(Curl_dyn_ptr(&data->state.headerb)),
                                        (size_t)k->maxdownload);
 
           if(result)
@@ -974,7 +977,8 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
       if(result)
         return result;
       /* init the "upload from here" pointer */
-      k->upload_fromhere = data->state.ulbuf;
+      // TODO
+      k->upload_fromhere = _GETCHARPTR(data->state.ulbuf);
 
       if(!k->upload_done) {
         /* HTTP pollution, this should be written nicer to become more
@@ -1147,7 +1151,8 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
       result = Curl_get_upload_buffer(data);
       if(result)
         return result;
-      k->upload_fromhere = data->state.ulbuf;
+      // TODO
+      k->upload_fromhere = _GETCHARPTR(data->state.ulbuf);
       k->upload_present = 0; /* no more bytes left */
 
       if(k->upload_done) {
@@ -1418,9 +1423,12 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
 
   if(!data->state.url && data->set.uh) {
     CURLUcode uc;
-    free(data->set.str[STRING_SET_URL]);
+    MM_FREE(char, data->set.str[STRING_SET_URL]);
+    // TODO
+    char *tmp_string_set_url = NULL;
     uc = curl_url_get(data->set.uh,
-                      CURLUPART_URL, &data->set.str[STRING_SET_URL], 0);
+                      CURLUPART_URL, &tmp_string_set_url, 0);
+    data->set.str[STRING_SET_URL] = mmize_str(tmp_string_set_url);
     if(uc) {
       failf(data, "No URL set!");
       return CURLE_URL_MALFORMAT;
@@ -1430,7 +1438,8 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
   data->state.prefer_ascii = data->set.prefer_ascii;
   data->state.list_only = data->set.list_only;
   data->state.httpreq = data->set.method;
-  data->state.url = data->set.str[STRING_SET_URL];
+  // TODO
+  data->state.url = _GETCHARPTR(data->set.str[STRING_SET_URL]);
 
   /* Init the SSL session ID cache here. We do it here since we want to do it
      after the *_setopt() calls (that could specify the size of the cache) but
@@ -1456,7 +1465,7 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
           (data->state.httpreq != HTTPREQ_HEAD)) {
     data->state.infilesize = data->set.postfieldsize;
     if(data->set.postfields && (data->state.infilesize == -1))
-      data->state.infilesize = (curl_off_t)strlen(data->set.postfields);
+      data->state.infilesize = (curl_off_t)strlen(_GETCHARPTR(data->set.postfields));
   }
   else
     data->state.infilesize = 0;
@@ -1515,23 +1524,24 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
   if(data->set.str[STRING_USERAGENT]) {
     Curl_safefree(data->state.aptr.uagent);
     data->state.aptr.uagent =
-      aprintf("User-Agent: %s\r\n", data->set.str[STRING_USERAGENT]);
+      aprintf("User-Agent: %s\r\n", _GETCHARPTR(data->set.str[STRING_USERAGENT]));
     if(!data->state.aptr.uagent)
       return CURLE_OUT_OF_MEMORY;
   }
 
   if(!result)
     result = Curl_setstropt(&data->state.aptr.user,
-                            data->set.str[STRING_USERNAME]);
+        // TODO
+                            _GETCHARPTR(data->set.str[STRING_USERNAME]));
   if(!result)
     result = Curl_setstropt(&data->state.aptr.passwd,
-                            data->set.str[STRING_PASSWORD]);
+                            _GETCHARPTR(data->set.str[STRING_PASSWORD]));
   if(!result)
     result = Curl_setstropt(&data->state.aptr.proxyuser,
-                            data->set.str[STRING_PROXYUSERNAME]);
+                            _GETCHARPTR(data->set.str[STRING_PROXYUSERNAME]));
   if(!result)
     result = Curl_setstropt(&data->state.aptr.proxypasswd,
-                            data->set.str[STRING_PROXYPASSWORD]);
+                            _GETCHARPTR(data->set.str[STRING_PROXYPASSWORD]));
 
   data->req.headerbytecount = 0;
   return result;

@@ -150,7 +150,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
       int res;
       bool alloced_param = FALSE;
       lineno++;
-      line = curlx_dyn_ptr(&buf);
+      line = _GETCHARPTR(curlx_dyn_ptr(&buf));
       if(!line) {
         rc = 1; /* out of memory */
         break;

@@ -704,7 +704,7 @@ CURLcode glob_match_url(mm_ptr<char *> result, char *filename, mm_ptr<struct URL
     return CURLE_OK;
   }
 #else
-  *result = curlx_dyn_ptr(&dyn);
+  *result = _GETCHARPTR(curlx_dyn_ptr(&dyn));
   return CURLE_OK;
 #endif /* MSDOS || WIN32 */
 }

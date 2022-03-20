@@ -97,7 +97,7 @@ static CURLcode getinfo_char(struct Curl_easy *data, CURLINFO info,
     *param_charp = data->state.url?data->state.url:(char *)"";
     break;
   case CURLINFO_EFFECTIVE_METHOD: {
-    const char *m = data->set.str[STRING_CUSTOMREQUEST];
+    const char *m = _GETCHARPTR(data->set.str[STRING_CUSTOMREQUEST]);
     if(!m) {
       if(data->set.opt_no_body)
         m = "HEAD";
@@ -159,7 +159,7 @@ static CURLcode getinfo_char(struct Curl_easy *data, CURLINFO info,
     *param_charp = data->info.conn_local_ip;
     break;
   case CURLINFO_RTSP_SESSION_ID:
-    *param_charp = data->set.str[STRING_RTSP_SESSION_ID];
+    *param_charp = _GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID]);
     break;
   case CURLINFO_SCHEME:
     *param_charp = data->info.conn_scheme;

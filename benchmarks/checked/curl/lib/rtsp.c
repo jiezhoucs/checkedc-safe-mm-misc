@@ -324,7 +324,8 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
     return result;
   }
 
-  p_session_id = data->set.str[STRING_RTSP_SESSION_ID];
+  // TODO?
+  p_session_id = _GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID]);
   if(!p_session_id &&
      (rtspreq & ~(RTSPREQ_OPTIONS | RTSPREQ_DESCRIBE | RTSPREQ_SETUP))) {
     failf(data, "Refusing to issue an RTSP request [%s] without a session ID.",
@@ -334,7 +335,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
 
   /* Stream URI. Default to server '*' if not specified */
   if(data->set.str[STRING_RTSP_STREAM_URI]) {
-    p_stream_uri = data->set.str[STRING_RTSP_STREAM_URI];
+    p_stream_uri = _GETCHARPTR(data->set.str[STRING_RTSP_STREAM_URI]);
   }
   else {
     p_stream_uri = "*";
@@ -350,7 +351,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
 
       data->state.aptr.rtsp_transport =
         aprintf("Transport: %s\r\n",
-                data->set.str[STRING_RTSP_TRANSPORT]);
+                _GETCHARPTR(data->set.str[STRING_RTSP_TRANSPORT]));
       if(!data->state.aptr.rtsp_transport)
         return CURLE_OUT_OF_MEMORY;
     }
@@ -374,7 +375,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
        data->set.str[STRING_ENCODING]) {
       Curl_safefree(data->state.aptr.accept_encoding);
       data->state.aptr.accept_encoding =
-        aprintf("Accept-Encoding: %s\r\n", data->set.str[STRING_ENCODING]);
+        aprintf("Accept-Encoding: %s\r\n", _GETCHARPTR(data->set.str[STRING_ENCODING]));
 
       if(!data->state.aptr.accept_encoding)
         return CURLE_OUT_OF_MEMORY;
@@ -518,7 +519,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
     else {
       postsize = (data->state.infilesize != -1)?
         data->state.infilesize:
-        (data->set.postfields? (curl_off_t)strlen(data->set.postfields):0);
+        (data->set.postfields? (curl_off_t)strlen(_GETCHARPTR(data->set.postfields)):0);
       data->state.httpreq = HTTPREQ_POST;
     }
 
@@ -570,7 +571,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
     return result;
 
   if(postsize > 0) {
-    result = Curl_dyn_addn(&req_buffer, data->set.postfields,
+    result = Curl_dyn_addn(&req_buffer, _GETCHARPTR(data->set.postfields),
                            (size_t)postsize);
     if(result)
       return result;
@@ -813,10 +814,10 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
     if(data->set.str[STRING_RTSP_SESSION_ID]) {
 
       /* If the Session ID is set, then compare */
-      if(strlen(data->set.str[STRING_RTSP_SESSION_ID]) != idlen ||
-         strncmp(start, data->set.str[STRING_RTSP_SESSION_ID], idlen) != 0) {
+      if(strlen(_GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID])) != idlen ||
+         strncmp(start, _GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID]), idlen) != 0) {
         failf(data, "Got RTSP Session ID Line [%s], but wanted ID [%s]",
-              start, data->set.str[STRING_RTSP_SESSION_ID]);
+              start, _GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID]));
         return CURLE_RTSP_SESSION_ERROR;
       }
     }
@@ -826,10 +827,10 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
        */
 
       /* Copy the id substring into a new buffer */
-      data->set.str[STRING_RTSP_SESSION_ID] = malloc(idlen + 1);
+      data->set.str[STRING_RTSP_SESSION_ID] = MM_ARRAY_ALLOC(char, idlen + 1);
       if(!data->set.str[STRING_RTSP_SESSION_ID])
         return CURLE_OUT_OF_MEMORY;
-      memcpy(data->set.str[STRING_RTSP_SESSION_ID], start, idlen);
+      memcpy(_GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID]), start, idlen);
       (data->set.str[STRING_RTSP_SESSION_ID])[idlen] = '\0';
     }
   }

@@ -1085,7 +1085,8 @@ char *curl_mvaprintf(const char *format, va_list ap_save)
     return NULL;
   }
   if(Curl_dyn_len(info.b))
-    return Curl_dyn_ptr(info.b);
+    // TODO?
+    return _GETCHARPTR(Curl_dyn_ptr(info.b));
   return strdup("");
 }
 

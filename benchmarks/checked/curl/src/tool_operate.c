@@ -1710,7 +1710,8 @@ static CURLcode single_transfer(struct GlobalConfig *global,
             }
           }
 
-          my_setopt_str(curl, CURLOPT_COOKIE, curlx_dyn_ptr(&cookies));
+          // TODO
+          my_setopt_str(curl, CURLOPT_COOKIE, _GETCHARPTR(curlx_dyn_ptr(&cookies)));
           curlx_dyn_free(&cookies);
         }
 

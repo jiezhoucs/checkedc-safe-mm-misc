@@ -381,7 +381,7 @@ static CURLcode smb_send(struct Curl_easy *data, ssize_t len,
   ssize_t bytes_written;
   CURLcode result;
 
-  result = Curl_write(data, FIRSTSOCKET, data->state.ulbuf,
+  result = Curl_write(data, FIRSTSOCKET, _GETCHARPTR(data->state.ulbuf),
                       len, &bytes_written);
   if(result)
     return result;
@@ -408,7 +408,7 @@ static CURLcode smb_flush(struct Curl_easy *data)
     return CURLE_OK;
 
   result = Curl_write(data, FIRSTSOCKET,
-                      data->state.ulbuf + smbc->sent,
+                      _GETCHARPTR(data->state.ulbuf) + smbc->sent,
                       len, &bytes_written);
   if(result)
     return result;
@@ -429,7 +429,7 @@ static CURLcode smb_send_message(struct Curl_easy *data, unsigned char cmd,
     return result;
   smb_format_message(data, (struct smb_header *)data->state.ulbuf,
                      cmd, msg_len);
-  memcpy(data->state.ulbuf + sizeof(struct smb_header),
+  memcpy(_GETCHARPTR(data->state.ulbuf) + sizeof(struct smb_header),
          msg, msg_len);
 
   return smb_send(data, sizeof(struct smb_header) + msg_len, 0);
@@ -631,7 +631,7 @@ static CURLcode smb_send_and_recv(struct Curl_easy *data, void **msg)
   if(!smbc->send_size && smbc->upload_size) {
     size_t nread = smbc->upload_size > (size_t)data->set.upload_buffer_size ?
       (size_t)data->set.upload_buffer_size : smbc->upload_size;
-    data->req.upload_fromhere = data->state.ulbuf;
+    data->req.upload_fromhere = _GETCHARPTR(data->state.ulbuf);
     result = Curl_fillreadbuffer(data, nread, &nread);
     if(result && result != CURLE_AGAIN)
       return result;

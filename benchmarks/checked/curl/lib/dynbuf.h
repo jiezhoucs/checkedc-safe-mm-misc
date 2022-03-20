@@ -40,7 +40,7 @@
 #endif
 
 struct dynbuf {
-  char *bufr;    /* point to a null-terminated allocated buffer */
+  mm_array_ptr<char> bufr;    /* point to a null-terminated allocated buffer */
   size_t leng;   /* number of bytes *EXCLUDING* the zero terminator */
   size_t allc;   /* size of the current allocation */
   size_t toobig; /* size limit for the buffer */
@@ -61,7 +61,7 @@ CURLcode Curl_dyn_vaddf(struct dynbuf *s, const char *fmt, va_list ap)
   WARN_UNUSED_RESULT;
 void Curl_dyn_reset(struct dynbuf *s);
 CURLcode Curl_dyn_tail(struct dynbuf *s, size_t trail);
-char *Curl_dyn_ptr(const struct dynbuf *s);
+mm_array_ptr<char> Curl_dyn_ptr(const struct dynbuf *s);
 unsigned char *Curl_dyn_uptr(const struct dynbuf *s);
 size_t Curl_dyn_len(const struct dynbuf *s);
 

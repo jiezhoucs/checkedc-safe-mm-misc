@@ -228,7 +228,8 @@ CHUNKcode Curl_httpchunk_read(struct Curl_easy *data,
 
     case CHUNK_TRAILER:
       if((*datap == 0x0d) || (*datap == 0x0a)) {
-        char *tr = Curl_dyn_ptr(&conn->trailer);
+        // TODO
+        char *tr = _GETCHARPTR(Curl_dyn_ptr(&conn->trailer));
         /* this is the end of a trailer, but if the trailer was zero bytes
            there was no trailer and we move on */
 
@@ -238,7 +239,8 @@ CHUNKcode Curl_httpchunk_read(struct Curl_easy *data,
           if(result)
             return CHUNKE_OUT_OF_MEMORY;
 
-          tr = Curl_dyn_ptr(&conn->trailer);
+          // TODO
+          tr = _GETCHARPTR(Curl_dyn_ptr(&conn->trailer));
           trlen = Curl_dyn_len(&conn->trailer);
           /* Convert to host encoding before calling Curl_client_write */
           result = Curl_convert_from_network(data, tr, trlen);

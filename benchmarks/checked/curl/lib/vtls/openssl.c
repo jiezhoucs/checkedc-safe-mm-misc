@@ -458,8 +458,8 @@ static CURLcode ossl_seed(struct Curl_easy *data)
 #endif
   {
     /* let the option override the define */
-    RAND_load_file((data->set.str[STRING_SSL_RANDOM_FILE]?
-                    data->set.str[STRING_SSL_RANDOM_FILE]:
+    RAND_load_file((_GETCHARPTR(data->set.str[STRING_SSL_RANDOM_FILE])?
+                    _GETCHARPTR(data->set.str[STRING_SSL_RANDOM_FILE]):
                     RANDOM_FILE),
                    RAND_LOAD_LENGTH);
     if(rand_enough())
@@ -4001,7 +4001,7 @@ static CURLcode servercert(struct Curl_easy *data,
     /* when not strict, we don't bother about the verify cert problems */
     result = CURLE_OK;
 
-  ptr = SSL_PINNED_PUB_KEY();
+  ptr = _GETCHARPTR(SSL_PINNED_PUB_KEY());
   if(!result && ptr) {
     result = pkp_pin_peer_pubkey(data, backend->server_cert, ptr);
     if(result)

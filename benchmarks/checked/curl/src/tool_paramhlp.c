@@ -80,7 +80,8 @@ ParameterError file2string(mm_ptr<char *> bufp, FILE *file)
         return PARAM_NO_MEM;
     }
   }
-  *bufp = curlx_dyn_ptr(&dyn);
+  // TODO
+  *bufp = _GETCHARPTR(curlx_dyn_ptr(&dyn));
   return PARAM_OK;
 }
 
@@ -100,7 +101,8 @@ ParameterError file2memory(char **bufp, size_t *size, FILE *file)
           return PARAM_NO_MEM;
     } while(nread);
     *size = curlx_dyn_len(&dyn);
-    *bufp = curlx_dyn_ptr(&dyn);
+    // TODO
+    *bufp = _GETCHARPTR(curlx_dyn_ptr(&dyn));
   }
   else {
     *size = 0;
@@ -485,7 +487,7 @@ static CURLcode checkpasswd(const char *kind, /* for what purpose */
 
     /* return the new string */
     free(*userpwd);
-    *userpwd = curlx_dyn_ptr(&dyn);
+    *userpwd = _GETCHARPTR(curlx_dyn_ptr(&dyn));
   }
 
   return CURLE_OK;

@@ -1323,7 +1323,7 @@ struct UrlState {
   struct dynbuf headerb; /* buffer to store headers in */
 
   char *buffer; /* download buffer */
-  char *ulbuf; /* allocated upload buffer or NULL */
+  mm_array_ptr<char> ulbuf; /* allocated upload buffer or NULL */
   curl_off_t current_speed;  /* the ProgressShow() function sets this,
                                 bytes / second */
   char *first_host; /* host name of the first (not followed) request.
@@ -1628,7 +1628,7 @@ struct UserDefined {
 
   int keep_post;     /* keep POSTs as POSTs after a 30x request; each
                         bit represents a request, from 301 to 303 */
-  void *postfields;  /* if POST, set the fields' values here */
+  mm_array_ptr<void> postfields;  /* if POST, set the fields' values here */
   curl_seek_callback seek_func;      /* function that seeks the input */
   curl_off_t postfieldsize; /* if POST, this might have a size to use instead
                                of strlen(), and then the data *may* be binary
@@ -1741,7 +1741,7 @@ struct UserDefined {
   long new_file_perms;    /* Permissions to use when creating remote files */
   long new_directory_perms; /* Permissions to use when creating remote dirs */
   long ssh_auth_types;   /* allowed SSH auth types */
-  char *str[STRING_LAST]; /* array of strings, pointing to allocated memory */
+  mm_array_ptr<char> str[STRING_LAST]; /* array of strings, pointing to allocated memory */
   struct curl_blob *blobs[BLOB_LAST];
   unsigned int scope_id;  /* Scope id for IPv6 */
   long allowed_protocols;

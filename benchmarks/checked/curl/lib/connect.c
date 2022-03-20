@@ -252,7 +252,8 @@ static CURLcode bindlocal(struct Curl_easy *data,
                                                 "random" */
   /* how many port numbers to try to bind to, increasing one at a time */
   int portnum = data->set.localportrange;
-  const char *dev = data->set.str[STRING_DEVICE];
+  // TODO
+  const char *dev = _GETCHARPTR(data->set.str[STRING_DEVICE]);
   int error;
 #ifdef IP_BIND_ADDRESS_NO_PORT
   int on = 1;

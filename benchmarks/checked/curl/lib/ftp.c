@@ -940,7 +940,7 @@ static CURLcode ftp_state_use_port(struct Curl_easy *data,
   enum resolve_t rc;
   int error;
   char *host = NULL;
-  char *string_ftpport = data->set.str[STRING_FTPPORT];
+  char *string_ftpport = _GETCHARPTR(data->set.str[STRING_FTPPORT]);
   struct Curl_dns_entry *h = NULL;
   unsigned short port_min = 0;
   unsigned short port_max = 0;
@@ -955,7 +955,7 @@ static CURLcode ftp_state_use_port(struct Curl_easy *data,
    */
 
   if(data->set.str[STRING_FTPPORT] &&
-     (strlen(data->set.str[STRING_FTPPORT]) > 1)) {
+     (strlen(_GETCHARPTR(data->set.str[STRING_FTPPORT])) > 1)) {
 
 #ifdef ENABLE_IPV6
     size_t addrlen = INET6_ADDRSTRLEN > strlen(string_ftpport) ?
@@ -1378,8 +1378,8 @@ static CURLcode ftp_state_prepare_transfer(struct Curl_easy *data)
       struct ftp_conn *ftpc = &conn->proto.ftpc;
       if(!conn->proto.ftpc.file)
         result = Curl_pp_sendf(data, &ftpc->pp, "PRET %s",
-                               data->set.str[STRING_CUSTOMREQUEST]?
-                               data->set.str[STRING_CUSTOMREQUEST]:
+                               _GETCHARPTR(data->set.str[STRING_CUSTOMREQUEST])?
+                               _GETCHARPTR(data->set.str[STRING_CUSTOMREQUEST]):
                                (data->state.list_only?"NLST":"LIST"));
       else if(data->set.upload)
         result = Curl_pp_sendf(data, &ftpc->pp, "PRET STOR %s",
@@ -1485,8 +1485,8 @@ static CURLcode ftp_state_list(struct Curl_easy *data)
   }
 
   cmd = aprintf("%s%s%s",
-                data->set.str[STRING_CUSTOMREQUEST]?
-                data->set.str[STRING_CUSTOMREQUEST]:
+                _GETCHARPTR(data->set.str[STRING_CUSTOMREQUEST])?
+                _GETCHARPTR(data->set.str[STRING_CUSTOMREQUEST]):
                 (data->state.list_only?"NLST":"LIST"),
                 lstArg? " ": "",
                 lstArg? lstArg: "");
@@ -2609,7 +2609,7 @@ static CURLcode ftp_state_user_resp(struct Curl_easy *data,
   else if(ftpcode == 332) {
     if(data->set.str[STRING_FTP_ACCOUNT]) {
       result = Curl_pp_sendf(data, &ftpc->pp, "ACCT %s",
-                             data->set.str[STRING_FTP_ACCOUNT]);
+                             _GETCHARPTR(data->set.str[STRING_FTP_ACCOUNT]));
       if(!result)
         state(data, FTP_ACCT);
     }
@@ -2629,7 +2629,7 @@ static CURLcode ftp_state_user_resp(struct Curl_easy *data,
       /* Ok, USER failed.  Let's try the supplied command. */
       result =
         Curl_pp_sendf(data, &ftpc->pp, "%s",
-                      data->set.str[STRING_FTP_ALTERNATIVE_TO_USER]);
+                      _GETCHARPTR(data->set.str[STRING_FTP_ALTERNATIVE_TO_USER]));
       if(!result) {
         data->state.ftp_trying_alternative = TRUE;
         state(data, FTP_USER);

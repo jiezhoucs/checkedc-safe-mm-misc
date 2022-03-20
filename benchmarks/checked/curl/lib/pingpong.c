@@ -196,7 +196,7 @@ CURLcode Curl_pp_vsendf(struct Curl_easy *data,
     return result;
 
   write_len = Curl_dyn_len(&pp->sendbuf);
-  s = Curl_dyn_ptr(&pp->sendbuf);
+  s = _GETCHARPTR(Curl_dyn_ptr(&pp->sendbuf));
   Curl_pp_init(data, pp);
 
   result = Curl_convert_to_network(data, s, write_len);

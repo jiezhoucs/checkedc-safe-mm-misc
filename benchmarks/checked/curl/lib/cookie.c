@@ -1742,10 +1742,11 @@ void Curl_flush_cookies(struct Curl_easy *data, bool cleanup)
     Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
 
     /* if we have a destination file for all the cookies to get dumped to */
-    res = cookie_output(data, data->cookies, data->set.str[STRING_COOKIEJAR]);
+    // TODO
+    res = cookie_output(data, data->cookies, _GETCHARPTR(data->set.str[STRING_COOKIEJAR]));
     if(res)
       infof(data, "WARNING: failed to save cookies in %s: %s",
-            data->set.str[STRING_COOKIEJAR], curl_easy_strerror(res));
+            _GETCHARPTR(data->set.str[STRING_COOKIEJAR]), curl_easy_strerror(res));
   }
   else {
     if(cleanup && data->state.cookielist) {

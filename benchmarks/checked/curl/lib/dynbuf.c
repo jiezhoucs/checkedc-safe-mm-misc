@@ -55,7 +55,7 @@ void Curl_dyn_init(struct dynbuf *s, size_t toobig)
 void Curl_dyn_free(struct dynbuf *s)
 {
   DEBUGASSERT(s);
-  Curl_safefree(s->bufr);
+  MM_curl_free(char, s->bufr);
   s->leng = s->allc = 0;
 }
 
@@ -95,9 +95,9 @@ static CURLcode dyn_nappend(struct dynbuf *s,
   if(a != s->allc) {
     /* this logic is not using Curl_saferealloc() to make the tool not have to
        include that as well when it uses this code */
-    void *p = realloc(s->bufr, a);
+    mm_array_ptr<char> p = mm_array_realloc<char>(s->bufr, a);
     if(!p) {
-      Curl_safefree(s->bufr);
+      MM_curl_free(char, s->bufr);
       s->leng = s->allc = 0;
       return CURLE_OUT_OF_MEMORY;
     }
@@ -106,7 +106,7 @@ static CURLcode dyn_nappend(struct dynbuf *s,
   }
 
   if(len)
-    memcpy(&s->bufr[indx], mem, len);
+    memcpy(_GETCHARPTR(&s->bufr[indx]), mem, len);
   s->leng = indx + len;
   s->bufr[s->leng] = 0;
   return CURLE_OK;
@@ -224,7 +224,7 @@ CURLcode Curl_dyn_addf(struct dynbuf *s, const char *fmt, ...)
 /*
  * Returns a pointer to the buffer.
  */
-char *Curl_dyn_ptr(const struct dynbuf *s)
+mm_array_ptr<char> Curl_dyn_ptr(const struct dynbuf *s)
 {
   DEBUGASSERT(s);
   DEBUGASSERT(s->init == DYNINIT);

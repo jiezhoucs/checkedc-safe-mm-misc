@@ -92,7 +92,8 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   char *signed_headers = NULL;
   Curl_HttpReq httpreq;
   const char *method;
-  const char *post_data = data->set.postfields ? data->set.postfields : "";
+  // TODO
+  const char *post_data = _GETCHARPTR(data->set.postfields) ? _GETCHARPTR(data->set.postfields) : "";
   unsigned char sha_hash[32];
   char sha_hex[65];
   char *canonical_request = NULL;
@@ -121,8 +122,8 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
    * AWS is the default because most of non-amazon providers
    * are still using aws:amz as a prefix.
    */
-  tmp0 = data->set.str[STRING_AWS_SIGV4] ?
-    data->set.str[STRING_AWS_SIGV4] : "aws:amz";
+  tmp0 = _GETCHARPTR(data->set.str[STRING_AWS_SIGV4]) ?
+    _GETCHARPTR(data->set.str[STRING_AWS_SIGV4]) : "aws:amz";
   tmp1 = strchr(tmp0, ':');
   len = tmp1 ? (size_t)(tmp1 - tmp0) : strlen(tmp0);
   if(len < 1) {

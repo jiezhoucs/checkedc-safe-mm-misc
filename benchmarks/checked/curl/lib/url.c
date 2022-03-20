@@ -316,7 +316,7 @@ void Curl_freeset(struct Curl_easy *data)
   enum dupblob j;
 
   for(i = (enum dupstring)0; i < STRING_LAST; i++) {
-    Curl_safefree(data->set.str[i]);
+    MM_curl_free(char, data->set.str[i]);
   }
 
   for(j = (enum dupblob)0; j < BLOB_LAST; j++) {
@@ -425,11 +425,12 @@ CURLcode Curl_close(struct Curl_easy **datap)
   up_free(data);
   Curl_safefree(data->state.buffer);
   Curl_dyn_free(&data->state.headerb);
-  Curl_safefree(data->state.ulbuf);
+  MM_curl_free(char, data->state.ulbuf);
   Curl_flush_cookies(data, TRUE);
-  Curl_altsvc_save(data, data->asi, data->set.str[STRING_ALTSVC]);
+  // TODO
+  Curl_altsvc_save(data, data->asi, _GETCHARPTR(data->set.str[STRING_ALTSVC]));
   Curl_altsvc_cleanup(&data->asi);
-  Curl_hsts_save(data, data->hsts, data->set.str[STRING_HSTS]);
+  Curl_hsts_save(data, data->hsts, _GETCHARPTR(data->set.str[STRING_HSTS]));
   Curl_hsts_cleanup(&data->hsts);
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_CRYPTO_AUTH)
   Curl_http_auth_cleanup_digest(data);
@@ -458,7 +459,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
   Curl_safefree(data->state.aptr.rangeline);
   Curl_safefree(data->state.aptr.ref);
   Curl_safefree(data->state.aptr.host);
-  MM_FREE(char, data->state.aptr.cookiehost);
+  MM_curl_free(char, data->state.aptr.cookiehost);
   Curl_safefree(data->state.aptr.rtsp_transport);
   Curl_safefree(data->state.aptr.user);
   Curl_safefree(data->state.aptr.passwd);
@@ -586,17 +587,17 @@ CURLcode Curl_init_userdefined(struct Curl_easy *data)
    */
   if(Curl_ssl_backend() != CURLSSLBACKEND_SCHANNEL) {
 #if defined(CURL_CA_BUNDLE)
-    result = Curl_setstropt(&set->str[STRING_SSL_CAFILE], CURL_CA_BUNDLE);
+    result = mm_Curl_setstropt(&set->str[STRING_SSL_CAFILE], CURL_CA_BUNDLE);
     if(result)
       return result;
 
-    result = Curl_setstropt(&set->str[STRING_SSL_CAFILE_PROXY],
+    result = mm_Curl_setstropt(&set->str[STRING_SSL_CAFILE_PROXY],
                             CURL_CA_BUNDLE);
     if(result)
       return result;
 #endif
 #if defined(CURL_CA_PATH)
-    result = Curl_setstropt(&set->str[STRING_SSL_CAPATH], CURL_CA_PATH);
+    result = mm_Curl_setstropt(&set->str[STRING_SSL_CAPATH], CURL_CA_PATH);
     if(result)
       return result;
 
@@ -1600,7 +1601,7 @@ CURLcode Curl_idnconvert_hostname(struct Curl_easy *data,
 #else
       int flags = IDN2_NFC_INPUT;
 #endif
-      char *tmp_ace_hostname;
+      char *tmp_ace_hostname = NULL;
       int rc = IDN2_LOOKUP(host->name, (char *)&tmp_ace_hostname, flags);
       ace_hostname = mmize_str(tmp_ace_hostname);
       if(rc != IDN2_OK)
@@ -1779,7 +1780,8 @@ static struct connectdata *allocate_conn(struct Curl_easy *data)
 
   /* Store the local bind parameters that will be used for this connection */
   if(data->set.str[STRING_DEVICE]) {
-    conn->localdev = strdup(data->set.str[STRING_DEVICE]);
+    // TODO
+    conn->localdev = strdup(_GETCHARPTR(data->set.str[STRING_DEVICE]));
     if(!conn->localdev)
       goto error;
   }
@@ -1944,7 +1946,7 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
 
   if(data->set.str[STRING_DEFAULT_PROTOCOL] &&
      !Curl_is_absolute_url(data->state.url, NULL, MAX_SCHEME_LEN)) {
-    char *url = aprintf("%s://%s", data->set.str[STRING_DEFAULT_PROTOCOL],
+    char *url = aprintf("%s://%s", _GETCHARPTR(data->set.str[STRING_DEFAULT_PROTOCOL]),
                         data->state.url);
     if(!url)
       return CURLE_OUT_OF_MEMORY;
@@ -2135,7 +2137,8 @@ static CURLcode setup_range(struct Curl_easy *data)
     if(s->resume_from)
       s->range = aprintf("%" CURL_FORMAT_CURL_OFF_T "-", s->resume_from);
     else
-      s->range = strdup(data->set.str[STRING_SET_RANGE]);
+      // TODO
+      s->range = strdup(_GETCHARPTR(data->set.str[STRING_SET_RANGE]));
 
     s->rangestringalloc = (s->range) ? TRUE : FALSE;
 
@@ -2580,7 +2583,8 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
    * Detect what (if any) proxy to use
    *************************************************************/
   if(data->set.str[STRING_PROXY]) {
-    proxy = strdup(data->set.str[STRING_PROXY]);
+    // TODO
+    proxy = strdup(_GETCHARPTR(data->set.str[STRING_PROXY]));
     /* if global proxy is set, this is it */
     if(NULL == proxy) {
       failf(data, "memory shortage");
@@ -2590,7 +2594,8 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
   }
 
   if(data->set.str[STRING_PRE_PROXY]) {
-    socksproxy = strdup(data->set.str[STRING_PRE_PROXY]);
+    // TODO
+    socksproxy = strdup(_GETCHARPTR(data->set.str[STRING_PRE_PROXY]));
     /* if global socks proxy is set, this is it */
     if(NULL == socksproxy) {
       failf(data, "memory shortage");
@@ -2612,8 +2617,8 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
   }
 
   // TODO
-  if(check_noproxy(_GETCHARPTR(conn->host.name), data->set.str[STRING_NOPROXY] ?
-      data->set.str[STRING_NOPROXY] : no_proxy)) {
+  if(check_noproxy(_GETCHARPTR(conn->host.name), _GETCHARPTR(data->set.str[STRING_NOPROXY]) ?
+      _GETCHARPTR(data->set.str[STRING_NOPROXY]) : no_proxy)) {
     Curl_safefree(proxy);
     Curl_safefree(socksproxy);
   }
@@ -2913,7 +2918,8 @@ static CURLcode override_login(struct Curl_easy *data,
 
   if(data->set.str[STRING_OPTIONS]) {
     free(*optionsp);
-    *optionsp = strdup(data->set.str[STRING_OPTIONS]);
+    // TODO
+    *optionsp = strdup(_GETCHARPTR(data->set.str[STRING_OPTIONS]));
     if(!*optionsp)
       return CURLE_OUT_OF_MEMORY;
   }
@@ -2929,10 +2935,10 @@ static CURLcode override_login(struct Curl_easy *data,
     ret = Curl_parsenetrc(_GETCHARPTR(conn->host.name),
                           userp, passwdp,
                           &netrc_user_changed, &netrc_passwd_changed,
-                          data->set.str[STRING_NETRC_FILE]);
+                          _GETCHARPTR(data->set.str[STRING_NETRC_FILE]));
     if(ret > 0) {
       infof(data, "Couldn't find host %s in the %s file; using defaults",
-            _GETCHARPTR(conn->host.name), data->set.str[STRING_NETRC_FILE]);
+            _GETCHARPTR(conn->host.name), _GETCHARPTR(data->set.str[STRING_NETRC_FILE]));
     }
     else if(ret < 0) {
       return CURLE_OUT_OF_MEMORY;
@@ -3609,7 +3615,8 @@ static CURLcode create_conn(struct Curl_easy *data,
     goto out;
 
   if(data->set.str[STRING_SASL_AUTHZID]) {
-    conn->sasl_authzid = strdup(data->set.str[STRING_SASL_AUTHZID]);
+    // TODO
+    conn->sasl_authzid = strdup(_GETCHARPTR(data->set.str[STRING_SASL_AUTHZID]));
     if(!conn->sasl_authzid) {
       result = CURLE_OUT_OF_MEMORY;
       goto out;
@@ -3618,7 +3625,8 @@ static CURLcode create_conn(struct Curl_easy *data,
 
 #ifdef USE_UNIX_SOCKETS
   if(data->set.str[STRING_UNIX_SOCKET_PATH]) {
-    conn->unix_domain_socket = strdup(data->set.str[STRING_UNIX_SOCKET_PATH]);
+    // TODO
+    conn->unix_domain_socket = strdup(_GETCHARPTR(data->set.str[STRING_UNIX_SOCKET_PATH]));
     if(!conn->unix_domain_socket) {
       result = CURLE_OUT_OF_MEMORY;
       goto out;
@@ -3784,61 +3792,62 @@ static CURLcode create_conn(struct Curl_easy *data,
      that will be freed as part of the Curl_easy struct, but all cloned
      copies will be separately allocated.
   */
-  data->set.ssl.primary.CApath = data->set.str[STRING_SSL_CAPATH];
-  data->set.ssl.primary.CAfile = data->set.str[STRING_SSL_CAFILE];
-  data->set.ssl.primary.issuercert = data->set.str[STRING_SSL_ISSUERCERT];
+  // TODO
+  data->set.ssl.primary.CApath = _GETCHARPTR(data->set.str[STRING_SSL_CAPATH]);
+  data->set.ssl.primary.CAfile = _GETCHARPTR(data->set.str[STRING_SSL_CAFILE]);
+  data->set.ssl.primary.issuercert = _GETCHARPTR(data->set.str[STRING_SSL_ISSUERCERT]);
   data->set.ssl.primary.issuercert_blob = data->set.blobs[BLOB_SSL_ISSUERCERT];
-  data->set.ssl.primary.random_file = data->set.str[STRING_SSL_RANDOM_FILE];
-  data->set.ssl.primary.egdsocket = data->set.str[STRING_SSL_EGDSOCKET];
+  data->set.ssl.primary.random_file = _GETCHARPTR(data->set.str[STRING_SSL_RANDOM_FILE]);
+  data->set.ssl.primary.egdsocket = _GETCHARPTR(data->set.str[STRING_SSL_EGDSOCKET]);
   data->set.ssl.primary.cipher_list =
-    data->set.str[STRING_SSL_CIPHER_LIST];
+    _GETCHARPTR(data->set.str[STRING_SSL_CIPHER_LIST]);
   data->set.ssl.primary.cipher_list13 =
-    data->set.str[STRING_SSL_CIPHER13_LIST];
+    _GETCHARPTR(data->set.str[STRING_SSL_CIPHER13_LIST]);
   data->set.ssl.primary.pinned_key =
-    data->set.str[STRING_SSL_PINNEDPUBLICKEY];
+    _GETCHARPTR(data->set.str[STRING_SSL_PINNEDPUBLICKEY]);
   data->set.ssl.primary.cert_blob = data->set.blobs[BLOB_CERT];
   data->set.ssl.primary.ca_info_blob = data->set.blobs[BLOB_CAINFO];
-  data->set.ssl.primary.curves = data->set.str[STRING_SSL_EC_CURVES];
+  data->set.ssl.primary.curves = _GETCHARPTR(data->set.str[STRING_SSL_EC_CURVES]);
 
 #ifndef CURL_DISABLE_PROXY
-  data->set.proxy_ssl.primary.CApath = data->set.str[STRING_SSL_CAPATH_PROXY];
-  data->set.proxy_ssl.primary.CAfile = data->set.str[STRING_SSL_CAFILE_PROXY];
+  data->set.proxy_ssl.primary.CApath = _GETCHARPTR(data->set.str[STRING_SSL_CAPATH_PROXY]);
+  data->set.proxy_ssl.primary.CAfile = _GETCHARPTR(data->set.str[STRING_SSL_CAFILE_PROXY]);
   data->set.proxy_ssl.primary.random_file =
-    data->set.str[STRING_SSL_RANDOM_FILE];
-  data->set.proxy_ssl.primary.egdsocket = data->set.str[STRING_SSL_EGDSOCKET];
+    _GETCHARPTR(data->set.str[STRING_SSL_RANDOM_FILE]);
+  data->set.proxy_ssl.primary.egdsocket = _GETCHARPTR(data->set.str[STRING_SSL_EGDSOCKET]);
   data->set.proxy_ssl.primary.cipher_list =
-    data->set.str[STRING_SSL_CIPHER_LIST_PROXY];
+    _GETCHARPTR(data->set.str[STRING_SSL_CIPHER_LIST_PROXY]);
   data->set.proxy_ssl.primary.cipher_list13 =
-    data->set.str[STRING_SSL_CIPHER13_LIST_PROXY];
+    _GETCHARPTR(data->set.str[STRING_SSL_CIPHER13_LIST_PROXY]);
   data->set.proxy_ssl.primary.pinned_key =
-    data->set.str[STRING_SSL_PINNEDPUBLICKEY_PROXY];
+    _GETCHARPTR(data->set.str[STRING_SSL_PINNEDPUBLICKEY_PROXY]);
   data->set.proxy_ssl.primary.cert_blob = data->set.blobs[BLOB_CERT_PROXY];
   data->set.proxy_ssl.primary.ca_info_blob =
     data->set.blobs[BLOB_CAINFO_PROXY];
   data->set.proxy_ssl.primary.issuercert =
-    data->set.str[STRING_SSL_ISSUERCERT_PROXY];
+    _GETCHARPTR(data->set.str[STRING_SSL_ISSUERCERT_PROXY]);
   data->set.proxy_ssl.primary.issuercert_blob =
     data->set.blobs[BLOB_SSL_ISSUERCERT_PROXY];
-  data->set.proxy_ssl.CRLfile = data->set.str[STRING_SSL_CRLFILE_PROXY];
-  data->set.proxy_ssl.cert_type = data->set.str[STRING_CERT_TYPE_PROXY];
-  data->set.proxy_ssl.key = data->set.str[STRING_KEY_PROXY];
-  data->set.proxy_ssl.key_type = data->set.str[STRING_KEY_TYPE_PROXY];
-  data->set.proxy_ssl.key_passwd = data->set.str[STRING_KEY_PASSWD_PROXY];
-  data->set.proxy_ssl.primary.clientcert = data->set.str[STRING_CERT_PROXY];
+  data->set.proxy_ssl.CRLfile = _GETCHARPTR(data->set.str[STRING_SSL_CRLFILE_PROXY]);
+  data->set.proxy_ssl.cert_type = _GETCHARPTR(data->set.str[STRING_CERT_TYPE_PROXY]);
+  data->set.proxy_ssl.key = _GETCHARPTR(data->set.str[STRING_KEY_PROXY]);
+  data->set.proxy_ssl.key_type = _GETCHARPTR(data->set.str[STRING_KEY_TYPE_PROXY]);
+  data->set.proxy_ssl.key_passwd = _GETCHARPTR(data->set.str[STRING_KEY_PASSWD_PROXY]);
+  data->set.proxy_ssl.primary.clientcert = _GETCHARPTR(data->set.str[STRING_CERT_PROXY]);
   data->set.proxy_ssl.key_blob = data->set.blobs[BLOB_KEY_PROXY];
 #endif
-  data->set.ssl.CRLfile = data->set.str[STRING_SSL_CRLFILE];
-  data->set.ssl.cert_type = data->set.str[STRING_CERT_TYPE];
-  data->set.ssl.key = data->set.str[STRING_KEY];
-  data->set.ssl.key_type = data->set.str[STRING_KEY_TYPE];
-  data->set.ssl.key_passwd = data->set.str[STRING_KEY_PASSWD];
-  data->set.ssl.primary.clientcert = data->set.str[STRING_CERT];
+  data->set.ssl.CRLfile = _GETCHARPTR(data->set.str[STRING_SSL_CRLFILE]);
+  data->set.ssl.cert_type = _GETCHARPTR(data->set.str[STRING_CERT_TYPE]);
+  data->set.ssl.key = _GETCHARPTR(data->set.str[STRING_KEY]);
+  data->set.ssl.key_type = _GETCHARPTR(data->set.str[STRING_KEY_TYPE]);
+  data->set.ssl.key_passwd = _GETCHARPTR(data->set.str[STRING_KEY_PASSWD]);
+  data->set.ssl.primary.clientcert = _GETCHARPTR(data->set.str[STRING_CERT]);
 #ifdef USE_TLS_SRP
-  data->set.ssl.username = data->set.str[STRING_TLSAUTH_USERNAME];
-  data->set.ssl.password = data->set.str[STRING_TLSAUTH_PASSWORD];
+  data->set.ssl.username = _GETCHARPTR(data->set.str[STRING_TLSAUTH_USERNAME]);
+  data->set.ssl.password = _GETCHARPTR(data->set.str[STRING_TLSAUTH_PASSWORD]);
 #ifndef CURL_DISABLE_PROXY
-  data->set.proxy_ssl.username = data->set.str[STRING_TLSAUTH_USERNAME_PROXY];
-  data->set.proxy_ssl.password = data->set.str[STRING_TLSAUTH_PASSWORD_PROXY];
+  data->set.proxy_ssl.username = _GETCHARPTR(data->set.str[STRING_TLSAUTH_USERNAME_PROXY]);
+  data->set.proxy_ssl.password = _GETCHARPTR(data->set.str[STRING_TLSAUTH_PASSWORD_PROXY]);
 #endif
 #endif
   data->set.ssl.key_blob = data->set.blobs[BLOB_KEY];

@@ -311,29 +311,30 @@ static CURLcode dohprobe(struct Curl_easy *data,
       ERROR_CHECK_SETOPT(CURLOPT_SSL_FALSESTART, 1L);
     if(data->set.str[STRING_SSL_CAFILE]) {
       ERROR_CHECK_SETOPT(CURLOPT_CAINFO,
-                         data->set.str[STRING_SSL_CAFILE]);
+                         _GETCHARPTR(data->set.str[STRING_SSL_CAFILE]));
     }
+    // TODO?
     if(data->set.blobs[BLOB_CAINFO]) {
       ERROR_CHECK_SETOPT(CURLOPT_CAINFO_BLOB,
                          data->set.blobs[BLOB_CAINFO]);
     }
     if(data->set.str[STRING_SSL_CAPATH]) {
       ERROR_CHECK_SETOPT(CURLOPT_CAPATH,
-                         data->set.str[STRING_SSL_CAPATH]);
+                         _GETCHARPTR(data->set.str[STRING_SSL_CAPATH]));
     }
     if(data->set.str[STRING_SSL_CRLFILE]) {
       ERROR_CHECK_SETOPT(CURLOPT_CRLFILE,
-                         data->set.str[STRING_SSL_CRLFILE]);
+                         _GETCHARPTR(data->set.str[STRING_SSL_CRLFILE]));
     }
     if(data->set.ssl.certinfo)
       ERROR_CHECK_SETOPT(CURLOPT_CERTINFO, 1L);
     if(data->set.str[STRING_SSL_RANDOM_FILE]) {
       ERROR_CHECK_SETOPT(CURLOPT_RANDOM_FILE,
-                         data->set.str[STRING_SSL_RANDOM_FILE]);
+                         _GETCHARPTR(data->set.str[STRING_SSL_RANDOM_FILE]));
     }
     if(data->set.str[STRING_SSL_EGDSOCKET]) {
       ERROR_CHECK_SETOPT(CURLOPT_EGDSOCKET,
-                         data->set.str[STRING_SSL_EGDSOCKET]);
+                         _GETCHARPTR(data->set.str[STRING_SSL_EGDSOCKET]));
     }
     if(data->set.ssl.fsslctx)
       ERROR_CHECK_SETOPT(CURLOPT_SSL_CTX_FUNCTION, data->set.ssl.fsslctx);
@@ -341,7 +342,7 @@ static CURLcode dohprobe(struct Curl_easy *data,
       ERROR_CHECK_SETOPT(CURLOPT_SSL_CTX_DATA, data->set.ssl.fsslctxp);
     if(data->set.str[STRING_SSL_EC_CURVES]) {
       ERROR_CHECK_SETOPT(CURLOPT_SSL_EC_CURVES,
-                         data->set.str[STRING_SSL_EC_CURVES]);
+                         _GETCHARPTR(data->set.str[STRING_SSL_EC_CURVES]));
     }
 
     {
@@ -422,7 +423,8 @@ struct Curl_addrinfo *Curl_doh(struct Curl_easy *data,
 
   /* create IPv4 DoH request */
   result = dohprobe(data, &dohp->probe[DOH_PROBE_SLOT_IPADDR_V4],
-                    DNS_TYPE_A, hostname, data->set.str[STRING_DOH],
+      // TODO
+                    DNS_TYPE_A, hostname, _GETCHARPTR(data->set.str[STRING_DOH]),
                     data->multi, dohp->headers);
   if(result)
     goto error;
@@ -431,7 +433,7 @@ struct Curl_addrinfo *Curl_doh(struct Curl_easy *data,
   if(Curl_ipv6works(data)) {
     /* create IPv6 DoH request */
     result = dohprobe(data, &dohp->probe[DOH_PROBE_SLOT_IPADDR_V6],
-                      DNS_TYPE_AAAA, hostname, data->set.str[STRING_DOH],
+                      DNS_TYPE_AAAA, hostname, _GETCHARPTR(data->set.str[STRING_DOH]),
                       data->multi, dohp->headers);
     if(result)
       goto error;
@@ -792,7 +794,7 @@ static void showdoh(struct Curl_easy *data,
     }
   }
   for(i = 0; i < d->numcname; i++) {
-    infof(data, "CNAME: %s", Curl_dyn_ptr(&d->cname[i]));
+    infof(data, "CNAME: %s", _GETCHARPTR(Curl_dyn_ptr(&d->cname[i])));
   }
 }
 #else

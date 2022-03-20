@@ -264,7 +264,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
   curl_socket_t tunnelsocket = conn->sock[sockindex];
   mm_ptr<struct http_connect_state> s = conn->connect_state;
   mm_ptr<struct HTTP> http = data->req.p.http;
-  char *linep;
+  mm_array_ptr<char> linep = NULL;
   size_t perline;
 
 #define SELECT_OK      0
@@ -323,7 +323,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
         if(!result && !Curl_checkProxyheaders(data, conn, "User-Agent") &&
            data->set.str[STRING_USERAGENT])
           result = Curl_dyn_addf(req, "User-Agent: %s\r\n",
-                                 data->set.str[STRING_USERAGENT]);
+                                 _GETCHARPTR(data->set.str[STRING_USERAGENT]));
 
         if(!result && !Curl_checkProxyheaders(data, conn, "Proxy-Connection"))
           result = Curl_dyn_add(req, "Proxy-Connection: Keep-Alive\r\n");
@@ -366,7 +366,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
     if(http->sending == HTTPSEND_REQUEST) {
       if(!s->nsend) {
         size_t fillcount;
-        k->upload_fromhere = data->state.ulbuf;
+        // TODO
+        k->upload_fromhere = _GETCHARPTR(data->state.ulbuf);
         result = Curl_fillreadbuffer(data, data->set.upload_buffer_size,
                                      &fillcount);
         if(result)
@@ -486,7 +487,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
           return result;
 
         /* output debug if that is requested */
-        Curl_debug(data, CURLINFO_HEADER_IN, linep, perline);
+        // TODO
+        Curl_debug(data, CURLINFO_HEADER_IN, _GETCHARPTR(linep), perline);
 
         if(!data->set.suppress_connect_headers) {
           /* send the header to the callback */
@@ -494,7 +496,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
           if(data->set.include_header)
             writetype |= CLIENTWRITE_BODY;
 
-          result = Curl_client_write(data, writetype, linep, perline);
+          // TODO
+          result = Curl_client_write(data, writetype, _GETCHARPTR(linep), perline);
           if(result)
             return result;
         }
@@ -536,7 +539,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
 
               /* now parse the chunked piece of data so that we can properly
                  tell when the stream ends */
-              r = Curl_httpchunk_read(data, linep + 1, 1, &gotbytes,
+              // TODO
+              r = Curl_httpchunk_read(data, _GETCHARPTR(linep) + 1, 1, &gotbytes,
                                       &extra);
               if(r == CHUNKE_STOP) {
                 /* we're done reading chunks! */
@@ -564,13 +568,15 @@ static CURLcode CONNECT(struct Curl_easy *data,
           continue;
         }
 
-        if((checkprefix("WWW-Authenticate:", linep) &&
+        // TODO
+        if((checkprefix("WWW-Authenticate:", _GETCHARPTR(linep)) &&
             (401 == k->httpcode)) ||
-           (checkprefix("Proxy-authenticate:", linep) &&
+           (checkprefix("Proxy-authenticate:", _GETCHARPTR(linep)) &&
             (407 == k->httpcode))) {
 
           bool proxy = (k->httpcode == 407) ? TRUE : FALSE;
-          mm_array_ptr<char> auth = Curl_copy_header_value(linep);
+          // TODO
+          mm_array_ptr<char> auth = Curl_copy_header_value(_GETCHARPTR(linep));
           if(!auth)
             return CURLE_OUT_OF_MEMORY;
 
@@ -582,7 +588,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
           if(result)
             return result;
         }
-        else if(checkprefix("Content-Length:", linep)) {
+        //TODO
+        else if(checkprefix("Content-Length:", _GETCHARPTR(linep))) {
           if(k->httpcode/100 == 2) {
             /* A client MUST ignore any Content-Length or Transfer-Encoding
                header fields received in a successful response to CONNECT.
@@ -592,13 +599,15 @@ static CURLcode CONNECT(struct Curl_easy *data,
           }
           else {
             // TODO
-            (void)curlx_strtoofft(linep +
+            (void)curlx_strtoofft(_GETCHARPTR(linep) +
                                   strlen("Content-Length:"), NULL, 10, _GETPTR(curl_off_t, &s->cl));
           }
         }
+        // TODO
         else if(Curl_compareheader(linep, "Connection:", "close"))
           s->close_connection = TRUE;
-        else if(checkprefix("Transfer-Encoding:", linep)) {
+        // TODO
+        else if(checkprefix("Transfer-Encoding:", _GETCHARPTR(linep))) {
           if(k->httpcode/100 == 2) {
             /* A client MUST ignore any Content-Length or Transfer-Encoding
                header fields received in a successful response to CONNECT.
@@ -616,7 +625,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
         }
         else if(Curl_compareheader(linep, "Proxy-Connection:", "close"))
           s->close_connection = TRUE;
-        else if(2 == sscanf(linep, "HTTP/1.%d %d",
+        else if(2 == sscanf(_GETCHARPTR(linep), "HTTP/1.%d %d",
                             &subversion,
                             &k->httpcode)) {
           /* store the HTTP code from the proxy */

@@ -779,7 +779,8 @@ static CURLcode dupset(struct Curl_easy *dst, struct Curl_easy *src)
 
   /* duplicate all strings */
   for(i = (enum dupstring)0; i< STRING_LASTZEROTERMINATED; i++) {
-    result = Curl_setstropt(&dst->set.str[i], src->set.str[i]);
+    // TODO
+    result = Curl_setstropt((char**)(&dst->set.str[i]), _GETCHARPTR(src->set.str[i]));
     if(result)
       return result;
   }
@@ -797,12 +798,12 @@ static CURLcode dupset(struct Curl_easy *dst, struct Curl_easy *src)
   i = STRING_COPYPOSTFIELDS;
   if(src->set.postfieldsize && src->set.str[i]) {
     /* postfieldsize is curl_off_t, Curl_memdup() takes a size_t ... */
-    dst->set.str[i] = Curl_memdup(src->set.str[i],
+    dst->set.str[i] = (mm_array_ptr<char>)mm_memdup((mm_array_ptr<void>)(src->set.str[i]),
                                   curlx_sotouz(src->set.postfieldsize));
     if(!dst->set.str[i])
       return CURLE_OUT_OF_MEMORY;
     /* point to the new copy */
-    dst->set.postfields = dst->set.str[i];
+    dst->set.postfields = (mm_array_ptr<void>)dst->set.str[i];
   }
 
   /* Duplicate mime data. */
@@ -881,7 +882,8 @@ struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
   /* Reinitialize an SSL engine for the new handle
    * note: the engine name has already been copied by dupset */
   if(outcurl->set.str[STRING_SSL_ENGINE]) {
-    if(Curl_ssl_set_engine(outcurl, outcurl->set.str[STRING_SSL_ENGINE]))
+    // TODO
+    if(Curl_ssl_set_engine(outcurl, _GETCHARPTR(outcurl->set.str[STRING_SSL_ENGINE])))
       goto fail;
   }
 
@@ -901,7 +903,8 @@ struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
       goto fail;
     if(outcurl->set.str[STRING_HSTS])
       (void)Curl_hsts_loadfile(outcurl,
-                               outcurl->hsts, outcurl->set.str[STRING_HSTS]);
+          // TODO
+                               outcurl->hsts, _GETCHARPTR(outcurl->set.str[STRING_HSTS]));
     (void)Curl_hsts_loadcb(outcurl, outcurl->hsts);
   }
 #endif
@@ -1064,7 +1067,8 @@ CURLcode curl_easy_pause(struct Curl_easy *data, int action)
            all buffers */
         if(!result)
           result = Curl_client_write(data, writebuf[i].type,
-                                     Curl_dyn_ptr(&writebuf[i].b),
+              // TODO
+                                     _GETCHARPTR(Curl_dyn_ptr(&writebuf[i].b)),
                                      Curl_dyn_len(&writebuf[i].b));
         Curl_dyn_free(&writebuf[i].b);
       }

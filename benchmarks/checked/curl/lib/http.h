@@ -47,13 +47,13 @@ extern const struct Curl_handler Curl_handler_https;
 #endif
 
 /* Header specific functions */
-bool Curl_compareheader(const char *headerline,  /* line to check */
+bool Curl_compareheader(mm_array_ptr<const char>  headerline,  /* line to check */
                         const char *header,   /* header keyword _with_ colon */
                         const char *content); /* content string to find */
 
 mm_array_ptr<char> Curl_copy_header_value(const char *header);
 
-char *Curl_checkProxyheaders(struct Curl_easy *data,
+mm_array_ptr<char> Curl_checkProxyheaders(struct Curl_easy *data,
                              const struct connectdata *conn,
                              const char *thisheader);
 #ifndef USE_HYPER
@@ -94,7 +94,7 @@ CURLcode Curl_http_target(struct Curl_easy *data, struct connectdata *conn,
 CURLcode Curl_http_statusline(struct Curl_easy *data,
                               struct connectdata *conn);
 CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
-                          char *headp);
+                          mm_array_ptr<char> headp);
 CURLcode Curl_transferencode(struct Curl_easy *data);
 CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
                         Curl_HttpReq httpreq,
@@ -174,7 +174,7 @@ struct h3out; /* see ngtcp2 */
 struct HTTP {
   curl_mimepart *sendit;
   curl_off_t postsize; /* off_t to handle large file sizes */
-  const char *postdata;
+  mm_array_ptr<const char> postdata;
 
   const char *p_pragma;      /* Pragma: string */
 
@@ -184,7 +184,7 @@ struct HTTP {
   struct back {
     curl_read_callback fread_func; /* backup storage for fread pointer */
     void *fread_in;           /* backup storage for fread_in pointer */
-    const char *postdata;
+    mm_array_ptr<const char> postdata;
     curl_off_t postsize;
   } backup;
 

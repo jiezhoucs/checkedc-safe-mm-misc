@@ -472,7 +472,7 @@ fail:
 static CURLcode mqtt_publish(struct Curl_easy *data)
 {
   CURLcode result;
-  char *payload = data->set.postfields;
+  char *payload = _GETCHARPTR(data->set.postfields);
   size_t payloadlen;
   char *topic = NULL;
   size_t topiclen;

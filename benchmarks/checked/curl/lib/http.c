@@ -215,7 +215,7 @@ static CURLcode http_setup_conn(struct Curl_easy *data,
  * not, as it then might check a different header list. Provide the header
  * prefix without colon!
  */
-char *Curl_checkProxyheaders(struct Curl_easy *data,
+mm_array_ptr<char> Curl_checkProxyheaders(struct Curl_easy *data,
                              const struct connectdata *conn,
                              const char *thisheader)
 {
@@ -228,8 +228,7 @@ char *Curl_checkProxyheaders(struct Curl_easy *data,
       // TODO
     if(strncasecompare(_GETCHARPTR(head->data), thisheader, thislen) &&
        Curl_headersep(head->data[thislen]))
-        // TODO
-      return _GETCHARPTR(head->data);
+      return head->data;
   }
 
   return NULL;
@@ -368,7 +367,7 @@ static CURLcode http_output_bearer(struct Curl_easy *data)
   userp = &data->state.aptr.userpwd;
   free(*userp);
   *userp = aprintf("Authorization: Bearer %s\r\n",
-                   data->set.str[STRING_BEARER]);
+                   _GETCHARPTR(data->set.str[STRING_BEARER]));
 
   if(!*userp) {
     result = CURLE_OUT_OF_MEMORY;
@@ -1188,7 +1187,7 @@ static size_t readmoredata(char *buffer,
     fullsize = (size_t)data->set.max_send_speed;
 
   else if(http->postsize <= (curl_off_t)fullsize) {
-    memcpy(buffer, http->postdata, (size_t)http->postsize);
+    memcpy(buffer, _GETCHARPTR(http->postdata), (size_t)http->postsize);
     fullsize = (size_t)http->postsize;
 
     if(http->backup.postsize) {
@@ -1208,7 +1207,7 @@ static size_t readmoredata(char *buffer,
     return fullsize;
   }
 
-  memcpy(buffer, http->postdata, fullsize);
+  memcpy(buffer, _GETCHARPTR(http->postdata), fullsize);
   http->postdata += fullsize;
   http->postsize -= fullsize;
 
@@ -1232,7 +1231,7 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
 {
   ssize_t amount;
   CURLcode result;
-  char *ptr;
+  mm_array_ptr<char> ptr = NULL;
   size_t size;
   struct connectdata *conn = data->conn;
   mm_ptr<struct HTTP> http = data->req.p.http;
@@ -1255,7 +1254,8 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
 
   DEBUGASSERT(size > (size_t)included_body_bytes);
 
-  result = Curl_convert_to_network(data, ptr, headersize);
+  // TODO
+  result = Curl_convert_to_network(data, _GETCHARPTR(ptr), headersize);
   /* Curl_convert_to_network calls failf if unsuccessful */
   if(result) {
     /* conversion failed, free memory and return to the caller */
@@ -1301,7 +1301,7 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
     if(sendsize > (size_t)data->set.upload_buffer_size)
       sendsize = (size_t)data->set.upload_buffer_size;
 
-    memcpy(data->state.ulbuf, ptr, sendsize);
+    memcpy(_GETCHARPTR(data->state.ulbuf), _GETCHARPTR(ptr), sendsize);
     ptr = data->state.ulbuf;
   }
   else {
@@ -1334,7 +1334,8 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
     }
   }
 
-  result = Curl_write(data, sockfd, ptr, sendsize, &amount);
+  // TODO
+  result = Curl_write(data, sockfd, _GETCHARPTR(ptr), sendsize, &amount);
 
   if(!result) {
     /*
@@ -1347,11 +1348,12 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
     size_t bodylen = amount - headlen;
 
     /* this data _may_ contain binary stuff */
-    Curl_debug(data, CURLINFO_HEADER_OUT, ptr, headlen);
+    // TODO
+    Curl_debug(data, CURLINFO_HEADER_OUT, _GETCHARPTR(ptr), headlen);
     if(bodylen)
       /* there was body data sent beyond the initial header part, pass that on
          to the debug callback too */
-      Curl_debug(data, CURLINFO_DATA_OUT, ptr + headlen, bodylen);
+      Curl_debug(data, CURLINFO_DATA_OUT, _GETCHARPTR(ptr) + headlen, bodylen);
 
     /* 'amount' can never be a very large value here so typecasting it so a
        signed 31 bit value should not cause problems even if ssize_t is
@@ -1429,7 +1431,7 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
  * Pass headers WITH the colon.
  */
 bool
-Curl_compareheader(const char *headerline, /* line to check */
+Curl_compareheader(mm_array_ptr<const char> headerline, /* line to check */
                    const char *header,  /* header keyword _with_ colon */
                    const char *content) /* content string to find */
 {
@@ -1441,10 +1443,11 @@ Curl_compareheader(const char *headerline, /* line to check */
   size_t hlen = strlen(header);
   size_t clen;
   size_t len;
-  const char *start;
-  const char *end;
+  mm_array_ptr<const char> start = NULL;
+  mm_array_ptr<const char> end = NULL;
 
-  if(!strncasecompare(headerline, header, hlen))
+  // TODO
+  if(!strncasecompare(_GETCHARPTR(headerline), header, hlen))
     return FALSE; /* doesn't start with header */
 
   /* pass the header */
@@ -1455,14 +1458,14 @@ Curl_compareheader(const char *headerline, /* line to check */
     start++;
 
   /* find the end of the header line */
-  end = strchr(start, '\r'); /* lines end with CRLF */
+  end = mm_strchr(start, '\r'); /* lines end with CRLF */
   if(!end) {
     /* in case there's a non-standard compliant line here */
-    end = strchr(start, '\n');
+    end = mm_strchr(start, '\n');
 
     if(!end)
       /* hm, there's no line ending here, use the zero byte! */
-      end = strchr(start, '\0');
+      end = mm_strchr(start, '\0');
   }
 
   len = end-start; /* length of the content part of the input line */
@@ -1470,7 +1473,8 @@ Curl_compareheader(const char *headerline, /* line to check */
 
   /* find the content string in the rest of the line */
   for(; len >= clen; len--, start++) {
-    if(strncasecompare(start, content, clen))
+      // TODO
+    if(strncasecompare(_GETCHARPTR(start), content, clen))
       return TRUE; /* match! */
   }
 
@@ -1635,7 +1639,7 @@ CURLcode Curl_http_done(struct Curl_easy *data,
     return CURLE_OK;
 
   // TODO
-  Curl_dyn_free(_GETPTR(struct dynbuf, &http->send_buffer));
+  Curl_dyn_free(_GETDYNBUFPTR(&http->send_buffer));
   Curl_http2_done(data, premature);
   Curl_quic_done(data, premature);
   // TODO
@@ -1725,7 +1729,7 @@ static CURLcode expect100(struct Curl_easy *data,
     if(ptr) {
       data->state.expect100header =
           // TODO
-        Curl_compareheader(_GETCHARPTR(ptr), "Expect:", "100-continue");
+        Curl_compareheader(ptr, "Expect:", "100-continue");
     }
     else {
       result = Curl_dyn_add(req, "Expect: 100-continue\r\n");
@@ -2035,7 +2039,7 @@ void Curl_http_method(struct Curl_easy *data, struct connectdata *conn,
                       const char **method, Curl_HttpReq *reqp)
 {
   Curl_HttpReq httpreq = data->state.httpreq;
-  const char *request;
+  mm_array_ptr<const char> request = NULL;
   if((conn->handler->protocol&(PROTO_FAMILY_HTTP|CURLPROTO_FTP)) &&
      data->set.upload)
     httpreq = HTTPREQ_PUT;
@@ -2067,7 +2071,8 @@ void Curl_http_method(struct Curl_easy *data, struct connectdata *conn,
       }
     }
   }
-  *method = request;
+  // TODO
+  *method = _GETCHARPTR(request);
   *reqp = httpreq;
 }
 
@@ -2191,7 +2196,8 @@ CURLcode Curl_http_target(struct Curl_easy *data,
   const char *query = data->state.up.query;
 
   if(data->set.str[STRING_TARGET]) {
-    path = data->set.str[STRING_TARGET];
+      // TODO
+    path = _GETCHARPTR(data->set.str[STRING_TARGET]);
     query = NULL;
   }
 
@@ -2249,8 +2255,9 @@ CURLcode Curl_http_target(struct Curl_easy *data,
     curl_url_cleanup(h);
 
     /* target or url */
-    result = Curl_dyn_add(r, data->set.str[STRING_TARGET]?
-      data->set.str[STRING_TARGET]:url);
+    // TODO
+    result = Curl_dyn_add(r, _GETCHARPTR(data->set.str[STRING_TARGET])?
+      _GETCHARPTR(data->set.str[STRING_TARGET]):url);
     free(url);
     if(result)
       return (result);
@@ -2353,7 +2360,7 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
     /* Some kind of TE is requested, check if 'chunked' is chosen */
     data->req.upload_chunky =
         // TODO
-      Curl_compareheader(_GETCHARPTR(ptr), "Transfer-Encoding:", "chunked");
+      Curl_compareheader(ptr, "Transfer-Encoding:", "chunked");
   }
   else {
     if((conn->handler->protocol & PROTO_FAMILY_HTTP) &&
@@ -2501,7 +2508,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     if(ptr) {
       data->state.expect100header =
           // TODO
-        Curl_compareheader(_GETCHARPTR(ptr), "Expect:", "100-continue");
+        Curl_compareheader(ptr, "Expect:", "100-continue");
     }
     else if(http->postsize > EXPECT_100_THRESHOLD || http->postsize < 0) {
       result = expect100(data, conn, r);
@@ -2575,7 +2582,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     if(ptr) {
       data->state.expect100header =
           // TODO
-        Curl_compareheader(_GETCHARPTR(ptr), "Expect:", "100-continue");
+        Curl_compareheader(ptr, "Expect:", "100-continue");
     }
     else if(http->postsize > EXPECT_100_THRESHOLD || http->postsize < 0) {
       result = expect100(data, conn, r);
@@ -2609,7 +2616,8 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
         if(!data->req.upload_chunky) {
           /* We're not sending it 'chunked', append it to the request
              already now to reduce the number if send() calls */
-          result = Curl_dyn_addn(r, data->set.postfields,
+            // TODO
+          result = Curl_dyn_addn(r, _GETCHARPTR(data->set.postfields),
                                  (size_t)http->postsize);
           included_body = http->postsize;
         }
@@ -2621,7 +2629,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
             result = Curl_dyn_add(r, chunk);
             if(!result) {
               included_body = http->postsize + strlen(chunk);
-              result = Curl_dyn_addn(r, data->set.postfields,
+              result = Curl_dyn_addn(r, _GETCHARPTR(data->set.postfields),
                                      (size_t)http->postsize);
               if(!result)
                 result = Curl_dyn_add(r, "\r\n");
@@ -2641,7 +2649,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
       }
       else {
         /* A huge POST coming up, do data separate from the request */
-        http->postdata = data->set.postfields;
+        http->postdata = (mm_array_ptr<const char>)data->set.postfields;
 
         http->sending = HTTPSEND_BODY;
 
@@ -2681,7 +2689,8 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
         /* set the pointer to mark that we will send the post body using the
            read callback, but only if we're not in authenticate negotiation */
         if(!conn->bits.authneg)
-          http->postdata = (char *)&http->postdata;
+            // TODO??
+          http->postdata = &http->postdata;
       }
     }
     /* issue the request */
@@ -2722,7 +2731,8 @@ CURLcode Curl_http_cookies(struct Curl_easy *data,
   CURLcode result = CURLE_OK;
   char *addcookies = NULL;
   if(data->set.str[STRING_COOKIE] && !Curl_checkheaders(data, "Cookie"))
-    addcookies = data->set.str[STRING_COOKIE];
+      // TODO
+    addcookies = _GETCHARPTR(data->set.str[STRING_COOKIE]);
 
   if(data->cookies || addcookies) {
     struct Cookie *co = NULL; /* no cookies from start */
@@ -3134,7 +3144,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
      data->set.str[STRING_ENCODING]) {
     Curl_safefree(data->state.aptr.accept_encoding);
     data->state.aptr.accept_encoding =
-      aprintf("Accept-Encoding: %s\r\n", data->set.str[STRING_ENCODING]);
+      aprintf("Accept-Encoding: %s\r\n", _GETCHARPTR(data->set.str[STRING_ENCODING]));
     if(!data->state.aptr.accept_encoding)
       return CURLE_OUT_OF_MEMORY;
   }
@@ -3426,15 +3436,17 @@ checkprotoprefix(struct Curl_easy *data, struct connectdata *conn,
  * Curl_http_header() parses a single response header.
  */
 CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
-                          char *headp)
+                          mm_array_ptr<char> headp)
 {
   CURLcode result;
   struct SingleRequest *k = &data->req;
   /* Check for Content-Length: header lines to get size */
   if(!k->http_bodyless &&
-     !data->set.ignorecl && checkprefix("Content-Length:", headp)) {
+          // TODO
+     !data->set.ignorecl && checkprefix("Content-Length:", _GETCHARPTR(headp))) {
     curl_off_t contentlength;
-    CURLofft offt = curlx_strtoofft(headp + strlen("Content-Length:"),
+    // TODO
+    CURLofft offt = curlx_strtoofft(_GETCHARPTR(headp) + strlen("Content-Length:"),
                                     NULL, 10, &contentlength);
 
     if(offt == CURL_OFFT_OK) {
@@ -3457,8 +3469,9 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
     }
   }
   /* check for Content-Type: header lines to get the MIME-type */
-  else if(checkprefix("Content-Type:", headp)) {
-    mm_array_ptr<char> contenttype = Curl_copy_header_value(headp);
+  // TODO
+  else if(checkprefix("Content-Type:", _GETCHARPTR(headp))) {
+    mm_array_ptr<char> contenttype = Curl_copy_header_value(_GETCHARPTR(headp));
     if(!contenttype)
       return CURLE_OUT_OF_MEMORY;
     if(!*contenttype)
@@ -3514,7 +3527,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
      */
     streamclose(conn, "Connection: close used");
   }
-  else if(!k->http_bodyless && checkprefix("Transfer-Encoding:", headp)) {
+  // TODO
+  else if(!k->http_bodyless && checkprefix("Transfer-Encoding:", _GETCHARPTR(headp))) {
     /* One or more encodings. We check for chunked and/or a compression
        algorithm. */
     /*
@@ -3526,8 +3540,9 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
      * of chunks, and a chunk-data set to zero signals the
      * end-of-chunks. */
 
+      // TODO
     result = Curl_build_unencoding_stack(data,
-                                         headp + strlen("Transfer-Encoding:"),
+                                         _GETCHARPTR(headp) + strlen("Transfer-Encoding:"),
                                          TRUE);
     if(result)
       return result;
@@ -3538,7 +3553,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
       k->ignore_cl = TRUE;
     }
   }
-  else if(!k->http_bodyless && checkprefix("Content-Encoding:", headp) &&
+  // TODO
+  else if(!k->http_bodyless && checkprefix("Content-Encoding:", _GETCHARPTR(headp)) &&
           data->set.str[STRING_ENCODING]) {
     /*
      * Process Content-Encoding. Look for the values: identity,
@@ -3547,19 +3563,23 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
      * 2616). zlib cannot handle compress.  However, errors are
      * handled further down when the response body is processed
      */
+      // TODO
     result = Curl_build_unencoding_stack(data,
-                                         headp + strlen("Content-Encoding:"),
+                                         _GETCHARPTR(headp) + strlen("Content-Encoding:"),
                                          FALSE);
     if(result)
       return result;
   }
-  else if(checkprefix("Retry-After:", headp)) {
+  // TODO
+  else if(checkprefix("Retry-After:", _GETCHARPTR(headp))) {
     /* Retry-After = HTTP-date / delay-seconds */
     curl_off_t retry_after = 0; /* zero for unknown or "now" */
-    time_t date = Curl_getdate_capped(headp + strlen("Retry-After:"));
+    // TODO
+    time_t date = Curl_getdate_capped(_GETCHARPTR(headp) + strlen("Retry-After:"));
     if(-1 == date) {
       /* not a date, try it as a decimal number */
-      (void)curlx_strtoofft(headp + strlen("Retry-After:"),
+        // TODO
+      (void)curlx_strtoofft(_GETCHARPTR(headp) + strlen("Retry-After:"),
                             NULL, 10, &retry_after);
     }
     else
@@ -3567,7 +3587,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
       retry_after = date - time(NULL);
     data->info.retry_after = retry_after; /* store it */
   }
-  else if(!k->http_bodyless && checkprefix("Content-Range:", headp)) {
+  else if(!k->http_bodyless && checkprefix("Content-Range:", _GETCHARPTR(headp))) {
     /* Content-Range: bytes [num]-
        Content-Range: bytes: [num]-
        Content-Range: [num]-
@@ -3579,7 +3599,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
        The forth means the requested range was unsatisfied.
     */
 
-    char *ptr = headp + strlen("Content-Range:");
+    mm_array_ptr<char> ptr = headp + strlen("Content-Range:");
 
     /* Move forward until first digit or asterisk */
     while(*ptr && !ISDIGIT(*ptr) && *ptr != '*')
@@ -3587,7 +3607,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
 
     /* if it truly stopped on a digit */
     if(ISDIGIT(*ptr)) {
-      if(!curlx_strtoofft(ptr, NULL, 10, &k->offset)) {
+        // TODO
+      if(!curlx_strtoofft(_GETCHARPTR(ptr), NULL, 10, &k->offset)) {
         if(data->state.resume_from == k->offset)
           /* we asked for a resume and we got it */
           k->content_range = TRUE;
@@ -3598,7 +3619,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
   }
 #if !defined(CURL_DISABLE_COOKIES)
   else if(data->cookies && data->state.cookie_engine &&
-          checkprefix("Set-Cookie:", headp)) {
+          // TODO
+          checkprefix("Set-Cookie:", _GETCHARPTR(headp))) {
     /* If there is a custom-set Host: name, use it here, or else use real peer
        host name. */
     const char *host = data->state.aptr.cookiehost?
@@ -3611,25 +3633,29 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
 
     Curl_share_lock(data, CURL_LOCK_DATA_COOKIE,
                     CURL_LOCK_ACCESS_SINGLE);
+    // TODO
     Curl_cookie_add(data, data->cookies, TRUE, FALSE,
-                    headp + strlen("Set-Cookie:"), host,
+                    _GETCHARPTR(headp) + strlen("Set-Cookie:"), host,
                     data->state.up.path, secure_context);
     Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
   }
 #endif
-  else if(!k->http_bodyless && checkprefix("Last-Modified:", headp) &&
+  // TODO
+  else if(!k->http_bodyless && checkprefix("Last-Modified:", _GETCHARPTR(headp)) &&
           (data->set.timecondition || data->set.get_filetime) ) {
-    k->timeofdoc = Curl_getdate_capped(headp + strlen("Last-Modified:"));
+    k->timeofdoc = Curl_getdate_capped(_GETCHARPTR(headp) + strlen("Last-Modified:"));
     if(data->set.get_filetime)
       data->info.filetime = k->timeofdoc;
   }
-  else if((checkprefix("WWW-Authenticate:", headp) &&
+  // TODO
+  else if((checkprefix("WWW-Authenticate:", _GETCHARPTR(headp)) &&
            (401 == k->httpcode)) ||
-          (checkprefix("Proxy-authenticate:", headp) &&
+          (checkprefix("Proxy-authenticate:", _GETCHARPTR(headp)) &&
            (407 == k->httpcode))) {
 
     bool proxy = (k->httpcode == 407) ? TRUE : FALSE;
-    mm_array_ptr<char> auth = Curl_copy_header_value(headp);
+    // TODO
+    mm_array_ptr<char> auth = Curl_copy_header_value(_GETCHARPTR(headp));
     if(!auth)
       return CURLE_OUT_OF_MEMORY;
 
@@ -3642,11 +3668,13 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
       return result;
   }
 #ifdef USE_SPNEGO
-  else if(checkprefix("Persistent-Auth:", headp)) {
+  // TODO
+  else if(checkprefix("Persistent-Auth:", _GETCHARPTR(headp))) {
     struct negotiatedata *negdata = &conn->negotiate;
     struct auth *authp = &data->state.authhost;
     if(authp->picked == CURLAUTH_NEGOTIATE) {
-      char *persistentauth = Curl_copy_header_value(headp);
+        // TODO
+      char *persistentauth = Curl_copy_header_value(_GETCHARPTR(headp));
       if(!persistentauth)
         return CURLE_OUT_OF_MEMORY;
       /* negdata->noauthpersist = checkprefix("false", persistentauth)? */
@@ -3659,10 +3687,12 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
   }
 #endif
   else if((k->httpcode >= 300 && k->httpcode < 400) &&
-          checkprefix("Location:", headp) &&
+          // TODO
+          checkprefix("Location:", _GETCHARPTR(headp)) &&
           !data->req.location) {
     /* this is the URL that the server advises us to use instead */
-    mm_array_ptr<char> location = Curl_copy_header_value(headp);
+      // TODO
+    mm_array_ptr<char> location = Curl_copy_header_value(_GETCHARPTR(headp));
     if(!location)
       return CURLE_OUT_OF_MEMORY;
     if(!*location)
@@ -3689,11 +3719,12 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
 
 #ifndef CURL_DISABLE_HSTS
   /* If enabled, the header is incoming and this is over HTTPS */
-  else if(data->hsts && checkprefix("Strict-Transport-Security:", headp) &&
+  // TODO
+  else if(data->hsts && checkprefix("Strict-Transport-Security:", _GETCHARPTR(headp)) &&
           (conn->handler->flags & PROTOPT_SSL)) {
     CURLcode check =
       Curl_hsts_parse(data->hsts, data->state.up.hostname,
-                      headp + strlen("Strict-Transport-Security:"));
+                      _GETCHARPTR(headp) + strlen("Strict-Transport-Security:"));
     if(check)
       infof(data, "Illegal STS header skipped");
 #ifdef DEBUGBUILD
@@ -3705,7 +3736,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
 #endif
 #ifndef CURL_DISABLE_ALTSVC
   /* If enabled, the header is incoming and this is over HTTPS */
-  else if(data->asi && checkprefix("Alt-Svc:", headp) &&
+  // TODO
+  else if(data->asi && checkprefix("Alt-Svc:", _GETCHARPTR(headp)) &&
           ((conn->handler->flags & PROTOPT_SSL) ||
 #ifdef CURLDEBUG
            /* allow debug builds to circumvent the HTTPS restriction */
@@ -3717,7 +3749,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
     /* the ALPN of the current request */
     enum alpnid id = (conn->httpversion == 20) ? ALPN_h2 : ALPN_h1;
     result = Curl_altsvc_parse(data, data->asi,
-                               headp + strlen("Alt-Svc:"),
+            // TODO
+                               _GETCHARPTR(headp) + strlen("Alt-Svc:"),
                                // TOOD
                                id, _GETCHARPTR(conn->host.name),
                                curlx_uitous(conn->remote_port));
@@ -3726,7 +3759,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
   }
 #endif
   else if(conn->handler->protocol & CURLPROTO_RTSP) {
-    result = Curl_rtsp_parseheader(data, headp);
+      // TODO
+    result = Curl_rtsp_parseheader(data, _GETCHARPTR(headp));
     if(result)
       return result;
   }
@@ -3824,7 +3858,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
   struct SingleRequest *k = &data->req;
   ssize_t onread = *nread;
   char *ostr = k->str;
-  char *headp;
+  mm_array_ptr<char> headp = NULL;
   char *str_start;
   char *end_ptr;
 
@@ -3850,9 +3884,10 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       if(!k->headerline) {
         /* check if this looks like a protocol header */
         statusline st =
+            // TODO
           checkprotoprefix(data, conn,
-                           Curl_dyn_ptr(&data->state.headerb),
-                           Curl_dyn_len(&data->state.headerb));
+                           _GETCHARPTR(Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb))),
+                           Curl_dyn_len(_GETDYNBUFPTR(&data->state.headerb)));
 
         if(st == STATUS_BAD) {
           /* this is not the beginning of a protocol first header line */
@@ -3889,7 +3924,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
     if(!k->headerline) {
       /* the first read header */
       statusline st = checkprotoprefix(data, conn,
-                                       Curl_dyn_ptr(&data->state.headerb),
+                                       _GETCHARPTR(Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb))),
                                        Curl_dyn_len(&data->state.headerb));
       if(st == STATUS_BAD) {
         streamclose(conn, "bad HTTP: No end-of-message indicator");
@@ -3915,6 +3950,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
 
     /* headers are in network encoding so use 0x0a and 0x0d instead of '\n'
        and '\r' */
+    // TODO
     headp = Curl_dyn_ptr(&data->state.headerb);
     if((0x0a == *headp) || (0x0d == *headp)) {
       size_t headerlen;
@@ -4045,7 +4081,8 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
 
       headerlen = Curl_dyn_len(&data->state.headerb);
       result = Curl_client_write(data, writetype,
-                                 Curl_dyn_ptr(&data->state.headerb),
+              // TODO
+                                 _GETCHARPTR(Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb))),
                                  headerlen);
       if(result)
         return result;
@@ -4258,7 +4295,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
         char twoorthree[2];
         int httpversion = 0;
         char digit4 = 0;
-        nc = sscanf(HEADER1,
+        nc = sscanf(_GETCHARPTR(HEADER1),
                     " HTTP/%1d.%1d%c%3d%c",
                     &httpversion_major,
                     &httpversion,
@@ -4267,7 +4304,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
                     &digit4);
 
         if(nc == 1 && httpversion_major >= 2 &&
-           2 == sscanf(HEADER1, " HTTP/%1[23] %d", twoorthree, &k->httpcode)) {
+           2 == sscanf(_GETCHARPTR(HEADER1), " HTTP/%1[23] %d", twoorthree, &k->httpcode)) {
           conn->httpversion = 0;
           nc = 4;
           separator = ' ';
@@ -4314,7 +4351,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
           /* this is the real world, not a Nirvana
              NCSA 1.5.x returns this crap when asked for HTTP/1.1
           */
-          nc = sscanf(HEADER1, " HTTP %3d", &k->httpcode);
+          nc = sscanf(_GETCHARPTR(HEADER1), " HTTP %3d", &k->httpcode);
           conn->httpversion = 10;
 
           /* If user has set option HTTP200ALIASES,
@@ -4323,7 +4360,8 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
           if(!nc) {
             statusline check =
               checkhttpprefix(data,
-                              Curl_dyn_ptr(&data->state.headerb),
+                      // TODO
+                              _GETCHARPTR(Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb))),
                               Curl_dyn_len(&data->state.headerb));
             if(check == STATUS_DONE) {
               nc = 1;
@@ -4340,7 +4378,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       else if(conn->handler->protocol & CURLPROTO_RTSP) {
         char separator;
         int rtspversion;
-        nc = sscanf(HEADER1,
+        nc = sscanf(_GETCHARPTR(HEADER1),
                     " RTSP/%1d.%1d%c%3d",
                     &rtspversion_major,
                     &rtspversion,
@@ -4365,7 +4403,8 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       }
     }
 
-    result = Curl_convert_from_network(data, headp, strlen(headp));
+    // TODO
+    result = Curl_convert_from_network(data, _GETCHARPTR(headp), strlen(_GETCHARPTR(headp)));
     /* Curl_convert_from_network calls failf if unsuccessful */
     if(result)
       return result;
@@ -4382,10 +4421,11 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
     if(data->set.include_header)
       writetype |= CLIENTWRITE_BODY;
 
-    Curl_debug(data, CURLINFO_HEADER_IN, headp,
+    // TODO
+    Curl_debug(data, CURLINFO_HEADER_IN, _GETCHARPTR(headp),
                Curl_dyn_len(&data->state.headerb));
 
-    result = Curl_client_write(data, writetype, headp,
+    result = Curl_client_write(data, writetype, _GETCHARPTR(headp),
                                Curl_dyn_len(&data->state.headerb));
     if(result)
       return result;

@@ -1768,7 +1768,7 @@ static CURLcode imap_sendf(struct Curl_easy *data,
   if(!result) {
     va_list ap;
     va_start(ap, fmt);
-    result = Curl_pp_vsendf(data, &imapc->pp, Curl_dyn_ptr(&imapc->dyn), ap);
+    result = Curl_pp_vsendf(data, &imapc->pp, _GETCHARPTR(Curl_dyn_ptr(&imapc->dyn)), ap);
     va_end(ap);
   }
   return result;
@@ -2093,7 +2093,7 @@ static CURLcode imap_parse_custom_request(struct Curl_easy *data)
 {
   CURLcode result = CURLE_OK;
   struct IMAP *imap = data->req.p.imap;
-  const char *custom = data->set.str[STRING_CUSTOMREQUEST];
+  const char *custom = _GETCHARPTR(data->set.str[STRING_CUSTOMREQUEST]);
 
   if(custom) {
     /* URL decode the custom request */

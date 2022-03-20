@@ -1416,7 +1416,7 @@ static CURLcode pop3_parse_custom_request(struct Curl_easy *data)
 {
   CURLcode result = CURLE_OK;
   struct POP3 *pop3 = data->req.p.pop3;
-  const char *custom = data->set.str[STRING_CUSTOMREQUEST];
+  const char *custom = _GETCHARPTR(data->set.str[STRING_CUSTOMREQUEST]);
 
   /* URL decode the custom request */
   if(custom)
