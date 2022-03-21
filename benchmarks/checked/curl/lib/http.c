@@ -225,8 +225,7 @@ mm_array_ptr<char> Curl_checkProxyheaders(struct Curl_easy *data,
   for(head = (conn->bits.proxy && data->set.sep_headers) ?
         data->set.proxyheaders : data->set.headers;
       head; head = head->next) {
-      // TODO
-    if(strncasecompare(_GETCHARPTR(head->data), thisheader, thislen) &&
+    if(strncasecompare(head->data, thisheader, thislen) &&
        Curl_headersep(head->data[thislen]))
       return head->data;
   }
@@ -1446,8 +1445,7 @@ Curl_compareheader(mm_array_ptr<const char> headerline, /* line to check */
   mm_array_ptr<const char> start = NULL;
   mm_array_ptr<const char> end = NULL;
 
-  // TODO
-  if(!strncasecompare(_GETCHARPTR(headerline), header, hlen))
+  if(!strncasecompare(headerline, header, hlen))
     return FALSE; /* doesn't start with header */
 
   /* pass the header */
@@ -1473,8 +1471,7 @@ Curl_compareheader(mm_array_ptr<const char> headerline, /* line to check */
 
   /* find the content string in the rest of the line */
   for(; len >= clen; len--, start++) {
-      // TODO
-    if(strncasecompare(_GETCHARPTR(start), content, clen))
+    if(strncasecompare(start, content, clen))
       return TRUE; /* match! */
   }
 
@@ -2192,12 +2189,11 @@ CURLcode Curl_http_target(struct Curl_easy *data,
                           struct dynbuf *r)
 {
   CURLcode result = CURLE_OK;
-  const char *path = data->state.up.path;
+  mm_array_ptr<const char> path = data->state.up.path;
   const char *query = data->state.up.query;
 
   if(data->set.str[STRING_TARGET]) {
-      // TODO
-    path = _GETCHARPTR(data->set.str[STRING_TARGET]);
+    path = data->set.str[STRING_TARGET];
     query = NULL;
   }
 
@@ -2265,7 +2261,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
     if(strcasecompare("ftp", data->state.up.scheme)) {
       if(data->set.proxy_transfer_mode) {
         /* when doing ftp, append ;type=<a|i> if not present */
-        char *type = strstr(path, ";type=");
+        mm_array_ptr<char> type = mm_strstr(path, ";type=");
         if(type && type[6] && type[7] == 0) {
           switch(Curl_raw_toupper(type[6])) {
           case 'A':
@@ -2291,7 +2287,8 @@ CURLcode Curl_http_target(struct Curl_easy *data,
     (void)conn; /* not used in disabled-proxy builds */
 #endif
   {
-    result = Curl_dyn_add(r, path);
+      // TODO
+    result = Curl_dyn_add(r, _GETCHARPTR(path));
     if(result)
       return result;
     if(query)
@@ -2747,7 +2744,8 @@ CURLcode Curl_http_cookies(struct Curl_easy *data,
         !strcmp(_GETCHARPTR(host), "127.0.0.1") ||
         !strcmp(_GETCHARPTR(host), "[::1]") ? TRUE : FALSE;
       Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
-      co = Curl_cookie_getlist(data->cookies, _GETCHARPTR(host), data->state.up.path,
+      // TODO
+      co = Curl_cookie_getlist(data->cookies, _GETCHARPTR(host), _GETCHARPTR(data->state.up.path),
                                secure_context);
       Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
     }
@@ -3122,12 +3120,13 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
   {
     char *pq = NULL;
     if(data->state.up.query) {
-      pq = aprintf("%s?%s", data->state.up.path, data->state.up.query);
+      pq = aprintf("%s?%s", _GETCHARPTR(data->state.up.path), data->state.up.query);
       if(!pq)
         return CURLE_OUT_OF_MEMORY;
     }
+    // TODO
     result = Curl_http_output_auth(data, conn, request, httpreq,
-                                   (pq ? pq : data->state.up.path), FALSE);
+                                   (pq ? pq : _GETCHARPTR(data->state.up.path)), FALSE);
     free(pq);
     if(result)
       return result;
@@ -3540,9 +3539,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
      * of chunks, and a chunk-data set to zero signals the
      * end-of-chunks. */
 
-      // TODO
     result = Curl_build_unencoding_stack(data,
-                                         _GETCHARPTR(headp) + strlen("Transfer-Encoding:"),
+                                         headp + strlen("Transfer-Encoding:"),
                                          TRUE);
     if(result)
       return result;
@@ -3563,9 +3561,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
      * 2616). zlib cannot handle compress.  However, errors are
      * handled further down when the response body is processed
      */
-      // TODO
     result = Curl_build_unencoding_stack(data,
-                                         _GETCHARPTR(headp) + strlen("Content-Encoding:"),
+                                         headp + strlen("Content-Encoding:"),
                                          FALSE);
     if(result)
       return result;
@@ -3636,7 +3633,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
     // TODO
     Curl_cookie_add(data, data->cookies, TRUE, FALSE,
                     _GETCHARPTR(headp) + strlen("Set-Cookie:"), host,
-                    data->state.up.path, secure_context);
+                    _GETCHARPTR(data->state.up.path), secure_context);
     Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
   }
 #endif

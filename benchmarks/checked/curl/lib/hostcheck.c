@@ -91,7 +91,8 @@ static int hostmatch(char *hostname, char *pattern)
   pattern_label_end = strchr(pattern, '.');
   if(!pattern_label_end || strchr(pattern_label_end + 1, '.') == NULL ||
      pattern_wildcard > pattern_label_end ||
-     strncasecompare(pattern, "xn--", 4)) {
+     // TODO?
+     strncasecompare_raw(pattern, "xn--", 4)) {
     wildcard_enabled = 0;
   }
   if(!wildcard_enabled)
@@ -111,8 +112,9 @@ static int hostmatch(char *hostname, char *pattern)
 
   prefixlen = pattern_wildcard - pattern;
   suffixlen = pattern_label_end - (pattern_wildcard + 1);
-  return strncasecompare(pattern, hostname, prefixlen) &&
-    strncasecompare(pattern_wildcard + 1, hostname_label_end - suffixlen,
+  // TODO?
+  return strncasecompare_raw(pattern, hostname, prefixlen) &&
+    strncasecompare_raw(pattern_wildcard + 1, hostname_label_end - suffixlen,
                     suffixlen) ?
     CURL_HOST_MATCH : CURL_HOST_NOMATCH;
 }

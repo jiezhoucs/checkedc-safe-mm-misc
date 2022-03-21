@@ -297,7 +297,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
                   "%s\n" /* SignedHeaders */
                   "%s",  /* HashedRequestPayload in hex */
                   method,
-                  data->state.up.path,
+                  _GETCHARPTR(data->state.up.path),
                   data->state.up.query ? data->state.up.query : "",
                   canonical_headers,
                   signed_headers,

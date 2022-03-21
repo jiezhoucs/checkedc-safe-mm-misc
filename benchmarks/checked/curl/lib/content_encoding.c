@@ -1011,7 +1011,7 @@ void Curl_unencode_cleanup(struct Curl_easy *data)
 }
 
 /* Find the content encoding by name. */
-static const struct content_encoding *find_encoding(const char *name,
+static const struct content_encoding *find_encoding(mm_array_ptr<const char> name,
                                                     size_t len)
 {
   const struct content_encoding * const *cep;
@@ -1028,12 +1028,12 @@ static const struct content_encoding *find_encoding(const char *name,
 /* Set-up the unencoding stack from the Content-Encoding header value.
  * See RFC 7231 section 3.1.2.2. */
 CURLcode Curl_build_unencoding_stack(struct Curl_easy *data,
-                                     const char *enclist, int maybechunked)
+                                     mm_array_ptr<const char> enclist, int maybechunked)
 {
   struct SingleRequest *k = &data->req;
 
   do {
-    const char *name;
+    mm_array_ptr<const char> name = NULL;
     size_t namelen;
 
     /* Parse a single encoding name. */
@@ -1079,7 +1079,7 @@ CURLcode Curl_build_unencoding_stack(struct Curl_easy *data,
 #else
 /* Stubs for builds without HTTP. */
 CURLcode Curl_build_unencoding_stack(struct Curl_easy *data,
-                                     const char *enclist, int maybechunked)
+                                     mm_array_ptr<const char> enclist, int maybechunked)
 {
   (void) data;
   (void) enclist;

@@ -1051,7 +1051,8 @@ Curl_cookie_add(struct Curl_easy *data,
             else
               cllen = strlen(clist->spath);
 
-            if(strncasecompare(clist->spath, co->spath, cllen)) {
+            // TODO
+            if(strncasecompare_raw(clist->spath, co->spath, cllen)) {
               freecookie(co);
               return NULL;
             }

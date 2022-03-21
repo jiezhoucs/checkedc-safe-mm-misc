@@ -129,7 +129,7 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)
   struct connectdata *conn = data->conn;
   curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
   char *gopherpath;
-  char *path = data->state.up.path;
+  char *path = _GETCHARPTR(data->state.up.path);
   char *query = data->state.up.query;
   char *sel = NULL;
   char *sel_org = NULL;

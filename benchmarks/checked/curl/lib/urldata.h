@@ -1309,7 +1309,7 @@ struct urlpieces {
   char *user;
   char *password;
   char *options;
-  char *path;
+  mm_array_ptr<char> path;
   char *query;
 };
 

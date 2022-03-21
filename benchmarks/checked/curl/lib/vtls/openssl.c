@@ -591,7 +591,7 @@ static int ssl_ui_writer(UI *ui, UI_STRING *uis)
  */
 static bool is_pkcs11_uri(const char *string)
 {
-  return (string && strncasecompare(string, "pkcs11:", 7));
+  return (string && strncasecompare_raw(string, "pkcs11:", 7));
 }
 
 #endif

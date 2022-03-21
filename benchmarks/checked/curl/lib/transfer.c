@@ -103,8 +103,7 @@ mm_array_ptr<char> Curl_checkheaders(const struct Curl_easy *data,
   DEBUGASSERT(thisheader[thislen-1] != ':');
 
   for(head = data->set.headers; head; head = head->next) {
-      // TODO
-    if(strncasecompare(_GETCHARPTR(head->data), thisheader, thislen) &&
+    if(strncasecompare(head->data, thisheader, thislen) &&
        Curl_headersep(head->data[thislen]) )
       return head->data;
   }
@@ -687,7 +686,7 @@ static CURLcode readwrite_data(struct Curl_easy *data,
                 "Excess found:"
                 " excess = %zd"
                 " url = %s (zero-length body)",
-                nread, data->state.up.path);
+                nread, _GETCHARPTR(data->state.up.path));
         }
 
         break;

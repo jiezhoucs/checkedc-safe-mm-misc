@@ -1669,7 +1669,7 @@ static CURLcode smtp_parse_url_options(struct connectdata *conn)
     while(*ptr && *ptr != ';')
       ptr++;
 
-    if(strncasecompare(key, "AUTH=", 5))
+    if(strncasecompare_raw(key, "AUTH=", 5))
       result = Curl_sasl_parse_url_auth_option(&smtpc->sasl,
                                                value, ptr - value);
     else
@@ -1693,7 +1693,7 @@ static CURLcode smtp_parse_url_path(struct Curl_easy *data)
   /* The SMTP struct is already initialised in smtp_connect() */
   struct connectdata *conn = data->conn;
   struct smtp_conn *smtpc = &conn->proto.smtpc;
-  const char *path = &data->state.up.path[1]; /* skip leading path */
+  const char *path = GETPTR(char, &data->state.up.path[1]); /* skip leading path */
   char localhost[HOSTNAME_MAX + 1];
 
   /* Calculate the path if necessary */

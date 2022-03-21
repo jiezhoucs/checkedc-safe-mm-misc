@@ -34,10 +34,13 @@
 
 #define strcasecompare(a,b) Curl_strcasecompare(a,b)
 #define strncasecompare(a,b,c) Curl_strncasecompare(a,b,c)
+// TODO
+#define strncasecompare_raw(a,b,c) Curl_strncasecompare_raw(a,b,c)
 
 int Curl_strcasecompare(const char *first, const char *second);
 int Curl_safe_strcasecompare(const char *first, const char *second);
-int Curl_strncasecompare(const char *first, const char *second, size_t max);
+int Curl_strncasecompare(mm_array_ptr<const char> first, const char *second, size_t max);
+int Curl_strncasecompare_raw(const char *first, const char *second, size_t max);
 
 char Curl_raw_toupper(char in);
 

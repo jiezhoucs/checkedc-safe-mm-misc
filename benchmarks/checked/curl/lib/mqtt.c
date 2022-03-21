@@ -382,7 +382,7 @@ fail:
 static CURLcode mqtt_get_topic(struct Curl_easy *data,
                                char **topic, size_t *topiclen)
 {
-  char *path = data->state.up.path;
+  char *path = GETPTR(char, data->state.up.path);
   if(strlen(path) > 1)
     return Curl_urldecode(data, path + 1, 0, topic, topiclen,
                           REJECT_NADA);

@@ -236,7 +236,7 @@ static bool imap_matchresp(const char *line, size_t len, const char *cmd)
 
   /* Does the command name match and is it followed by a space character or at
      the end of line? */
-  if(line + cmd_len <= end && strncasecompare(line, cmd, cmd_len) &&
+  if(line + cmd_len <= end && strncasecompare_raw(line, cmd, cmd_len) &&
      (line[cmd_len] == ' ' || line + cmd_len + 2 == end))
     return TRUE;
 
@@ -1925,7 +1925,7 @@ static CURLcode imap_parse_url_options(struct connectdata *conn)
     while(*ptr && *ptr != ';')
       ptr++;
 
-    if(strncasecompare(key, "AUTH=", 5))
+    if(strncasecompare_raw(key, "AUTH=", 5))
       result = Curl_sasl_parse_url_auth_option(&imapc->sasl,
                                                value, ptr - value);
     else
@@ -1962,7 +1962,7 @@ static CURLcode imap_parse_url_path(struct Curl_easy *data)
   /* The imap struct is already initialised in imap_connect() */
   CURLcode result = CURLE_OK;
   struct IMAP *imap = data->req.p.imap;
-  const char *begin = &data->state.up.path[1]; /* skip leading slash */
+  const char *begin = GETPTR(char, &data->state.up.path[1]); /* skip leading slash */
   const char *ptr = begin;
 
   /* See how much of the URL is a valid path and decode it */

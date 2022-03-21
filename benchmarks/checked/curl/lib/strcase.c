@@ -205,8 +205,24 @@ int Curl_safe_strcasecompare(const char *first, const char *second)
 /*
  * @unittest: 1301
  */
-int Curl_strncasecompare(const char *first, const char *second, size_t max)
+int Curl_strncasecompare(mm_array_ptr<const char> first, const char *second, size_t max)
 {
+  while(*first && *second && max) {
+    if(Curl_raw_toupper(*first) != Curl_raw_toupper(*second)) {
+      break;
+    }
+    max--;
+    first++;
+    second++;
+  }
+  if(0 == max)
+    return 1; /* they are equal this far */
+
+  return Curl_raw_toupper(*first) == Curl_raw_toupper(*second);
+}
+
+// TODO: Remove this temporary fn.
+int Curl_strncasecompare_raw(const char *first, const char *second, size_t max) {
   while(*first && *second && max) {
     if(Curl_raw_toupper(*first) != Curl_raw_toupper(*second)) {
       break;
@@ -259,5 +275,5 @@ int curl_strequal(const char *first, const char *second)
 }
 int curl_strnequal(const char *first, const char *second, size_t max)
 {
-  return Curl_strncasecompare(first, second, max);
+  return Curl_strncasecompare_raw(first, second, max);
 }

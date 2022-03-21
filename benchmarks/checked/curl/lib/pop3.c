@@ -1357,11 +1357,11 @@ static CURLcode pop3_parse_url_options(struct connectdata *conn)
     while(*ptr && *ptr != ';')
       ptr++;
 
-    if(strncasecompare(key, "AUTH=", 5)) {
+    if(strncasecompare_raw(key, "AUTH=", 5)) {
       result = Curl_sasl_parse_url_auth_option(&pop3c->sasl,
                                                value, ptr - value);
 
-      if(result && strncasecompare(value, "+APOP", ptr - value)) {
+      if(result && strncasecompare_raw(value, "+APOP", ptr - value)) {
         pop3c->preftype = POP3_TYPE_APOP;
         pop3c->sasl.prefmech = SASL_AUTH_NONE;
         result = CURLE_OK;
@@ -1400,7 +1400,7 @@ static CURLcode pop3_parse_url_path(struct Curl_easy *data)
 {
   /* The POP3 struct is already initialised in pop3_connect() */
   struct POP3 *pop3 = data->req.p.pop3;
-  const char *path = &data->state.up.path[1]; /* skip leading path */
+  const char *path = GETPTR(char, &data->state.up.path[1]); /* skip leading path */
 
   /* URL decode the path for the message ID */
   return Curl_urldecode(data, path, 0, &pop3->id, NULL, REJECT_CTRL);

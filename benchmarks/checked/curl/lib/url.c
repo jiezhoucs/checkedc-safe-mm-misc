@@ -347,7 +347,7 @@ static void up_free(struct Curl_easy *data)
   Curl_safefree(up->user);
   Curl_safefree(up->password);
   Curl_safefree(up->options);
-  Curl_safefree(up->path);
+  MM_curl_free(char, up->path);
   Curl_safefree(up->query);
   curl_url_cleanup(data->state.uh);
   data->state.uh = NULL;
@@ -2075,7 +2075,10 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
   else if(uc != CURLUE_NO_OPTIONS)
     return Curl_uc_to_curlcode(uc);
 
-  uc = curl_url_get(uh, CURLUPART_PATH, &data->state.up.path, 0);
+  // TODO
+  char *tmp = GETPTR(char, data->state.up.path);
+  uc = curl_url_get(uh, CURLUPART_PATH, &tmp, 0);
+  data->state.up.path = mmize_str(tmp);
   if(uc)
     return Curl_uc_to_curlcode(uc);
 
@@ -2271,7 +2274,8 @@ static bool check_noproxy(const char *name, const char *no_proxy)
       if((tok_end - tok_start) <= namelen) {
         /* Match the last part of the name to the domain we are checking. */
         const char *checkn = name + namelen - (tok_end - tok_start);
-        if(strncasecompare(no_proxy + tok_start, checkn,
+        // TODO
+        if(strncasecompare_raw(no_proxy + tok_start, checkn,
                            tok_end - tok_start)) {
           if((tok_end - tok_start) == namelen || *(checkn - 1) == '.') {
             /* We either have an exact match, or the previous character is a .
@@ -3161,7 +3165,8 @@ static CURLcode parse_connect_to_string(struct Curl_easy *data,
     if(!hostname_to_match)
       return CURLE_OUT_OF_MEMORY;
     hostname_to_match_len = strlen(hostname_to_match);
-    host_match = strncasecompare(ptr, hostname_to_match,
+    // TODO
+    host_match = strncasecompare_raw(ptr, hostname_to_match,
                                  hostname_to_match_len);
     free(hostname_to_match);
     ptr += hostname_to_match_len;

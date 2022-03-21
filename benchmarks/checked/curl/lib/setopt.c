@@ -2799,7 +2799,7 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
   case CURLOPT_TLSAUTH_TYPE:
     argptr = va_arg(param, char *);
     if(!argptr ||
-       strncasecompare(argptr, "SRP", strlen("SRP")))
+      strncasecompare_raw(argptr, "SRP", strlen("SRP")))
       data->set.ssl.authtype = CURL_TLSAUTH_SRP;
     else
       data->set.ssl.authtype = CURL_TLSAUTH_NONE;
@@ -2808,7 +2808,7 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
   case CURLOPT_PROXY_TLSAUTH_TYPE:
     argptr = va_arg(param, char *);
     if(!argptr ||
-       strncasecompare(argptr, "SRP", strlen("SRP")))
+       strncasecompare_raw(argptr, "SRP", strlen("SRP")))
       data->set.proxy_ssl.authtype = CURL_TLSAUTH_SRP;
     else
       data->set.proxy_ssl.authtype = CURL_TLSAUTH_NONE;

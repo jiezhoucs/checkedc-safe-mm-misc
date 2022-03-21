@@ -175,18 +175,18 @@ static CURLcode sendf(curl_socket_t sockfd, struct Curl_easy *data,
 
 static CURLcode dict_do(struct Curl_easy *data, bool *done)
 {
-  char *word;
+  mm_array_ptr<char> word = NULL;
   char *eword;
-  char *ppath;
-  char *database = NULL;
-  char *strategy = NULL;
-  char *nthdef = NULL; /* This is not part of the protocol, but required
+  mm_array_ptr<char> ppath = NULL;
+  mm_array_ptr<char> database = NULL;
+  mm_array_ptr<char> strategy = NULL;
+  mm_array_ptr<char> nthdef = NULL; /* This is not part of the protocol, but required
                           by RFC 2229 */
   CURLcode result = CURLE_OK;
   struct connectdata *conn = data->conn;
   curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
 
-  char *path = data->state.up.path;
+  mm_array_ptr<char> path = data->state.up.path;
 
   *done = TRUE; /* unconditionally */
 
@@ -198,16 +198,16 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
      strncasecompare(path, DICT_MATCH2, sizeof(DICT_MATCH2)-1) ||
      strncasecompare(path, DICT_MATCH3, sizeof(DICT_MATCH3)-1)) {
 
-    word = strchr(path, ':');
+    word = mm_strchr(path, ':');
     if(word) {
       word++;
-      database = strchr(word, ':');
+      database = mm_strchr(word, ':');
       if(database) {
         *database++ = (char)0;
-        strategy = strchr(database, ':');
+        strategy = mm_strchr(database, ':');
         if(strategy) {
           *strategy++ = (char)0;
-          nthdef = strchr(strategy, ':');
+          nthdef = mm_strchr(strategy, ':');
           if(nthdef) {
             *nthdef = (char)0;
           }
@@ -217,16 +217,17 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
 
     if(!word || (*word == (char)0)) {
       infof(data, "lookup word is missing");
-      word = (char *)"default";
+      word = "default";
     }
     if(!database || (*database == (char)0)) {
-      database = (char *)"!";
+      database = "!";
     }
     if(!strategy || (*strategy == (char)0)) {
-      strategy = (char *)".";
+      strategy = ".";
     }
 
-    eword = unescape_word(data, word);
+    // TODO
+    eword = unescape_word(data, _GETCHARPTR(word));
     if(!eword)
       return CURLE_OUT_OF_MEMORY;
 
@@ -237,8 +238,8 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
                    "%s "    /* strategy */
                    "%s\r\n" /* word */
                    "QUIT\r\n",
-                   database,
-                   strategy,
+                   _GETCHARPTR(database),
+                   _GETCHARPTR(strategy),
                    eword);
 
     free(eword);
@@ -253,13 +254,13 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
           strncasecompare(path, DICT_DEFINE2, sizeof(DICT_DEFINE2)-1) ||
           strncasecompare(path, DICT_DEFINE3, sizeof(DICT_DEFINE3)-1)) {
 
-    word = strchr(path, ':');
+    word = mm_strchr(path, ':');
     if(word) {
       word++;
-      database = strchr(word, ':');
+      database = mm_strchr(word, ':');
       if(database) {
         *database++ = (char)0;
-        nthdef = strchr(database, ':');
+        nthdef = mm_strchr(database, ':');
         if(nthdef) {
           *nthdef = (char)0;
         }
@@ -268,13 +269,14 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
 
     if(!word || (*word == (char)0)) {
       infof(data, "lookup word is missing");
-      word = (char *)"default";
+      word = "default";
     }
     if(!database || (*database == (char)0)) {
-      database = (char *)"!";
+      database = "!";
     }
 
-    eword = unescape_word(data, word);
+    // TODO
+    eword = unescape_word(data, _GETCHARPTR(word));
     if(!eword)
       return CURLE_OUT_OF_MEMORY;
 
@@ -284,7 +286,7 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
                    "%s "     /* database */
                    "%s\r\n"  /* word */
                    "QUIT\r\n",
-                   database,
+                   _GETCHARPTR(database),
                    eword);
 
     free(eword);
@@ -297,7 +299,7 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
   }
   else {
 
-    ppath = strchr(path, '/');
+    ppath = mm_strchr(path, '/');
     if(ppath) {
       int i;
 
@@ -309,7 +311,7 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
       result = sendf(sockfd, data,
                      "CLIENT " LIBCURL_NAME " " LIBCURL_VERSION "\r\n"
                      "%s\r\n"
-                     "QUIT\r\n", ppath);
+                     "QUIT\r\n", _GETCHARPTR(ppath));
       if(result) {
         failf(data, "Failed sending DICT request");
         return result;

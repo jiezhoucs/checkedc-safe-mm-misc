@@ -256,7 +256,7 @@ struct stsentry *Curl_hsts(struct hsts *h, const char *hostname,
         if(ntail < hlen) {
           size_t offs = hlen - ntail;
           if((hostname[offs-1] == '.') &&
-             Curl_strncasecompare(&hostname[offs], sts->host, ntail))
+             Curl_strncasecompare_raw(&hostname[offs], sts->host, ntail))
             return sts;
         }
       }

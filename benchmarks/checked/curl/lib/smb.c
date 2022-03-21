@@ -989,7 +989,7 @@ static CURLcode smb_parse_url_path(struct Curl_easy *data,
   char *slash;
 
   /* URL decode the path */
-  CURLcode result = Curl_urldecode(data, data->state.up.path, 0, &path, NULL,
+  CURLcode result = Curl_urldecode(data, _GETCHARPTR(data->state.up.path), 0, &path, NULL,
                                    REJECT_CTRL);
   if(result)
     return result;

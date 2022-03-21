@@ -463,7 +463,7 @@ static CURLcode tftp_send_first(struct tftp_state_data *state,
     /* As RFC3617 describes the separator slash is not actually part of the
        file name so we skip the always-present first letter of the path
        string. */
-    result = Curl_urldecode(data, &state->data->state.up.path[1], 0,
+    result = Curl_urldecode(data, _GETCHARPTR(&state->data->state.up.path[1]), 0,
                             &filename, NULL, REJECT_ZERO);
     if(result)
       return result;
@@ -1379,7 +1379,7 @@ static CURLcode tftp_setup_connection(struct Curl_easy *data,
 
   /* TFTP URLs support an extension like ";mode=<typecode>" that
    * we'll try to get now! */
-  type = strstr(data->state.up.path, ";mode=");
+  type = strstr(_GETCHARPTR(data->state.up.path), ";mode=");
 
   if(!type)
     type = strstr(_GETCHARPTR(conn->host.rawalloc), ";mode=");

@@ -309,7 +309,7 @@ static char *match_header(struct curl_slist *hdr, const char *lbl, size_t len)
 {
   char *value = NULL;
 
-  if(strncasecompare(_GETCHARPTR(hdr->data), lbl, len) && hdr->data[len] == ':')
+  if(strncasecompare(hdr->data, lbl, len) && hdr->data[len] == ':')
     for(value = _GETCHARPTR(hdr->data) + len + 1; *value == ' '; value++)
       ;
   return value;
@@ -1785,7 +1785,7 @@ static bool content_type_match(const char *contenttype, const char *target)
 {
   size_t len = strlen(target);
 
-  if(contenttype && strncasecompare(contenttype, target, len))
+  if(contenttype && strncasecompare_raw(contenttype, target, len))
     switch(contenttype[len]) {
     case '\0':
     case '\t':
@@ -1857,7 +1857,7 @@ CURLcode Curl_mime_prepare_headers(curl_mimepart *part,
   if(!search_header(part->userheaders, "Content-Disposition")) {
     if(!disposition)
       if(part->filename || part->name ||
-        (contenttype && !strncasecompare(contenttype, "multipart/", 10)))
+        (contenttype && !strncasecompare_raw(contenttype, "multipart/", 10)))
           disposition = DISPOSITION_DEFAULT;
     if(disposition && curl_strequal(disposition, "attachment") &&
      !part->name && !part->filename)
