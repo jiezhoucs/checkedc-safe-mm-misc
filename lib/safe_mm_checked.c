@@ -196,8 +196,11 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
 __attribute__ ((noinline))
 for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     if (p == NULL) {
+#ifdef MM_DEBUG
+      fprintf(stderr, "[mm_array_realloc] Calling mm_array_alloc()\n");
+#endif
       mm_array_ptr<void> new_p = MM_ARRAY_ALLOC(void, size);
-      insert_mmsafe_ptr((void *)new_p);
+      /* insert_mmsafe_ptr((void *)new_p); */
       return *(mm_array_ptr<T> *)&new_p;
     }
 
@@ -208,7 +211,7 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
 
 #ifdef MM_DEBUG
     fprintf(stdout, "[mm_array_realloc] Old raw ptr = %p, key = %u\n",
-        old_raw_ptr, GET_KEY(safeptr_ptr->key_offset));
+        safeptr_ptr->p, GET_KEY(safeptr_ptr->key_offset));
 #endif
 
     // In case realloc() reallocates the memory to a new starting address,
@@ -225,6 +228,7 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     }
 
     // Allocated to a new place. We need remove the old ptr from the set.
+    print_free_info("mm_array_realloc", old_raw_ptr + EXTRA_HEAP_MEM);
     erase_mmsafe_ptr(old_raw_ptr + EXTRA_HEAP_MEM);
 
     // The new object is placed in a different location and the old one is freed.
