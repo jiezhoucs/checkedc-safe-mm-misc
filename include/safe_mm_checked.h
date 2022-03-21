@@ -68,9 +68,9 @@ for_any(T) void **_marshal_shared_array_ptr(mm_array_ptr<mm_array_ptr<T>> p);
 mm_array_ptr<char> mm_strdup(mm_array_ptr<char> p);
 mm_array_ptr<char> mm_strdup_from_raw(const char *p);
 
-/* strchr() and strpbrk() */
 mm_array_ptr<char> mm_strchr(mm_array_ptr<const char> p, int c);
 mm_array_ptr<char> mm_strpbrk(mm_array_ptr<const char> p, const char *accept);
+mm_array_ptr<char> mm_strstr(mm_array_ptr<const char> p, const char *needle);
 
 /* Others */
 mm_array_ptr<void> mm_memdup(mm_array_ptr<void> src, size_t len);

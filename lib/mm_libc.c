@@ -33,3 +33,9 @@ mm_array_ptr<char> mm_strpbrk(mm_array_ptr<const char> p, const char *accept) {
     char *new_p = strpbrk(_GETCHARPTR(p), accept);
     return _create_mm_array_ptr_char(p, new_p);
 }
+
+/* strstr() */
+mm_array_ptr<char> mm_strstr(mm_array_ptr<const char> p, const char *needle) {
+  char *new_p = strstr(_GETCHARPTR(p), needle);
+  return _create_mm_array_ptr_char(p, new_p);
+}
