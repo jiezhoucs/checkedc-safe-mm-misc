@@ -427,7 +427,7 @@ static char raw_toupper(char in)
   return in;
 }
 
-int strncasecompare(const char *first, const char *second, size_t max)
+int strncasecompare_raw(const char *first, const char *second, size_t max)
 {
   while(*first && *second && max) {
     if(raw_toupper(*first) != raw_toupper(*second)) {
