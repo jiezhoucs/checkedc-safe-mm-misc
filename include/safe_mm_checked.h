@@ -7,9 +7,11 @@
 #ifndef _SAFE_MM_CHECKED_H
 #define _SAFE_MM_CHECKED_H
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdint.h>
 #include "stdchecked.h"
+#include "mm_libc.h"
 
 /* Extract the raw pointer from a checked pointer. */
 #define _GETPTR(T, p) ((T *)(p))
@@ -54,7 +56,7 @@ for_any(T) mm_ptr<T> mmarrayptr_to_mmptr(mm_array_ptr<T> p);
 
 for_any(T) void _setptr_mm_array(mm_array_ptr<const T> *p, char *new_p);
 /* Create an mmsafe pointer based on an existing checked pointer. */
-for_any(T) mm_array_ptr<T> _create_mm_array_ptr(mm_array_ptr<T> p, char *new_p);
+for_any(T) mm_array_ptr<T> _create_mm_array_ptr(mm_array_ptr<const T> p, char *new_p);
 
 /* Mark a checked pointer to be valid */
 for_any(T) void mm_checked(mm_ptr<T> p);
@@ -65,7 +67,7 @@ for_any(T) void **_marshal_shared_array_ptr(mm_array_ptr<mm_array_ptr<T>> p);
 
 /* Checked C version of regular common libc functions. */
 /* mmsafe strdup/strndup */
-mm_array_ptr<char> mm_strdup(mm_array_ptr<char> p);
+mm_array_ptr<char> mm_strdup(mm_array_ptr<const char> p);
 mm_array_ptr<char> mm_strdup_from_raw(const char *p);
 
 mm_array_ptr<char> mm_strchr(mm_array_ptr<const char> p, int c);
