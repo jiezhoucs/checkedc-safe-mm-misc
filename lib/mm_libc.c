@@ -58,9 +58,17 @@ mm_array_ptr<char> mm_memrchr(mm_array_ptr<const char> s, int c, size_t n) {
   return _create_mm_array_ptr_char(s, ret_p);
 }
 
-
 /* strtok_r() */
-mm_array_ptr<char> mm_strtok_r(mm_array_ptr<char> str, const char *delim, char **saveptr) {
+mm_array_ptr<char> mm_strtok_r(mm_array_ptr<char> str, const char *delim,
+                               char **saveptr, mm_array_ptr<char> ostr) {
   char *ret_p = strtok_r(_GETCHARPTR(str), delim, saveptr);
-  return _create_mm_array_ptr_char(str, ret_p);
+  if (ret_p == NULL) return NULL;
+
+  if (str != NULL) {
+    // First call.
+    return _create_mm_array_ptr_char(str, ret_p);
+  } else {
+    // Subsequent call(s).
+    return _create_mm_array_ptr_char(ostr, ret_p);
+  }
 }

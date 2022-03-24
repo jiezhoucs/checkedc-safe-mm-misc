@@ -9,7 +9,8 @@
 #define mm_strcpy(d,s) strcpy(_GETCHARPTR(d),_GETCHARPTR(s))
 #define mm_memcpy(d,s,n) memcpy(_GETCHARPTR(d),_GETCHARPTR(s),n)
 
-mm_array_ptr<char> mm_strtok_r(mm_array_ptr<char> str, const char *delim, char **saveptr);
+mm_array_ptr<char> mm_strtok_r(mm_array_ptr<char> str, const char *delim,
+                               char **saveptr, mm_array_ptr<char> ostr);
 mm_array_ptr<char> mm_memchr(mm_array_ptr<const char> s, int c, size_t n);
 mm_array_ptr<char> mm_memrchr(mm_array_ptr<const char> s, int c, size_t n);
 
