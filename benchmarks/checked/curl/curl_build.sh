@@ -10,7 +10,7 @@ ROOT_DIR=$(realpath ../../../../)
 MISC_DIR=$ROOT_DIR/misc
 
 CC=$ROOT_DIR/build/bin/clang
-CFLAGS="-O3 -Wall -g"
+CFLAGS="-O3 -Wall"
 CFLAGS="$CFLAGS -I$MISC_DIR/include"
 LDFLAGS="-L$MISC_DIR/lib -lsafemm -lstdc++ -lporting -ldebug"
 
@@ -50,8 +50,14 @@ config_configure() {
 #
 # clean_stat_files
 
+# Add optional debug flags.
+if [[ $1 == "debug" ]]; then
+    CFLAGS="$CFLAGS -O0 -g"
+fi
+
 config_configure
 
-if [[ $1 == "make" ]]; then
+# Optionally compile curl.
+if [[ $1 == "make" || $2 == "make" ]]; then
     make -j8
 fi
