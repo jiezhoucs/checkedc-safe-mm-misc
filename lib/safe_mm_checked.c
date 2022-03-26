@@ -297,7 +297,7 @@ for_any(T) mm_ptr<T> mm_single_calloc(size_t size) {
 
     print_ptr_info("mm_single_calloc", safe_ptr.p, key - 1);
 
-    return *((mm_array_ptr<T> *)&safe_ptr);
+    return *((mm_ptr<T> *)&safe_ptr);
 }
 
 /*
@@ -306,7 +306,7 @@ for_any(T) mm_ptr<T> mm_single_calloc(size_t size) {
  * An mmsafe version of strdup. It accepts an mm_array_ptr and returns an
  * mm_array_ptr.
  * */
-mm_array_ptr<char> mm_strdup(mm_array_ptr<char> p) {
+mm_array_ptr<char> mm_strdup(mm_array_ptr<const char> p) {
     if (p == NULL) return NULL;
 
     size_t len = strlen(_GETCHARPTR(p)) + 1;
@@ -569,7 +569,7 @@ for_any(T) void _setptr_mm_array(mm_array_ptr<const T> *p, char *new_p) {
  * object. Examples include strchr(), strrrchar(), and strpbrk().
  *
  * */
-for_any(T) mm_array_ptr<T> _create_mm_array_ptr(mm_array_ptr<T> p, char *new_p) {
+for_any(T) mm_array_ptr<T> _create_mm_array_ptr(mm_array_ptr<const T> p, char *new_p) {
     _MMSafe_ptr_Rep *base_safeptr_ptr = (_MMSafe_ptr_Rep *)&p;
     _MMSafe_ptr_Rep new_safeptr = {
         new_p,
@@ -608,6 +608,21 @@ for_any(T) void **_marshal_shared_array_ptr(mm_array_ptr<mm_array_ptr<T>> p) {
   }
   new_p[size - 1] = NULL;
 
+  return new_p;
+}
+
+/*
+ * Function: _marshal_mm_ptr()
+ *
+ * Marshal an array of size number of mm_ptr.
+ * */
+for_any(T) void **_marshal_mm_ptr(mm_array_ptr<mm_ptr<T>> p, size_t size) {
+  char **raw_p = *(char ***)&p;
+
+  void **new_p = malloc(sizeof(void*) * size);
+  for (unsigned i = 0; i < size; i++) {
+    new_p[i] = raw_p[i * 2];
+  }
   return new_p;
 }
 

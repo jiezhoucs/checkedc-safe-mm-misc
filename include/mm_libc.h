@@ -14,4 +14,7 @@ mm_array_ptr<char> mm_strtok_r(mm_array_ptr<char> str, const char *delim,
 mm_array_ptr<char> mm_memchr(mm_array_ptr<const char> s, int c, size_t n);
 mm_array_ptr<char> mm_memrchr(mm_array_ptr<const char> s, int c, size_t n);
 
+void mm_qsort(mm_array_ptr<mm_ptr<void>> base, size_t nmemb, size_t size,
+    int (*compar)(const void *, const void *));
+
 #endif
