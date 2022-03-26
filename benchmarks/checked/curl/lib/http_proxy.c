@@ -572,8 +572,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
             (407 == k->httpcode))) {
 
           bool proxy = (k->httpcode == 407) ? TRUE : FALSE;
-          // TODO
-          mm_array_ptr<char> auth = Curl_copy_header_value(_GETCHARPTR(linep));
+          mm_array_ptr<char> auth = Curl_copy_header_value(linep);
           if(!auth)
             return CURLE_OUT_OF_MEMORY;
 

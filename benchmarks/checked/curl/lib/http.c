@@ -243,10 +243,10 @@ mm_array_ptr<char> Curl_checkProxyheaders(struct Curl_easy *data,
  * case of allocation failure. Returns an empty string if the header value
  * consists entirely of whitespace.
  */
-mm_array_ptr<char> Curl_copy_header_value(const char *header)
+mm_array_ptr<char> Curl_copy_header_value(mm_array_ptr<const char> header)
 {
-  const char *start;
-  const char *end;
+  mm_array_ptr<const char> start = NULL;
+  mm_array_ptr<const char> end = NULL;
   mm_array_ptr<char> value = NULL;
   size_t len;
 
@@ -265,11 +265,11 @@ mm_array_ptr<char> Curl_copy_header_value(const char *header)
 
   /* data is in the host encoding so
      use '\r' and '\n' instead of 0x0d and 0x0a */
-  end = strchr(start, '\r');
+  end = mm_strchr(start, '\r');
   if(!end)
-    end = strchr(start, '\n');
+    end = mm_strchr(start, '\n');
   if(!end)
-    end = strchr(start, '\0');
+    end = mm_strchr(start, '\0');
   if(!end)
     return NULL;
 
@@ -284,7 +284,7 @@ mm_array_ptr<char> Curl_copy_header_value(const char *header)
   if(!value)
     return NULL;
 
-  memcpy(_GETCHARPTR(value), start, len);
+  mm_memcpy(value, start, len);
   value[len] = 0; /* null-terminate */
 
   return value;
@@ -856,7 +856,7 @@ Curl_http_output_auth(struct Curl_easy *data,
 #endif
      !data->state.first_host ||
      data->set.allow_auth_to_other_hosts ||
-     strcasecompare(data->state.first_host, _GETCHARPTR(conn->host.name))) {
+     mm_strcasecompare(data->state.first_host, conn->host.name)) {
     result = output_auth_headers(data, conn, authhost, request, path, FALSE);
   }
   else
@@ -1918,7 +1918,7 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
                   (data->state.this_is_a_follow &&
                    data->state.first_host &&
                    !data->set.allow_auth_to_other_hosts &&
-                   !strcasecompare(data->state.first_host, _GETCHARPTR(conn->host.name))))
+                   !mm_strcasecompare(data->state.first_host, conn->host.name)))
             ;
           else {
 #ifdef USE_HYPER
@@ -2083,10 +2083,9 @@ CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn)
   mm_array_ptr<const char> ptr = NULL;
   if(!data->state.this_is_a_follow) {
     /* Free to avoid leaking memory on multiple requests*/
-    free(data->state.first_host);
+    MM_FREE(char, data->state.first_host);
 
-    // TODO
-    data->state.first_host = strdup(_GETCHARPTR(conn->host.name));
+    data->state.first_host = mm_strdup(conn->host.name);
     if(!data->state.first_host)
       return CURLE_OUT_OF_MEMORY;
 
@@ -2096,15 +2095,14 @@ CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn)
 
   ptr = Curl_checkheaders(data, "Host");
   if(ptr && (!data->state.this_is_a_follow ||
-             strcasecompare(data->state.first_host, _GETCHARPTR(conn->host.name)))) {
+             mm_strcasecompare(data->state.first_host, conn->host.name))) {
 #if !defined(CURL_DISABLE_COOKIES)
     /* If we have a given custom Host: header, we extract the host name in
        order to possibly use it for cookie reasons later on. We only allow the
        custom Host: header if this is NOT a redirect, as setting Host: in the
        redirected request is being out on thin ice. Except if the host name
        is the same as the first one! */
-      // TODO
-    mm_array_ptr<char> cookiehost = Curl_copy_header_value(_GETCHARPTR(ptr));
+    mm_array_ptr<char> cookiehost = Curl_copy_header_value(ptr);
     if(!cookiehost)
       return CURLE_OUT_OF_MEMORY;
     if(!*cookiehost)
@@ -3007,8 +3005,7 @@ CURLcode Curl_transferencode(struct Curl_easy *data)
     Curl_safefree(data->state.aptr.te);
 
     if(cptr) {
-      // TODO
-      cptr = Curl_copy_header_value(_GETCHARPTR(cptr));
+      cptr = Curl_copy_header_value(cptr);
       if(!cptr)
         return CURLE_OUT_OF_MEMORY;
     }
@@ -3432,7 +3429,6 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
   if(!k->http_bodyless &&
      !data->set.ignorecl && checkprefix("Content-Length:", headp)) {
     curl_off_t contentlength;
-    // TODO
     CURLofft offt = curlx_strtoofft(_GETCHARPTR(headp) + strlen("Content-Length:"),
                                     NULL, 10, &contentlength);
 
@@ -3457,7 +3453,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
   }
   /* check for Content-Type: header lines to get the MIME-type */
   else if(checkprefix("Content-Type:", headp)) {
-    mm_array_ptr<char> contenttype = Curl_copy_header_value(_GETCHARPTR(headp));
+    mm_array_ptr<char> contenttype = Curl_copy_header_value(headp);
     if(!contenttype)
       return CURLE_OUT_OF_MEMORY;
     if(!*contenttype)
@@ -3559,7 +3555,6 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
     time_t date = Curl_getdate_capped(_GETCHARPTR(headp) + strlen("Retry-After:"));
     if(-1 == date) {
       /* not a date, try it as a decimal number */
-        // TODO
       (void)curlx_strtoofft(_GETCHARPTR(headp) + strlen("Retry-After:"),
                             NULL, 10, &retry_after);
     }
@@ -3588,7 +3583,6 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
 
     /* if it truly stopped on a digit */
     if(ISDIGIT(*ptr)) {
-        // TODO
       if(!curlx_strtoofft(_GETCHARPTR(ptr), NULL, 10, &k->offset)) {
         if(data->state.resume_from == k->offset)
           /* we asked for a resume and we got it */
@@ -3631,8 +3625,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
            (407 == k->httpcode))) {
 
     bool proxy = (k->httpcode == 407) ? TRUE : FALSE;
-    // TODO
-    mm_array_ptr<char> auth = Curl_copy_header_value(_GETCHARPTR(headp));
+    mm_array_ptr<char> auth = Curl_copy_header_value(headp);
     if(!auth)
       return CURLE_OUT_OF_MEMORY;
 
@@ -3649,8 +3642,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
     struct negotiatedata *negdata = &conn->negotiate;
     struct auth *authp = &data->state.authhost;
     if(authp->picked == CURLAUTH_NEGOTIATE) {
-        // TODO
-      char *persistentauth = Curl_copy_header_value(_GETCHARPTR(headp));
+      char *persistentauth = Curl_copy_header_value(headp);
       if(!persistentauth)
         return CURLE_OUT_OF_MEMORY;
       /* negdata->noauthpersist = checkprefix("false", persistentauth)? */
@@ -3666,8 +3658,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
           checkprefix("Location:", headp) &&
           !data->req.location) {
     /* this is the URL that the server advises us to use instead */
-      // TODO
-    mm_array_ptr<char> location = Curl_copy_header_value(_GETCHARPTR(headp));
+    mm_array_ptr<char> location = Curl_copy_header_value(headp);
     if(!location)
       return CURLE_OUT_OF_MEMORY;
     if(!*location)

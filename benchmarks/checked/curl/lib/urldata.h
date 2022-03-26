@@ -1326,7 +1326,7 @@ struct UrlState {
   mm_array_ptr<char> ulbuf; /* allocated upload buffer or NULL */
   curl_off_t current_speed;  /* the ProgressShow() function sets this,
                                 bytes / second */
-  char *first_host; /* host name of the first (not followed) request.
+  mm_array_ptr<char> first_host; /* host name of the first (not followed) request.
                        if set, this should be the host name that we will
                        sent authorization to, no else. Used to make Location:
                        following not keep sending user+password... This is

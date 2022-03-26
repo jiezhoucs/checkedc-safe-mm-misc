@@ -51,7 +51,7 @@ bool Curl_compareheader(mm_array_ptr<const char>  headerline,  /* line to check 
                         const char *header,   /* header keyword _with_ colon */
                         const char *content); /* content string to find */
 
-mm_array_ptr<char> Curl_copy_header_value(const char *header);
+mm_array_ptr<char> Curl_copy_header_value(mm_array_ptr<const char> header);
 
 mm_array_ptr<char> Curl_checkProxyheaders(struct Curl_easy *data,
                              const struct connectdata *conn,
