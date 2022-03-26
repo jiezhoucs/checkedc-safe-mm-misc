@@ -87,13 +87,13 @@ const char *Curl_alpnid2str(enum alpnid id)
 
 static void altsvc_free(struct altsvc *as)
 {
-  free(as->src.host);
-  free(as->dst.host);
+  MM_FREE(char, as->src.host);
+  MM_FREE(char, as->dst.host);
   free(as);
 }
 
-static struct altsvc *altsvc_createid(const char *srchost,
-                                      const char *dsthost,
+static struct altsvc *altsvc_createid(mm_array_ptr<const char> srchost,
+                                      mm_array_ptr<const char> dsthost,
                                       enum alpnid srcalpnid,
                                       enum alpnid dstalpnid,
                                       unsigned int srcport,
@@ -103,10 +103,10 @@ static struct altsvc *altsvc_createid(const char *srchost,
   if(!as)
     return NULL;
 
-  as->src.host = strdup(srchost);
+  as->src.host = mm_strdup(srchost);
   if(!as->src.host)
     goto error;
-  as->dst.host = strdup(dsthost);
+  as->dst.host = mm_strdup(dsthost);
   if(!as->dst.host)
     goto error;
 
@@ -121,8 +121,8 @@ static struct altsvc *altsvc_createid(const char *srchost,
   return NULL;
 }
 
-static struct altsvc *altsvc_create(char *srchost,
-                                    char *dsthost,
+static struct altsvc *altsvc_create(mm_array_ptr<char> srchost,
+                                    mm_array_ptr<char> dsthost,
                                     char *srcalpn,
                                     char *dstalpn,
                                     unsigned int srcport,
@@ -241,8 +241,8 @@ static CURLcode altsvc_out(struct altsvc *as, FILE *fp)
           "\"%d%02d%02d "
           "%02d:%02d:%02d\" "
           "%u %d\n",
-          Curl_alpnid2str(as->src.alpnid), as->src.host, as->src.port,
-          Curl_alpnid2str(as->dst.alpnid), as->dst.host, as->dst.port,
+          Curl_alpnid2str(as->src.alpnid), _GETCHARPTR(as->src.host), as->src.port,
+          Curl_alpnid2str(as->dst.alpnid), _GETCHARPTR(as->dst.host), as->dst.port,
           stamp.tm_year + 1900, stamp.tm_mon + 1, stamp.tm_mday,
           stamp.tm_hour, stamp.tm_min, stamp.tm_sec,
           as->persist, as->prio);
@@ -376,11 +376,11 @@ CURLcode Curl_altsvc_save(struct Curl_easy *data,
   return result;
 }
 
-static CURLcode getalnum(const char **ptr, char *alpnbuf, size_t buflen)
+static CURLcode getalnum(mm_array_ptr<const char> *ptr, char *alpnbuf, size_t buflen)
 {
   size_t len;
-  const char *protop;
-  const char *p = *ptr;
+  mm_array_ptr<const char> protop = NULL;
+  mm_array_ptr<const char> p = *ptr;
   while(*p && ISBLANK(*p))
     p++;
   protop = p;
@@ -391,7 +391,7 @@ static CURLcode getalnum(const char **ptr, char *alpnbuf, size_t buflen)
 
   if(!len || (len >= buflen))
     return CURLE_BAD_FUNCTION_ARGUMENT;
-  memcpy(alpnbuf, protop, len);
+  mm_memcpy(alpnbuf, protop, len);
   alpnbuf[len] = 0;
   return CURLE_OK;
 }
@@ -399,7 +399,7 @@ static CURLcode getalnum(const char **ptr, char *alpnbuf, size_t buflen)
 /* altsvc_flush() removes all alternatives for this source origin from the
    list */
 static void altsvc_flush(struct altsvcinfo *asi, enum alpnid srcalpnid,
-                         const char *srchost, unsigned short srcport)
+                         mm_array_ptr<const char> srchost, unsigned short srcport)
 {
   struct Curl_llist_element *e;
   struct Curl_llist_element *n;
@@ -408,7 +408,7 @@ static void altsvc_flush(struct altsvcinfo *asi, enum alpnid srcalpnid,
     n = e->next;
     if((srcalpnid == as->src.alpnid) &&
        (srcport == as->src.port) &&
-       strcasecompare(srchost, as->src.host)) {
+       mm_strcasecompare(srchost, as->src.host)) {
       Curl_llist_remove(&asi->list, e, NULL);
       altsvc_free(as);
     }
@@ -445,11 +445,11 @@ static time_t debugtime(void *unused)
  * being rejected. Unknown protocols are skipped.
  */
 CURLcode Curl_altsvc_parse(struct Curl_easy *data,
-                           struct altsvcinfo *asi, const char *value,
-                           enum alpnid srcalpnid, const char *srchost,
+                           struct altsvcinfo *asi, mm_array_ptr<const char> value,
+                           enum alpnid srcalpnid, mm_array_ptr<const char> srchost,
                            unsigned short srcport)
 {
-  const char *p = value;
+  mm_array_ptr<const char> p = value;
   size_t len;
   char namebuf[MAX_ALTSVC_HOSTLEN] = "";
   char alpnbuf[MAX_ALTSVC_ALPNLEN] = "";
@@ -480,18 +480,18 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
       enum alpnid dstalpnid = alpn2alpnid(alpnbuf); /* the same by default */
       p++;
       if(*p == '\"') {
-        const char *dsthost = "";
-        const char *value_ptr;
+        mm_array_ptr<const char> dsthost = "";
+        mm_array_ptr<const char> value_ptr = NULL;
         char option[32];
         unsigned long num;
-        char *end_ptr;
+        mm_array_ptr<char> end_ptr = NULL;
         bool quoted = FALSE;
         time_t maxage = 24 * 3600; /* default is 24 hours */
         bool persist = FALSE;
         p++;
         if(*p != ':') {
           /* host name starts here */
-          const char *hostp = p;
+          mm_array_ptr<const char> hostp = p;
           while(*p && (ISALNUM(*p) || (*p == '.') || (*p == '-')))
             p++;
           len = p - hostp;
@@ -500,7 +500,7 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
             dstalpnid = ALPN_none;
           }
           else {
-            memcpy(namebuf, hostp, len);
+            mm_memcpy(namebuf, hostp, len);
             namebuf[len] = 0;
             dsthost = namebuf;
           }
@@ -511,7 +511,7 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
         }
         if(*p == ':') {
           /* a port number */
-          unsigned long port = strtoul(++p, &end_ptr, 10);
+          unsigned long port = mm_strtoul(++p, &end_ptr, 10);
           if(port > USHRT_MAX || end_ptr == p || *end_ptr != '\"') {
             infof(data, "Unknown alt-svc port number, ignoring.");
             dstalpnid = ALPN_none;
@@ -561,7 +561,7 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
             while(*p && !ISBLANK(*p) && *p!= ';' && *p != ',')
               p++;
           }
-          num = strtoul(value_ptr, &end_ptr, 10);
+          num = mm_strtoul(value_ptr, &end_ptr, 10);
           if((end_ptr != value_ptr) && (num < ULONG_MAX)) {
             if(strcasecompare("ma", option))
               maxage = num;
@@ -579,8 +579,8 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
             as->expires = maxage + time(NULL);
             as->persist = persist;
             Curl_llist_insert_next(&asi->list, asi->list.tail, as, &as->node);
-            infof(data, "Added alt-svc: %s:%d over %s", dsthost, dstport,
-                  Curl_alpnid2str(dstalpnid));
+            infof(data, "Added alt-svc: %s:%d over %s", _GETCHARPTR(dsthost),
+                  dstport, Curl_alpnid2str(dstalpnid));
           }
         }
         else {
@@ -633,7 +633,7 @@ bool Curl_altsvc_lookup(struct altsvcinfo *asi,
       continue;
     }
     if((as->src.alpnid == srcalpnid) &&
-       strcasecompare(as->src.host, srchost) &&
+       mm_strcasecompare_0(as->src.host, srchost) &&
        (as->src.port == srcport) &&
        (versions & as->dst.alpnid)) {
       /* match */

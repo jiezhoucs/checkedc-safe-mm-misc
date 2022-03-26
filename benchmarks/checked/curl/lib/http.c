@@ -3704,10 +3704,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
     /* the ALPN of the current request */
     enum alpnid id = (conn->httpversion == 20) ? ALPN_h2 : ALPN_h1;
     result = Curl_altsvc_parse(data, data->asi,
-            // TODO
-                               _GETCHARPTR(headp) + strlen("Alt-Svc:"),
-                               // TOOD
-                               id, _GETCHARPTR(conn->host.name),
+                               headp + strlen("Alt-Svc:"),
+                               id, conn->host.name,
                                curlx_uitous(conn->remote_port));
     if(result)
       return result;
@@ -4356,7 +4354,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       }
     }
 
-    // TODO
+    // TODO?
     result = Curl_convert_from_network(data, _GETCHARPTR(headp), strlen(_GETCHARPTR(headp)));
     /* Curl_convert_from_network calls failf if unsuccessful */
     if(result)
@@ -4374,7 +4372,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
     if(data->set.include_header)
       writetype |= CLIENTWRITE_BODY;
 
-    // TODO
+    // TODO?
     Curl_debug(data, CURLINFO_HEADER_IN, _GETCHARPTR(headp),
                Curl_dyn_len(&data->state.headerb));
 

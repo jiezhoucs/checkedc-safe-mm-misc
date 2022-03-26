@@ -35,7 +35,7 @@ enum alpnid {
 };
 
 struct althost {
-  char *host;
+  mm_array_ptr<char> host;
   unsigned short port;
   enum alpnid alpnid;
 };
@@ -63,8 +63,8 @@ CURLcode Curl_altsvc_save(struct Curl_easy *data,
 CURLcode Curl_altsvc_ctrl(struct altsvcinfo *asi, const long ctrl);
 void Curl_altsvc_cleanup(struct altsvcinfo **altsvc);
 CURLcode Curl_altsvc_parse(struct Curl_easy *data,
-                           struct altsvcinfo *altsvc, const char *value,
-                           enum alpnid srcalpn, const char *srchost,
+                           struct altsvcinfo *altsvc, mm_array_ptr<const char> value,
+                           enum alpnid srcalpn, mm_array_ptr<const char> srchost,
                            unsigned short srcport);
 bool Curl_altsvc_lookup(struct altsvcinfo *asi,
                         enum alpnid srcalpnid, const char *srchost,
