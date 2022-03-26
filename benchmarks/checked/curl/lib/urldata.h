@@ -672,9 +672,9 @@ struct SingleRequest {
   struct contenc_writer *writer_stack;
   time_t timeofdoc;
   long bodywrites;
-  char *location;   /* This points to an allocated version of the Location:
+  mm_array_ptr<char> location;   /* This points to an allocated version of the Location:
                        header data */
-  char *newurl;     /* Set to the new URL to use when a redirect or a retry is
+  mm_array_ptr<char> newurl;     /* Set to the new URL to use when a redirect or a retry is
                        wanted */
 
   /* 'upload_present' is used to keep a byte counter of how much data there is

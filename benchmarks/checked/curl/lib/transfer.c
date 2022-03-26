@@ -1569,7 +1569,7 @@ CURLcode Curl_posttransfer(struct Curl_easy *data)
  * This function DOES NOT FREE the given url.
  */
 CURLcode Curl_follow(struct Curl_easy *data,
-                     char *newurl,    /* the Location: string */
+                     mm_array_ptr<char> newurl,    /* the Location: string */
                      followtype type) /* see transfer.h */
 {
 #ifdef CURL_DISABLE_HTTP
@@ -1641,13 +1641,14 @@ CURLcode Curl_follow(struct Curl_easy *data,
 
   if((type != FOLLOW_RETRY) &&
      (data->req.httpcode != 401) && (data->req.httpcode != 407) &&
-     Curl_is_absolute_url(newurl, NULL, MAX_SCHEME_LEN))
+     Curl_is_absolute_url(_GETCHARPTR(newurl), NULL, MAX_SCHEME_LEN))
     /* If this is not redirect due to a 401 or 407 response and an absolute
        URL: don't allow a custom port number */
     disallowport = TRUE;
 
   DEBUGASSERT(data->state.uh);
-  uc = curl_url_set(data->state.uh, CURLUPART_URL, newurl,
+  // TODO
+  uc = curl_url_set(data->state.uh, CURLUPART_URL, _GETCHARPTR(newurl),
                     (type == FOLLOW_FAKE) ? CURLU_NON_SUPPORT_SCHEME :
                     ((type == FOLLOW_REDIR) ? CURLU_URLENCODE : 0) |
                     CURLU_ALLOW_SPACE);
@@ -1657,13 +1658,12 @@ CURLcode Curl_follow(struct Curl_easy *data,
 
     /* the URL could not be parsed for some reason, but since this is FAKE
        mode, just duplicate the field as-is */
-    newurl = strdup(newurl);
+    newurl = mm_strdup(newurl);
     if(!newurl)
       return CURLE_OUT_OF_MEMORY;
   }
   else {
-
-    uc = curl_url_get(data->state.uh, CURLUPART_URL, &newurl, 0);
+    uc = curl_url_get(data->state.uh, CURLUPART_URL, (char**)&newurl, 0);
     if(uc)
       return Curl_uc_to_curlcode(uc);
   }
@@ -1671,7 +1671,7 @@ CURLcode Curl_follow(struct Curl_easy *data,
   if(type == FOLLOW_FAKE) {
     /* we're only figuring out the new url if we would've followed locations
        but now we're done so we can get out! */
-    data->info.wouldredirect = newurl;
+    data->info.wouldredirect = _GETCHARPTR(newurl);
 
     if(reachedmax) {
       failf(data, "Maximum (%ld) redirects followed", data->set.maxredirs);
@@ -1686,7 +1686,7 @@ CURLcode Curl_follow(struct Curl_easy *data,
   if(data->state.url_alloc)
     Curl_safefree(data->state.url);
 
-  data->state.url = newurl;
+  data->state.url = _GETCHARPTR(newurl);
   data->state.url_alloc = TRUE;
 
   infof(data, "Issue another request to this URL: '%s'", data->state.url);
@@ -1804,7 +1804,7 @@ CURLcode Curl_follow(struct Curl_easy *data,
 /* Returns CURLE_OK *and* sets '*url' if a request retry is wanted.
 
    NOTE: that the *url is malloc()ed. */
-CURLcode Curl_retry_request(struct Curl_easy *data, char **url)
+CURLcode Curl_retry_request(struct Curl_easy *data, mm_array_ptr<char> *url)
 {
   struct connectdata *conn = data->conn;
   bool retry = FALSE;
@@ -1850,7 +1850,7 @@ CURLcode Curl_retry_request(struct Curl_easy *data, char **url)
     }
     infof(data, "Connection died, retrying a fresh connect (retry count: %d)",
           data->state.retrycount);
-    *url = strdup(data->state.url);
+    *url = mm_strdup_from_raw(data->state.url);
     if(!*url)
       return CURLE_OUT_OF_MEMORY;
 
@@ -1866,7 +1866,7 @@ CURLcode Curl_retry_request(struct Curl_easy *data, char **url)
       if(data->req.writebytecount) {
         CURLcode result = Curl_readrewind(data);
         if(result) {
-          Curl_safefree(*url);
+          MM_curl_free(char, *url);
           return result;
         }
       }

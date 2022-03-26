@@ -572,8 +572,8 @@ static CURLcode multi_done(struct Curl_easy *data,
   Curl_resolver_kill(data);
 
   /* Cleanup possible redirect junk */
-  Curl_safefree(data->req.newurl);
-  Curl_safefree(data->req.location);
+  MM_curl_free(char, data->req.newurl);
+  MM_curl_free(char, data->req.location);
 
   switch(status) {
   case CURLE_ABORTED_BY_CALLBACK:
@@ -2087,7 +2087,7 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
            * may have unexpectedly died.  If possible, send the connection
            * back to the CONNECT phase so we can try again.
            */
-          char *newurl = NULL;
+          mm_array_ptr<char> newurl = NULL;
           followtype follow = FOLLOW_NONE;
           CURLcode drc;
 
@@ -2126,7 +2126,7 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
             /* Have error handler disconnect conn if we can't retry */
             stream_error = TRUE;
           }
-          free(newurl);
+          MM_FREE(char, newurl);
         }
         else {
           /* failure detected */
@@ -2256,7 +2256,7 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
 
     case MSTATE_PERFORMING:
     {
-      char *newurl = NULL;
+      mm_array_ptr<char> newurl = NULL;
       bool retry = FALSE;
       bool comeback = FALSE;
       DEBUGASSERT(data->state.buffer);
@@ -2321,7 +2321,7 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
           data->state.errorbuf = FALSE;
           if(!newurl)
             /* typically for HTTP_1_1_REQUIRED error on first flight */
-            newurl = strdup(data->state.url);
+            newurl = mm_strdup_from_raw(data->state.url);
           /* if we are to retry, set the result to OK and consider the request
              as done */
           retry = TRUE;
@@ -2360,7 +2360,7 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
           if(!retry) {
             /* if the URL is a follow-location and not just a retried request
                then figure out the URL here */
-            free(newurl);
+            MM_FREE(char, newurl);
             newurl = data->req.newurl;
             data->req.newurl = NULL;
             follow = FOLLOW_REDIR;
@@ -2374,7 +2374,7 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
             multistate(data, MSTATE_CONNECT);
             rc = CURLM_CALL_MULTI_PERFORM;
           }
-          free(newurl);
+          MM_FREE(char, newurl);
         }
         else {
           /* after the transfer is done, go DONE */
@@ -2382,11 +2382,11 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
           /* but first check to see if we got a location info even though we're
              not following redirects */
           if(data->req.location) {
-            free(newurl);
+            MM_FREE(char, newurl);
             newurl = data->req.location;
             data->req.location = NULL;
             result = Curl_follow(data, newurl, FOLLOW_FAKE);
-            free(newurl);
+            MM_FREE(char, newurl);
             if(result) {
               stream_error = TRUE;
               result = multi_done(data, result, TRUE);

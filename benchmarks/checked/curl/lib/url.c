@@ -413,7 +413,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
   Curl_ssl_free_certinfo(data);
 
   /* Cleanup possible redirect junk */
-  free(data->req.newurl);
+  MM_FREE(char, data->req.newurl);
   data->req.newurl = NULL;
 
   if(data->state.referer_alloc) {
@@ -2199,8 +2199,8 @@ static CURLcode setup_connection_internals(struct Curl_easy *data,
 
 void Curl_free_request_state(struct Curl_easy *data)
 {
-  MM_curl_free(struct HTTP, data->req.p.http);
-  Curl_safefree(data->req.newurl);
+  mm_Curl_safefree(struct HTTP, data->req.p.http);
+  mm_Curl_safefree(char, data->req.newurl);
 
 #ifndef CURL_DISABLE_DOH
   if(data->req.doh) {

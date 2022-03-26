@@ -288,7 +288,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
         /* This only happens if we've looped here due to authentication
            reasons, and we don't really use the newly cloned URL here
            then. Just free() it. */
-      free(data->req.newurl);
+      MM_FREE(char, data->req.newurl);
       data->req.newurl = NULL;
 
       /* initialize send-buffer */
@@ -672,7 +672,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
       connect_done(data);
     }
     else {
-      free(data->req.newurl);
+      MM_FREE(char, data->req.newurl);
       data->req.newurl = NULL;
       /* failure, close this connection to avoid re-use */
       streamclose(conn, "proxy CONNECT failure");

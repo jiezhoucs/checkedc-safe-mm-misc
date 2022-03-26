@@ -624,8 +624,8 @@ CURLcode Curl_http_auth_act(struct Curl_easy *data)
     /* In case this is GSS auth, the newurl field is already allocated so
        we must make sure to free it before allocating a new one. As figured
        out in bug #2284386 */
-    Curl_safefree(data->req.newurl);
-    data->req.newurl = strdup(data->state.url); /* clone URL */
+    MM_curl_free(char, data->req.newurl);
+    data->req.newurl = mm_strdup_from_raw(data->state.url); /* clone URL */
     if(!data->req.newurl)
       return CURLE_OUT_OF_MEMORY;
   }
@@ -638,7 +638,7 @@ CURLcode Curl_http_auth_act(struct Curl_easy *data)
        we didn't try HEAD or GET */
     if((data->state.httpreq != HTTPREQ_GET) &&
        (data->state.httpreq != HTTPREQ_HEAD)) {
-      data->req.newurl = strdup(data->state.url); /* clone URL */
+      data->req.newurl = mm_strdup_from_raw(data->state.url); /* clone URL */
       if(!data->req.newurl)
         return CURLE_OUT_OF_MEMORY;
       data->state.authhost.done = TRUE;
@@ -3316,10 +3316,10 @@ typedef enum {
 
 
 /* Check a string for a prefix. Check no more than 'len' bytes */
-static bool checkprefixmax(mm_array_ptr<const char> prefix, const char *buffer, size_t len)
+static bool checkprefixmax(mm_array_ptr<const char> prefix, mm_array_ptr<const char> buffer, size_t len)
 {
   size_t ch = CURLMIN(mm_strlen(prefix), len);
-  return mm_strncasecompare_0(prefix, buffer, ch);
+  return mm_strncasecompare(prefix, buffer, ch);
 }
 
 /*
@@ -3329,21 +3329,21 @@ static bool checkprefixmax(mm_array_ptr<const char> prefix, const char *buffer, 
  */
 static statusline
 checkhttpprefix(struct Curl_easy *data,
-                const char *s, size_t len)
+                mm_array_ptr<const char> s, size_t len)
 {
   struct curl_slist *head = data->set.http200aliases;
   statusline rc = STATUS_BAD;
   statusline onmatch = len >= 5? STATUS_DONE : STATUS_UNKNOWN;
 #ifdef CURL_DOES_CONVERSIONS
   /* convert from the network encoding using a scratch area */
-  char *scratch = strdup(s);
+  mm_array_ptr<char> scratch = mm_strdup(s);
   if(NULL == scratch) {
     failf(data, "Failed to allocate memory for conversion!");
     return FALSE; /* can't return CURLE_OUT_OF_MEMORY so return FALSE */
   }
-  if(CURLE_OK != Curl_convert_from_network(data, scratch, strlen(s) + 1)) {
+  if(CURLE_OK != Curl_convert_from_network(data, _GETCHARPTR(scratch), mm_strlen(s) + 1)) {
     /* Curl_convert_from_network calls failf if unsuccessful */
-    free(scratch);
+    MM_FREE(char, scratch);
     return FALSE; /* can't return CURLE_foobar so return FALSE */
   }
   s = scratch;
@@ -3361,7 +3361,7 @@ checkhttpprefix(struct Curl_easy *data,
     rc = onmatch;
 
 #ifdef CURL_DOES_CONVERSIONS
-  free(scratch);
+  MM_FREE(char, scratch);
 #endif /* CURL_DOES_CONVERSIONS */
   return rc;
 }
@@ -3369,7 +3369,7 @@ checkhttpprefix(struct Curl_easy *data,
 #ifndef CURL_DISABLE_RTSP
 static statusline
 checkrtspprefix(struct Curl_easy *data,
-                const char *s, size_t len)
+                mm_array_ptr<const char> s, size_t len)
 {
   statusline result = STATUS_BAD;
   statusline onmatch = len >= 5? STATUS_DONE : STATUS_UNKNOWN;
@@ -3400,7 +3400,7 @@ checkrtspprefix(struct Curl_easy *data,
 
 static statusline
 checkprotoprefix(struct Curl_easy *data, struct connectdata *conn,
-                 const char *s, size_t len)
+                 mm_array_ptr<const char> s, size_t len)
 {
 #ifndef CURL_DISABLE_RTSP
   if(conn->handler->protocol & CURLPROTO_RTSP)
@@ -3545,7 +3545,6 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
   else if(checkprefix("Retry-After:", headp)) {
     /* Retry-After = HTTP-date / delay-seconds */
     curl_off_t retry_after = 0; /* zero for unknown or "now" */
-    // TODO
     time_t date = Curl_getdate_capped(_GETCHARPTR(headp) + strlen("Retry-After:"));
     if(-1 == date) {
       /* not a date, try it as a decimal number */
@@ -3658,12 +3657,11 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
       /* ignore empty data */
       MM_FREE(char, location);
     else {
-        // TODO
-      data->req.location = _GETCHARPTR(location);
+      data->req.location = location;
 
       if(data->set.http_follow_location) {
         DEBUGASSERT(!data->req.newurl);
-        data->req.newurl = strdup(data->req.location); /* clone */
+        data->req.newurl = mm_strdup(data->req.location); /* clone */
         if(!data->req.newurl)
           return CURLE_OUT_OF_MEMORY;
 
@@ -3841,9 +3839,8 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       if(!k->headerline) {
         /* check if this looks like a protocol header */
         statusline st =
-            // TODO
           checkprotoprefix(data, conn,
-                           _GETCHARPTR(Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb))),
+                           Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb)),
                            Curl_dyn_len(_GETDYNBUFPTR(&data->state.headerb)));
 
         if(st == STATUS_BAD) {
@@ -3881,7 +3878,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
     if(!k->headerline) {
       /* the first read header */
       statusline st = checkprotoprefix(data, conn,
-                                       _GETCHARPTR(Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb))),
+                                       Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb)),
                                        Curl_dyn_len(&data->state.headerb));
       if(st == STATUS_BAD) {
         streamclose(conn, "bad HTTP: No end-of-message indicator");
@@ -4101,7 +4098,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
                 infof(data, "Got 417 while waiting for a 100");
                 data->state.disableexpect = TRUE;
                 DEBUGASSERT(!data->req.newurl);
-                data->req.newurl = strdup(data->state.url);
+                data->req.newurl = mm_strdup_from_raw(data->state.url);
                 Curl_done_sending(data, k);
               }
               else if(data->set.http_keep_sending_on_error) {
@@ -4317,8 +4314,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
           if(!nc) {
             statusline check =
               checkhttpprefix(data,
-                      // TODO
-                              _GETCHARPTR(Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb))),
+                              Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb)),
                               Curl_dyn_len(&data->state.headerb));
             if(check == STATUS_DONE) {
               nc = 1;
