@@ -848,30 +848,30 @@ static const struct content_encoding * const encodings[] = {
 
 
 /* Return a list of comma-separated names of supported encodings. */
-char *Curl_all_content_encodings(void)
+mm_array_ptr<char> Curl_all_content_encodings(void)
 {
   size_t len = 0;
   const struct content_encoding * const *cep;
   const struct content_encoding *ce;
-  char *ace;
+  mm_array_ptr<char> ace = NULL;
 
   for(cep = encodings; *cep; cep++) {
     ce = *cep;
-    if(!strcasecompare(ce->name, CONTENT_ENCODING_DEFAULT))
-      len += strlen(ce->name) + 2;
+    if(!mm_strcasecompare_0(ce->name, CONTENT_ENCODING_DEFAULT))
+      len += mm_strlen(ce->name) + 2;
   }
 
   if(!len)
-    return strdup(CONTENT_ENCODING_DEFAULT);
+    return mm_strdup_from_raw(CONTENT_ENCODING_DEFAULT);
 
-  ace = malloc(len);
+  ace = MM_ARRAY_ALLOC(char, len);
   if(ace) {
-    char *p = ace;
+    mm_array_ptr<char> p = ace;
     for(cep = encodings; *cep; cep++) {
       ce = *cep;
-      if(!strcasecompare(ce->name, CONTENT_ENCODING_DEFAULT)) {
-        strcpy(p, ce->name);
-        p += strlen(p);
+      if(!mm_strcasecompare_0(ce->name, CONTENT_ENCODING_DEFAULT)) {
+        mm_strcpy(p, ce->name);
+        p += mm_strlen(p);
         *p++ = ',';
         *p++ = ' ';
       }
@@ -934,7 +934,7 @@ static CURLcode error_unencode_write(struct Curl_easy *data,
                                      struct contenc_writer *writer,
                                      const char *buf, size_t nbytes)
 {
-  char *all = Curl_all_content_encodings();
+  mm_array_ptr<char> all = Curl_all_content_encodings();
 
   (void) writer;
   (void) buf;
@@ -943,8 +943,8 @@ static CURLcode error_unencode_write(struct Curl_easy *data,
   if(!all)
     return CURLE_OUT_OF_MEMORY;
   failf(data, "Unrecognized content encoding type. "
-        "libcurl understands %s content encodings.", all);
-  free(all);
+        "libcurl understands %s content encodings.", _GETCHARPTR(all));
+  MM_FREE(char, all);
   return CURLE_BAD_CONTENT_ENCODING;
 }
 

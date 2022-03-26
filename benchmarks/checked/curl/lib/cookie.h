@@ -26,18 +26,18 @@
 #include <curl/curl.h>
 
 struct Cookie {
-  struct Cookie *next; /* next in the chain */
-  char *name;        /* <this> = value */
-  char *value;       /* name = <this> */
-  char *path;         /* path = <this> which is in Set-Cookie: */
-  char *spath;        /* sanitized cookie path */
-  char *domain;      /* domain = <this> */
+  mm_ptr<struct Cookie> next; /* next in the chain */
+  mm_array_ptr<char> name;        /* <this> = value */
+  mm_array_ptr<char> value;       /* name = <this> */
+  mm_array_ptr<char> path;         /* path = <this> which is in Set-Cookie: */
+  mm_array_ptr<char> spath;        /* sanitized cookie path */
+  mm_array_ptr<char> domain;      /* domain = <this> */
   curl_off_t expires;  /* expires = <this> */
-  char *expirestr;   /* the plain text version */
+  mm_array_ptr<char> expirestr;   /* the plain text version */
 
   /* RFC 2109 keywords. Version=1 means 2109-compliant cookie sending */
-  char *version;     /* Version = <value> */
-  char *maxage;      /* Max-Age = <value> */
+  mm_array_ptr<char> version;     /* Version = <value> */
+  mm_array_ptr<char> maxage;      /* Max-Age = <value> */
 
   bool tailmatch;    /* whether we do tail-matching of the domain name */
   bool secure;       /* whether the 'secure' keyword was used */
@@ -58,7 +58,7 @@ struct Cookie {
 
 struct CookieInfo {
   /* linked list of cookies we know of */
-  struct Cookie *cookies[COOKIE_HASH_SIZE];
+  mm_array_ptr<struct Cookie> cookies[COOKIE_HASH_SIZE];
 
   char *filename;  /* file we read from/write to */
   long numcookies; /* number of cookies in the "jar" */
@@ -91,15 +91,15 @@ struct Curl_easy;
  * are only used if the header boolean is TRUE.
  */
 
-struct Cookie *Curl_cookie_add(struct Curl_easy *data,
+mm_ptr<struct Cookie> Curl_cookie_add(struct Curl_easy *data,
                                struct CookieInfo *c, bool header,
-                               bool noexpiry, char *lineptr,
+                               bool noexpiry, mm_array_ptr<char> lineptr,
                                const char *domain, const char *path,
                                bool secure);
 
-struct Cookie *Curl_cookie_getlist(struct CookieInfo *c, const char *host,
-                                   const char *path, bool secure);
-void Curl_cookie_freelist(struct Cookie *cookies);
+mm_ptr<struct Cookie> Curl_cookie_getlist(struct CookieInfo *c, mm_array_ptr<const char> host,
+                                   mm_array_ptr<const char> path, bool secure);
+void Curl_cookie_freelist(mm_ptr<struct Cookie> cookies);
 void Curl_cookie_clearall(struct CookieInfo *cookies);
 void Curl_cookie_clearsess(struct CookieInfo *cookies);
 

@@ -225,7 +225,7 @@ mm_array_ptr<char> Curl_checkProxyheaders(struct Curl_easy *data,
   for(head = (conn->bits.proxy && data->set.sep_headers) ?
         data->set.proxyheaders : data->set.headers;
       head; head = head->next) {
-    if(strncasecompare(head->data, thisheader, thislen) &&
+    if(mm_strncasecompare_0(head->data, thisheader, thislen) &&
        Curl_headersep(head->data[thislen]))
       return head->data;
   }
@@ -950,7 +950,7 @@ CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
 
   while(*auth) {
 #ifdef USE_SPNEGO
-    if(checkprefix("Negotiate", auth) && is_valid_auth_separator(auth[9])) {
+    if(checkprefix_raw("Negotiate", auth) && is_valid_auth_separator(auth[9])) {
       if((authp->avail & CURLAUTH_NEGOTIATE) ||
          Curl_auth_is_spnego_supported()) {
         *availp |= CURLAUTH_NEGOTIATE;
@@ -976,7 +976,7 @@ CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
 #endif
 #ifdef USE_NTLM
       /* NTLM support requires the SSL crypto libs */
-      if(checkprefix("NTLM", auth) && is_valid_auth_separator(auth[4])) {
+      if(checkprefix_raw("NTLM", auth) && is_valid_auth_separator(auth[4])) {
         if((authp->avail & CURLAUTH_NTLM) ||
            (authp->avail & CURLAUTH_NTLM_WB) ||
            Curl_auth_is_ntlm_supported()) {
@@ -1014,7 +1014,7 @@ CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
       else
 #endif
 #ifndef CURL_DISABLE_CRYPTO_AUTH
-        if(checkprefix("Digest", auth) && is_valid_auth_separator(auth[6])) {
+        if(checkprefix_raw("Digest", auth) && is_valid_auth_separator(auth[6])) {
           if((authp->avail & CURLAUTH_DIGEST) != 0)
             infof(data, "Ignoring duplicate digest auth header.");
           else if(Curl_auth_is_digest_supported()) {
@@ -1036,7 +1036,7 @@ CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
         }
         else
 #endif
-          if(checkprefix("Basic", auth) &&
+          if(checkprefix_raw("Basic", auth) &&
              is_valid_auth_separator(auth[5])) {
             *availp |= CURLAUTH_BASIC;
             authp->avail |= CURLAUTH_BASIC;
@@ -1050,7 +1050,7 @@ CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
             }
           }
           else
-            if(checkprefix("Bearer", auth) &&
+            if(checkprefix_raw("Bearer", auth) &&
                is_valid_auth_separator(auth[6])) {
               *availp |= CURLAUTH_BEARER;
               authp->avail |= CURLAUTH_BEARER;
@@ -1253,8 +1253,7 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
 
   DEBUGASSERT(size > (size_t)included_body_bytes);
 
-  // TODO
-  result = Curl_convert_to_network(data, _GETCHARPTR(ptr), headersize);
+  result = Curl_convert_to_network(data, ptr, headersize);
   /* Curl_convert_to_network calls failf if unsuccessful */
   if(result) {
     /* conversion failed, free memory and return to the caller */
@@ -1333,7 +1332,6 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
     }
   }
 
-  // TODO
   result = Curl_write(data, sockfd, _GETCHARPTR(ptr), sendsize, &amount);
 
   if(!result) {
@@ -1347,7 +1345,6 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
     size_t bodylen = amount - headlen;
 
     /* this data _may_ contain binary stuff */
-    // TODO
     Curl_debug(data, CURLINFO_HEADER_OUT, _GETCHARPTR(ptr), headlen);
     if(bodylen)
       /* there was body data sent beyond the initial header part, pass that on
@@ -1445,7 +1442,7 @@ Curl_compareheader(mm_array_ptr<const char> headerline, /* line to check */
   mm_array_ptr<const char> start = NULL;
   mm_array_ptr<const char> end = NULL;
 
-  if(!strncasecompare(headerline, header, hlen))
+  if(!mm_strncasecompare_0(headerline, header, hlen))
     return FALSE; /* doesn't start with header */
 
   /* pass the header */
@@ -1471,7 +1468,7 @@ Curl_compareheader(mm_array_ptr<const char> headerline, /* line to check */
 
   /* find the content string in the rest of the line */
   for(; len >= clen; len--, start++) {
-    if(strncasecompare(start, content, clen))
+    if(mm_strncasecompare_0(start, content, clen))
       return TRUE; /* match! */
   }
 
@@ -1635,7 +1632,6 @@ CURLcode Curl_http_done(struct Curl_easy *data,
   if(!http)
     return CURLE_OK;
 
-  // TODO
   Curl_dyn_free(_GETDYNBUFPTR(&http->send_buffer));
   Curl_http2_done(data, premature);
   Curl_quic_done(data, premature);
@@ -1725,7 +1721,6 @@ static CURLcode expect100(struct Curl_easy *data,
     const mm_array_ptr<char> ptr = Curl_checkheaders(data, "Expect");
     if(ptr) {
       data->state.expect100header =
-          // TODO
         Curl_compareheader(ptr, "Expect:", "100-continue");
     }
     else {
@@ -1774,7 +1769,6 @@ CURLcode Curl_http_compile_trailers(struct curl_slist *trailers,
     /* only add correctly formatted trailers */
     ptr = strchr(_GETCHARPTR(trailers->data), ':');
     if(ptr && *(ptr + 1) == ' ') {
-    // TODO
       result = Curl_dyn_add(b, _GETCHARPTR(trailers->data));
       if(result)
         return result;
@@ -1800,7 +1794,7 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
   )
 {
   struct connectdata *conn = data->conn;
-  char *ptr;
+  mm_array_ptr<char> ptr = NULL;
   struct curl_slist *h[2];
   struct curl_slist *headers;
   int numlists = 1; /* by default */
@@ -1843,12 +1837,12 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
     headers = h[i];
 
     while(headers) {
-      char *semicolonp = NULL;
-      ptr = strchr(_GETCHARPTR(headers->data), ':');
+      mm_array_ptr<char> semicolonp = NULL;
+      ptr = mm_strchr(headers->data, ':');
       if(!ptr) {
-        char *optr;
+        mm_array_ptr<char> optr = NULL;
         /* no colon, semicolon? */
-        ptr = strchr(_GETCHARPTR(headers->data), ';');
+        ptr = mm_strchr(headers->data, ';');
         if(ptr) {
           optr = ptr;
           ptr++; /* pass the semicolon */
@@ -1862,8 +1856,7 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
           else {
             if(*(--ptr) == ';') {
               /* copy the source */
-                // TODO
-              semicolonp = strdup(_GETCHARPTR(headers->data));
+              semicolonp = mm_strdup(headers->data);
               if(!semicolonp) {
 #ifndef USE_HYPER
                 Curl_dyn_free(req);
@@ -1871,9 +1864,9 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
                 return CURLE_OUT_OF_MEMORY;
               }
               /* put a colon where the semicolon is */
-              semicolonp[ptr - _GETCHARPTR(headers->data)] = ':';
+              semicolonp[ptr - headers->data] = ':';
               /* point at the colon */
-              optr = &semicolonp [ptr - _GETCHARPTR(headers->data)];
+              optr = &semicolonp [ptr - headers->data];
             }
           }
           ptr = optr;
@@ -1889,8 +1882,7 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
         if(*ptr || semicolonp) {
           /* only send this if the contents was non-blank or done special */
           CURLcode result = CURLE_OK;
-          // TODO
-          char *compare = semicolonp ? semicolonp : _GETCHARPTR(headers->data);
+          mm_array_ptr<char> compare = semicolonp ? semicolonp : headers->data;
 
           if(data->state.aptr.host &&
              /* a Host: header was sent already, don't pass on any custom Host:
@@ -1932,11 +1924,11 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
 #ifdef USE_HYPER
             result = Curl_hyper_header(data, req, compare);
 #else
-            result = Curl_dyn_addf(req, "%s\r\n", compare);
+            result = Curl_dyn_addf(req, "%s\r\n", _GETCHARPTR(compare));
 #endif
           }
           if(semicolonp)
-            free(semicolonp);
+            MM_FREE(char, semicolonp);
           if(result)
             return result;
         }
@@ -2312,6 +2304,7 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
     break;
   case HTTPREQ_POST_FORM:
     /* Convert the form structure into a mime structure. */
+    // TODO
     Curl_mime_cleanpart(_GETPTR(curl_mimepart, &http->form));
     result = Curl_getformdata(data, _GETPTR(curl_mimepart, &http->form), data->set.httppost,
                               data->state.fread_func);
@@ -2732,7 +2725,7 @@ CURLcode Curl_http_cookies(struct Curl_easy *data,
     addcookies = _GETCHARPTR(data->set.str[STRING_COOKIE]);
 
   if(data->cookies || addcookies) {
-    struct Cookie *co = NULL; /* no cookies from start */
+    mm_ptr<struct Cookie> co = NULL; /* no cookies from start */
     int count = 0;
 
     if(data->cookies && data->state.cookie_engine) {
@@ -2744,13 +2737,12 @@ CURLcode Curl_http_cookies(struct Curl_easy *data,
         !strcmp(_GETCHARPTR(host), "127.0.0.1") ||
         !strcmp(_GETCHARPTR(host), "[::1]") ? TRUE : FALSE;
       Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
-      // TODO
-      co = Curl_cookie_getlist(data->cookies, _GETCHARPTR(host), _GETCHARPTR(data->state.up.path),
+      co = Curl_cookie_getlist(data->cookies, host, data->state.up.path,
                                secure_context);
       Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
     }
     if(co) {
-      struct Cookie *store = co;
+      mm_ptr<struct Cookie> store = co;
       /* now loop through all cookies that matched */
       while(co) {
         if(co->value) {
@@ -2760,7 +2752,7 @@ CURLcode Curl_http_cookies(struct Curl_easy *data,
               break;
           }
           result = Curl_dyn_addf(r, "%s%s=%s", count?"; ":"",
-                                 co->name, co->value);
+                                 _GETCHARPTR(co->name), _GETCHARPTR(co->value));
           if(result)
             break;
           count++;
@@ -3334,10 +3326,10 @@ typedef enum {
 
 
 /* Check a string for a prefix. Check no more than 'len' bytes */
-static bool checkprefixmax(const char *prefix, const char *buffer, size_t len)
+static bool checkprefixmax(mm_array_ptr<const char> prefix, const char *buffer, size_t len)
 {
-  size_t ch = CURLMIN(strlen(prefix), len);
-  return curl_strnequal(prefix, buffer, ch);
+  size_t ch = CURLMIN(mm_strlen(prefix), len);
+  return mm_strncasecompare_0(prefix, buffer, ch);
 }
 
 /*
@@ -3368,8 +3360,7 @@ checkhttpprefix(struct Curl_easy *data,
 #endif /* CURL_DOES_CONVERSIONS */
 
   while(head) {
-      // TODO
-    if(checkprefixmax(_GETCHARPTR(head->data), s, len)) {
+    if(checkprefixmax(head->data, s, len)) {
       rc = onmatch;
       break;
     }
@@ -3441,8 +3432,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
   struct SingleRequest *k = &data->req;
   /* Check for Content-Length: header lines to get size */
   if(!k->http_bodyless &&
-          // TODO
-     !data->set.ignorecl && checkprefix("Content-Length:", _GETCHARPTR(headp))) {
+     !data->set.ignorecl && checkprefix("Content-Length:", headp)) {
     curl_off_t contentlength;
     // TODO
     CURLofft offt = curlx_strtoofft(_GETCHARPTR(headp) + strlen("Content-Length:"),
@@ -3468,8 +3458,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
     }
   }
   /* check for Content-Type: header lines to get the MIME-type */
-  // TODO
-  else if(checkprefix("Content-Type:", _GETCHARPTR(headp))) {
+  else if(checkprefix("Content-Type:", headp)) {
     mm_array_ptr<char> contenttype = Curl_copy_header_value(_GETCHARPTR(headp));
     if(!contenttype)
       return CURLE_OUT_OF_MEMORY;
@@ -3526,8 +3515,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
      */
     streamclose(conn, "Connection: close used");
   }
-  // TODO
-  else if(!k->http_bodyless && checkprefix("Transfer-Encoding:", _GETCHARPTR(headp))) {
+  else if(!k->http_bodyless && checkprefix("Transfer-Encoding:", headp)) {
     /* One or more encodings. We check for chunked and/or a compression
        algorithm. */
     /*
@@ -3551,8 +3539,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
       k->ignore_cl = TRUE;
     }
   }
-  // TODO
-  else if(!k->http_bodyless && checkprefix("Content-Encoding:", _GETCHARPTR(headp)) &&
+  else if(!k->http_bodyless && checkprefix("Content-Encoding:", headp) &&
           data->set.str[STRING_ENCODING]) {
     /*
      * Process Content-Encoding. Look for the values: identity,
@@ -3567,8 +3554,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
     if(result)
       return result;
   }
-  // TODO
-  else if(checkprefix("Retry-After:", _GETCHARPTR(headp))) {
+  else if(checkprefix("Retry-After:", headp)) {
     /* Retry-After = HTTP-date / delay-seconds */
     curl_off_t retry_after = 0; /* zero for unknown or "now" */
     // TODO
@@ -3584,7 +3570,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
       retry_after = date - time(NULL);
     data->info.retry_after = retry_after; /* store it */
   }
-  else if(!k->http_bodyless && checkprefix("Content-Range:", _GETCHARPTR(headp))) {
+  else if(!k->http_bodyless && checkprefix("Content-Range:", headp)) {
     /* Content-Range: bytes [num]-
        Content-Range: bytes: [num]-
        Content-Range: [num]-
@@ -3616,8 +3602,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
   }
 #if !defined(CURL_DISABLE_COOKIES)
   else if(data->cookies && data->state.cookie_engine &&
-          // TODO
-          checkprefix("Set-Cookie:", _GETCHARPTR(headp))) {
+          checkprefix("Set-Cookie:", headp)) {
     /* If there is a custom-set Host: name, use it here, or else use real peer
        host name. */
     const char *host = data->state.aptr.cookiehost?
@@ -3630,24 +3615,21 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
 
     Curl_share_lock(data, CURL_LOCK_DATA_COOKIE,
                     CURL_LOCK_ACCESS_SINGLE);
-    // TODO
     Curl_cookie_add(data, data->cookies, TRUE, FALSE,
-                    _GETCHARPTR(headp) + strlen("Set-Cookie:"), host,
+                    headp + strlen("Set-Cookie:"), host,
                     _GETCHARPTR(data->state.up.path), secure_context);
     Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
   }
 #endif
-  // TODO
-  else if(!k->http_bodyless && checkprefix("Last-Modified:", _GETCHARPTR(headp)) &&
+  else if(!k->http_bodyless && checkprefix("Last-Modified:", headp) &&
           (data->set.timecondition || data->set.get_filetime) ) {
     k->timeofdoc = Curl_getdate_capped(_GETCHARPTR(headp) + strlen("Last-Modified:"));
     if(data->set.get_filetime)
       data->info.filetime = k->timeofdoc;
   }
-  // TODO
-  else if((checkprefix("WWW-Authenticate:", _GETCHARPTR(headp)) &&
+  else if((checkprefix("WWW-Authenticate:", headp) &&
            (401 == k->httpcode)) ||
-          (checkprefix("Proxy-authenticate:", _GETCHARPTR(headp)) &&
+          (checkprefix("Proxy-authenticate:", headp) &&
            (407 == k->httpcode))) {
 
     bool proxy = (k->httpcode == 407) ? TRUE : FALSE;
@@ -3665,8 +3647,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
       return result;
   }
 #ifdef USE_SPNEGO
-  // TODO
-  else if(checkprefix("Persistent-Auth:", _GETCHARPTR(headp))) {
+  else if(checkprefix("Persistent-Auth:", headp)) {
     struct negotiatedata *negdata = &conn->negotiate;
     struct auth *authp = &data->state.authhost;
     if(authp->picked == CURLAUTH_NEGOTIATE) {
@@ -3684,8 +3665,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
   }
 #endif
   else if((k->httpcode >= 300 && k->httpcode < 400) &&
-          // TODO
-          checkprefix("Location:", _GETCHARPTR(headp)) &&
+          checkprefix("Location:", headp) &&
           !data->req.location) {
     /* this is the URL that the server advises us to use instead */
       // TODO
@@ -3716,8 +3696,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
 
 #ifndef CURL_DISABLE_HSTS
   /* If enabled, the header is incoming and this is over HTTPS */
-  // TODO
-  else if(data->hsts && checkprefix("Strict-Transport-Security:", _GETCHARPTR(headp)) &&
+  else if(data->hsts && checkprefix("Strict-Transport-Security:", headp) &&
           (conn->handler->flags & PROTOPT_SSL)) {
     CURLcode check =
       Curl_hsts_parse(data->hsts, data->state.up.hostname,
@@ -3733,8 +3712,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
 #endif
 #ifndef CURL_DISABLE_ALTSVC
   /* If enabled, the header is incoming and this is over HTTPS */
-  // TODO
-  else if(data->asi && checkprefix("Alt-Svc:", _GETCHARPTR(headp)) &&
+  else if(data->asi && checkprefix("Alt-Svc:", headp) &&
           ((conn->handler->flags & PROTOPT_SSL) ||
 #ifdef CURLDEBUG
            /* allow debug builds to circumvent the HTTPS restriction */

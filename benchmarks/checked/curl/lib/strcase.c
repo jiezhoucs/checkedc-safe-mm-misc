@@ -205,7 +205,8 @@ int Curl_safe_strcasecompare(const char *first, const char *second)
 /*
  * @unittest: 1301
  */
-int Curl_strncasecompare(mm_array_ptr<const char> first, const char *second, size_t max)
+int Curl_strncasecompare(mm_array_ptr<const char> first,
+                         mm_array_ptr<const char> second, size_t max)
 {
   while(*first && *second && max) {
     if(Curl_raw_toupper(*first) != Curl_raw_toupper(*second)) {
@@ -221,8 +222,70 @@ int Curl_strncasecompare(mm_array_ptr<const char> first, const char *second, siz
   return Curl_raw_toupper(*first) == Curl_raw_toupper(*second);
 }
 
+// A fully safe strncasecompare().
+int mm_Curl_strncasecompare(mm_array_ptr<const char> first,
+                            mm_array_ptr<const char> second, size_t max)
+{
+  while(*first && *second && max) {
+    if(Curl_raw_toupper(*first) != Curl_raw_toupper(*second)) {
+      break;
+    }
+    max--;
+    first++;
+    second++;
+  }
+  if(0 == max)
+    return 1; /* they are equal this far */
+
+  return Curl_raw_toupper(*first) == Curl_raw_toupper(*second);
+}
+
+int mm_Curl_strcasecompare_0(mm_array_ptr<const char> first, const char *second) {
+  while(*first && *second) {
+    if(Curl_raw_toupper(*first) != Curl_raw_toupper(*second))
+      /* get out of the loop as soon as they don't match */
+      break;
+    first++;
+    second++;
+  }
+  /* we do the comparison here (possibly again), just to make sure that if the
+     loop above is skipped because one of the strings reached zero, we must not
+     return this as a successful match */
+  return (Curl_raw_toupper(*first) == Curl_raw_toupper(*second));
+}
+
+int mm_Curl_strcasecompare(mm_array_ptr<const char> first, mm_array_ptr<const char> second) {
+  while(*first && *second) {
+    if(Curl_raw_toupper(*first) != Curl_raw_toupper(*second))
+      /* get out of the loop as soon as they don't match */
+      break;
+    first++;
+    second++;
+  }
+  /* we do the comparison here (possibly again), just to make sure that if the
+     loop above is skipped because one of the strings reached zero, we must not
+     return this as a successful match */
+  return (Curl_raw_toupper(*first) == Curl_raw_toupper(*second));
+}
+
 // TODO: Remove this temporary fn.
 int Curl_strncasecompare_raw(const char *first, const char *second, size_t max) {
+  while(*first && *second && max) {
+    if(Curl_raw_toupper(*first) != Curl_raw_toupper(*second)) {
+      break;
+    }
+    max--;
+    first++;
+    second++;
+  }
+  if(0 == max)
+    return 1; /* they are equal this far */
+
+  return Curl_raw_toupper(*first) == Curl_raw_toupper(*second);
+}
+
+// TODO
+int mm_Curl_strncasecompare_0(mm_array_ptr<const char> first, const char *second, size_t max) {
   while(*first && *second && max) {
     if(Curl_raw_toupper(*first) != Curl_raw_toupper(*second)) {
       break;

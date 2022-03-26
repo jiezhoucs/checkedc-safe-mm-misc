@@ -1847,7 +1847,8 @@ static bool contains_trailers(const char *p, size_t len)
       ;
     if(p == end || (size_t)(end - p) < sizeof("trailers") - 1)
       return FALSE;
-    if(strncasecompare("trailers", p, sizeof("trailers") - 1)) {
+    // TODO
+    if(strncasecompare_raw("trailers", p, sizeof("trailers") - 1)) {
       p += sizeof("trailers") - 1;
       for(; p != end && (*p == ' ' || *p == '\t'); ++p)
         ;
@@ -1877,23 +1878,24 @@ static header_instruction inspect_header(const char *name, size_t namelen,
                                          const char *value, size_t valuelen) {
   switch(namelen) {
   case 2:
-    if(!strncasecompare("te", name, namelen))
+    // TODO
+    if(!strncasecompare_raw("te", name, namelen))
       return HEADERINST_FORWARD;
 
     return contains_trailers(value, valuelen) ?
            HEADERINST_TE_TRAILERS : HEADERINST_IGNORE;
   case 7:
-    return strncasecompare("upgrade", name, namelen) ?
+    return strncasecompare_raw("upgrade", name, namelen) ?
            HEADERINST_IGNORE : HEADERINST_FORWARD;
   case 10:
-    return (strncasecompare("connection", name, namelen) ||
-            strncasecompare("keep-alive", name, namelen)) ?
+    return (strncasecompare_raw("connection", name, namelen) ||
+            strncasecompare_raw("keep-alive", name, namelen)) ?
            HEADERINST_IGNORE : HEADERINST_FORWARD;
   case 16:
-    return strncasecompare("proxy-connection", name, namelen) ?
+    return strncasecompare_raw("proxy-connection", name, namelen) ?
            HEADERINST_IGNORE : HEADERINST_FORWARD;
   case 17:
-    return strncasecompare("transfer-encoding", name, namelen) ?
+    return strncasecompare_raw("transfer-encoding", name, namelen) ?
            HEADERINST_IGNORE : HEADERINST_FORWARD;
   default:
     return HEADERINST_FORWARD;
@@ -2077,7 +2079,7 @@ static ssize_t http2_send(struct Curl_easy *data, int sockindex,
       goto fail;
     hlen = end - hdbuf;
 
-    if(hlen == 4 && strncasecompare("host", hdbuf, 4)) {
+    if(hlen == 4 && strncasecompare_raw("host", hdbuf, 4)) {
       authority_idx = i;
       nva[i].name = (unsigned char *)":authority";
       nva[i].namelen = strlen((char *)nva[i].name);

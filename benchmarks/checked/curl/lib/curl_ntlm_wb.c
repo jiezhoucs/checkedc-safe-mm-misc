@@ -339,7 +339,7 @@ CURLcode Curl_input_ntlm_wb(struct Curl_easy *data,
 
   (void) data;  /* In case it gets unused by nop log macros. */
 
-  if(!checkprefix("NTLM", header))
+  if(!checkprefix_raw("NTLM", header))
     return CURLE_BAD_CONTENT_ENCODING;
 
   header += strlen("NTLM");

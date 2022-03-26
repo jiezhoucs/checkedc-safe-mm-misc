@@ -82,13 +82,14 @@ CURLcode Curl_convert_clone(struct Curl_easy *data,
  * conversions on non-ASCII platforms. It converts the buffer _in place_.
  */
 CURLcode Curl_convert_to_network(struct Curl_easy *data,
-                                 char *buffer, size_t length)
+                                 mm_array_ptr<char> buffer, size_t length)
 {
   if(data && data->set.convtonetwork) {
     /* use translation callback */
     CURLcode result;
     Curl_set_in_callback(data, true);
-    result = data->set.convtonetwork(buffer, length);
+    // TODO?
+    result = data->set.convtonetwork(_GETCHARPTR(buffer), length);
     Curl_set_in_callback(data, false);
     if(result) {
       failf(data,
@@ -103,7 +104,7 @@ CURLcode Curl_convert_to_network(struct Curl_easy *data,
     /* do the translation ourselves */
     iconv_t tmpcd = (iconv_t) -1;
     iconv_t *cd = &tmpcd;
-    char *input_ptr, *output_ptr;
+    mm_array_ptr<char> input_ptr = NULL, output_ptr = NULL;
     size_t in_bytes, out_bytes, rc;
     char ebuffer[STRERROR_LEN];
 
@@ -125,8 +126,8 @@ CURLcode Curl_convert_to_network(struct Curl_easy *data,
     /* call iconv */
     input_ptr = output_ptr = buffer;
     in_bytes = out_bytes = length;
-    rc = iconv(*cd, &input_ptr, &in_bytes,
-               &output_ptr, &out_bytes);
+    rc = iconv(*cd, (char **)&input_ptr, &in_bytes,
+               (char **)&output_ptr, &out_bytes);
     if(!data)
       iconv_close(tmpcd);
     if((rc == ICONV_ERROR) || (in_bytes)) {

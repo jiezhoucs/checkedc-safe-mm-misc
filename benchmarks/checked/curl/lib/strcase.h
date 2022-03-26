@@ -34,19 +34,28 @@
 
 #define strcasecompare(a,b) Curl_strcasecompare(a,b)
 #define strncasecompare(a,b,c) Curl_strncasecompare(a,b,c)
-// TODO
 #define strncasecompare_raw(a,b,c) Curl_strncasecompare_raw(a,b,c)
+#define mm_strncasecompare(a,b,c) mm_Curl_strncasecompare(a,b,c)
+#define mm_strcasecompare(a,b) mm_Curl_strcasecompare(a,b)
+#define mm_strcasecompare_0(a,b) mm_Curl_strcasecompare_0(a,b)
+#define mm_strncasecompare_0(a,b,c) mm_Curl_strncasecompare_0(a,b,c)
 
 int Curl_strcasecompare(const char *first, const char *second);
 int Curl_safe_strcasecompare(const char *first, const char *second);
-int Curl_strncasecompare(mm_array_ptr<const char> first, const char *second, size_t max);
+int Curl_strncasecompare(mm_array_ptr<const char> first, mm_array_ptr<const char> second, size_t max);
 int Curl_strncasecompare_raw(const char *first, const char *second, size_t max);
+
+int mm_Curl_strcasecompare_0(mm_array_ptr<const char> first, const char *second);
+int mm_Curl_strcasecompare(mm_array_ptr<const char> first, mm_array_ptr<const char> second);
+int mm_Curl_strncasecompare_0(mm_array_ptr<const char> first, const char *second, size_t max);
+int mm_Curl_strncasecompare(mm_array_ptr<const char> first, mm_array_ptr<const char> second, size_t max);
 
 char Curl_raw_toupper(char in);
 
 /* checkprefix() is a shorter version of the above, used when the first
    argument is zero-byte terminated */
-#define checkprefix(a,b)    curl_strnequal(a,b,strlen(a))
+#define checkprefix(a, b) mm_strncasecompare(a,b,strlen(a))
+#define checkprefix_raw(a,b)    curl_strnequal(a,b,strlen(a))
 
 void Curl_strntoupper(char *dest, const char *src, size_t n);
 void Curl_strntolower(char *dest, const char *src, size_t n);

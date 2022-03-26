@@ -56,7 +56,8 @@ CURLcode Curl_input_digest(struct Curl_easy *data,
     digest = &data->state.digest;
   }
 
-  if(!checkprefix("Digest", header) || !ISSPACE(header[6]))
+  // TODO
+  if(!checkprefix_raw("Digest", header) || !ISSPACE(header[6]))
     return CURLE_BAD_CONTENT_ENCODING;
 
   header += strlen("Digest");

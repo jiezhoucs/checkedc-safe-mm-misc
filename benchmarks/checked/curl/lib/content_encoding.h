@@ -31,8 +31,8 @@ struct contenc_writer {
 
 /* Content encoding writer. */
 struct content_encoding {
-  const char *name;        /* Encoding name. */
-  const char *alias;       /* Encoding name alias. */
+  mm_array_ptr<const char> name;        /* Encoding name. */
+  mm_array_ptr<const char> alias;       /* Encoding name alias. */
   CURLcode (*init_writer)(struct Curl_easy *data,
                           struct contenc_writer *writer);
   CURLcode (*unencode_write)(struct Curl_easy *data,
@@ -50,6 +50,6 @@ CURLcode Curl_unencode_write(struct Curl_easy *data,
                              struct contenc_writer *writer,
                              const char *buf, size_t nbytes);
 void Curl_unencode_cleanup(struct Curl_easy *data);
-char *Curl_all_content_encodings(void);
+mm_array_ptr<char> Curl_all_content_encodings(void);
 
 #endif /* HEADER_CURL_CONTENT_ENCODING_H */

@@ -103,7 +103,7 @@ mm_array_ptr<char> Curl_checkheaders(const struct Curl_easy *data,
   DEBUGASSERT(thisheader[thislen-1] != ':');
 
   for(head = data->set.headers; head; head = head->next) {
-    if(strncasecompare(head->data, thisheader, thislen) &&
+    if(mm_strncasecompare_0(head->data, thisheader, thislen) &&
        Curl_headersep(head->data[thislen]) )
       return head->data;
   }

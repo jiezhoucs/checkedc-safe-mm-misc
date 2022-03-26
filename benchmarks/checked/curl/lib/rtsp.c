@@ -772,7 +772,7 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
 {
   long CSeq = 0;
 
-  if(checkprefix("CSeq:", header)) {
+  if(checkprefix_raw("CSeq:", header)) {
     /* Store the received CSeq. Match is verified in rtsp_done */
     int nc = sscanf(&header[4], ": %ld", &CSeq);
     if(nc == 1) {
@@ -785,7 +785,7 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
       return CURLE_RTSP_CSEQ_ERROR;
     }
   }
-  else if(checkprefix("Session:", header)) {
+  else if(checkprefix_raw("Session:", header)) {
     char *start;
     char *end;
     size_t idlen;

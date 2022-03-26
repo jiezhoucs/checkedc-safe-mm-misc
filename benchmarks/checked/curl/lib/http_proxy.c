@@ -568,10 +568,9 @@ static CURLcode CONNECT(struct Curl_easy *data,
           continue;
         }
 
-        // TODO
-        if((checkprefix("WWW-Authenticate:", _GETCHARPTR(linep)) &&
+        if((checkprefix("WWW-Authenticate:", linep) &&
             (401 == k->httpcode)) ||
-           (checkprefix("Proxy-authenticate:", _GETCHARPTR(linep)) &&
+           (checkprefix("Proxy-authenticate:", linep) &&
             (407 == k->httpcode))) {
 
           bool proxy = (k->httpcode == 407) ? TRUE : FALSE;
@@ -588,8 +587,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
           if(result)
             return result;
         }
-        //TODO
-        else if(checkprefix("Content-Length:", _GETCHARPTR(linep))) {
+        else if(checkprefix("Content-Length:", linep)) {
           if(k->httpcode/100 == 2) {
             /* A client MUST ignore any Content-Length or Transfer-Encoding
                header fields received in a successful response to CONNECT.
@@ -606,8 +604,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
         // TODO
         else if(Curl_compareheader(linep, "Connection:", "close"))
           s->close_connection = TRUE;
-        // TODO
-        else if(checkprefix("Transfer-Encoding:", _GETCHARPTR(linep))) {
+        else if(checkprefix("Transfer-Encoding:", linep)) {
           if(k->httpcode/100 == 2) {
             /* A client MUST ignore any Content-Length or Transfer-Encoding
                header fields received in a successful response to CONNECT.

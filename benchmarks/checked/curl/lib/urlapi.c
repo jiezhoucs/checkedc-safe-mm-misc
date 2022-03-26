@@ -832,8 +832,8 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
       if(ptr[0] != '/' && !STARTS_WITH_URL_DRIVE_PREFIX(ptr)) {
         /* the URL includes a host name, it must match "localhost" or
            "127.0.0.1" to be valid */
-        if(!checkprefix("localhost/", ptr) &&
-           !checkprefix("127.0.0.1/", ptr)) {
+        if(!checkprefix_raw("localhost/", ptr) &&
+           !checkprefix_raw("127.0.0.1/", ptr)) {
           /* Invalid file://hostname/, expected localhost or 127.0.0.1 or
              none */
           return CURLUE_MALFORMED_INPUT;
@@ -1019,17 +1019,17 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
 
     if((flags & CURLU_GUESS_SCHEME) && !schemep) {
       /* legacy curl-style guess based on host name */
-      if(checkprefix("ftp.", hostname))
+      if(checkprefix_raw("ftp.", hostname))
         schemep = "ftp";
-      else if(checkprefix("dict.", hostname))
+      else if(checkprefix_raw("dict.", hostname))
         schemep = "dict";
-      else if(checkprefix("ldap.", hostname))
+      else if(checkprefix_raw("ldap.", hostname))
         schemep = "ldap";
-      else if(checkprefix("imap.", hostname))
+      else if(checkprefix_raw("imap.", hostname))
         schemep = "imap";
-      else if(checkprefix("smtp.", hostname))
+      else if(checkprefix_raw("smtp.", hostname))
         schemep = "smtp";
-      else if(checkprefix("pop3.", hostname))
+      else if(checkprefix_raw("pop3.", hostname))
         schemep = "pop3";
       else
         schemep = "http";

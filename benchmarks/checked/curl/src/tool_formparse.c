@@ -521,7 +521,7 @@ static int get_param_part(mm_ptr<struct OperationConfig> config, char endchar,
     while(ISSPACE(*++p))
       ;
 
-    if(!endct && checkprefix("type=", p)) {
+    if(!endct && checkprefix_raw("type=", p)) {
       for(p += 5; ISSPACE(*p); p++)
         ;
       /* set type pointer */
@@ -541,7 +541,7 @@ static int get_param_part(mm_ptr<struct OperationConfig> config, char endchar,
           endct = p + 1;
       sep = *p;
     }
-    else if(checkprefix("filename=", p)) {
+    else if(checkprefix_raw("filename=", p)) {
       if(endct) {
         *endct = '\0';
         endct = NULL;
@@ -557,7 +557,7 @@ static int get_param_part(mm_ptr<struct OperationConfig> config, char endchar,
       sep = *p;
       *endpos = '\0';
     }
-    else if(checkprefix("headers=", p)) {
+    else if(checkprefix_raw("headers=", p)) {
       if(endct) {
         *endct = '\0';
         endct = NULL;
@@ -613,7 +613,7 @@ static int get_param_part(mm_ptr<struct OperationConfig> config, char endchar,
         }
       }
     }
-    else if(checkprefix("encoder=", p)) {
+    else if(checkprefix_raw("encoder=", p)) {
       if(endct) {
         *endct = '\0';
         endct = NULL;

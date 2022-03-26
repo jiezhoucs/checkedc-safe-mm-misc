@@ -147,7 +147,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
   do {
     while(*p && ISSPACE(*p))
       p++;
-    if(Curl_strncasecompare("max-age=", p, 8)) {
+    if(Curl_strncasecompare_raw("max-age=", p, 8)) {
       bool quoted = FALSE;
       CURLofft offt;
       char *endp;
@@ -176,7 +176,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
       }
       gotma = TRUE;
     }
-    else if(Curl_strncasecompare("includesubdomains", p, 17)) {
+    else if(Curl_strncasecompare_raw("includesubdomains", p, 17)) {
       if(gotinc)
         return CURLE_BAD_FUNCTION_ARGUMENT;
       subdomains = TRUE;
