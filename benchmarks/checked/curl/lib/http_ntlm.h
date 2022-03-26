@@ -28,7 +28,7 @@
 
 /* this is for ntlm header input */
 CURLcode Curl_input_ntlm(struct Curl_easy *data, bool proxy,
-                         const char *header);
+                         mm_array_ptr<const char> header);
 
 /* this is for creating ntlm header output */
 CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy);

@@ -576,8 +576,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
           if(!auth)
             return CURLE_OUT_OF_MEMORY;
 
-          // TODO
-          result = Curl_http_input_auth(data, proxy, _GETCHARPTR(auth));
+          result = Curl_http_input_auth(data, proxy, auth);
 
           MM_FREE(char, auth);
 
@@ -593,7 +592,6 @@ static CURLcode CONNECT(struct Curl_easy *data,
                   k->httpcode);
           }
           else {
-            // TODO
             (void)curlx_strtoofft(_GETCHARPTR(linep) +
                                   strlen("Content-Length:"), NULL, 10, _GETPTR(curl_off_t, &s->cl));
           }

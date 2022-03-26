@@ -43,7 +43,7 @@ Proxy-Authenticate: Digest realm="testrealm", nonce="1053604598"
 
 CURLcode Curl_input_digest(struct Curl_easy *data,
                            bool proxy,
-                           const char *header) /* rest of the *-authenticate:
+                           mm_array_ptr<const char> header) /* rest of the *-authenticate:
                                                   header */
 {
   /* Point to the correct struct with this */
@@ -56,15 +56,15 @@ CURLcode Curl_input_digest(struct Curl_easy *data,
     digest = &data->state.digest;
   }
 
-  // TODO
-  if(!checkprefix_raw("Digest", header) || !ISSPACE(header[6]))
+  if(!checkprefix("Digest", header) || !ISSPACE(header[6]))
     return CURLE_BAD_CONTENT_ENCODING;
 
   header += strlen("Digest");
   while(*header && ISSPACE(*header))
     header++;
 
-  return Curl_auth_decode_digest_http_message(header, digest);
+  // TODO
+  return Curl_auth_decode_digest_http_message(_GETCHARPTR(header), digest);
 }
 
 CURLcode Curl_output_digest(struct Curl_easy *data,

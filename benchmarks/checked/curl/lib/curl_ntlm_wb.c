@@ -332,14 +332,14 @@ done:
 CURLcode Curl_input_ntlm_wb(struct Curl_easy *data,
                             struct connectdata *conn,
                             bool proxy,
-                            const char *header)
+                            mm_array_ptr<const char> header)
 {
   struct ntlmdata *ntlm = proxy ? &conn->proxyntlm : &conn->ntlm;
   curlntlm *state = proxy ? &conn->proxy_ntlm_state : &conn->http_ntlm_state;
 
   (void) data;  /* In case it gets unused by nop log macros. */
 
-  if(!checkprefix_raw("NTLM", header))
+  if(!checkprefix("NTLM", header))
     return CURLE_BAD_CONTENT_ENCODING;
 
   header += strlen("NTLM");
@@ -347,7 +347,8 @@ CURLcode Curl_input_ntlm_wb(struct Curl_easy *data,
     header++;
 
   if(*header) {
-    ntlm->challenge = strdup(header);
+    // TODO
+    ntlm->challenge = strdup(_GETCHARPTR(header));
     if(!ntlm->challenge)
       return CURLE_OUT_OF_MEMORY;
 

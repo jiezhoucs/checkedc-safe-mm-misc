@@ -62,7 +62,7 @@
 
 CURLcode Curl_input_ntlm(struct Curl_easy *data,
                          bool proxy,         /* if proxy or not */
-                         const char *header) /* rest of the www-authenticate:
+                         mm_array_ptr<const char> header) /* rest of the www-authenticate:
                                                 header */
 {
   /* point to the correct struct with this */
@@ -74,7 +74,7 @@ CURLcode Curl_input_ntlm(struct Curl_easy *data,
   ntlm = proxy ? &conn->proxyntlm : &conn->ntlm;
   state = proxy ? &conn->proxy_ntlm_state : &conn->http_ntlm_state;
 
-  if(checkprefix_raw("NTLM", header)) {
+  if(checkprefix("NTLM", header)) {
     header += strlen("NTLM");
 
     while(*header && ISSPACE(*header))
@@ -84,7 +84,8 @@ CURLcode Curl_input_ntlm(struct Curl_easy *data,
       unsigned char *hdr;
       size_t hdrlen;
 
-      result = Curl_base64_decode(header, &hdr, &hdrlen);
+      // TODO
+      result = Curl_base64_decode(_GETCHARPTR(header), &hdr, &hdrlen);
       if(!result) {
         struct bufref hdrbuf;
 

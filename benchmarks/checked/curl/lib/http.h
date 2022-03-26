@@ -126,7 +126,7 @@ CURLcode Curl_http_connect(struct Curl_easy *data, bool *done);
 
 /* These functions are in http.c */
 CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
-                              const char *auth);
+                              mm_array_ptr<const char> auth);
 CURLcode Curl_http_auth_act(struct Curl_easy *data);
 
 /* If only the PICKNONE bit is set, there has been a round-trip and we

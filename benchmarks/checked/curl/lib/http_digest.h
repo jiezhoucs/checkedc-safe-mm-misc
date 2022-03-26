@@ -27,7 +27,7 @@
 
 /* this is for digest header input */
 CURLcode Curl_input_digest(struct Curl_easy *data,
-                           bool proxy, const char *header);
+                           bool proxy, mm_array_ptr<const char> header);
 
 /* this is for creating digest header output */
 CURLcode Curl_output_digest(struct Curl_easy *data,

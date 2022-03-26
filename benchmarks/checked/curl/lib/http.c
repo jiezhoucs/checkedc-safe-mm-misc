@@ -908,7 +908,7 @@ static int is_valid_auth_separator(char ch)
 }
 
 CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
-                              const char *auth) /* the first non-space */
+                              mm_array_ptr<const char> auth) /* the first non-space */
 {
   /*
    * This resource requires authentication
@@ -976,7 +976,7 @@ CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
 #endif
 #ifdef USE_NTLM
       /* NTLM support requires the SSL crypto libs */
-      if(checkprefix_raw("NTLM", auth) && is_valid_auth_separator(auth[4])) {
+      if(checkprefix("NTLM", auth) && is_valid_auth_separator(auth[4])) {
         if((authp->avail & CURLAUTH_NTLM) ||
            (authp->avail & CURLAUTH_NTLM_WB) ||
            Curl_auth_is_ntlm_supported()) {
@@ -1014,7 +1014,7 @@ CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
       else
 #endif
 #ifndef CURL_DISABLE_CRYPTO_AUTH
-        if(checkprefix_raw("Digest", auth) && is_valid_auth_separator(auth[6])) {
+        if(checkprefix("Digest", auth) && is_valid_auth_separator(auth[6])) {
           if((authp->avail & CURLAUTH_DIGEST) != 0)
             infof(data, "Ignoring duplicate digest auth header.");
           else if(Curl_auth_is_digest_supported()) {
@@ -1036,7 +1036,7 @@ CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
         }
         else
 #endif
-          if(checkprefix_raw("Basic", auth) &&
+          if(checkprefix("Basic", auth) &&
              is_valid_auth_separator(auth[5])) {
             *availp |= CURLAUTH_BASIC;
             authp->avail |= CURLAUTH_BASIC;
@@ -1050,7 +1050,7 @@ CURLcode Curl_http_input_auth(struct Curl_easy *data, bool proxy,
             }
           }
           else
-            if(checkprefix_raw("Bearer", auth) &&
+            if(checkprefix("Bearer", auth) &&
                is_valid_auth_separator(auth[6])) {
               *availp |= CURLAUTH_BEARER;
               authp->avail |= CURLAUTH_BEARER;
@@ -2712,10 +2712,9 @@ CURLcode Curl_http_cookies(struct Curl_easy *data,
                            struct dynbuf *r)
 {
   CURLcode result = CURLE_OK;
-  char *addcookies = NULL;
+  mm_array_ptr<char> addcookies = NULL;
   if(data->set.str[STRING_COOKIE] && !Curl_checkheaders(data, "Cookie"))
-      // TODO
-    addcookies = _GETCHARPTR(data->set.str[STRING_COOKIE]);
+    addcookies = data->set.str[STRING_COOKIE];
 
   if(data->cookies || addcookies) {
     mm_ptr<struct Cookie> co = NULL; /* no cookies from start */
@@ -2758,7 +2757,7 @@ CURLcode Curl_http_cookies(struct Curl_easy *data,
       if(!count)
         result = Curl_dyn_add(r, "Cookie: ");
       if(!result) {
-        result = Curl_dyn_addf(r, "%s%s", count?"; ":"", addcookies);
+        result = Curl_dyn_addf(r, "%s%s", count?"; ":"", _GETCHARPTR(addcookies));
         count++;
       }
     }
@@ -3624,8 +3623,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
     if(!auth)
       return CURLE_OUT_OF_MEMORY;
 
-    // TODO
-    result = Curl_http_input_auth(data, proxy, _GETCHARPTR(auth));
+    result = Curl_http_input_auth(data, proxy, auth);
 
     MM_FREE(char, auth);
 
