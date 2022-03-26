@@ -91,7 +91,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   char *canonical_headers = NULL;
   char *signed_headers = NULL;
   Curl_HttpReq httpreq;
-  const char *method;
+  mm_array_ptr<const char> method = NULL;
   // TODO
   const char *post_data = _GETCHARPTR(data->set.postfields) ? _GETCHARPTR(data->set.postfields) : "";
   unsigned char sha_hash[32];
@@ -296,7 +296,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
                   "%s\n" /* CanonicalHeaders */
                   "%s\n" /* SignedHeaders */
                   "%s",  /* HashedRequestPayload in hex */
-                  method,
+                  _GETCHARPTR(method),
                   _GETCHARPTR(data->state.up.path),
                   data->state.up.query ? data->state.up.query : "",
                   canonical_headers,

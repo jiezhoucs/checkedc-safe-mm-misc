@@ -249,13 +249,13 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   curl_off_t postsize = 0; /* for ANNOUNCE and SET_PARAMETER */
   curl_off_t putsize = 0; /* for ANNOUNCE and SET_PARAMETER */
 
-  const char *p_request = NULL;
+  mm_array_ptr<const char> p_request = NULL;
   const char *p_session_id = NULL;
   const char *p_accept = NULL;
   const char *p_accept_encoding = NULL;
   const char *p_range = NULL;
   const char *p_referrer = NULL;
-  const char *p_stream_uri = NULL;
+  mm_array_ptr<const char> p_stream_uri = NULL;
   const char *p_transport = NULL;
   const char *p_uagent = NULL;
   const char *p_proxyuserpwd = NULL;
@@ -329,13 +329,13 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   if(!p_session_id &&
      (rtspreq & ~(RTSPREQ_OPTIONS | RTSPREQ_DESCRIBE | RTSPREQ_SETUP))) {
     failf(data, "Refusing to issue an RTSP request [%s] without a session ID.",
-          p_request);
+          _GETCHARPTR(p_request));
     return CURLE_BAD_FUNCTION_ARGUMENT;
   }
 
   /* Stream URI. Default to server '*' if not specified */
   if(data->set.str[STRING_RTSP_STREAM_URI]) {
-    p_stream_uri = _GETCHARPTR(data->set.str[STRING_RTSP_STREAM_URI]);
+    p_stream_uri = data->set.str[STRING_RTSP_STREAM_URI];
   }
   else {
     p_stream_uri = "*";
@@ -451,7 +451,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
     Curl_dyn_addf(&req_buffer,
                   "%s %s RTSP/1.0\r\n" /* Request Stream-URI RTSP/1.0 */
                   "CSeq: %ld\r\n", /* CSeq */
-                  p_request, p_stream_uri, rtsp->CSeq_sent);
+                  _GETCHARPTR(p_request), _GETCHARPTR(p_stream_uri), rtsp->CSeq_sent);
   if(result)
     return result;
 

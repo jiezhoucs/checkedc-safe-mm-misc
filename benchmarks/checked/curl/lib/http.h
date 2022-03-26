@@ -86,7 +86,7 @@ CURLcode Curl_http_compile_trailers(struct curl_slist *trailers,
                                     struct Curl_easy *handle);
 
 void Curl_http_method(struct Curl_easy *data, struct connectdata *conn,
-                      const char **method, Curl_HttpReq *);
+                      mm_array_ptr<const char> *method, Curl_HttpReq *);
 CURLcode Curl_http_useragent(struct Curl_easy *data);
 CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn);
 CURLcode Curl_http_target(struct Curl_easy *data, struct connectdata *conn,
@@ -317,9 +317,9 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
 CURLcode
 Curl_http_output_auth(struct Curl_easy *data,
                       struct connectdata *conn,
-                      const char *request,
+                      mm_array_ptr<const char> request,
                       Curl_HttpReq httpreq,
-                      const char *path,
+                      mm_array_ptr<const char> path,
                       bool proxytunnel); /* TRUE if this is the request setting
                                             up the proxy tunnel */
 

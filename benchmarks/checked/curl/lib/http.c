@@ -662,8 +662,8 @@ static CURLcode
 output_auth_headers(struct Curl_easy *data,
                     struct connectdata *conn,
                     struct auth *authstatus,
-                    const char *request,
-                    const char *path,
+                    mm_array_ptr<const char> request,
+                    mm_array_ptr<const char> path,
                     bool proxy)
 {
   const char *auth = NULL;
@@ -793,9 +793,9 @@ output_auth_headers(struct Curl_easy *data,
 CURLcode
 Curl_http_output_auth(struct Curl_easy *data,
                       struct connectdata *conn,
-                      const char *request,
+                      mm_array_ptr<const char> request,
                       Curl_HttpReq httpreq,
-                      const char *path,
+                      mm_array_ptr<const char> path,
                       bool proxytunnel) /* TRUE if this is the request setting
                                            up the proxy tunnel */
 {
@@ -881,7 +881,7 @@ Curl_http_output_auth(struct Curl_easy *data,
 CURLcode
 Curl_http_output_auth(struct Curl_easy *data,
                       struct connectdata *conn,
-                      const char *request,
+                      mm_array_ptr<const char> request,
                       Curl_HttpReq httpreq,
                       const char *path,
                       bool proxytunnel)
@@ -2025,7 +2025,7 @@ CURLcode Curl_add_timecondition(struct Curl_easy *data,
 #endif
 
 void Curl_http_method(struct Curl_easy *data, struct connectdata *conn,
-                      const char **method, Curl_HttpReq *reqp)
+                      mm_array_ptr<const char> *method, Curl_HttpReq *reqp)
 {
   Curl_HttpReq httpreq = data->state.httpreq;
   mm_array_ptr<const char> request = NULL;
@@ -2060,8 +2060,7 @@ void Curl_http_method(struct Curl_easy *data, struct connectdata *conn,
       }
     }
   }
-  // TODO
-  *method = _GETCHARPTR(request);
+  *method = request;
   *reqp = httpreq;
 }
 
@@ -3040,7 +3039,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
   mm_ptr<struct HTTP> http = NULL;
   Curl_HttpReq httpreq;
   const char *te = ""; /* transfer-encoding */
-  const char *request;
+  mm_array_ptr<const char> request = NULL;
   const char *httpstring;
   struct dynbuf req;
   char *altused = NULL;
@@ -3110,16 +3109,15 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
 
   /* setup the authentication headers */
   {
-    char *pq = NULL;
+    mm_array_ptr<char> pq = NULL;
     if(data->state.up.query) {
-      pq = aprintf("%s?%s", _GETCHARPTR(data->state.up.path), data->state.up.query);
+      pq = mmize_str(aprintf("%s?%s", _GETCHARPTR(data->state.up.path), data->state.up.query));
       if(!pq)
         return CURLE_OUT_OF_MEMORY;
     }
-    // TODO
     result = Curl_http_output_auth(data, conn, request, httpreq,
-                                   (pq ? pq : _GETCHARPTR(data->state.up.path)), FALSE);
-    free(pq);
+                                   (pq ? pq : data->state.up.path), FALSE);
+    MM_FREE(char, pq);
     if(result)
       return result;
   }
@@ -3174,7 +3172,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
 
   /* add the main request stuff */
   /* GET/HEAD/POST/PUT */
-  result = Curl_dyn_addf(&req, "%s ", request);
+  result = Curl_dyn_addf(&req, "%s ", _GETCHARPTR(request));
   if(!result)
     result = Curl_http_target(data, conn, &req);
   if(result) {

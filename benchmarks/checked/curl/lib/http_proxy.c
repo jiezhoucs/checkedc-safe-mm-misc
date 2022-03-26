@@ -114,8 +114,7 @@ CURLcode Curl_proxy_connect(struct Curl_easy *data, int sockindex)
     else
       remote_port = conn->remote_port;
 
-    // TODO
-    result = Curl_proxyCONNECT(data, sockindex, _GETCHARPTR(hostname), remote_port);
+    result = Curl_proxyCONNECT(data, sockindex, hostname, remote_port);
     if(CURLE_OK != result)
       return result;
     Curl_safefree(data->state.aptr.proxyuserpwd);
@@ -220,29 +219,28 @@ static void connect_done(struct Curl_easy *data)
 
 static CURLcode CONNECT_host(struct Curl_easy *data,
                              struct connectdata *conn,
-                             const char *hostname,
+                             mm_array_ptr<const char> hostname,
                              int remote_port,
-                             char **connecthostp,
+                             mm_array_ptr<char> *connecthostp,
                              char **hostp)
 {
-  char *hostheader; /* for CONNECT */
+  mm_array_ptr<char> hostheader = NULL; /* for CONNECT */
   char *host = NULL; /* Host: */
   bool ipv6_ip = conn->bits.ipv6_ip;
 
   /* the hostname may be different */
-  // TODO
-  if(hostname != _GETCHARPTR(conn->host.name))
+  if(hostname != conn->host.name)
     ipv6_ip = (strchr(_GETCHARPTR(hostname), ':') != NULL);
   hostheader = /* host:port with IPv6 support */
-    aprintf("%s%s%s:%d", ipv6_ip?"[":"", hostname, ipv6_ip?"]":"",
-            remote_port);
+    mmize_str(aprintf("%s%s%s:%d", ipv6_ip?"[":"", _GETCHARPTR(hostname), ipv6_ip?"]":"",
+            remote_port));
   if(!hostheader)
     return CURLE_OUT_OF_MEMORY;
 
   if(!Curl_checkProxyheaders(data, conn, "Host")) {
-    host = aprintf("Host: %s\r\n", hostheader);
+    host = aprintf("Host: %s\r\n", _GETCHARPTR(hostheader));
     if(!host) {
-      free(hostheader);
+      MM_FREE(char, hostheader);
       return CURLE_OUT_OF_MEMORY;
     }
   }
@@ -254,7 +252,7 @@ static CURLcode CONNECT_host(struct Curl_easy *data,
 #ifndef USE_HYPER
 static CURLcode CONNECT(struct Curl_easy *data,
                         int sockindex,
-                        const char *hostname,
+                        mm_array_ptr<const char> hostname,
                         int remote_port)
 {
   int subversion = 0;
@@ -281,11 +279,11 @@ static CURLcode CONNECT(struct Curl_easy *data,
       /* BEGIN CONNECT PHASE */
       // TODO
       struct dynbuf *req = GETPTR(struct dynbuf, &s->req);
-      char *hostheader = NULL;
+      mm_array_ptr<char> hostheader = NULL;
       char *host = NULL;
 
       infof(data, "Establish HTTP proxy tunnel to %s:%d",
-            hostname, remote_port);
+            _GETCHARPTR(hostname), remote_port);
 
         /* This only happens if we've looped here due to authentication
            reasons, and we don't really use the newly cloned URL here
@@ -314,7 +312,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
                         "CONNECT %s HTTP/%s\r\n"
                         "%s"  /* Host: */
                         "%s", /* Proxy-Authorization */
-                        hostheader,
+                        _GETCHARPTR(hostheader),
                         httpv,
                         host?host:"",
                         data->state.aptr.proxyuserpwd?
@@ -344,7 +342,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
           failf(data, "Failed sending CONNECT to proxy");
       }
       free(host);
-      free(hostheader);
+      MM_FREE(char, hostheader);
       if(result)
         return result;
 
@@ -997,7 +995,7 @@ void Curl_connect_free(struct Curl_easy *data)
 
 CURLcode Curl_proxyCONNECT(struct Curl_easy *data,
                            int sockindex,
-                           const char *hostname,
+                           mm_array_ptr<const char> hostname,
                            int remote_port)
 {
   CURLcode result;
