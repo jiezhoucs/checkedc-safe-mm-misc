@@ -435,7 +435,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_CRYPTO_AUTH)
   Curl_http_auth_cleanup_digest(data);
 #endif
-  Curl_safefree(data->info.contenttype);
+  MM_curl_free(char, data->info.contenttype);
   Curl_safefree(data->info.wouldredirect);
 
   /* this destroys the channel and we cannot use it anymore after this */
@@ -1529,11 +1529,11 @@ void Curl_verboseconnect(struct Curl_easy *data,
   if(data->set.verbose)
     infof(data, "Connected to %s (%s) port %u (#%ld)",
 #ifndef CURL_DISABLE_PROXY
-          conn->bits.socksproxy ? conn->socks_proxy.host.dispname :
-          conn->bits.httpproxy ? conn->http_proxy.host.dispname :
+          conn->bits.socksproxy ? _GETCHARPTR(conn->socks_proxy.host.dispname) :
+          conn->bits.httpproxy ? _GETCHARPTR(conn->http_proxy.host.dispname) :
 #endif
-          conn->bits.conn_to_host ? conn->conn_to_host.dispname :
-          conn->host.dispname,
+          conn->bits.conn_to_host ? _GETCHARPTR(conn->conn_to_host.dispname) :
+          _GETCHARPTR(conn->host.dispname),
           conn->primary_ip, conn->port, conn->connection_id);
 }
 #endif
@@ -1584,8 +1584,7 @@ CURLcode Curl_idnconvert_hostname(struct Curl_easy *data,
 #endif
 
   /* set the name we use to display the host name */
-  // TODO
-  host->dispname = _GETCHARPTR(host->name);
+  host->dispname = host->name;
 
   /* Check name for non-ASCII and convert hostname to ACE form if we can */
   // TODO
@@ -3414,12 +3413,12 @@ static CURLcode resolve_server(struct Curl_easy *data,
 
       else if(rc == CURLRESOLV_TIMEDOUT) {
         failf(data, "Failed to resolve host '%s' with timeout after %ld ms",
-              connhost->dispname,
+              _GETCHARPTR(connhost->dispname),
               Curl_timediff(Curl_now(), data->progress.t_startsingle));
         result = CURLE_OPERATION_TIMEDOUT;
       }
       else if(!hostaddr) {
-        failf(data, "Could not resolve host: %s", connhost->dispname);
+        failf(data, "Could not resolve host: %s", _GETCHARPTR(connhost->dispname));
         result = CURLE_COULDNT_RESOLVE_HOST;
         /* don't return yet, we need to clean up the timeout first */
       }
@@ -3446,7 +3445,7 @@ static CURLcode resolve_server(struct Curl_easy *data,
         result = CURLE_OPERATION_TIMEDOUT;
 
       else if(!hostaddr) {
-        failf(data, "Couldn't resolve proxy '%s'", host->dispname);
+        failf(data, "Couldn't resolve proxy '%s'", _GETCHARPTR(host->dispname));
         result = CURLE_COULDNT_RESOLVE_PROXY;
         /* don't return yet, we need to clean up the timeout first */
       }
@@ -3910,12 +3909,12 @@ static CURLcode create_conn(struct Curl_easy *data,
     infof(data, "Re-using existing connection! (#%ld) with %s %s",
           conn->connection_id,
           conn->bits.proxy?"proxy":"host",
-          conn->socks_proxy.host.name ? conn->socks_proxy.host.dispname :
-          conn->http_proxy.host.name ? conn->http_proxy.host.dispname :
-          conn->host.dispname);
+          conn->socks_proxy.host.name ? _GETCHARPTR(conn->socks_proxy.host.dispname) :
+          conn->http_proxy.host.name ? _GETCHARPTR(conn->http_proxy.host.dispname) :
+          _GETCHARPTR(conn->host.dispname));
 #else
     infof(data, "Re-using existing connection! (#%ld) with host %s",
-          conn->connection_id, conn->host.dispname);
+          conn->connection_id, _GETCHARPTR(conn->host.dispname));
 #endif
   }
   else {

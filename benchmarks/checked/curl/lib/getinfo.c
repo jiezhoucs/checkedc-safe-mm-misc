@@ -68,7 +68,7 @@ CURLcode Curl_initinfo(struct Curl_easy *data)
   info->httpauthavail = 0;
   info->numconnects = 0;
 
-  free(info->contenttype);
+  MM_FREE(char, info->contenttype);
   info->contenttype = NULL;
 
   free(info->wouldredirect);
@@ -127,7 +127,9 @@ static CURLcode getinfo_char(struct Curl_easy *data, CURLINFO info,
   }
     break;
   case CURLINFO_CONTENT_TYPE:
-    *param_charp = data->info.contenttype;
+    // Checked C: If we port this, then we have to port a lot of fields in data
+    // that are used below. The troublesome one is conn_primary_ip.
+    *param_charp = _GETCHARPTR(data->info.contenttype);
     break;
   case CURLINFO_PRIVATE:
     *param_charp = (char *) data->set.private_data;

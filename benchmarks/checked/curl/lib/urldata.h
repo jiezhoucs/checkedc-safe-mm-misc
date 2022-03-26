@@ -535,7 +535,7 @@ struct hostname {
   mm_array_ptr<char> rawalloc; /* allocated "raw" version of the name */
   mm_array_ptr<char> encalloc; /* allocated IDN-encoded version of the name */
   mm_array_ptr<char> name;     /* name to use internally, might be encoded, might be raw */
-  const char *dispname; /* name to display, as 'name' might be encoded */
+  mm_array_ptr<const char> dispname; /* name to display, as 'name' might be encoded */
 };
 
 /*
@@ -1144,7 +1144,7 @@ struct PureInfo {
   unsigned long proxyauthavail; /* what proxy auth types were announced */
   unsigned long httpauthavail;  /* what host auth types were announced */
   long numconnects; /* how many new connection did libcurl created */
-  char *contenttype; /* the content type of the object */
+  mm_array_ptr<char> contenttype; /* the content type of the object */
   char *wouldredirect; /* URL this would've been redirected to if asked to */
   curl_off_t retry_after; /* info from Retry-After: header */
 

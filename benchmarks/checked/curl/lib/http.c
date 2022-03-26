@@ -2201,8 +2201,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
     if(!h)
       return CURLE_OUT_OF_MEMORY;
 
-    // TODO
-    if(conn->host.dispname != _GETCHARPTR(conn->host.name)) {
+    if(conn->host.dispname != conn->host.name) {
       uc = curl_url_set(h, CURLUPART_HOST, _GETCHARPTR(conn->host.name), 0);
       if(uc) {
         curl_url_cleanup(h);
@@ -2346,7 +2345,6 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
   if(ptr) {
     /* Some kind of TE is requested, check if 'chunked' is chosen */
     data->req.upload_chunky =
-        // TODO
       Curl_compareheader(ptr, "Transfer-Encoding:", "chunked");
   }
   else {
@@ -2494,7 +2492,6 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     ptr = Curl_checkheaders(data, "Expect");
     if(ptr) {
       data->state.expect100header =
-          // TODO
         Curl_compareheader(ptr, "Expect:", "100-continue");
     }
     else if(http->postsize > EXPECT_100_THRESHOLD || http->postsize < 0) {
@@ -2568,7 +2565,6 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     ptr = Curl_checkheaders(data, "Expect");
     if(ptr) {
       data->state.expect100header =
-          // TODO
         Curl_compareheader(ptr, "Expect:", "100-continue");
     }
     else if(http->postsize > EXPECT_100_THRESHOLD || http->postsize < 0) {
@@ -3460,9 +3456,8 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
       /* ignore empty data */
       MM_FREE(char, contenttype);
     else {
-      Curl_safefree(data->info.contenttype);
-      // TODO
-      data->info.contenttype = _GETCHARPTR(contenttype);
+      MM_curl_free(char, data->info.contenttype);
+      data->info.contenttype = contenttype;
     }
   }
 #ifndef CURL_DISABLE_PROXY

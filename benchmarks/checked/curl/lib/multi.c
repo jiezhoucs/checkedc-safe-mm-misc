@@ -670,7 +670,7 @@ static CURLcode multi_done(struct Curl_easy *data,
   }
   else {
     char buffer[256];
-    const char *host =
+    mm_array_ptr<const char> host =
 #ifndef CURL_DISABLE_PROXY
       conn->bits.socksproxy ?
       conn->socks_proxy.host.dispname :
@@ -681,7 +681,7 @@ static CURLcode multi_done(struct Curl_easy *data,
     /* create string before returning the connection */
     msnprintf(buffer, sizeof(buffer),
               "Connection #%ld to host %s left intact",
-              conn->connection_id, host);
+              conn->connection_id, _GETCHARPTR(host));
     /* the connection is no longer in use by this transfer */
     CONNCACHE_UNLOCK(data);
     if(Curl_conncache_return_conn(data, conn)) {
