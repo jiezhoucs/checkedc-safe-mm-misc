@@ -102,3 +102,13 @@ void mm_qsort(mm_array_ptr<mm_ptr<void>> base, size_t nmemb, size_t size,
     }
     free(raw_base);
 }
+
+/* strtoul() */
+unsigned long int mm_strtoul(mm_array_ptr<const char> nptr,
+                             mm_array_ptr<char> *endptr, int base) {
+    unsigned long int result = strtoul(_GETCHARPTR(nptr), (char**)endptr, base);
+    if (endptr != NULL) {
+        *endptr = _create_mm_array_ptr_char(nptr, _GETCHARPTR(*endptr));
+    }
+    return result;
+}

@@ -17,4 +17,7 @@ mm_array_ptr<char> mm_memrchr(mm_array_ptr<const char> s, int c, size_t n);
 void mm_qsort(mm_array_ptr<mm_ptr<void>> base, size_t nmemb, size_t size,
     int (*compar)(const void *, const void *));
 
+unsigned long int mm_strtoul(mm_array_ptr<const char> nptr,
+                             mm_array_ptr<char> *endptr, int base);
+
 #endif

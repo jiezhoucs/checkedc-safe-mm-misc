@@ -17,7 +17,7 @@
 #define _GETPTR(T, p) ((T *)(p))
 #define GETPTR(T, p) _getptr_mm<T>(p)
 #define _GETARRAYPTR(T, p) ((T *)p)
-#define _GETCHARPTR(p) ((char *)(p))
+#define _GETCHARPTR(p) (((char *)(p)))
 
 /* These macros provide convenience for programmers to type a little less. */
 #define MM_ALLOC(T) mm_alloc<T>(sizeof(T))
@@ -64,6 +64,7 @@ for_any(T) void mmarray_checked(mm_array_ptr<T> p);
 
 /* Marshaling an array of mm_array_ptr to an array of raw pointers. */
 for_any(T) void **_marshal_shared_array_ptr(mm_array_ptr<mm_array_ptr<T>> p);
+for_any(T) void **_marshal_mm_ptr(mm_array_ptr<mm_ptr<T>> p, size_t n);
 
 /* Checked C version of regular common libc functions. */
 /* mmsafe strdup/strndup */
