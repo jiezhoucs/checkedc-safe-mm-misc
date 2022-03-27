@@ -535,7 +535,6 @@ static CURLcode CONNECT(struct Curl_easy *data,
 
               /* now parse the chunked piece of data so that we can properly
                  tell when the stream ends */
-              // TODO
               r = Curl_httpchunk_read(data, linep + 1, 1, &gotbytes,
                                       &extra);
               if(r == CHUNKE_STOP) {
@@ -594,7 +593,6 @@ static CURLcode CONNECT(struct Curl_easy *data,
                                   strlen("Content-Length:"), NULL, 10, _GETPTR(curl_off_t, &s->cl));
           }
         }
-        // TODO
         else if(Curl_compareheader(linep, "Connection:", "close"))
           s->close_connection = TRUE;
         else if(checkprefix("Transfer-Encoding:", linep)) {

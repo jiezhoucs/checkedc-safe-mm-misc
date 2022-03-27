@@ -124,9 +124,9 @@ static void http2_stream_free(mm_ptr<struct HTTP> http)
     // TODO
     Curl_dyn_free(_GETPTR(struct dynbuf, &http->header_recvbuf));
     for(; http->push_headers_used > 0; --http->push_headers_used) {
-      free(http->push_headers[http->push_headers_used - 1]);
+      MM_FREE(char, http->push_headers[http->push_headers_used - 1]);
     }
-    free(http->push_headers);
+    MM_FREE(mm_array_ptr<char>, http->push_headers);
     http->push_headers = NULL;
   }
 }
@@ -149,7 +149,7 @@ static CURLcode http2_disconnect(struct Curl_easy *data,
   H2BUGF(infof(data, "HTTP/2 DISCONNECT starts now"));
 
   nghttp2_session_del(c->h2);
-  Curl_safefree(c->inbuf);
+  mm_Curl_safefree(char, c->inbuf);
 
   H2BUGF(infof(data, "HTTP/2 DISCONNECT done"));
 
@@ -193,7 +193,7 @@ static bool http2_connisdead(struct Curl_easy *data, struct connectdata *conn)
       if(httpc->recv_underlying)
         /* if called "too early", this pointer isn't setup yet! */
         nread = ((Curl_recv *)httpc->recv_underlying)(
-          data, FIRSTSOCKET, httpc->inbuf, H2_BUFSIZE, &result);
+          data, FIRSTSOCKET, _GETCHARPTR(httpc->inbuf), H2_BUFSIZE, &result);
       if(nread != -1) {
         infof(data,
               "%d bytes stray data read before trying h2 connection",
@@ -411,7 +411,7 @@ struct curl_pushheaders {
 /*
  * push header access function. Only to be used from within the push callback
  */
-char *curl_pushheader_bynum(struct curl_pushheaders *h, size_t num)
+mm_array_ptr<char> curl_pushheader_bynum(struct curl_pushheaders *h, size_t num)
 {
   /* Verify that we got a good easy handle in the push header struct, mostly to
      detect rubbish input fast(er). */
@@ -428,7 +428,7 @@ char *curl_pushheader_bynum(struct curl_pushheaders *h, size_t num)
 /*
  * push header access function. Only to be used from within the push callback
  */
-char *curl_pushheader_byname(struct curl_pushheaders *h, const char *header)
+mm_array_ptr<char> curl_pushheader_byname(struct curl_pushheaders *h, const char *header)
 {
   /* Verify that we got a good easy handle in the push header struct,
      mostly to detect rubbish input fast(er). Also empty header name
@@ -444,7 +444,7 @@ char *curl_pushheader_byname(struct curl_pushheaders *h, const char *header)
     size_t len = strlen(header);
     size_t i;
     for(i = 0; i<stream->push_headers_used; i++) {
-      if(!strncmp(header, stream->push_headers[i], len)) {
+      if(!mm_strncmp(header, stream->push_headers[i], len)) {
         /* sub-match, make sure that it is followed by a colon */
         if(stream->push_headers[i][len] != ':')
           continue;
@@ -500,7 +500,7 @@ static struct Curl_easy *duphandle(struct Curl_easy *data)
 static int set_transfer_url(struct Curl_easy *data,
                             struct curl_pushheaders *hp)
 {
-  const char *v;
+  mm_array_ptr<const char> v = NULL;
   CURLU *u = curl_url();
   CURLUcode uc;
   char *url = NULL;
@@ -508,7 +508,7 @@ static int set_transfer_url(struct Curl_easy *data,
 
   v = curl_pushheader_byname(hp, ":scheme");
   if(v) {
-    uc = curl_url_set(u, CURLUPART_SCHEME, v, 0);
+    uc = curl_url_set(u, CURLUPART_SCHEME, _GETCHARPTR(v), 0);
     if(uc) {
       rc = 1;
       goto fail;
@@ -517,7 +517,7 @@ static int set_transfer_url(struct Curl_easy *data,
 
   v = curl_pushheader_byname(hp, ":authority");
   if(v) {
-    uc = curl_url_set(u, CURLUPART_HOST, v, 0);
+    uc = curl_url_set(u, CURLUPART_HOST, _GETCHARPTR(v), 0);
     if(uc) {
       rc = 2;
       goto fail;
@@ -526,7 +526,7 @@ static int set_transfer_url(struct Curl_easy *data,
 
   v = curl_pushheader_byname(hp, ":path");
   if(v) {
-    uc = curl_url_set(u, CURLUPART_PATH, v, 0);
+    uc = curl_url_set(u, CURLUPART_PATH, _GETCHARPTR(v), 0);
     if(uc) {
       rc = 3;
       goto fail;
@@ -598,8 +598,8 @@ static int push_promise(struct Curl_easy *data,
 
     /* free the headers again */
     for(i = 0; i<stream->push_headers_used; i++)
-      free(stream->push_headers[i]);
-    free(stream->push_headers);
+      MM_FREE(char, stream->push_headers[i]);
+    MM_FREE(mm_array_ptr<char>, stream->push_headers);
     stream->push_headers = NULL;
     stream->push_headers_used = 0;
 
@@ -1003,7 +1003,7 @@ static int on_header(nghttp2_session *session, const nghttp2_frame *frame,
   /* Store received PUSH_PROMISE headers to be used when the subsequent
      PUSH_PROMISE callback comes */
   if(frame->hd.type == NGHTTP2_PUSH_PROMISE) {
-    char *h;
+    mm_array_ptr<char> h = NULL;
 
     if(!strcmp(":authority", (const char *)name)) {
       /* pseudo headers are lower case */
@@ -1014,8 +1014,7 @@ static int on_header(nghttp2_session *session, const nghttp2_frame *frame,
         return NGHTTP2_ERR_CALLBACK_FAILURE;
       if(!Curl_strcasecompare(check, (const char *)value) &&
          ((conn->remote_port != conn->given->defport) ||
-          // TODO
-          !Curl_strcasecompare(_GETCHARPTR(conn->host.name), (const char *)value))) {
+          !mm_strcasecompare_0(conn->host.name, (const char *)value))) {
         /* This is push is not for the same authority that was asked for in
          * the URL. RFC 7540 section 8.2 says: "A client MUST treat a
          * PUSH_PROMISE for which the server is not authoritative as a stream
@@ -1032,25 +1031,24 @@ static int on_header(nghttp2_session *session, const nghttp2_frame *frame,
 
     if(!stream->push_headers) {
       stream->push_headers_alloc = 10;
-      stream->push_headers = malloc(stream->push_headers_alloc *
-                                    sizeof(char *));
+      stream->push_headers = MM_ARRAY_ALLOC(mm_array_ptr<char>,stream->push_headers_alloc);
       if(!stream->push_headers)
         return NGHTTP2_ERR_TEMPORAL_CALLBACK_FAILURE;
       stream->push_headers_used = 0;
     }
     else if(stream->push_headers_used ==
             stream->push_headers_alloc) {
-      char **headp;
+      mm_array_ptr<mm_array_ptr<char>> headp = NULL;
       stream->push_headers_alloc *= 2;
-      headp = Curl_saferealloc(stream->push_headers,
-                               stream->push_headers_alloc * sizeof(char *));
+      headp = (mm_array_ptr<mm_array_ptr<char>>)mm_Curl_saferealloc((mm_array_ptr<void>)stream->push_headers,
+                               stream->push_headers_alloc * sizeof(mm_array_ptr<char>));
       if(!headp) {
         stream->push_headers = NULL;
         return NGHTTP2_ERR_TEMPORAL_CALLBACK_FAILURE;
       }
       stream->push_headers = headp;
     }
-    h = aprintf("%s:%s", name, value);
+    h = mmize_str(aprintf("%s:%s", name, value));
     if(h)
       stream->push_headers[stream->push_headers_used++] = h;
     return 0;
@@ -1223,9 +1221,9 @@ void Curl_http2_done(struct Curl_easy *data, bool premature)
   if(http->push_headers) {
     /* if they weren't used and then freed before */
     for(; http->push_headers_used > 0; --http->push_headers_used) {
-      free(http->push_headers[http->push_headers_used - 1]);
+      MM_FREE(char, http->push_headers[http->push_headers_used - 1]);
     }
-    free(http->push_headers);
+    MM_FREE(mm_array_ptr<char>, http->push_headers);
     http->push_headers = NULL;
   }
 
@@ -1272,7 +1270,7 @@ static CURLcode http2_init(struct Curl_easy *data, struct connectdata *conn)
     int rc;
     nghttp2_session_callbacks *callbacks;
 
-    conn->proto.httpc.inbuf = malloc(H2_BUFSIZE);
+    conn->proto.httpc.inbuf = MM_ARRAY_ALLOC(char, H2_BUFSIZE);
     if(!conn->proto.httpc.inbuf)
       return CURLE_OUT_OF_MEMORY;
 
@@ -1382,7 +1380,7 @@ static int h2_process_pending_input(struct Curl_easy *data,
                                     CURLcode *err)
 {
   ssize_t nread;
-  char *inbuf;
+  mm_array_ptr<char> inbuf = NULL;
   ssize_t rv;
 
   nread = httpc->inbuflen - httpc->nread_inbuf;
@@ -1538,22 +1536,21 @@ static ssize_t http2_handle_stream_close(struct connectdata *conn,
 
   // TODO
   if(Curl_dyn_len(_GETDYNBUFPTR(&stream->trailer_recvbuf))) {
-    // TODO
-    char *trailp = _GETCHARPTR(Curl_dyn_ptr(_GETDYNBUFPTR(&stream->trailer_recvbuf)));
-    char *lf;
+    mm_array_ptr<char> trailp = Curl_dyn_ptr(_GETDYNBUFPTR(&stream->trailer_recvbuf));
+    mm_array_ptr<char> lf = NULL;
 
     do {
       size_t len = 0;
       CURLcode result;
       /* each trailer line ends with a newline */
-      lf = strchr(trailp, '\n');
+      lf = mm_strchr(trailp, '\n');
       if(!lf)
         break;
       len = lf + 1 - trailp;
 
-      Curl_debug(data, CURLINFO_HEADER_IN, trailp, len);
+      Curl_debug(data, CURLINFO_HEADER_IN, _GETCHARPTR(trailp), len);
       /* pass the trailers one by one to the callback */
-      result = Curl_client_write(data, CLIENTWRITE_HEADER, trailp, len);
+      result = Curl_client_write(data, CLIENTWRITE_HEADER, _GETCHARPTR(trailp), len);
       if(result) {
         *err = result;
         return -1;
@@ -1752,7 +1749,8 @@ static ssize_t http2_recv(struct Curl_easy *data, int sockindex,
 
     if(httpc->inbuflen == 0) {
       nread = ((Curl_recv *)httpc->recv_underlying)(
-        data, FIRSTSOCKET, httpc->inbuf, H2_BUFSIZE, err);
+              // TODO?
+        data, FIRSTSOCKET, _GETCHARPTR(httpc->inbuf), H2_BUFSIZE, err);
 
       if(nread == -1) {
         if(*err != CURLE_AGAIN)
@@ -1914,7 +1912,7 @@ static ssize_t http2_send(struct Curl_easy *data, int sockindex,
   struct connectdata *conn = data->conn;
   struct http_conn *httpc = &conn->proto.httpc;
   mm_ptr<struct HTTP> stream = data->req.p.http;
-  nghttp2_nv *nva = NULL;
+  mm_array_ptr<nghttp2_nv> nva = NULL;
   size_t nheader;
   size_t i;
   size_t authority_idx;
@@ -1995,7 +1993,7 @@ static ssize_t http2_send(struct Curl_easy *data, int sockindex,
      new headers: :method, :path and :scheme. Therefore we need one
      more space. */
   nheader += 1;
-  nva = malloc(sizeof(nghttp2_nv) * nheader);
+  nva = MM_ARRAY_ALLOC(nghttp2_nv, nheader);
   if(!nva) {
     *err = CURLE_OUT_OF_MEMORY;
     return -1;
@@ -2166,15 +2164,15 @@ static ssize_t http2_send(struct Curl_easy *data, int sockindex,
 
     data_prd.read_callback = data_source_read_callback;
     data_prd.source.ptr = NULL;
-    stream_id = nghttp2_submit_request(h2, &pri_spec, nva, nheader,
+    stream_id = nghttp2_submit_request(h2, &pri_spec, _GETPTR(nghttp2_nv, nva), nheader,
                                        &data_prd, data);
     break;
   default:
-    stream_id = nghttp2_submit_request(h2, &pri_spec, nva, nheader,
+    stream_id = nghttp2_submit_request(h2, &pri_spec, _GETPTR(nghttp2_nv, nva), nheader,
                                        NULL, data);
   }
 
-  Curl_safefree(nva);
+  mm_Curl_safefree(nghttp2_nv, nva);
 
   if(stream_id < 0) {
     H2BUGF(infof(data,
@@ -2216,7 +2214,7 @@ static ssize_t http2_send(struct Curl_easy *data, int sockindex,
   return len;
 
 fail:
-  free(nva);
+  MM_FREE(nghttp2_nv, nva);
   *err = CURLE_SEND_ERROR;
   return -1;
 }

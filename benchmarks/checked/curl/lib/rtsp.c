@@ -616,8 +616,8 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
 
   if(rtspc->rtp_buf) {
     /* There was some leftover data the last time. Merge buffers */
-    mm_array_ptr<char> newptr = mm_Curl_saferealloc(rtspc->rtp_buf,
-                                    rtspc->rtp_bufsize + *nread);
+    mm_array_ptr<char> newptr = (mm_array_ptr<char>)mm_Curl_saferealloc(
+        (mm_array_ptr<void>)rtspc->rtp_buf, rtspc->rtp_bufsize + *nread);
     if(!newptr) {
       rtspc->rtp_buf = NULL;
       rtspc->rtp_bufsize = 0;

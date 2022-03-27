@@ -214,7 +214,7 @@ struct HTTP {
   size_t pauselen; /* the number of bytes left in data */
   bool close_handled; /* TRUE if stream closure is handled by libcurl */
 
-  char **push_headers;       /* allocated array */
+  mm_array_ptr<mm_array_ptr<char>> push_headers;       /* allocated array */
   size_t push_headers_used;  /* number of entries filled in */
   size_t push_headers_alloc; /* number of entries allocated */
   uint32_t error; /* HTTP/2 stream error code */
@@ -270,7 +270,7 @@ struct http_conn {
   nghttp2_session *h2;
   Curl_send *send_underlying; /* underlying send Curl_send callback */
   Curl_recv *recv_underlying; /* underlying recv Curl_recv callback */
-  char *inbuf; /* buffer to receive data from underlying socket */
+  mm_array_ptr<char> inbuf; /* buffer to receive data from underlying socket */
   size_t inbuflen; /* number of bytes filled in inbuf */
   size_t nread_inbuf; /* number of bytes read from in inbuf */
   /* We need separate buffer for transmission and reception because we

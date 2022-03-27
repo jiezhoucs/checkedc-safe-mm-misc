@@ -33,6 +33,6 @@ wchar_t* Curl_wcsdup(const wchar_t* src);
 void *Curl_memdup(const void *src, size_t buffer_length);
 mm_array_ptr<char> mm_Curl_memdup(mm_array_ptr<const char> src, size_t buffer_length);
 void *Curl_saferealloc(void *ptr, size_t size);
-mm_array_ptr<char> mm_Curl_saferealloc(mm_array_ptr<char> ptr, size_t size);
+mm_array_ptr<void> mm_Curl_saferealloc(mm_array_ptr<void> ptr, size_t size);
 
 #endif /* HEADER_CURL_STRDUP_H */

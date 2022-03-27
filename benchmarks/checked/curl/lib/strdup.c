@@ -130,10 +130,10 @@ void *Curl_saferealloc(void *ptr, size_t size)
 }
 
 /* mmsafe version of mm_Curl_saferealloc() */
-mm_array_ptr<char> mm_Curl_saferealloc(mm_array_ptr<char> ptr, size_t size) {
-  mm_array_ptr<char> datap = mm_array_realloc<char>(ptr, size);
+mm_array_ptr<void> mm_Curl_saferealloc(mm_array_ptr<void> ptr, size_t size) {
+  mm_array_ptr<void> datap = mm_array_realloc<void>(ptr, size);
   if (size && !datap) {
-    MM_FREE(char, ptr);
+    MM_FREE(void, ptr);
   }
 
   return datap;
