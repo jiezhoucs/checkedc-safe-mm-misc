@@ -141,7 +141,8 @@ void Curl_pp_init(struct Curl_easy *data, struct pingpong *pp)
 {
   DEBUGASSERT(data);
   pp->nread_resp = 0;
-  pp->linestart_resp = data->state.buffer;
+  // TODO?
+  pp->linestart_resp = _GETCHARPTR(data->state.buffer);
   pp->pending_resp = TRUE;
   pp->response = Curl_now(); /* start response time-out now! */
 }
@@ -275,7 +276,8 @@ CURLcode Curl_pp_readresp(struct Curl_easy *data,
   ssize_t gotbytes;
   char *ptr;
   struct connectdata *conn = data->conn;
-  char * const buf = data->state.buffer;
+  // TODO?
+  char * const buf = _GETCHARPTR(data->state.buffer);
   CURLcode result = CURLE_OK;
 
   *code = 0; /* 0 for errors or not done */

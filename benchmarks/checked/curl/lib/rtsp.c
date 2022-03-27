@@ -87,7 +87,7 @@ static int rtsp_getsock_do(struct Curl_easy *data, struct connectdata *conn,
 }
 
 static
-CURLcode rtp_client_write(struct Curl_easy *data, char *ptr, size_t len);
+CURLcode rtp_client_write(struct Curl_easy *data, mm_array_ptr<char> ptr, size_t len);
 
 
 /*
@@ -203,7 +203,7 @@ static CURLcode rtsp_disconnect(struct Curl_easy *data,
 {
   (void) dead;
   (void) data;
-  Curl_safefree(conn->proto.rtspc.rtp_buf);
+  mm_Curl_safefree(char, conn->proto.rtspc.rtp_buf);
   return CURLE_OK;
 }
 
@@ -609,14 +609,14 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
   struct SingleRequest *k = &data->req;
   struct rtsp_conn *rtspc = &(conn->proto.rtspc);
 
-  char *rtp; /* moving pointer to rtp data */
+  mm_array_ptr<char> rtp = NULL; /* moving pointer to rtp data */
   ssize_t rtp_dataleft; /* how much data left to parse in this round */
-  char *scratch;
+  mm_array_ptr<char> scratch = NULL;
   CURLcode result;
 
   if(rtspc->rtp_buf) {
     /* There was some leftover data the last time. Merge buffers */
-    char *newptr = Curl_saferealloc(rtspc->rtp_buf,
+    mm_array_ptr<char> newptr = mm_Curl_saferealloc(rtspc->rtp_buf,
                                     rtspc->rtp_bufsize + *nread);
     if(!newptr) {
       rtspc->rtp_buf = NULL;
@@ -624,7 +624,7 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
       return CURLE_OUT_OF_MEMORY;
     }
     rtspc->rtp_buf = newptr;
-    memcpy(rtspc->rtp_buf + rtspc->rtp_bufsize, k->str, *nread);
+    memcpy(_GETCHARPTR(rtspc->rtp_buf) + rtspc->rtp_bufsize, _GETCHARPTR(k->str), *nread);
     rtspc->rtp_bufsize += *nread;
     rtp = rtspc->rtp_buf;
     rtp_dataleft = rtspc->rtp_bufsize;
@@ -660,7 +660,7 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
       if(result) {
         failf(data, "Got an error writing an RTP packet");
         *readmore = FALSE;
-        Curl_safefree(rtspc->rtp_buf);
+        mm_Curl_safefree(char, rtspc->rtp_buf);
         rtspc->rtp_buf = NULL;
         rtspc->rtp_bufsize = 0;
         return result;
@@ -689,15 +689,15 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
           *readmore ? "(READMORE)" : ""));
 
     /* Store the incomplete RTP packet for a "rewind" */
-    scratch = malloc(rtp_dataleft);
+    scratch = MM_ARRAY_ALLOC(char, rtp_dataleft);
     if(!scratch) {
-      Curl_safefree(rtspc->rtp_buf);
+      mm_Curl_safefree(char, rtspc->rtp_buf);
       rtspc->rtp_buf = NULL;
       rtspc->rtp_bufsize = 0;
       return CURLE_OUT_OF_MEMORY;
     }
-    memcpy(scratch, rtp, rtp_dataleft);
-    Curl_safefree(rtspc->rtp_buf);
+    mm_memcpy(scratch, rtp, rtp_dataleft);
+    mm_Curl_safefree(char, rtspc->rtp_buf);
     rtspc->rtp_buf = scratch;
     rtspc->rtp_bufsize = rtp_dataleft;
 
@@ -719,7 +719,7 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
   *nread = rtp_dataleft;
 
   /* If we get here, we have finished with the leftover/merge buffer */
-  Curl_safefree(rtspc->rtp_buf);
+  mm_Curl_safefree(char, rtspc->rtp_buf);
   rtspc->rtp_buf = NULL;
   rtspc->rtp_bufsize = 0;
 
@@ -727,7 +727,7 @@ static CURLcode rtsp_rtp_readwrite(struct Curl_easy *data,
 }
 
 static
-CURLcode rtp_client_write(struct Curl_easy *data, char *ptr, size_t len)
+CURLcode rtp_client_write(struct Curl_easy *data, mm_array_ptr<char> ptr, size_t len)
 {
   size_t wrote;
   curl_write_callback writeit;
@@ -752,7 +752,7 @@ CURLcode rtp_client_write(struct Curl_easy *data, char *ptr, size_t len)
   }
 
   Curl_set_in_callback(data, true);
-  wrote = writeit(ptr, 1, len, user_ptr);
+  wrote = writeit(_GETCHARPTR(ptr), 1, len, user_ptr);
   Curl_set_in_callback(data, false);
 
   if(CURL_WRITEFUNC_PAUSE == wrote) {
@@ -768,26 +768,26 @@ CURLcode rtp_client_write(struct Curl_easy *data, char *ptr, size_t len)
   return CURLE_OK;
 }
 
-CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
+CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, mm_array_ptr<char> header)
 {
   long CSeq = 0;
 
-  if(checkprefix_raw("CSeq:", header)) {
+  if(checkprefix("CSeq:", header)) {
     /* Store the received CSeq. Match is verified in rtsp_done */
-    int nc = sscanf(&header[4], ": %ld", &CSeq);
+    int nc = sscanf(_GETCHARPTR(&header[4]), ": %ld", &CSeq);
     if(nc == 1) {
       mm_ptr<struct RTSP> rtsp = data->req.p.rtsp;
       rtsp->CSeq_recv = CSeq; /* mark the request */
       data->state.rtsp_CSeq_recv = CSeq; /* update the handle */
     }
     else {
-      failf(data, "Unable to read the CSeq header: [%s]", header);
+      failf(data, "Unable to read the CSeq header: [%s]", _GETCHARPTR(header));
       return CURLE_RTSP_CSEQ_ERROR;
     }
   }
-  else if(checkprefix_raw("Session:", header)) {
-    char *start;
-    char *end;
+  else if(checkprefix("Session:", header)) {
+    mm_array_ptr<char> start = NULL;
+    mm_array_ptr<char> end = NULL;
     size_t idlen;
 
     /* Find the first non-space letter */
@@ -815,9 +815,9 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
 
       /* If the Session ID is set, then compare */
       if(strlen(_GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID])) != idlen ||
-         strncmp(start, _GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID]), idlen) != 0) {
+         mm_strncmp(start, data->set.str[STRING_RTSP_SESSION_ID], idlen) != 0) {
         failf(data, "Got RTSP Session ID Line [%s], but wanted ID [%s]",
-              start, _GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID]));
+              _GETCHARPTR(start), _GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID]));
         return CURLE_RTSP_SESSION_ERROR;
       }
     }
@@ -830,7 +830,7 @@ CURLcode Curl_rtsp_parseheader(struct Curl_easy *data, char *header)
       data->set.str[STRING_RTSP_SESSION_ID] = MM_ARRAY_ALLOC(char, idlen + 1);
       if(!data->set.str[STRING_RTSP_SESSION_ID])
         return CURLE_OUT_OF_MEMORY;
-      memcpy(_GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID]), start, idlen);
+      mm_memcpy(data->set.str[STRING_RTSP_SESSION_ID], start, idlen);
       (data->set.str[STRING_RTSP_SESSION_ID])[idlen] = '\0';
     }
   }

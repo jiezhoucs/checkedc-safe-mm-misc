@@ -951,7 +951,7 @@ struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
   if(outcurl) {
     curl_slist_free_all(outcurl->state.cookielist);
     outcurl->state.cookielist = NULL;
-    Curl_safefree(outcurl->state.buffer);
+    mm_Curl_safefree(char, outcurl->state.buffer);
     Curl_dyn_free(&outcurl->state.headerb);
     Curl_safefree(outcurl->state.url);
     Curl_safefree(outcurl->state.referer);

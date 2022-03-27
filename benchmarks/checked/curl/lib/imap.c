@@ -878,7 +878,7 @@ static CURLcode imap_state_capability_resp(struct Curl_easy *data,
   CURLcode result = CURLE_OK;
   struct connectdata *conn = data->conn;
   struct imap_conn *imapc = &conn->proto.imapc;
-  const char *line = data->state.buffer;
+  const char *line = _GETCHARPTR(data->state.buffer);
 
   (void)instate; /* no use for this yet */
 
@@ -1040,7 +1040,7 @@ static CURLcode imap_state_listsearch_resp(struct Curl_easy *data,
                                            imapstate instate)
 {
   CURLcode result = CURLE_OK;
-  char *line = data->state.buffer;
+  char *line = _GETCHARPTR(data->state.buffer);
   size_t len = strlen(line);
 
   (void)instate; /* No use for this yet */
@@ -1068,7 +1068,7 @@ static CURLcode imap_state_select_resp(struct Curl_easy *data, int imapcode,
   struct connectdata *conn = data->conn;
   struct IMAP *imap = data->req.p.imap;
   struct imap_conn *imapc = &conn->proto.imapc;
-  const char *line = data->state.buffer;
+  const char *line = _GETCHARPTR(data->state.buffer);
 
   (void)instate; /* no use for this yet */
 
@@ -1115,7 +1115,7 @@ static CURLcode imap_state_fetch_resp(struct Curl_easy *data,
   CURLcode result = CURLE_OK;
   struct imap_conn *imapc = &conn->proto.imapc;
   struct pingpong *pp = &imapc->pp;
-  const char *ptr = data->state.buffer;
+  const char *ptr = _GETCHARPTR(data->state.buffer);
   bool parsed = FALSE;
   curl_off_t size = 0;
 

@@ -423,7 +423,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
   data->state.referer = NULL;
 
   up_free(data);
-  Curl_safefree(data->state.buffer);
+  mm_Curl_safefree(char, data->state.buffer);
   Curl_dyn_free(&data->state.headerb);
   MM_curl_free(char, data->state.ulbuf);
   Curl_flush_cookies(data, TRUE);

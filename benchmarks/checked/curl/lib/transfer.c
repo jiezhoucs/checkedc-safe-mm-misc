@@ -568,7 +568,7 @@ static CURLcode readwrite_data(struct Curl_easy *data,
   size_t excess = 0; /* excess bytes read */
   bool readmore = FALSE; /* used by RTP to signal for more data */
   int maxloops = 100;
-  char *buf = data->state.buffer;
+  mm_array_ptr<char> buf = data->state.buffer;
   DEBUGASSERT(buf);
 
   *done = FALSE;
@@ -604,7 +604,8 @@ static CURLcode readwrite_data(struct Curl_easy *data,
 
     if(bytestoread) {
       /* receive data from the network! */
-      result = Curl_read(data, conn->sockfd, buf, bytestoread, &nread);
+        // TODO
+      result = Curl_read(data, conn->sockfd, _GETCHARPTR(buf), bytestoread, &nread);
 
       /* read would've blocked */
       if(CURLE_AGAIN == result)
@@ -731,11 +732,11 @@ static CURLcode readwrite_data(struct Curl_easy *data,
                      Curl_dyn_len(&data->state.headerb));
           if(k->badheader == HEADER_PARTHEADER)
             Curl_debug(data, CURLINFO_DATA_IN,
-                       k->str, (size_t)nread);
+                       _GETCHARPTR(k->str), (size_t)nread);
         }
         else
           Curl_debug(data, CURLINFO_DATA_IN,
-                     k->str, (size_t)nread);
+                     _GETCHARPTR(k->str), (size_t)nread);
       }
 
 #ifndef CURL_DISABLE_HTTP
@@ -839,10 +840,10 @@ static CURLcode readwrite_data(struct Curl_easy *data,
             if(!k->ignorebody && nread) {
 #ifndef CURL_DISABLE_POP3
               if(conn->handler->protocol & PROTO_FAMILY_POP3)
-                result = Curl_pop3_write(data, k->str, nread);
+                result = Curl_pop3_write(data, _GETCHARPTR(k->str), nread);
               else
 #endif /* CURL_DISABLE_POP3 */
-                result = Curl_client_write(data, CLIENTWRITE_BODY, k->str,
+                result = Curl_client_write(data, CLIENTWRITE_BODY, _GETCHARPTR(k->str),
                                            nread);
             }
           }

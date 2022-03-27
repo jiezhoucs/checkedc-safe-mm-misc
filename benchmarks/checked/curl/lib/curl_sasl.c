@@ -252,7 +252,7 @@ static CURLcode get_server_message(struct SASL *sasl, struct Curl_easy *data,
   char *serverdata = NULL;
   CURLcode result = CURLE_OK;
 
-  sasl->params->getmessage(data->state.buffer, &serverdata);
+  sasl->params->getmessage(_GETCHARPTR(data->state.buffer), &serverdata);
   if(!serverdata)
     result = CURLE_BAD_CONTENT_ENCODING;
   else if(!*serverdata || *serverdata == '=')

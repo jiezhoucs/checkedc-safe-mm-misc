@@ -2239,7 +2239,8 @@ CURLcode Curl_http2_setup(struct Curl_easy *data,
   stream->upload_left = 0;
   stream->upload_mem = NULL;
   stream->upload_len = 0;
-  stream->mem = data->state.buffer;
+  // TODO
+  stream->mem = _GETCHARPTR(data->state.buffer);
   stream->len = data->set.buffer_size;
 
   multi_connchanged(data->multi);
@@ -2280,7 +2281,7 @@ CURLcode Curl_http2_setup(struct Curl_easy *data,
 }
 
 CURLcode Curl_http2_switched(struct Curl_easy *data,
-                             const char *mem, size_t nread)
+                             mm_array_ptr<const char> mem, size_t nread)
 {
   CURLcode result;
   struct connectdata *conn = data->conn;
@@ -2357,7 +2358,7 @@ CURLcode Curl_http2_switched(struct Curl_easy *data,
         nread);
 
   if(nread)
-    memcpy(httpc->inbuf, mem, nread);
+    mm_memcpy(httpc->inbuf, mem, nread);
 
   httpc->inbuflen = nread;
 

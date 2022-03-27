@@ -166,7 +166,7 @@ static CURLcode inflate_stream(struct Curl_easy *data,
   Bytef *orig_in = z->next_in;
   bool done = FALSE;
   CURLcode result = CURLE_OK;   /* Curl_client_write status */
-  char *decomp;                 /* Put the decompressed data here. */
+  mm_array_ptr<char> decomp = NULL;           /* Put the decompressed data here. */
 
   /* Check state. */
   if(zp->zlib_init != ZLIB_INIT &&
@@ -177,7 +177,7 @@ static CURLcode inflate_stream(struct Curl_easy *data,
 
   /* Dynamically allocate a buffer for decompression because it's uncommonly
      large to hold on the stack */
-  decomp = malloc(DSIZ);
+  decomp = MM_ARRAY_ALLOC(char, DSIZ);
   if(!decomp)
     return exit_zlib(data, z, &zp->zlib_init, CURLE_OUT_OF_MEMORY);
 
@@ -246,7 +246,7 @@ static CURLcode inflate_stream(struct Curl_easy *data,
       break;
     }
   }
-  free(decomp);
+  MM_FREE(char, decomp);
 
   /* We're about to leave this call so the `nread' data bytes won't be seen
      again. If we are in a state that would wrongly allow restart in raw mode
@@ -280,7 +280,7 @@ static CURLcode deflate_init_writer(struct Curl_easy *data,
 
 static CURLcode deflate_unencode_write(struct Curl_easy *data,
                                        struct contenc_writer *writer,
-                                       const char *buf, size_t nbytes)
+                                       mm_array_ptr<const char> buf, size_t nbytes)
 {
   struct zlib_params *zp = (struct zlib_params *) &writer->params;
   z_stream *z = &zp->z;     /* zlib state structure */
@@ -434,7 +434,7 @@ static enum {
 
 static CURLcode gzip_unencode_write(struct Curl_easy *data,
                                     struct contenc_writer *writer,
-                                    const char *buf, size_t nbytes)
+                                    mm_array_ptr<const char> buf, size_t nbytes)
 {
   struct zlib_params *zp = (struct zlib_params *) &writer->params;
   z_stream *z = &zp->z;     /* zlib state structure */
@@ -490,7 +490,7 @@ static CURLcode gzip_unencode_write(struct Curl_easy *data,
       if(!z->next_in) {
         return exit_zlib(data, z, &zp->zlib_init, CURLE_OUT_OF_MEMORY);
       }
-      memcpy(z->next_in, buf, z->avail_in);
+      mm_memcpy(z->next_in, buf, z->avail_in);
       zp->zlib_init = ZLIB_GZIP_HEADER;  /* Need more gzip header data state */
       /* We don't have any data to inflate yet */
       return CURLE_OK;
@@ -513,7 +513,7 @@ static CURLcode gzip_unencode_write(struct Curl_easy *data,
       return exit_zlib(data, z, &zp->zlib_init, CURLE_OUT_OF_MEMORY);
     }
     /* Append the new block of data to the previous one */
-    memcpy(z->next_in + z->avail_in - nbytes, buf, nbytes);
+    mm_memcpy(z->next_in + z->avail_in - nbytes, buf, nbytes);
 
     switch(check_gzip_header(z->next_in, z->avail_in, &hlen)) {
     case GZIP_OK:
@@ -808,7 +808,7 @@ static CURLcode identity_init_writer(struct Curl_easy *data,
 
 static CURLcode identity_unencode_write(struct Curl_easy *data,
                                         struct contenc_writer *writer,
-                                        const char *buf, size_t nbytes)
+                                        mm_array_ptr<const char> buf, size_t nbytes)
 {
   return Curl_unencode_write(data, writer->downstream, buf, nbytes);
 }
@@ -893,7 +893,7 @@ static CURLcode client_init_writer(struct Curl_easy *data,
 
 static CURLcode client_unencode_write(struct Curl_easy *data,
                                       struct contenc_writer *writer,
-                                      const char *buf, size_t nbytes)
+                                      mm_array_ptr<const char> buf, size_t nbytes)
 {
   struct SingleRequest *k = &data->req;
 
@@ -932,7 +932,7 @@ static CURLcode error_init_writer(struct Curl_easy *data,
 
 static CURLcode error_unencode_write(struct Curl_easy *data,
                                      struct contenc_writer *writer,
-                                     const char *buf, size_t nbytes)
+                                     mm_array_ptr<const char> buf, size_t nbytes)
 {
   mm_array_ptr<char> all = Curl_all_content_encodings();
 
@@ -989,7 +989,7 @@ new_unencoding_writer(struct Curl_easy *data,
    allowed to be 0. */
 CURLcode Curl_unencode_write(struct Curl_easy *data,
                              struct contenc_writer *writer,
-                             const char *buf, size_t nbytes)
+                             mm_array_ptr<const char> buf, size_t nbytes)
 {
   if(!nbytes)
     return CURLE_OK;

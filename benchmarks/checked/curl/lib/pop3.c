@@ -625,7 +625,7 @@ static CURLcode pop3_state_servergreet_resp(struct Curl_easy *data,
   CURLcode result = CURLE_OK;
   struct connectdata *conn = data->conn;
   struct pop3_conn *pop3c = &conn->proto.pop3c;
-  const char *line = data->state.buffer;
+  const char *line = _GETCHARPTR(data->state.buffer);
   size_t len = strlen(line);
 
   (void)instate; /* no use for this yet */
@@ -684,7 +684,7 @@ static CURLcode pop3_state_capa_resp(struct Curl_easy *data, int pop3code,
   CURLcode result = CURLE_OK;
   struct connectdata *conn = data->conn;
   struct pop3_conn *pop3c = &conn->proto.pop3c;
-  const char *line = data->state.buffer;
+  const char *line = _GETCHARPTR(data->state.buffer);
   size_t len = strlen(line);
 
   (void)instate; /* no use for this yet */

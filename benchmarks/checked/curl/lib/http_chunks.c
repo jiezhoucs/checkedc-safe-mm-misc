@@ -108,7 +108,7 @@ void Curl_httpchunk_init(struct Curl_easy *data)
  * For example, 0x0d and 0x0a are used instead of '\r' and '\n'.
  */
 CHUNKcode Curl_httpchunk_read(struct Curl_easy *data,
-                              char *datap,
+                              mm_array_ptr<char> datap,
                               ssize_t datalen,
                               ssize_t *wrotep,
                               CURLcode *extrap)
@@ -126,7 +126,7 @@ CHUNKcode Curl_httpchunk_read(struct Curl_easy *data,
   /* the original data is written to the client, but we go on with the
      chunk read process, to properly calculate the content length*/
   if(data->set.http_te_skip && !k->ignorebody) {
-    result = Curl_client_write(data, CLIENTWRITE_BODY, datap, datalen);
+    result = Curl_client_write(data, CLIENTWRITE_BODY, _GETCHARPTR(datap), datalen);
     if(result) {
       *extrap = result;
       return CHUNKE_PASSTHRU_ERROR;
@@ -197,7 +197,7 @@ CHUNKcode Curl_httpchunk_read(struct Curl_easy *data,
         if(!data->set.http_ce_skip && k->writer_stack)
           result = Curl_unencode_write(data, k->writer_stack, datap, piece);
         else
-          result = Curl_client_write(data, CLIENTWRITE_BODY, datap, piece);
+          result = Curl_client_write(data, CLIENTWRITE_BODY, _GETCHARPTR(datap), piece);
 
         if(result) {
           *extrap = result;
@@ -269,7 +269,7 @@ CHUNKcode Curl_httpchunk_read(struct Curl_easy *data,
         }
       }
       else {
-        result = Curl_dyn_addn(&conn->trailer, datap, 1);
+        result = Curl_dyn_addn(&conn->trailer, _GETCHARPTR(datap), 1);
         if(result)
           return CHUNKE_OUT_OF_MEMORY;
       }

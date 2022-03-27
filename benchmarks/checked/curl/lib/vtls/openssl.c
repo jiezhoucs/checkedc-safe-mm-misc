@@ -1658,7 +1658,8 @@ static CURLcode verifyhost(struct Curl_easy *data, struct connectdata *conn,
   bool dNSName = FALSE; /* if a dNSName field exists in the cert */
   bool iPAddress = FALSE; /* if a iPAddress field exists in the cert */
   const char * const hostname = _GETCHARPTR(SSL_HOST_NAME());
-  const char * const dispname = SSL_HOST_DISPNAME();
+  // TODO?
+  const char * const dispname = _GETCHARPTR(SSL_HOST_DISPNAME());
 
 #ifdef ENABLE_IPV6
   if(conn->bits.ipv6_ip &&
@@ -3233,7 +3234,7 @@ static CURLcode ossl_connect_step1(struct Curl_easy *data,
     /* RFC 6066 section 3 says the SNI field is case insensitive, but browsers
        send the data lowercase and subsequently there are now numerous servers
        out there that don't work unless the name is lowercased */
-    Curl_strntolower(data->state.buffer, hostname, nlen);
+    Curl_strntolower(_GETCHARPTR(data->state.buffer), hostname, nlen);
     data->state.buffer[nlen] = 0;
     if(!SSL_set_tlsext_host_name(backend->handle, data->state.buffer))
       infof(data, "WARNING: failed to configure server name indication (SNI) "

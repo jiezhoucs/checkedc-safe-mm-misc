@@ -37,7 +37,7 @@ struct content_encoding {
                           struct contenc_writer *writer);
   CURLcode (*unencode_write)(struct Curl_easy *data,
                              struct contenc_writer *writer,
-                             const char *buf, size_t nbytes);
+                             mm_array_ptr<const char> buf, size_t nbytes);
   void (*close_writer)(struct Curl_easy *data,
                        struct contenc_writer *writer);
   size_t paramsize;
@@ -48,7 +48,7 @@ CURLcode Curl_build_unencoding_stack(struct Curl_easy *data,
                                      mm_array_ptr<const char> enclist, int maybechunked);
 CURLcode Curl_unencode_write(struct Curl_easy *data,
                              struct contenc_writer *writer,
-                             const char *buf, size_t nbytes);
+                             mm_array_ptr<const char> buf, size_t nbytes);
 void Curl_unencode_cleanup(struct Curl_easy *data);
 mm_array_ptr<char> Curl_all_content_encodings(void);
 

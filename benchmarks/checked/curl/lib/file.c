@@ -251,7 +251,7 @@ static CURLcode file_upload(struct Curl_easy *data)
   int fd;
   int mode;
   CURLcode result = CURLE_OK;
-  char *buf = data->state.buffer;
+  char *buf = _GETCHARPTR(data->state.buffer);
   curl_off_t bytecount = 0;
   struct_stat file_stat;
   const char *buf2;
@@ -260,6 +260,7 @@ static CURLcode file_upload(struct Curl_easy *data)
    * Since FILE: doesn't do the full init, we need to provide some extra
    * assignments here.
    */
+  // TODO?
   data->req.upload_fromhere = buf;
 
   if(!dir)
@@ -374,7 +375,8 @@ static CURLcode file_do(struct Curl_easy *data, bool *done)
   curl_off_t expected_size = -1;
   bool size_known;
   bool fstated = FALSE;
-  char *buf = data->state.buffer;
+  // TODO?
+  char *buf = _GETCHARPTR(data->state.buffer);
   curl_off_t bytecount = 0;
   int fd;
   struct FILEPROTO *file;

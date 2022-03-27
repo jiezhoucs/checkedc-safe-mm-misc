@@ -693,7 +693,7 @@ static CURLcode multi_done(struct Curl_easy *data,
       data->state.lastconnect_id = -1;
   }
 
-  Curl_safefree(data->state.buffer);
+  mm_Curl_safefree(char, data->state.buffer);
   Curl_free_request_state(data);
   return result;
 }
@@ -1715,7 +1715,7 @@ static CURLcode protocol_connect(struct Curl_easy *data,
 CURLcode Curl_preconnect(struct Curl_easy *data)
 {
   if(!data->state.buffer) {
-    data->state.buffer = malloc(data->set.buffer_size + 1);
+    data->state.buffer = MM_ARRAY_ALLOC(char, data->set.buffer_size + 1);
     if(!data->state.buffer)
       return CURLE_OUT_OF_MEMORY;
   }

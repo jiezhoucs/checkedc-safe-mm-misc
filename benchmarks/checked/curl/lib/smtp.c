@@ -859,7 +859,7 @@ static CURLcode smtp_state_ehlo_resp(struct Curl_easy *data,
 {
   CURLcode result = CURLE_OK;
   struct smtp_conn *smtpc = &conn->proto.smtpc;
-  const char *line = data->state.buffer;
+  const char *line = _GETCHARPTR(data->state.buffer);
   size_t len = strlen(line);
 
   (void)instate; /* no use for this yet */
@@ -1008,7 +1008,7 @@ static CURLcode smtp_state_command_resp(struct Curl_easy *data, int smtpcode,
 {
   CURLcode result = CURLE_OK;
   struct SMTP *smtp = data->req.p.smtp;
-  char *line = data->state.buffer;
+  char *line = _GETCHARPTR(data->state.buffer);
   size_t len = strlen(line);
 
   (void)instate; /* no use for this yet */

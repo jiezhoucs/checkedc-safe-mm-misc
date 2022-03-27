@@ -97,6 +97,15 @@ void *Curl_memdup(const void *src, size_t length)
   return buffer;
 }
 
+mm_array_ptr<char> mm_Curl_memdup(mm_array_ptr<const char> src, size_t buffer_length) {
+  mm_array_ptr<char> buffer = MM_ARRAY_ALLOC(char, buffer_length);
+  if (!buffer) return NULL;
+
+  mm_memcpy(buffer, src, buffer_length);
+
+  return  buffer;
+}
+
 /***************************************************************************
  *
  * Curl_saferealloc(ptr, size)
@@ -117,5 +126,15 @@ void *Curl_saferealloc(void *ptr, size_t size)
   if(size && !datap)
     /* only free 'ptr' if size was non-zero */
     free(ptr);
+  return datap;
+}
+
+/* mmsafe version of mm_Curl_saferealloc() */
+mm_array_ptr<char> mm_Curl_saferealloc(mm_array_ptr<char> ptr, size_t size) {
+  mm_array_ptr<char> datap = mm_array_realloc<char>(ptr, size);
+  if (size && !datap) {
+    MM_FREE(char, ptr);
+  }
+
   return datap;
 }

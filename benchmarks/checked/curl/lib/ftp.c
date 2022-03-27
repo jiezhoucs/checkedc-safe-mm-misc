@@ -1631,7 +1631,7 @@ static CURLcode ftp_state_ul_setup(struct Curl_easy *data,
           curlx_sotouz(data->state.resume_from - passed);
 
         size_t actuallyread =
-          data->state.fread_func(data->state.buffer, 1, readthisamountnow,
+          data->state.fread_func(_GETCHARPTR(data->state.buffer), 1, readthisamountnow,
                                  data->state.in);
 
         passed += actuallyread;
@@ -1839,7 +1839,7 @@ static CURLcode ftp_state_pasv_resp(struct Curl_easy *data,
   struct Curl_dns_entry *addr = NULL;
   enum resolve_t rc;
   unsigned short connectport; /* the local port connect() should use! */
-  char *str = &data->state.buffer[4];  /* start on the first letter */
+  char *str = GETPTR(char, &data->state.buffer[4]);  /* start on the first letter */
 
   /* if we come here again, make sure the former name is cleared */
   Curl_safefree(ftpc->newhost);
@@ -2080,7 +2080,7 @@ static CURLcode ftp_state_mdtm_resp(struct Curl_easy *data,
       /* we got a time. Format should be: "YYYYMMDDHHMMSS[.sss]" where the
          last .sss part is optional and means fractions of a second */
       int year, month, day, hour, minute, second;
-      if(6 == sscanf(&data->state.buffer[4], "%04d%02d%02d%02d%02d%02d",
+      if(6 == sscanf(_GETCHARPTR(&data->state.buffer[4]), "%04d%02d%02d%02d%02d%02d",
                      &year, &month, &day, &hour, &minute, &second)) {
         /* we have a time, reformat it */
         char timebuf[24];
@@ -2290,7 +2290,7 @@ static CURLcode ftp_state_size_resp(struct Curl_easy *data,
 {
   CURLcode result = CURLE_OK;
   curl_off_t filesize = -1;
-  char *buf = data->state.buffer;
+  char *buf = _GETCHARPTR(data->state.buffer);
 
   /* get the size from the ascii string: */
   if(ftpcode == 213) {
@@ -2473,7 +2473,7 @@ static CURLcode ftp_state_get_resp(struct Curl_easy *data,
        *
        * Example D above makes this parsing a little tricky */
       char *bytes;
-      char *buf = data->state.buffer;
+      char *buf = _GETCHARPTR(data->state.buffer);
       bytes = strstr(buf, " bytes");
       if(bytes) {
         long in = (long)(--bytes-buf);
@@ -2833,7 +2833,7 @@ static CURLcode ftp_statemachine(struct Curl_easy *data,
 
     case FTP_PWD:
       if(ftpcode == 257) {
-        char *ptr = &data->state.buffer[4];  /* start on the first letter */
+        char *ptr = GETPTR(char, &data->state.buffer[4]);  /* start on the first letter */
         const size_t buf_size = data->set.buffer_size;
         char *dir;
         bool entry_extracted = FALSE;
@@ -2926,7 +2926,7 @@ static CURLcode ftp_statemachine(struct Curl_easy *data,
 
     case FTP_SYST:
       if(ftpcode == 215) {
-        char *ptr = &data->state.buffer[4];  /* start on the first letter */
+        char *ptr = GETPTR(char, &data->state.buffer[4]);  /* start on the first letter */
         char *os;
         char *store;
 

@@ -2878,7 +2878,8 @@ CURLcode Curl_http_resume(struct Curl_easy *data,
             curlx_sotouz(data->state.resume_from - passed);
 
           size_t actuallyread =
-            data->state.fread_func(data->state.buffer, 1, readthisamountnow,
+            // TODO?
+            data->state.fread_func(_GETCHARPTR(data->state.buffer), 1, readthisamountnow,
                                    data->state.in);
 
           passed += actuallyread;
@@ -3712,8 +3713,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
   }
 #endif
   else if(conn->handler->protocol & CURLPROTO_RTSP) {
-      // TODO
-    result = Curl_rtsp_parseheader(data, _GETCHARPTR(headp));
+    result = Curl_rtsp_parseheader(data, headp);
     if(result)
       return result;
   }
@@ -3810,10 +3810,10 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
   CURLcode result;
   struct SingleRequest *k = &data->req;
   ssize_t onread = *nread;
-  char *ostr = k->str;
+  mm_array_ptr<char> ostr = k->str;
   mm_array_ptr<char> headp = NULL;
-  char *str_start;
-  char *end_ptr;
+  mm_array_ptr<char> str_start = NULL;
+  mm_array_ptr<char> end_ptr = NULL;
 
   /* header line within buffer loop */
   do {
@@ -3825,12 +3825,12 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
     str_start = k->str;
 
     /* data is in network encoding so use 0x0a instead of '\n' */
-    end_ptr = memchr(str_start, 0x0a, *nread);
+    end_ptr = mm_memchr(str_start, 0x0a, *nread);
 
     if(!end_ptr) {
       /* Not a complete header line within buffer, append the data to
          the end of the headerbuff. */
-      result = Curl_dyn_addn(&data->state.headerb, str_start, *nread);
+      result = Curl_dyn_addn(&data->state.headerb, _GETCHARPTR(str_start), *nread);
       if(result)
         return result;
 
@@ -3865,7 +3865,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
 
     full_length = k->str - str_start;
 
-    result = Curl_dyn_addn(&data->state.headerb, str_start, full_length);
+    result = Curl_dyn_addn(&data->state.headerb, _GETCHARPTR(str_start), full_length);
     if(result)
       return result;
 
@@ -3902,7 +3902,6 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
 
     /* headers are in network encoding so use 0x0a and 0x0d instead of '\n'
        and '\r' */
-    // TODO
     headp = Curl_dyn_ptr(&data->state.headerb);
     if((0x0a == *headp) || (0x0d == *headp)) {
       size_t headerlen;
@@ -4033,7 +4032,6 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
 
       headerlen = Curl_dyn_len(&data->state.headerb);
       result = Curl_client_write(data, writetype,
-              // TODO
                                  _GETCHARPTR(Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb))),
                                  headerlen);
       if(result)
@@ -4195,7 +4193,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
           k->keepon &= ~KEEP_RECV;
         }
 
-        Curl_debug(data, CURLINFO_HEADER_IN, str_start, headerlen);
+        Curl_debug(data, CURLINFO_HEADER_IN, _GETCHARPTR(str_start), headerlen);
         break; /* exit header line loop */
       }
 

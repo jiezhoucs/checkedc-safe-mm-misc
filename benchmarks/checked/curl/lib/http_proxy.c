@@ -364,7 +364,6 @@ static CURLcode CONNECT(struct Curl_easy *data,
     if(http->sending == HTTPSEND_REQUEST) {
       if(!s->nsend) {
         size_t fillcount;
-        // TODO
         k->upload_fromhere = _GETCHARPTR(data->state.ulbuf);
         result = Curl_fillreadbuffer(data, data->set.upload_buffer_size,
                                      &fillcount);
@@ -494,7 +493,6 @@ static CURLcode CONNECT(struct Curl_easy *data,
           if(data->set.include_header)
             writetype |= CLIENTWRITE_BODY;
 
-          // TODO
           result = Curl_client_write(data, writetype, _GETCHARPTR(linep), perline);
           if(result)
             return result;
@@ -538,7 +536,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
               /* now parse the chunked piece of data so that we can properly
                  tell when the stream ends */
               // TODO
-              r = Curl_httpchunk_read(data, _GETCHARPTR(linep) + 1, 1, &gotbytes,
+              r = Curl_httpchunk_read(data, linep + 1, 1, &gotbytes,
                                       &extra);
               if(r == CHUNKE_STOP) {
                 /* we're done reading chunks! */

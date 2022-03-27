@@ -658,7 +658,7 @@ struct SingleRequest {
                                    written as body */
   int headerline;               /* counts header lines to better track the
                                    first one */
-  char *str;                    /* within buf */
+  mm_array_ptr<char> str;                    /* within buf */
   curl_off_t offset;            /* possible resume offset read from the
                                    Content-Range: header */
   int httpcode;                 /* error code from the 'HTTP/1.? XXX' or
@@ -1322,7 +1322,7 @@ struct UrlState {
   long lastconnect_id; /* The last connection, -1 if undefined */
   struct dynbuf headerb; /* buffer to store headers in */
 
-  char *buffer; /* download buffer */
+  mm_array_ptr<char> buffer; /* download buffer */
   mm_array_ptr<char> ulbuf; /* allocated upload buffer or NULL */
   curl_off_t current_speed;  /* the ProgressShow() function sets this,
                                 bytes / second */
