@@ -71,8 +71,8 @@
   } while(0)
 #endif /* !USE_WINDOWS_SSPI */
 
-bool Curl_auth_digest_get_pair(const char *str, char *value, char *content,
-                               const char **endptr)
+bool Curl_auth_digest_get_pair(mm_array_ptr<const char> str, char *value, char *content,
+                               mm_array_ptr<const char> *endptr)
 {
   int c;
   bool starts_with_quote = FALSE;
@@ -497,7 +497,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
  *
  * Returns CURLE_OK on success.
  */
-CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
+CURLcode Curl_auth_decode_digest_http_message(mm_array_ptr<const char> chlg,
                                               struct digestdata *digest)
 {
   bool before = FALSE; /* got a nonce before */

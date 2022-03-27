@@ -63,8 +63,7 @@ CURLcode Curl_input_digest(struct Curl_easy *data,
   while(*header && ISSPACE(*header))
     header++;
 
-  // TODO
-  return Curl_auth_decode_digest_http_message(_GETCHARPTR(header), digest);
+  return Curl_auth_decode_digest_http_message(header, digest);
 }
 
 CURLcode Curl_output_digest(struct Curl_easy *data,

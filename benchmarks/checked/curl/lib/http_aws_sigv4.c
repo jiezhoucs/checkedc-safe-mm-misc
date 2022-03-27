@@ -71,14 +71,14 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   CURLcode ret = CURLE_OUT_OF_MEMORY;
   struct connectdata *conn = data->conn;
   size_t len;
-  const char *tmp0;
-  const char *tmp1;
-  char *provider0_low = NULL;
-  char *provider0_up = NULL;
-  char *provider1_low = NULL;
-  char *provider1_mid = NULL;
-  char *region = NULL;
-  char *service = NULL;
+  mm_array_ptr<const char> tmp0 = NULL;
+  mm_array_ptr<const char> tmp1 = NULL;
+  mm_array_ptr<char> provider0_low = NULL;
+  mm_array_ptr<char> provider0_up = NULL;
+  mm_array_ptr<char> provider1_low = NULL;
+  mm_array_ptr<char> provider1_mid = NULL;
+  mm_array_ptr<char> region = NULL;
+  mm_array_ptr<char> service = NULL;
   mm_array_ptr<const char> hostname = conn->host.name;
 #ifdef DEBUGBUILD
   char *force_timestamp;
@@ -92,11 +92,11 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   char *signed_headers = NULL;
   Curl_HttpReq httpreq;
   mm_array_ptr<const char> method = NULL;
-  // TODO
-  const char *post_data = _GETCHARPTR(data->set.postfields) ? _GETCHARPTR(data->set.postfields) : "";
+  mm_array_ptr<const char> post_data = (mm_array_ptr<const char>)data->set.postfields;
+  if (!post_data) post_data = "";
   unsigned char sha_hash[32];
   char sha_hex[65];
-  char *canonical_request = NULL;
+  mm_array_ptr<char> canonical_request = NULL;
   char *request_type = NULL;
   char *credential_scope = NULL;
   char *str_to_sign = NULL;
@@ -122,55 +122,55 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
    * AWS is the default because most of non-amazon providers
    * are still using aws:amz as a prefix.
    */
-  tmp0 = _GETCHARPTR(data->set.str[STRING_AWS_SIGV4]) ?
-    _GETCHARPTR(data->set.str[STRING_AWS_SIGV4]) : "aws:amz";
-  tmp1 = strchr(tmp0, ':');
-  len = tmp1 ? (size_t)(tmp1 - tmp0) : strlen(tmp0);
+  tmp0 = data->set.str[STRING_AWS_SIGV4];
+  if (!tmp0) tmp0 = "aws:amz";
+  tmp1 = mm_strchr(tmp0, ':');
+  len = tmp1 ? (size_t)(tmp1 - tmp0) : mm_strlen(tmp0);
   if(len < 1) {
     infof(data, "first provider can't be empty");
     ret = CURLE_BAD_FUNCTION_ARGUMENT;
     goto fail;
   }
-  provider0_low = malloc(len + 1);
-  provider0_up = malloc(len + 1);
+  provider0_low = MM_ARRAY_ALLOC(char, len + 1);
+  provider0_up = MM_ARRAY_ALLOC(char, len + 1);
   if(!provider0_low || !provider0_up) {
     goto fail;
   }
-  Curl_strntolower(provider0_low, tmp0, len);
+  mm_Curl_strntolower(provider0_low, tmp0, len);
   provider0_low[len] = '\0';
-  Curl_strntoupper(provider0_up, tmp0, len);
+  mm_Curl_strntoupper(provider0_up, tmp0, len);
   provider0_up[len] = '\0';
 
   if(tmp1) {
     tmp0 = tmp1 + 1;
-    tmp1 = strchr(tmp0, ':');
-    len = tmp1 ? (size_t)(tmp1 - tmp0) : strlen(tmp0);
+    tmp1 = mm_strchr(tmp0, ':');
+    len = tmp1 ? (size_t)(tmp1 - tmp0) : mm_strlen(tmp0);
     if(len < 1) {
       infof(data, "second provider can't be empty");
       ret = CURLE_BAD_FUNCTION_ARGUMENT;
       goto fail;
     }
-    provider1_low = malloc(len + 1);
-    provider1_mid = malloc(len + 1);
+    provider1_low = MM_ARRAY_ALLOC(char, len + 1);
+    provider1_mid = MM_ARRAY_ALLOC(char, len + 1);
     if(!provider1_low || !provider1_mid) {
       goto fail;
     }
-    Curl_strntolower(provider1_low, tmp0, len);
+    mm_Curl_strntolower(provider1_low, tmp0, len);
     provider1_low[len] = '\0';
-    Curl_strntolower(provider1_mid, tmp0, len);
+    mm_Curl_strntolower(provider1_mid, tmp0, len);
     provider1_mid[0] = Curl_raw_toupper(provider1_mid[0]);
     provider1_mid[len] = '\0';
 
     if(tmp1) {
       tmp0 = tmp1 + 1;
-      tmp1 = strchr(tmp0, ':');
-      len = tmp1 ? (size_t)(tmp1 - tmp0) : strlen(tmp0);
+      tmp1 = mm_strchr(tmp0, ':');
+      len = tmp1 ? (size_t)(tmp1 - tmp0) : mm_strlen(tmp0);
       if(len < 1) {
         infof(data, "region can't be empty");
         ret = CURLE_BAD_FUNCTION_ARGUMENT;
         goto fail;
       }
-      region = Curl_memdup(tmp0, len + 1);
+      region = mm_Curl_memdup(tmp0, len + 1);
       if(!region) {
         goto fail;
       }
@@ -178,11 +178,11 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
 
       if(tmp1) {
         tmp0 = tmp1 + 1;
-        service = strdup(tmp0);
+        service = mm_strdup(tmp0);
         if(!service) {
           goto fail;
         }
-        if(strlen(service) < 1) {
+        if(mm_strlen(service) < 1) {
           infof(data, "service can't be empty");
           ret = CURLE_BAD_FUNCTION_ARGUMENT;
           goto fail;
@@ -191,8 +191,8 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
     }
   }
   else {
-    provider1_low = Curl_memdup(provider0_low, len + 1);
-    provider1_mid = Curl_memdup(provider0_low, len + 1);
+    provider1_low = mm_Curl_memdup(provider0_low, len + 1);
+    provider1_mid = mm_Curl_memdup(provider0_low, len + 1);
     if(!provider1_low || !provider1_mid) {
       goto fail;
     }
@@ -200,16 +200,15 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   }
 
   if(!service) {
-    // TODO
-    tmp0 = _GETCHARPTR(hostname);
-    tmp1 = strchr(tmp0, '.');
+    tmp0 = hostname;
+    tmp1 = mm_strchr(tmp0, '.');
     len = tmp1 - tmp0;
     if(!tmp1 || len < 1) {
       infof(data, "service missing in parameters or hostname");
       ret = CURLE_URL_MALFORMAT;
       goto fail;
     }
-    service = Curl_memdup(tmp0, len + 1);
+    service = mm_Curl_memdup(tmp0, len + 1);
     if(!service) {
       goto fail;
     }
@@ -217,14 +216,14 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
 
     if(!region) {
       tmp0 = tmp1 + 1;
-      tmp1 = strchr(tmp0, '.');
+      tmp1 = mm_strchr(tmp0, '.');
       len = tmp1 - tmp0;
       if(!tmp1 || len < 1) {
         infof(data, "region missing in parameters or hostname");
         ret = CURLE_URL_MALFORMAT;
         goto fail;
       }
-      region = Curl_memdup(tmp0, len + 1);
+      region = mm_Curl_memdup(tmp0, len + 1);
       if(!region) {
         goto fail;
       }
@@ -267,30 +266,30 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
                                       "x-%s-date:%s\n",
                                       _GETCHARPTR(content_type),
                                       _GETCHARPTR(hostname),
-                                      provider1_low, timestamp);
+                                      _GETCHARPTR(provider1_low), timestamp);
     signed_headers = curl_maprintf("content-type;host;x-%s-date",
-                                   provider1_low);
+                                   _GETCHARPTR(provider1_low));
   }
   else {
     canonical_headers = curl_maprintf("host:%s\n"
                                       "x-%s-date:%s\n",
                                       _GETCHARPTR(hostname),
-                                      provider1_low, timestamp);
-    signed_headers = curl_maprintf("host;x-%s-date", provider1_low);
+                                      _GETCHARPTR(provider1_low), timestamp);
+    signed_headers = curl_maprintf("host;x-%s-date", _GETCHARPTR(provider1_low));
   }
 
   if(!canonical_headers || !signed_headers) {
     goto fail;
   }
 
-  Curl_sha256it(sha_hash,
-                (const unsigned char *) post_data, strlen(post_data));
+  Curl_sha256it(sha_hash, (const unsigned char*)post_data,
+          mm_strlen(post_data));
   sha256_to_hex(sha_hex, sha_hash, sizeof(sha_hex));
 
   Curl_http_method(data, conn, &method, &httpreq);
 
   canonical_request =
-    curl_maprintf("%s\n" /* HTTPRequestMethod */
+    mmize_str(curl_maprintf("%s\n" /* HTTPRequestMethod */
                   "%s\n" /* CanonicalURI */
                   "%s\n" /* CanonicalQueryString */
                   "%s\n" /* CanonicalHeaders */
@@ -301,24 +300,24 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
                   data->state.up.query ? data->state.up.query : "",
                   canonical_headers,
                   signed_headers,
-                  sha_hex);
+                  sha_hex));
   if(!canonical_request) {
     goto fail;
   }
 
-  request_type = curl_maprintf("%s4_request", provider0_low);
+  request_type = curl_maprintf("%s4_request", _GETCHARPTR(provider0_low));
   if(!request_type) {
     goto fail;
   }
 
   credential_scope = curl_maprintf("%s/%s/%s/%s",
-                                   date, region, service, request_type);
+                                   date, _GETCHARPTR(region), _GETCHARPTR(service), request_type);
   if(!credential_scope) {
     goto fail;
   }
 
-  Curl_sha256it(sha_hash, (unsigned char *) canonical_request,
-                strlen(canonical_request));
+  Curl_sha256it(sha_hash, (unsigned char*) canonical_request,
+                mm_strlen(canonical_request));
   sha256_to_hex(sha_hex, sha_hash, sizeof(sha_hex));
 
   /*
@@ -329,7 +328,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
                               "%s\n" /* RequestDateTime */
                               "%s\n" /* CredentialScope */
                               "%s",  /* HashedCanonicalRequest in hex */
-                              provider0_up,
+                              _GETCHARPTR(provider0_up),
                               timestamp,
                               credential_scope,
                               sha_hex);
@@ -337,7 +336,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
     goto fail;
   }
 
-  secret = curl_maprintf("%s4%s", provider0_up, passwd);
+  secret = curl_maprintf("%s4%s", _GETCHARPTR(provider0_up), passwd);
   if(!secret) {
     goto fail;
   }
@@ -345,9 +344,9 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   HMAC_SHA256(secret, strlen(secret),
               date, strlen(date), tmp_sign0);
   HMAC_SHA256(tmp_sign0, sizeof(tmp_sign0),
-              region, strlen(region), tmp_sign1);
+              _GETCHARPTR(region), mm_strlen(region), tmp_sign1);
   HMAC_SHA256(tmp_sign1, sizeof(tmp_sign1),
-              service, strlen(service), tmp_sign0);
+              _GETCHARPTR(service), mm_strlen(service), tmp_sign0);
   HMAC_SHA256(tmp_sign0, sizeof(tmp_sign0),
               request_type, strlen(request_type), tmp_sign1);
   HMAC_SHA256(tmp_sign1, sizeof(tmp_sign1),
@@ -360,12 +359,12 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
                                "SignedHeaders=%s, "
                                "Signature=%s\r\n"
                                "X-%s-Date: %s\r\n",
-                               provider0_up,
+                               _GETCHARPTR(provider0_up),
                                user,
                                credential_scope,
                                signed_headers,
                                sha_hex,
-                               provider1_mid,
+                               _GETCHARPTR(provider1_mid),
                                timestamp);
   if(!auth_headers) {
     goto fail;
@@ -377,15 +376,15 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   ret = CURLE_OK;
 
 fail:
-  free(provider0_low);
-  free(provider0_up);
-  free(provider1_low);
-  free(provider1_mid);
-  free(region);
-  free(service);
+  MM_FREE(char, provider0_low);
+  MM_FREE(char, provider0_up);
+  MM_FREE(char, provider1_low);
+  MM_FREE(char, provider1_mid);
+  MM_FREE(char, region);
+  MM_FREE(char, service);
   free(canonical_headers);
   free(signed_headers);
-  free(canonical_request);
+  MM_FREE(char, canonical_request);
   free(request_type);
   free(credential_scope);
   free(str_to_sign);

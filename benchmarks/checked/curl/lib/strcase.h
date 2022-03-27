@@ -59,5 +59,7 @@ char Curl_raw_toupper(char in);
 
 void Curl_strntoupper(char *dest, const char *src, size_t n);
 void Curl_strntolower(char *dest, const char *src, size_t n);
+void mm_Curl_strntolower(mm_array_ptr<char> dest, mm_array_ptr<const char> src, size_t n);
+void mm_Curl_strntoupper(mm_array_ptr<char> dest, mm_array_ptr<const char> src, size_t n);
 
 #endif /* HEADER_CURL_STRCASE_H */

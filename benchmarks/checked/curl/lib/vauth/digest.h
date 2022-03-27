@@ -39,8 +39,8 @@ enum {
 };
 
 /* This is used to extract the realm from a challenge message */
-bool Curl_auth_digest_get_pair(const char *str, char *value, char *content,
-                               const char **endptr);
+bool Curl_auth_digest_get_pair(mm_array_ptr<const char> str, char *value, char *content,
+                               mm_array_ptr<const char> *endptr);
 
 #endif
 

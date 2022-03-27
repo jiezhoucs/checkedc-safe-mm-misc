@@ -315,6 +315,15 @@ void Curl_strntoupper(char *dest, const char *src, size_t n)
   } while(*src++ && --n);
 }
 
+void mm_Curl_strntoupper(mm_array_ptr<char> dest, mm_array_ptr<const char> src, size_t n) {
+  if(n < 1)
+    return;
+
+  do {
+    *dest++ = Curl_raw_toupper(*src);
+  } while(*src++ && --n);
+}
+
 /* Copy a lower case version of the string from src to dest.  The
  * strings may overlap.  No more than n characters of the string are copied
  * (including any NUL) and the destination string will NOT be
@@ -324,6 +333,14 @@ void Curl_strntolower(char *dest, const char *src, size_t n)
 {
   if(n < 1)
     return;
+
+  do {
+    *dest++ = raw_tolower(*src);
+  } while(*src++ && --n);
+}
+
+void mm_Curl_strntolower(mm_array_ptr<char> dest, mm_array_ptr<const char> src, size_t n) {
+  if (n < 1) return;
 
   do {
     *dest++ = raw_tolower(*src);

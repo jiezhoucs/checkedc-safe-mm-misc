@@ -97,7 +97,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
                                              struct bufref *out);
 
 /* This is used to decode a HTTP DIGEST challenge message */
-CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
+CURLcode Curl_auth_decode_digest_http_message(mm_array_ptr<const char> chlg,
                                               struct digestdata *digest);
 
 /* This is used to generate a HTTP DIGEST response message */
