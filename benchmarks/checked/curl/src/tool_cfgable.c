@@ -60,7 +60,7 @@ static void free_config_fields(mm_ptr<struct OperationConfig> config)
   Curl_safefree(config->cookiejar);
   curl_slist_free_all(config->cookiefiles);
 
-  Curl_safefree(config->postfields);
+  mm_Curl_safefree(char, config->postfields);
   Curl_safefree(config->referer);
 
   Curl_safefree(config->headerfile);
@@ -142,7 +142,7 @@ static void free_config_fields(mm_ptr<struct OperationConfig> config)
   Curl_safefree(config->sasl_authzid);
 
   Curl_safefree(config->unix_socket_path);
-  Curl_safefree(config->writeout);
+  mm_Curl_safefree(char, config->writeout);
   Curl_safefree(config->proto_default);
 
   curl_slist_free_all(config->quote);

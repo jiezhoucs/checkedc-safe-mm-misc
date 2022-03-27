@@ -232,7 +232,7 @@ static const struct NameValue setopt_nv_CURLNONZERODEFAULTS[] = {
 
 static mm_array_ptr<char> c_escape(const char *str, curl_off_t len)
 {
-  const char *s;
+  const char *s = NULL;
   unsigned char c;
   mm_array_ptr<char> escaped = NULL, e = NULL;
   unsigned int cutoff = 0;
@@ -255,23 +255,23 @@ static mm_array_ptr<char> c_escape(const char *str, curl_off_t len)
   for(s = str; len; s++, len--) {
     c = *s;
     if(c == '\n') {
-      strcpy(_GETCHARPTR(e), "\\n");
+      mm_strcpy(e, "\\n");
       e += 2;
     }
     else if(c == '\r') {
-      strcpy(_GETCHARPTR(e), "\\r");
+      mm_strcpy(e, "\\r");
       e += 2;
     }
     else if(c == '\t') {
-      strcpy(_GETCHARPTR(e), "\\t");
+      mm_strcpy(e, "\\t");
       e += 2;
     }
     else if(c == '\\') {
-      strcpy(_GETCHARPTR(e), "\\\\");
+      mm_strcpy(e, "\\\\");
       e += 2;
     }
     else if(c == '"') {
-      strcpy(_GETCHARPTR(e), "\\\"");
+      mm_strcpy(e, "\\\"");
       e += 2;
     }
     else if(!isprint(c)) {
@@ -425,7 +425,6 @@ static CURLcode libcurl_generate_slist(struct curl_slist *slist, int *slistno)
   CLEAN1("slist%d = NULL;", *slistno);
   for(; slist; slist = slist->next) {
     MM_curl_free(char, escaped);
-    // TODO
     escaped = c_escape(_GETCHARPTR(slist->data), ZERO_TERMINATED);
     if(!escaped)
       return CURLE_OUT_OF_MEMORY;
@@ -452,8 +451,8 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
   CURLcode ret = CURLE_OK;
   int submimeno = 0;
   mm_array_ptr<char> escaped = NULL;
-  const char *data = NULL;
-  const char *filename = part->filename;
+  mm_array_ptr<const char> data = NULL;
+  mm_array_ptr<const char> filename = part->filename;
 
   /* Parts are linked in reverse order. */
   if(part->prev) {
@@ -483,7 +482,7 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
 
     /* Our data is always textual: convert it to ASCII. */
     {
-      size_t size = strlen(part->data);
+      size_t size = mm_strlen(part->data);
       /* Checked C: Omit porting this malloc as it is in an MIME related fn. */
       char *cp = malloc(size + 1);
 
@@ -497,7 +496,7 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
 #endif
     if(!ret) {
       MM_curl_free(char, escaped);
-      escaped = c_escape(data, ZERO_TERMINATED);
+      escaped = c_escape(_GETCHARPTR(data), ZERO_TERMINATED);
       NULL_CHECK(escaped);
       CODE2("curl_mime_data(part%d, \"%s\", CURL_ZERO_TERMINATED);",
                             mimeno, _GETCHARPTR(escaped));
@@ -506,7 +505,7 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
 
   case TOOLMIME_FILE:
   case TOOLMIME_FILEDATA:
-    escaped = c_escape(part->data, ZERO_TERMINATED);
+    escaped = c_escape(_GETCHARPTR(part->data), ZERO_TERMINATED);
     NULL_CHECK(escaped);
     CODE2("curl_mime_filedata(part%d, \"%s\");", mimeno, _GETCHARPTR(escaped));
     if(part->kind == TOOLMIME_FILEDATA && !filename) {
@@ -531,28 +530,28 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
 
   if(!ret && part->encoder) {
     MM_curl_free(char, escaped);
-    escaped = c_escape(part->encoder, ZERO_TERMINATED);
+    escaped = c_escape(_GETCHARPTR(part->encoder), ZERO_TERMINATED);
     NULL_CHECK(escaped);
     CODE2("curl_mime_encoder(part%d, \"%s\");", mimeno, _GETCHARPTR(escaped));
   }
 
   if(!ret && filename) {
     MM_curl_free(char, escaped);
-    escaped = c_escape(filename, ZERO_TERMINATED);
+    escaped = c_escape(_GETCHARPTR(filename), ZERO_TERMINATED);
     NULL_CHECK(escaped);
     CODE2("curl_mime_filename(part%d, \"%s\");", mimeno, _GETCHARPTR(escaped));
   }
 
   if(!ret && part->name) {
     MM_curl_free(char, escaped);
-    escaped = c_escape(part->name, ZERO_TERMINATED);
+    escaped = c_escape(_GETCHARPTR(part->name), ZERO_TERMINATED);
     NULL_CHECK(escaped);
     CODE2("curl_mime_name(part%d, \"%s\");", mimeno, _GETCHARPTR(escaped));
   }
 
   if(!ret && part->type) {
     MM_curl_free(char, escaped);
-    escaped = c_escape(part->type, ZERO_TERMINATED);
+    escaped = c_escape(_GETCHARPTR(part->type), ZERO_TERMINATED);
     NULL_CHECK(escaped);
     CODE2("curl_mime_type(part%d, \"%s\");", mimeno, _GETCHARPTR(escaped));
   }
@@ -681,6 +680,7 @@ CURLcode tool_setopt(CURL *curl, bool str, struct GlobalConfig *global,
   }
   else if(tag < CURLOPTTYPE_OFF_T) {
     /* Value is some sort of object pointer */
+      // Checked C: Safe?
     void *pval = va_arg(arg, void *);
 
     /* function pointers are never printable */

@@ -308,11 +308,11 @@ static int writeOffset(FILE *stream, const struct writeoutvar *wovar,
   return 1; /* return 1 if anything was written */
 }
 
-void ourWriteOut(const char *writeinfo, mm_ptr<struct per_transfer> per,
+void ourWriteOut(mm_array_ptr<const char> writeinfo, mm_ptr<struct per_transfer> per,
                  CURLcode per_result)
 {
   FILE *stream = stdout;
-  const char *ptr = writeinfo;
+  mm_array_ptr<const char> ptr = writeinfo;
   bool done = FALSE;
 
   while(ptr && *ptr && !done) {
@@ -324,12 +324,12 @@ void ourWriteOut(const char *writeinfo, mm_ptr<struct per_transfer> per,
       }
       else {
         /* this is meant as a variable to output */
-        char *end;
+        mm_array_ptr<char> end = NULL;
         if('{' == ptr[1]) {
           char keepit;
           int i;
           bool match = FALSE;
-          end = strchr(ptr, '}');
+          end = mm_strchr(ptr, '}');
           ptr += 2; /* pass the % and the { */
           if(!end) {
             fputs("%{", stream);
@@ -338,7 +338,7 @@ void ourWriteOut(const char *writeinfo, mm_ptr<struct per_transfer> per,
           keepit = *end;
           *end = 0; /* null-terminate */
           for(i = 0; variables[i].name; i++) {
-            if(curl_strequal(ptr, variables[i].name)) {
+            if(mm_strcasecompare_0(ptr, variables[i].name)) {
               match = TRUE;
               switch(variables[i].id) {
               case VAR_ONERROR:
@@ -364,7 +364,7 @@ void ourWriteOut(const char *writeinfo, mm_ptr<struct per_transfer> per,
             }
           }
           if(!match) {
-            fprintf(stderr, "curl: unknown --write-out variable: '%s'\n", ptr);
+            fprintf(stderr, "curl: unknown --write-out variable: '%s'\n", _GETCHARPTR(ptr));
           }
           ptr = end + 1; /* pass the end */
           *end = keepit;

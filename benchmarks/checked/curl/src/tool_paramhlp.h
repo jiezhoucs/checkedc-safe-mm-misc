@@ -25,9 +25,9 @@
 
 mm_ptr<struct getout> new_getout(mm_ptr<struct OperationConfig> config);
 
-ParameterError file2string(mm_ptr<char *> bufp, FILE *file);
+ParameterError file2string(mm_ptr<mm_array_ptr<char>> bufp, FILE *file);
 
-ParameterError file2memory(char **bufp, size_t *size, FILE *file);
+ParameterError file2memory(mm_array_ptr<char> *bufp, size_t *size, FILE *file);
 
 void cleanarg(char *str);
 

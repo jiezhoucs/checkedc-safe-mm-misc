@@ -146,7 +146,6 @@ CURLcode easysrc_perform(void)
     /* Each unconverted option */
     if(easysrc_toohard) {
       for(ptr = easysrc_toohard->first; ptr; ptr = ptr->next)
-          // TODO
         CHKRET(easysrc_add(&easysrc_code, _GETCHARPTR(ptr->data)));
     }
     CHKRET(easysrc_add(&easysrc_code, ""));

@@ -130,7 +130,6 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
 
   curl_easy_getinfo(per->curl, CURLINFO_PROTOCOL, &protocol);
   if(hdrcbdata->honor_cd_filename &&
-          // TODO?
      (cb > 20) && checkprefix_raw("Content-disposition:", str) &&
      (protocol & (CURLPROTO_HTTPS|CURLPROTO_HTTP))) {
     const char *p = str + 20;

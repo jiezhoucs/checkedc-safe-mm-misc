@@ -650,7 +650,7 @@ static void single_transfer_cleanup(mm_ptr<struct OperationConfig> config)
       state->urls = NULL;
     }
     Curl_safefree(state->outfiles);
-    Curl_safefree(state->httpgetfields);
+    mm_Curl_safefree(char, state->httpgetfields);
     Curl_safefree(state->uploadfile);
     if(state->inglob) {
       /* Free list of globbed upload files */
@@ -673,15 +673,15 @@ static CURLcode single_transfer(struct GlobalConfig *global,
   bool orig_noprogress = global->noprogress;
   bool orig_isatty = global->isatty;
   mm_ptr<struct State> state = &config->state;
-  char *httpgetfields = state->httpgetfields;
+  mm_array_ptr<char> httpgetfields = state->httpgetfields;
   *added = FALSE; /* not yet */
 
   if(config->postfields) {
     if(config->use_httpget) {
       if(!httpgetfields) {
         /* Use the postfields data for a http get */
-        httpgetfields = state->httpgetfields = strdup(config->postfields);
-        Curl_safefree(config->postfields);
+        httpgetfields = state->httpgetfields = mm_strdup(config->postfields);
+        mm_Curl_safefree(char, config->postfields);
         if(!httpgetfields) {
           errorf(global, "out of memory\n");
           result = CURLE_OUT_OF_MEMORY;
@@ -1124,6 +1124,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
             per->separator = aprintf("%s%s", CURLseparator, per->this_url);
         }
         if(httpgetfields) {
+          // TODO
           char *urlbuffer;
           /* Find out whether the url contains a file name */
           const char *pc = strstr(per->this_url, "://");
@@ -1147,12 +1148,12 @@ static CURLcode single_transfer(struct GlobalConfig *global,
            * Then append ? followed by the get fields to the url.
            */
           if(pc)
-            urlbuffer = aprintf("%s%c%s", per->this_url, sep, httpgetfields);
+            urlbuffer = aprintf("%s%c%s", per->this_url, sep, _GETCHARPTR(httpgetfields));
           else
             /* Append  / before the ? to create a well-formed url
                if the url contains a hostname only
             */
-            urlbuffer = aprintf("%s/?%s", per->this_url, httpgetfields);
+            urlbuffer = aprintf("%s/?%s", per->this_url, _GETCHARPTR(httpgetfields));
 
           if(!urlbuffer) {
             result = CURLE_OUT_OF_MEMORY;
@@ -1294,7 +1295,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
         switch(config->httpreq) {
         case HTTPREQ_SIMPLEPOST:
           my_setopt_str(curl, CURLOPT_POSTFIELDS,
-                        config->postfields);
+                        _GETCHARPTR(config->postfields));
           my_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
                     config->postfieldsize);
           break;

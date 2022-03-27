@@ -59,6 +59,19 @@
   } \
 } while(0)
 
+// Checked C: Fix mm_strdup_from_raw?
+#define mm_GetStr(str,val) do { \
+  if(*(str)) { \
+    MM_FREE(char, *(str)); \
+    *(str) = NULL; \
+  } \
+  if((val)) {              \
+    *(str) = mm_strdup_from_raw((val)); \
+    if(!(*(str)))          \
+      return PARAM_NO_MEM; \
+  } \
+} while(0)
+
 struct LongShort {
   const char *letter; /* short name option */
   const char *lname;  /* long name option */
@@ -1365,7 +1378,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
     case 'd':
       /* postfield data */
     {
-      char *postdata = NULL;
+      mm_array_ptr<char> postdata = NULL;
       FILE *file;
       size_t size = 0;
       bool raw_mode = (subletter == 'r');
@@ -1414,22 +1427,22 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
             return err;
         }
         else {
-          GetStr(&postdata, p);
+          mm_GetStr(&postdata, p);
           if(postdata)
-            size = strlen(postdata);
+            size = mm_strlen(postdata);
         }
 
         if(!postdata) {
           /* no data from the file, point to a zero byte string to make this
              get sent as a POST anyway */
-          postdata = strdup("");
+          postdata = mm_strdup_from_raw("");
           if(!postdata)
             return PARAM_NO_MEM;
           size = 0;
         }
         else {
-          char *enc = curl_easy_escape(NULL, postdata, (int)size);
-          Curl_safefree(postdata); /* no matter if it worked or not */
+          char *enc = curl_easy_escape(NULL, _GETCHARPTR(postdata), (int)size);
+          mm_Curl_safefree(char, postdata); /* no matter if it worked or not */
           if(enc) {
             /* replace (in-place) '%20' by '+' acording to RFC1866 */
             size_t enclen = replace_url_encoded_space_by_plus(enc);
@@ -1438,17 +1451,17 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
             size_t outlen = nlen + enclen + 2;
             /* Checked C: Cannot port the next line. If so, postdata's raw ptr
              * will then be set to a ptr from curlx_dyn_len() in file2memory().*/
-            char *n = malloc(outlen);
+            mm_array_ptr<char> n = MM_ARRAY_ALLOC(char, outlen);
             if(!n) {
               curl_free(enc);
               return PARAM_NO_MEM;
             }
             if(nlen > 0) { /* only append '=' if we have a name */
-              msnprintf(n, outlen, "%.*s=%s", nlen, nextarg, enc);
+              msnprintf(_GETCHARPTR(n), outlen, "%.*s=%s", nlen, nextarg, enc);
               size = outlen-1;
             }
             else {
-              strcpy(n, enc);
+              mm_strcpy(n, enc);
               size = outlen-2; /* since no '=' was inserted */
             }
             curl_free(enc);
@@ -1481,7 +1494,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         else {
           err = file2string(&postdata, file);
           if(postdata)
-            size = strlen(postdata);
+            size = mm_strlen(postdata);
         }
 
         if(file && (file != stdin))
@@ -1492,15 +1505,15 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         if(!postdata) {
           /* no data from the file, point to a zero byte string to make this
              get sent as a POST anyway */
-          postdata = strdup("");
+          postdata = mm_strdup_from_raw("");
           if(!postdata)
             return PARAM_NO_MEM;
         }
       }
       else {
-        GetStr(&postdata, nextarg);
+        mm_GetStr(&postdata, nextarg);
         if(postdata)
-          size = strlen(postdata);
+          size = mm_strlen(postdata);
       }
 
 #ifdef CURL_DOES_CONVERSIONS
@@ -1516,23 +1529,23 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       if(config->postfields) {
         /* we already have a string, we append this one with a separating
            &-letter */
-        char *oldpost = config->postfields;
+        mm_array_ptr<char> oldpost = config->postfields;
         curl_off_t oldlen = config->postfieldsize;
         curl_off_t newlen = oldlen + curlx_uztoso(size) + 2;
         /* Checked C: Cannot port next line. See comment for the melloc above */
-        config->postfields = malloc((size_t)newlen);
+        config->postfields = MM_ARRAY_ALLOC(char, (size_t)newlen);
         if(!config->postfields) {
-          Curl_safefree(oldpost);
-          Curl_safefree(postdata);
+          mm_Curl_safefree(char, oldpost);
+          mm_Curl_safefree(char, postdata);
           return PARAM_NO_MEM;
         }
-        memcpy(config->postfields, oldpost, (size_t)oldlen);
+        mm_memcpy(config->postfields, oldpost, (size_t)oldlen);
         /* use byte value 0x26 for '&' to accommodate non-ASCII platforms */
         config->postfields[oldlen] = '\x26';
-        memcpy(&config->postfields[oldlen + 1], postdata, size);
+        mm_memcpy(&config->postfields[oldlen + 1], postdata, size);
         config->postfields[oldlen + 1 + size] = '\0';
-        Curl_safefree(oldpost);
-        Curl_safefree(postdata);
+        mm_Curl_safefree(char, oldpost);
+        mm_Curl_safefree(char, postdata);
         config->postfieldsize += size + 1;
       }
       else {
@@ -1855,7 +1868,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       /* A custom header to append to a list */
       if(nextarg[0] == '@') {
         /* read many headers from a file or stdin */
-        char *string;
+        mm_array_ptr<char> string = NULL;
         size_t len;
         bool use_stdin = !strcmp(&nextarg[1], "-");
         FILE *file = use_stdin?stdin:fopen(&nextarg[1], FOPEN_READTEXT);
@@ -1866,7 +1879,8 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
           if(!err && string) {
             /* Allow strtok() here since this isn't used threaded */
             /* !checksrc! disable BANNEDFUNC 2 */
-            char *h = strtok(string, "\r\n");
+            // TODO
+            char *h = strtok(_GETCHARPTR(string), "\r\n");
             while(h) {
               if(subletter == 'p') /* --proxy-header */
                 err = add2list(&config->proxyheaders, h);
@@ -1876,7 +1890,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
                 break;
               h = strtok(NULL, "\r\n");
             }
-            free(string);
+            MM_FREE(char, string);
           }
           if(!use_stdin)
             fclose(file);
@@ -2206,7 +2220,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
           fname = nextarg;
           file = fopen(nextarg, FOPEN_READTEXT);
         }
-        Curl_safefree(config->writeout);
+        mm_Curl_safefree(char, config->writeout);
         err = file2string(&config->writeout, file);
         if(file && (file != stdin))
           fclose(file);
@@ -2216,7 +2230,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
           warnf(global, "Failed to read %s", fname);
       }
       else
-        GetStr(&config->writeout, nextarg);
+        mm_GetStr(&config->writeout, nextarg);
       break;
     case 'x':
       switch(subletter) {

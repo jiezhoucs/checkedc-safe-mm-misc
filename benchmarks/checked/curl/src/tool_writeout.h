@@ -79,7 +79,7 @@ struct writeoutvar {
                    bool use_json);
 };
 
-void ourWriteOut(const char *writeinfo, mm_ptr<struct per_transfer> per,
+void ourWriteOut(mm_array_ptr<const char> writeinfo, mm_ptr<struct per_transfer> per,
                  CURLcode per_result);
 
 #endif /* HEADER_CURL_TOOL_WRITEOUT_H */

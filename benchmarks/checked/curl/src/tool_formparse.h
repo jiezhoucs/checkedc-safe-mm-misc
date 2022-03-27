@@ -43,11 +43,11 @@ struct tool_mime {
   struct tool_mime *parent;     /* Parent item. */
   struct tool_mime *prev;       /* Previous sibling (reverse order link). */
   /* Common fields. */
-  const char *data;             /* Actual data or data filename. */
-  const char *name;             /* Part name. */
-  const char *filename;         /* Part's filename. */
-  const char *type;             /* Part's mime type. */
-  const char *encoder;          /* Part's requested encoding. */
+  mm_array_ptr<const char> data;             /* Actual data or data filename. */
+  mm_array_ptr<const char> name;             /* Part name. */
+  mm_array_ptr<const char> filename;         /* Part's filename. */
+  mm_array_ptr<const char> type;             /* Part's mime type. */
+  mm_array_ptr<const char> encoder;          /* Part's requested encoding. */
   struct curl_slist *headers;   /* User-defined headers. */
   /* TOOLMIME_PARTS fields. */
   struct tool_mime *subparts;   /* Part's subparts. */

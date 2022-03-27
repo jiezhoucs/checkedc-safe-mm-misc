@@ -62,7 +62,7 @@ mm_ptr<struct getout> new_getout(mm_ptr<struct OperationConfig> config)
 
 #define MAX_FILE2STRING (256*1024*1024) /* big enough ? */
 
-ParameterError file2string(mm_ptr<char *> bufp, FILE *file)
+ParameterError file2string(mm_ptr<mm_array_ptr<char>> bufp, FILE *file)
 {
   struct curlx_dynbuf dyn;
   curlx_dyn_init(&dyn, MAX_FILE2STRING);
@@ -80,14 +80,13 @@ ParameterError file2string(mm_ptr<char *> bufp, FILE *file)
         return PARAM_NO_MEM;
     }
   }
-  // TODO
-  *bufp = _GETCHARPTR(curlx_dyn_ptr(&dyn));
+  *bufp = curlx_dyn_ptr(&dyn);
   return PARAM_OK;
 }
 
 #define MAX_FILE2MEMORY (1024*1024*1024) /* big enough ? */
 
-ParameterError file2memory(char **bufp, size_t *size, FILE *file)
+ParameterError file2memory(mm_array_ptr<char> *bufp, size_t *size, FILE *file)
 {
   if(file) {
     size_t nread;
@@ -101,8 +100,7 @@ ParameterError file2memory(char **bufp, size_t *size, FILE *file)
           return PARAM_NO_MEM;
     } while(nread);
     *size = curlx_dyn_len(&dyn);
-    // TODO
-    *bufp = _GETCHARPTR(curlx_dyn_ptr(&dyn));
+    *bufp = curlx_dyn_ptr(&dyn);
   }
   else {
     *size = 0;

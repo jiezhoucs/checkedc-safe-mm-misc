@@ -41,7 +41,7 @@ struct State {
   mm_ptr<struct URLGlob> inglob;
   mm_ptr<struct URLGlob> urls;
   char *outfiles;
-  char *httpgetfields;
+  mm_array_ptr<char> httpgetfields;
   char *uploadfile;
   unsigned long infilenum; /* number of files to upload */
   unsigned long up;  /* upload file counter within a single upload glob */
@@ -75,7 +75,7 @@ struct OperationConfig {
   bool proto_redir_present;
   char *proto_default;
   curl_off_t resume_from;
-  char *postfields;
+  mm_array_ptr<char> postfields;
   curl_off_t postfieldsize;
   char *referer;
   double timeout;
@@ -190,7 +190,7 @@ struct OperationConfig {
   bool proxydigest;
   bool proxybasic;
   bool proxyanyauth;
-  char *writeout;           /* %-styled format string to output */
+  mm_array_ptr<char> writeout;           /* %-styled format string to output */
   struct curl_slist *quote;
   struct curl_slist *postquote;
   struct curl_slist *prequote;
