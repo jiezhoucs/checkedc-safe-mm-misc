@@ -60,12 +60,26 @@ mm_array_ptr<char> mm_memrchr(mm_array_ptr<const char> s, int c, size_t n) {
   return _create_mm_array_ptr_char(s, ret_p);
 }
 
-
-/* strtok_r()
+/* strtok()
  *
  * The last argument is the pointer to the original string. It is used to
- * compute the new mm_array_ptr for the non-first-time calls to the fn.
+ * compute the new mm_array_ptr for the non-first-time call(s) to the fn.
  * */
+mm_array_ptr<char> mm_strtok(mm_array_ptr<char> str, const char *delim,
+                             mm_array_ptr<char> ostr) {
+  char *ret_p = strtok(_GETCHARPTR(str), delim);
+  if (ret_p == NULL) return NULL;
+
+  if (str != NULL) {
+    // First call.
+    return _create_mm_array_ptr_char(str, ret_p);
+  } else {
+    // Subsequent call(s).
+    return _create_mm_array_ptr_char(ostr, ret_p);
+  }
+}
+
+/* strtok_r() */
 mm_array_ptr<char> mm_strtok_r(mm_array_ptr<char> str, const char *delim,
                                char **saveptr,
                                mm_array_ptr<char> ostr) {
