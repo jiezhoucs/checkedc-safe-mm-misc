@@ -18,6 +18,8 @@ typedef struct {
  * */
 static mm_array_ptr<char>
 _create_mm_array_ptr_char(mm_array_ptr<const char> p, char *new_p) {
+    if (new_p == NULL) return NULL;
+
     _MMSafe_ptr_Rep *base_safeptr_ptr = (_MMSafe_ptr_Rep *)&p;
     _MMSafe_ptr_Rep new_safeptr = {
         new_p,
@@ -57,6 +59,7 @@ mm_array_ptr<char> mm_memrchr(mm_array_ptr<const char> s, int c, size_t n) {
   char *ret_p = memrchr(_GETPTR(char, s), c, n);
   return _create_mm_array_ptr_char(s, ret_p);
 }
+
 
 /* strtok_r()
  *
