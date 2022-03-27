@@ -39,7 +39,8 @@
    specified with an initial dash! */
 #define ISSEP(x,dash) (!dash && (((x) == '=') || ((x) == ':')))
 
-static const char *unslashquote(const char *line, char *param);
+static mm_array_ptr<const char> unslashquote(mm_array_ptr<const char> line,
+                                             mm_array_ptr<char> param);
 
 #define MAX_CONFIG_LINE_LENGTH (100*1024)
 static bool my_get_line(FILE *fp, struct curlx_dynbuf *, bool *error);
@@ -137,9 +138,9 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
   }
 
   if(file) {
-    char *line;
-    char *option;
-    char *param;
+    mm_array_ptr<char> line = NULL;
+    mm_array_ptr<char> option = NULL;
+    mm_array_ptr<char> param = NULL;
     int lineno = 0;
     bool dashed_option;
     struct curlx_dynbuf buf;
@@ -150,7 +151,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
       int res;
       bool alloced_param = FALSE;
       lineno++;
-      line = _GETCHARPTR(curlx_dyn_ptr(&buf));
+      line = curlx_dyn_ptr(&buf);
       if(!line) {
         rc = 1; /* out of memory */
         break;
@@ -196,11 +197,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
       if(*line == '\"') {
         /* quoted parameter, do the quote dance */
         line++;
-        /* Checked C: TODO? If we change the next line, we have to change
-         * char *line defined at line 140, which is set as the return value of
-         * curlx_dyn_ptr() at line 153. Touching curlx_dynbuf will affect too
-         * much code. We should wait to see if changing it is feasible. */
-        param = malloc(strlen(line) + 1); /* parameter */
+        param = MM_ARRAY_ALLOC(char, mm_strlen(line) + 1); /* parameter */
         if(!param) {
           /* out of memory */
           rc = 1;
@@ -232,7 +229,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
           default:
             warnf(operation->global, "%s:%d: warning: '%s' uses unquoted "
                   "whitespace in the line that may cause side-effects!\n",
-                  filename, lineno, option);
+                  filename, lineno, _GETCHARPTR(option));
           }
         }
         if(!*param)
@@ -242,9 +239,9 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
       }
 
 #ifdef DEBUG_CONFIG
-      fprintf(stderr, "PARAM: \"%s\"\n",(param ? param : "(null)"));
+      fprintf(stderr, "PARAM: \"%s\"\n",(param ? _GETCHARPTR(param) : "(null)"));
 #endif
-      res = getparameter(option, param, &usedarg, global, operation);
+      res = getparameter(option, _GETCHARPTR(param), &usedarg, global, operation);
       operation = global->last;
 
       if(!res && param && *param && !usedarg)
@@ -285,12 +282,12 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
            res != PARAM_ENGINES_REQUESTED) {
           const char *reason = param2text(res);
           warnf(operation->global, "%s:%d: warning: '%s' %s\n",
-                filename, lineno, option, reason);
+                filename, lineno, _GETCHARPTR(option), reason);
         }
       }
 
       if(alloced_param)
-        Curl_safefree(param);
+        mm_Curl_safefree(char, param);
 
       curlx_dyn_reset(&buf);
     }
@@ -314,7 +311,8 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
  * end of the input string. param must be at least as long as the input
  * string.  Returns the pointer after the last handled input character.
  */
-static const char *unslashquote(const char *line, char *param)
+static mm_array_ptr<const char> unslashquote(mm_array_ptr<const char> line,
+                                             mm_array_ptr<char> param)
 {
   while(*line && (*line != '\"')) {
     if(*line == '\\') {

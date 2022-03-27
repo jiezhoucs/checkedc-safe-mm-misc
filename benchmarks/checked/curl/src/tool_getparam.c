@@ -550,7 +550,7 @@ static ParameterError GetSizeParameter(struct GlobalConfig *global,
   return PARAM_OK;
 }
 
-ParameterError getparameter(const char *flag, /* f or -long-flag */
+ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
                             char *nextarg,    /* NULL if unset */
                             bool *usedarg,    /* set to TRUE if the arg
                                                  has been used */
@@ -560,6 +560,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
   char letter;
   char subletter = '\0'; /* subletters can only occur on long options */
   int rc;
+  // TODO?
   const char *parse = NULL;
   unsigned int j;
   time_t now;
@@ -574,12 +575,12 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
 
   if(('-' != flag[0]) || ('-' == flag[1])) {
     /* this should be a long name */
-    const char *word = ('-' == flag[0]) ? flag + 2 : flag;
-    size_t fnam = strlen(word);
+    mm_array_ptr<const char> word = ('-' == flag[0]) ? flag + 2 : flag;
+    size_t fnam = mm_strlen(word);
     int numhits = 0;
     bool noflagged = FALSE;
 
-    if(!strncmp(word, "no-", 3)) {
+    if(!mm_strncmp(word, "no-", 3)) {
       /* disable this option but ignore the "no-" part when looking for it */
       word += 3;
       toggle = FALSE;
@@ -587,10 +588,11 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
     }
 
     for(j = 0; j < sizeof(aliases)/sizeof(aliases[0]); j++) {
-      if(curl_strnequal(aliases[j].lname, word, fnam)) {
+        // TODO
+      if(strncasecompare_raw(aliases[j].lname, _GETCHARPTR(word), fnam)) {
         longopt = TRUE;
         numhits++;
-        if(curl_strequal(aliases[j].lname, word)) {
+        if(strcasecompare(aliases[j].lname, _GETCHARPTR(word))) {
           parse = aliases[j].letter;
           hit = j;
           numhits = 1; /* a single unique hit */
@@ -614,7 +616,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
   else {
     flag++; /* prefixed with one dash, pass it */
     hit = -1;
-    parse = flag;
+    parse = _GETCHARPTR(flag);
   }
 
   do {
@@ -1879,16 +1881,15 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
           if(!err && string) {
             /* Allow strtok() here since this isn't used threaded */
             /* !checksrc! disable BANNEDFUNC 2 */
-            // TODO
-            char *h = strtok(_GETCHARPTR(string), "\r\n");
+            mm_array_ptr<char> h = mm_strtok(string, "\r\n", string);
             while(h) {
               if(subletter == 'p') /* --proxy-header */
-                err = add2list(&config->proxyheaders, h);
+                err = add2list(&config->proxyheaders, _GETCHARPTR(h));
               else
-                err = add2list(&config->headers, h);
+                err = add2list(&config->headers, _GETCHARPTR(h));
               if(err)
                 break;
-              h = strtok(NULL, "\r\n");
+              h = mm_strtok(NULL, "\r\n", string);
             }
             MM_FREE(char, string);
           }
@@ -2336,7 +2337,7 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
 {
   int i;
   bool stillflags;
-  char *orig_opt = NULL;
+  mm_array_ptr<char> orig_opt = NULL;
   ParameterError result = PARAM_OK;
   mm_ptr<struct OperationConfig> config = global->first;
 
@@ -2348,17 +2349,18 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
     if(stillflags && ('-' == orig_opt[0])) {
       bool passarg;
 
-      if(!strcmp("--", orig_opt))
+      if(!mm_strcmp("--", orig_opt))
         /* This indicates the end of the flags and thus enables the
            following (URL) argument to start with -. */
         stillflags = FALSE;
       else {
-        char *nextarg = (i < (argc - 1))
+        mm_array_ptr<char> nextarg = (i < (argc - 1))
           ? curlx_convert_tchar_to_UTF8(argv[i + 1])
           : NULL;
 
-        result = getparameter(orig_opt, nextarg, &passarg, global, config);
-        curlx_unicodefree(nextarg);
+        // TODO
+        result = getparameter(orig_opt, _GETCHARPTR(nextarg), &passarg, global, config);
+        mm_Curl_safefree(char, nextarg);
         config = global->last;
         if(result == PARAM_NEXT_OPERATION) {
           /* Reset result as PARAM_NEXT_OPERATION is only used here and not
@@ -2394,12 +2396,12 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
       bool used;
 
       /* Just add the URL please */
-      result = getparameter("--url", orig_opt, &used, global,
+      result = getparameter("--url", _GETCHARPTR(orig_opt), &used, global,
                             config);
     }
 
     if(!result)
-      curlx_unicodefree(orig_opt);
+      mm_Curl_safefree(char, orig_opt);
   }
 
   if(!result && config->content_disposition) {
@@ -2415,12 +2417,12 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
      result != PARAM_ENGINES_REQUESTED) {
     const char *reason = param2text(result);
 
-    if(orig_opt && strcmp(":", orig_opt))
-      helpf(global->errors, "option %s: %s\n", orig_opt, reason);
+    if(orig_opt && mm_strcmp(":", orig_opt))
+      helpf(global->errors, "option %s: %s\n", _GETCHARPTR(orig_opt), reason);
     else
       helpf(global->errors, "%s\n", reason);
   }
 
-  curlx_unicodefree(orig_opt);
+  mm_Curl_safefree(char, orig_opt);
   return result;
 }

@@ -30,7 +30,7 @@
   */
 
 wchar_t *curlx_convert_UTF8_to_wchar(const char *str_utf8);
-char *curlx_convert_wchar_to_UTF8(const wchar_t *str_w);
+mm_array_ptr<char> curlx_convert_wchar_to_UTF8(const wchar_t *str_w);
 #endif /* WIN32 */
 
 /*
@@ -67,7 +67,7 @@ typedef union {
 #else
 
 #define curlx_convert_UTF8_to_tchar(ptr) (strdup)(ptr)
-#define curlx_convert_tchar_to_UTF8(ptr) (strdup)(ptr)
+#define curlx_convert_tchar_to_UTF8(ptr) (mm_strdup_from_raw)(ptr)
 
 typedef union {
   char                *tchar_ptr;

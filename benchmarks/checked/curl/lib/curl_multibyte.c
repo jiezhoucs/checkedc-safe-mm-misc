@@ -60,19 +60,19 @@ wchar_t *curlx_convert_UTF8_to_wchar(const char *str_utf8)
   return str_w;
 }
 
-char *curlx_convert_wchar_to_UTF8(const wchar_t *str_w)
+mm_array_ptr<char> curlx_convert_wchar_to_UTF8(const wchar_t *str_w)
 {
-  char *str_utf8 = NULL;
+  mm_arary_ptr<char> str_utf8 = NULL;
 
   if(str_w) {
     int bytes = WideCharToMultiByte(CP_UTF8, 0, str_w, -1,
                                     NULL, 0, NULL, NULL);
     if(bytes > 0) {
-      str_utf8 = malloc(bytes);
+      str_utf8 = MM_ARRAY_ALLOC(char, bytes);
       if(str_utf8) {
         if(WideCharToMultiByte(CP_UTF8, 0, str_w, -1, str_utf8, bytes,
                                NULL, NULL) == 0) {
-          free(str_utf8);
+          MM_FREE(char, str_utf8);
           return NULL;
         }
       }
