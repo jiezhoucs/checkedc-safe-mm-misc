@@ -1250,7 +1250,7 @@ struct auth {
 };
 
 struct Curl_http2_dep {
-  struct Curl_http2_dep *next;
+  mm_ptr<struct Curl_http2_dep> next;
   struct Curl_easy *data;
 };
 
@@ -1769,7 +1769,7 @@ struct UserDefined {
   long expect_100_timeout; /* in milliseconds */
   struct Curl_easy *stream_depends_on;
   int stream_weight;
-  struct Curl_http2_dep *stream_dependents;
+  mm_ptr<struct Curl_http2_dep> stream_dependents;
 
   curl_resolver_start_callback resolver_start; /* optional callback called
                                                   before resolver start */

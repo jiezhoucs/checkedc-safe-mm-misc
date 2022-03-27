@@ -2419,22 +2419,24 @@ CURLcode Curl_http2_add_child(struct Curl_easy *parent,
                               bool exclusive)
 {
   if(parent) {
-    struct Curl_http2_dep **tail;
-    struct Curl_http2_dep *dep = calloc(1, sizeof(struct Curl_http2_dep));
+    mm_ptr<struct Curl_http2_dep> *tail = NULL;
+    mm_ptr<struct Curl_http2_dep> dep = MM_SINGLE_CALLOC(struct Curl_http2_dep);
     if(!dep)
       return CURLE_OUT_OF_MEMORY;
     dep->data = child;
 
     if(parent->set.stream_dependents && exclusive) {
-      struct Curl_http2_dep *node = parent->set.stream_dependents;
+      mm_ptr<struct Curl_http2_dep> node = parent->set.stream_dependents;
       while(node) {
         node->data->set.stream_depends_on = child;
         node = node->next;
       }
 
       tail = &child->set.stream_dependents;
-      while(*tail)
-        tail = &(*tail)->next;
+      while(*tail) {
+        mm_ptr<struct Curl_http2_dep> next = (*tail)->next;
+        tail = &next;
+      }
 
       DEBUGASSERT(!*tail);
       *tail = parent->set.stream_dependents;
@@ -2444,7 +2446,8 @@ CURLcode Curl_http2_add_child(struct Curl_easy *parent,
     tail = &parent->set.stream_dependents;
     while(*tail) {
       (*tail)->data->set.stream_depends_e = FALSE;
-      tail = &(*tail)->next;
+      mm_ptr<struct Curl_http2_dep> next = (*tail)->next;
+      tail = &next;
     }
 
     DEBUGASSERT(!*tail);
@@ -2458,8 +2461,8 @@ CURLcode Curl_http2_add_child(struct Curl_easy *parent,
 
 void Curl_http2_remove_child(struct Curl_easy *parent, struct Curl_easy *child)
 {
-  struct Curl_http2_dep *last = 0;
-  struct Curl_http2_dep *data = parent->set.stream_dependents;
+  mm_ptr<struct Curl_http2_dep> last = 0;
+  mm_ptr<struct Curl_http2_dep> data = parent->set.stream_dependents;
   DEBUGASSERT(child->set.stream_depends_on == parent);
 
   while(data && data->data != child) {
@@ -2476,7 +2479,7 @@ void Curl_http2_remove_child(struct Curl_easy *parent, struct Curl_easy *child)
     else {
       parent->set.stream_dependents = data->next;
     }
-    free(data);
+    MM_FREE(struct Curl_http2_dep, data);
   }
 
   child->set.stream_depends_on = 0;
