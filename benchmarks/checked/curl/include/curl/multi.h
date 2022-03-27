@@ -438,9 +438,9 @@ CURL_EXTERN CURLMcode curl_multi_assign(CURLM *multi_handle,
 
 struct curl_pushheaders;  /* forward declaration only */
 
-CURL_EXTERN char *curl_pushheader_bynum(struct curl_pushheaders *h,
+CURL_EXTERN mm_array_ptr<char> curl_pushheader_bynum(struct curl_pushheaders *h,
                                         size_t num);
-CURL_EXTERN char *curl_pushheader_byname(struct curl_pushheaders *h,
+CURL_EXTERN mm_array_ptr<char> curl_pushheader_byname(struct curl_pushheaders *h,
                                          const char *name);
 
 typedef int (*curl_push_callback)(CURL *parent,
