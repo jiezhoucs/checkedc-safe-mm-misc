@@ -45,7 +45,7 @@ static CURLcode glob_fixed(mm_ptr<struct URLGlob> glob, char *fixed, size_t len)
   pat->content.Set.ptr_s = 0;
   pat->globindex = -1;
 
-  pat->content.Set.elements = MM_ARRAY_ALLOC(char*, 1);
+  pat->content.Set.elements = MM_ARRAY_ALLOC(mm_array_ptr<char>, 1);
 
   if(!pat->content.Set.elements)
     return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
@@ -54,11 +54,11 @@ static CURLcode glob_fixed(mm_ptr<struct URLGlob> glob, char *fixed, size_t len)
    * "outs->filename = per->outfile;" in single_transfer(), and outs->filename
    * must stay char * because it may get assigned from lib which calls
    * tool_header_cb(), and outs->filename will be free'd and that'd be an error.*/
-  pat->content.Set.elements[0] = malloc(len + 1);
+  pat->content.Set.elements[0] = MM_ARRAY_ALLOC(char, len + 1);
   if(!pat->content.Set.elements[0])
     return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
 
-  memcpy(pat->content.Set.elements[0], fixed, len);
+  mm_memcpy(pat->content.Set.elements[0], fixed, len);
   pat->content.Set.elements[0][len] = 0;
 
   return CURLE_OK;
@@ -125,21 +125,22 @@ static CURLcode glob_set(mm_ptr<struct URLGlob> glob, char **patternp,
     case ',':
       *buf = '\0';
       if(pat->content.Set.elements) {
-         mm_array_ptr<char *> new_arr = mm_array_realloc<char*>(pat->content.Set.elements,
-             (pat->content.Set.size + 1) * sizeof(char*));
+         mm_array_ptr<mm_array_ptr<char>> new_arr =
+             mm_array_realloc<mm_array_ptr<char>>(pat->content.Set.elements,
+             (pat->content.Set.size + 1) * sizeof(mm_array_ptr<char>));
         if(!new_arr)
           return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
 
         pat->content.Set.elements = new_arr;
       }
       else
-        pat->content.Set.elements = MM_ARRAY_ALLOC(char *, 1);
+        pat->content.Set.elements = MM_ARRAY_ALLOC(mm_array_ptr<char>, 1);
 
       if(!pat->content.Set.elements)
         return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
 
       pat->content.Set.elements[pat->content.Set.size] =
-        strdup(_GETARRAYPTR(char, glob->glob_buffer));
+        mm_strdup(glob->glob_buffer);
       if(!pat->content.Set.elements[pat->content.Set.size])
         return GLOBERROR("out of memory", 0, CURLE_OUT_OF_MEMORY);
       ++pat->content.Set.size;
@@ -511,9 +512,9 @@ void glob_cleanup(mm_ptr<struct URLGlob> glob)
       for(elem = glob->pattern[i].content.Set.size - 1;
           elem >= 0;
           --elem) {
-        Curl_safefree(glob->pattern[i].content.Set.elements[elem]);
+        mm_Curl_safefree(char, glob->pattern[i].content.Set.elements[elem]);
       }
-      MM_curl_free(char *, glob->pattern[i].content.Set.elements);
+      mm_Curl_safefree(mm_array_ptr<char>, glob->pattern[i].content.Set.elements);
     }
   }
   MM_curl_free(char, glob->glob_buffer);
@@ -580,8 +581,8 @@ CURLcode glob_next_url(mm_ptr<mm_array_ptr<char>> globbed, mm_ptr<struct URLGlob
     case UPTSet:
       if(pat->content.Set.elements) {
         msnprintf(_GETARRAYPTR(char, buf), buflen, "%s",
-                  pat->content.Set.elements[pat->content.Set.ptr_s]);
-        len = strlen(_GETARRAYPTR(char, buf));
+                  _GETCHARPTR(pat->content.Set.elements[pat->content.Set.ptr_s]));
+        len = mm_strlen(buf);
         buf += len;
         buflen -= len;
       }
@@ -616,10 +617,11 @@ CURLcode glob_next_url(mm_ptr<mm_array_ptr<char>> globbed, mm_ptr<struct URLGlob
 
 #define MAX_OUTPUT_GLOB_LENGTH (10*1024)
 
-CURLcode glob_match_url(mm_ptr<mm_array_ptr<char>> result, char *filename, mm_ptr<struct URLGlob> glob)
+CURLcode glob_match_url(mm_ptr<mm_array_ptr<char>> result,
+        mm_array_ptr<char> filename, mm_ptr<struct URLGlob> glob)
 {
   char numbuf[18];
-  char *appendthis = (char *)"";
+  mm_array_ptr<char> appendthis = "";
   size_t appendlen = 0;
   struct curlx_dynbuf dyn;
 
@@ -632,8 +634,8 @@ CURLcode glob_match_url(mm_ptr<mm_array_ptr<char>> result, char *filename, mm_pt
 
   while(*filename) {
     if(*filename == '#' && ISDIGIT(filename[1])) {
-      char *ptr = filename;
-      unsigned long num = strtoul(&filename[1], &filename, 10);
+      mm_array_ptr<char> ptr = filename;
+      unsigned long num = mm_strtoul(&filename[1], &filename, 10);
       mm_ptr<struct URLPattern> pat = NULL;
 
       if(num && (num < glob->size)) {
@@ -654,7 +656,7 @@ CURLcode glob_match_url(mm_ptr<mm_array_ptr<char>> result, char *filename, mm_pt
           if(pat->content.Set.elements) {
             appendthis = pat->content.Set.elements[pat->content.Set.ptr_s];
             appendlen =
-              strlen(pat->content.Set.elements[pat->content.Set.ptr_s]);
+              mm_strlen(pat->content.Set.elements[pat->content.Set.ptr_s]);
           }
           break;
         case UPTCharRange:
@@ -688,7 +690,7 @@ CURLcode glob_match_url(mm_ptr<mm_array_ptr<char>> result, char *filename, mm_pt
       appendthis = filename++;
       appendlen = 1;
     }
-    if(curlx_dyn_addn(&dyn, appendthis, appendlen))
+    if(curlx_dyn_addn(&dyn, _GETCHARPTR(appendthis), appendlen))
       return CURLE_OUT_OF_MEMORY;
   }
 

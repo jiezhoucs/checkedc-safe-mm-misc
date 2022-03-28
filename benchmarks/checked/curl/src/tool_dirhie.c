@@ -99,42 +99,43 @@ static void show_dir_errno(FILE *errors, const char *name)
 #endif
 
 
-CURLcode create_dir_hierarchy(const char *outfile, FILE *errors)
+CURLcode create_dir_hierarchy(mm_array_ptr<const char> outfile, FILE *errors)
 {
-  char *tempdir;
-  char *tempdir2;
-  char *outdup;
-  char *dirbuildup;
+  mm_array_ptr<char> tempdir = NULL;
+  mm_array_ptr<char> tempdir2 = NULL;
+  mm_array_ptr<char> outdup = NULL;
+  mm_array_ptr<char> dirbuildup = NULL;
   CURLcode result = CURLE_OK;
   size_t outlen;
 
-  outlen = strlen(outfile);
-  outdup = strdup(outfile);
+  outlen = mm_strlen(outfile);
+  outdup = mm_strdup(outfile);
   if(!outdup)
     return CURLE_OUT_OF_MEMORY;
 
   /* Checked C: No need to port the next line as it is only passed to libc fn
    * and show_dir_errno() which just prints stuffs, i.e., no escaping. */
-  dirbuildup = malloc(outlen + 1);
+  dirbuildup = MM_ARRAY_ALLOC(char, outlen + 1);
   if(!dirbuildup) {
-    Curl_safefree(outdup);
+    mm_Curl_safefree(char, outdup);
     return CURLE_OUT_OF_MEMORY;
   }
   dirbuildup[0] = '\0';
 
   /* Allow strtok() here since this isn't used threaded */
   /* !checksrc! disable BANNEDFUNC 2 */
-  tempdir = strtok(outdup, PATH_DELIMITERS);
+  tempdir = mm_strtok(outdup, PATH_DELIMITERS, outdup);
 
   while(tempdir != NULL) {
     bool skip = false;
-    tempdir2 = strtok(NULL, PATH_DELIMITERS);
+    tempdir2 = mm_strtok(NULL, PATH_DELIMITERS, outdup);
     /* since strtok returns a token for the last word even
        if not ending with DIR_CHAR, we need to prune it */
     if(tempdir2 != NULL) {
-      size_t dlen = strlen(dirbuildup);
+      size_t dlen = mm_strlen(dirbuildup);
       if(dlen)
-        msnprintf(&dirbuildup[dlen], outlen - dlen, "%s%s", DIR_CHAR, tempdir);
+        msnprintf(_GETCHARPTR(&dirbuildup[dlen]), outlen - dlen, "%s%s",
+            DIR_CHAR, _GETCHARPTR(tempdir));
       else {
         if(outdup == tempdir) {
 #if defined(MSDOS) || defined(WIN32)
@@ -144,20 +145,20 @@ CURLcode create_dir_hierarchy(const char *outfile, FILE *errors)
              erroneously.
              eg if outfile is X:\foo\bar\filename then don't mkdir X:
              This logic takes into account unsupported drives !:, 1:, etc. */
-          char *p = strchr(tempdir, ':');
+          mm_array_ptr<char> p = mm_strchr(tempdir, ':');
           if(p && !p[1])
             skip = true;
 #endif
           /* the output string doesn't start with a separator */
-          strcpy(dirbuildup, tempdir);
+          mm_strcpy(dirbuildup, tempdir);
         }
         else
-          msnprintf(dirbuildup, outlen, "%s%s", DIR_CHAR, tempdir);
+          msnprintf(_GETCHARPTR(dirbuildup), outlen, "%s%s", DIR_CHAR, _GETCHARPTR(tempdir));
       }
       /* Create directory. Ignore access denied error to allow traversal. */
-      if(!skip && (-1 == mkdir(dirbuildup, (mode_t)0000750)) &&
+      if(!skip && (-1 == mkdir(_GETCHARPTR(dirbuildup), (mode_t)0000750)) &&
          (errno != EACCES) && (errno != EEXIST)) {
-        show_dir_errno(errors, dirbuildup);
+        show_dir_errno(errors, _GETCHARPTR(dirbuildup));
         result = CURLE_WRITE_ERROR;
         break; /* get out of loop */
       }
@@ -165,8 +166,8 @@ CURLcode create_dir_hierarchy(const char *outfile, FILE *errors)
     tempdir = tempdir2;
   }
 
-  Curl_safefree(dirbuildup);
-  Curl_safefree(outdup);
+  mm_Curl_safefree(char, dirbuildup);
+  mm_Curl_safefree(char, outdup);
 
   return result;
 }

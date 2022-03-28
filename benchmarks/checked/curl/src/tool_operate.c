@@ -979,8 +979,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
           else if(state->urls) {
             /* fill '#1' ... '#9' terms from URL pattern */
             mm_array_ptr<char> storefile = per->outfile;
-            // TODO
-            result = glob_match_url(&per->outfile, _GETCHARPTR(storefile), state->urls);
+            result = glob_match_url(&per->outfile, storefile, state->urls);
             mm_Curl_safefree(char, storefile);
             if(result) {
               /* bad globbing */
@@ -1003,8 +1002,7 @@ static CURLcode single_transfer(struct GlobalConfig *global,
              file output call */
 
           if(config->create_dirs) {
-            // TODO
-            result = create_dir_hierarchy(_GETCHARPTR(per->outfile), global->errors);
+            result = create_dir_hierarchy(per->outfile, global->errors);
             /* create_dir_hierarchy shows error upon CURLE_WRITE_ERROR */
             if(result)
               break;
