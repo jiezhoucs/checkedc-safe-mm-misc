@@ -6,6 +6,10 @@
 #include "safe_mm_checked.h"
 #include <string.h>
 
+#ifdef MM_DEBUG
+#include <stdio.h>
+#endif
+
 // A helper struct that has the same inner structure as an mmsafe ptr.
 typedef struct {
   void *p;
@@ -33,6 +37,12 @@ _create_mm_array_ptr_char(mm_array_ptr<const char> p, char *new_p) {
 /* strchr */
 mm_array_ptr<char> mm_strchr(mm_array_ptr<const char> p, int c) {
     char *new_p = strchr(_GETCHARPTR(p), c);
+    return _create_mm_array_ptr_char(p, new_p);
+}
+
+/* strrchr */
+mm_array_ptr<char> mm_strrchr(mm_array_ptr<const char> p, int c) {
+    char *new_p = strrchr(_GETCHARPTR(p), c);
     return _create_mm_array_ptr_char(p, new_p);
 }
 
@@ -124,6 +134,23 @@ void mm_qsort(mm_array_ptr<mm_ptr<void>> base, size_t nmemb, size_t size,
 unsigned long int mm_strtoul(mm_array_ptr<const char> nptr,
                              mm_array_ptr<char> *endptr, int base) {
     unsigned long int result = strtoul(_GETCHARPTR(nptr), (char**)endptr, base);
+    if (endptr != NULL) {
+        *endptr = _create_mm_array_ptr_char(nptr, _GETCHARPTR(*endptr));
+    }
+    return result;
+}
+
+/* strtol() */
+long int mm_strtol(mm_array_ptr<const char> nptr, mm_array_ptr<char> *endptr, int base) {
+    long int result = strtol(_GETCHARPTR(nptr), (char**)endptr, base);
+    if (endptr != NULL) {
+        *endptr = _create_mm_array_ptr_char(nptr, _GETCHARPTR(*endptr));
+    }
+    return result;
+}
+
+double mm_strtod(mm_array_ptr<const char> nptr, mm_array_ptr<char> *endptr) {
+    double result = strtod(_GETCHARPTR(nptr), (char**)endptr);
     if (endptr != NULL) {
         *endptr = _create_mm_array_ptr_char(nptr, _GETCHARPTR(*endptr));
     }
