@@ -75,6 +75,9 @@ static void print_free_info(char *caller, void *p) {
 //
 __INLINE
 static uint32_t rand_keygen() {
+#ifdef MM_DEBUG
+  return 3;
+#endif
     uint32_t key;
     while (1) {
         int succeeded = _rdrand32_step(&key);
