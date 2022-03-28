@@ -439,13 +439,13 @@ static CURLcode libcurl_generate_slist(struct curl_slist *slist, int *slistno)
 
 static CURLcode libcurl_generate_mime(CURL *curl,
                                       struct GlobalConfig *config,
-                                      struct tool_mime *toolmime,
+                                      mm_ptr<struct tool_mime> toolmime,
                                       int *mimeno);     /* Forward. */
 
 /* Wrapper to generate source code for a mime part. */
 static CURLcode libcurl_generate_mime_part(CURL *curl,
                                            struct GlobalConfig *config,
-                                           struct tool_mime *part,
+                                           mm_ptr<struct tool_mime> part,
                                            int mimeno)
 {
   CURLcode ret = CURLE_OK;
@@ -483,7 +483,7 @@ static CURLcode libcurl_generate_mime_part(CURL *curl,
     /* Our data is always textual: convert it to ASCII. */
     {
       size_t size = mm_strlen(part->data);
-      /* Checked C: Omit porting this malloc as it is in an MIME related fn. */
+      /* Checked C: Omit porting this malloc as it is not used by default. */
       char *cp = malloc(size + 1);
 
       NULL_CHECK(cp);
@@ -579,7 +579,7 @@ nomem:
 /* Wrapper to generate source code for a mime structure. */
 static CURLcode libcurl_generate_mime(CURL *curl,
                                       struct GlobalConfig *config,
-                                      struct tool_mime *toolmime,
+                                      mm_ptr<struct tool_mime> toolmime,
                                       int *mimeno)
 {
   CURLcode ret = CURLE_OK;

@@ -42,10 +42,10 @@
 #define CONST_SAFEFREE(x)       Curl_safefree(*((void **) &(x)))
 
 /* tool_mime functions. */
-static struct tool_mime *tool_mime_new(struct tool_mime *parent,
+static mm_array_ptr<struct tool_mime> tool_mime_new(mm_ptr<struct tool_mime> parent,
                                        toolmimekind kind)
 {
-  struct tool_mime *m = (struct tool_mime *) calloc(1, sizeof(*m));
+  mm_ptr<struct tool_mime> m = MM_SINGLE_CALLOC(struct tool_mime);
 
   if(m) {
     m->kind = kind;
@@ -58,15 +58,15 @@ static struct tool_mime *tool_mime_new(struct tool_mime *parent,
   return m;
 }
 
-static struct tool_mime *tool_mime_new_parts(struct tool_mime *parent)
+static mm_array_ptr<struct tool_mime> tool_mime_new_parts(mm_ptr<struct tool_mime> parent)
 {
   return tool_mime_new(parent, TOOLMIME_PARTS);
 }
 
-static struct tool_mime *tool_mime_new_data(struct tool_mime *parent,
+static mm_ptr<struct tool_mime> tool_mime_new_data(mm_ptr<struct tool_mime> parent,
                                             mm_array_ptr<const char> data)
 {
-  struct tool_mime *m = NULL;
+  mm_ptr<struct tool_mime> m = NULL;
 
   data = mm_strdup(data);
   if(data) {
@@ -79,13 +79,13 @@ static struct tool_mime *tool_mime_new_data(struct tool_mime *parent,
   return m;
 }
 
-static struct tool_mime *tool_mime_new_filedata(struct tool_mime *parent,
+static mm_ptr<struct tool_mime> tool_mime_new_filedata(mm_ptr<struct tool_mime> parent,
                                                 mm_array_ptr<const char> filename,
                                                 bool isremotefile,
                                                 CURLcode *errcode)
 {
   CURLcode result = CURLE_OK;
-  struct tool_mime *m = NULL;
+  mm_ptr<struct tool_mime> m = NULL;
 
   *errcode = CURLE_OUT_OF_MEMORY;
   if(mm_strcmp(filename, "-")) {
@@ -161,7 +161,7 @@ static struct tool_mime *tool_mime_new_filedata(struct tool_mime *parent,
   return m;
 }
 
-void tool_mime_free(struct tool_mime *mime)
+void tool_mime_free(mm_ptr<struct tool_mime> mime)
 {
   if(mime) {
     if(mime->subparts)
@@ -174,7 +174,7 @@ void tool_mime_free(struct tool_mime *mime)
     CONST_SAFEFREE(mime->encoder);
     CONST_SAFEFREE(mime->data);
     curl_slist_free_all(mime->headers);
-    free(mime);
+    MM_FREE(struct tool_mime, mime);
   }
 }
 
@@ -240,7 +240,7 @@ int tool_mime_stdin_seek(void *instream, curl_off_t offset, int whence)
 
 /* Translate an internal mime tree into a libcurl mime tree. */
 
-static CURLcode tool2curlparts(CURL *curl, struct tool_mime *m,
+static CURLcode tool2curlparts(CURL *curl, mm_ptr<struct tool_mime> m,
                                curl_mime *mime)
 {
   CURLcode ret = CURLE_OK;
@@ -272,7 +272,7 @@ static CURLcode tool2curlparts(CURL *curl, struct tool_mime *m,
         /* Our data is always textual: convert it to ASCII. */
         {
           size_t size = strlen(m->data);
-          /* Checked C: Omit changing the next line as it is MIME related. */
+          /* Checked C: Omit changing the next line. */
           char *cp = malloc(size + 1);
 
           if(!cp)
@@ -305,7 +305,7 @@ static CURLcode tool2curlparts(CURL *curl, struct tool_mime *m,
         ret = curl_mime_data_cb(part, m->size,
                                 (curl_read_callback) tool_mime_stdin_read,
                                 (curl_seek_callback) tool_mime_stdin_seek,
-                                NULL, m);
+                                NULL, _GETPTR(struct tool_mime, m));
         break;
 
       default:
@@ -327,7 +327,7 @@ static CURLcode tool2curlparts(CURL *curl, struct tool_mime *m,
   return ret;
 }
 
-CURLcode tool2curlmime(CURL *curl, struct tool_mime *m, curl_mime **mime)
+CURLcode tool2curlmime(CURL *curl, mm_ptr<struct tool_mime> m, curl_mime **mime)
 {
   CURLcode ret = CURLE_OK;
 
@@ -748,8 +748,8 @@ static int get_param_part(mm_ptr<struct OperationConfig> config, char endchar,
 
 int formparse(mm_ptr<struct OperationConfig> config,
               mm_array_ptr<const char> input,
-              mm_ptr<struct tool_mime *> mimeroot,
-              mm_ptr<struct tool_mime *> mimecurrent,
+              mm_ptr<mm_ptr<struct tool_mime>> mimeroot,
+              mm_ptr<mm_ptr<struct tool_mime>> mimecurrent,
               bool literal_value)
 {
   /* input MUST be a string in the format 'name=contents' and we'll
@@ -762,7 +762,7 @@ int formparse(mm_ptr<struct OperationConfig> config,
   mm_array_ptr<char> filename = NULL;
   mm_array_ptr<char> encoder = NULL;
   struct curl_slist *headers = NULL;
-  struct tool_mime *part = NULL;
+  mm_ptr<struct tool_mime> part = NULL;
   CURLcode res;
 
   /* Allocate the main mime structure if needed. */
@@ -809,7 +809,7 @@ int formparse(mm_ptr<struct OperationConfig> config,
 
       /* we use the @-letter to indicate file name(s) */
 
-      struct tool_mime *subparts = NULL;
+      mm_ptr<struct tool_mime> subparts = NULL;
 
       do {
         /* since this was a file, it may have a content-type specifier

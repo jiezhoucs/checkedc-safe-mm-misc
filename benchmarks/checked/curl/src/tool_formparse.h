@@ -40,8 +40,8 @@ typedef enum {
 struct tool_mime {
   /* Structural fields. */
   toolmimekind kind;            /* Part kind. */
-  struct tool_mime *parent;     /* Parent item. */
-  struct tool_mime *prev;       /* Previous sibling (reverse order link). */
+  mm_ptr<struct tool_mime> parent;     /* Parent item. */
+  mm_ptr<struct tool_mime> prev;       /* Previous sibling (reverse order link). */
   /* Common fields. */
   mm_array_ptr<const char> data;             /* Actual data or data filename. */
   mm_array_ptr<const char> name;             /* Part name. */
@@ -50,7 +50,7 @@ struct tool_mime {
   mm_array_ptr<const char> encoder;          /* Part's requested encoding. */
   struct curl_slist *headers;   /* User-defined headers. */
   /* TOOLMIME_PARTS fields. */
-  struct tool_mime *subparts;   /* Part's subparts. */
+  mm_ptr<struct tool_mime> subparts;   /* Part's subparts. */
   /* TOOLMIME_STDIN/TOOLMIME_STDINDATA fields. */
   curl_off_t origin;            /* Stdin read origin offset. */
   curl_off_t size;              /* Stdin data size. */
@@ -64,10 +64,10 @@ int tool_mime_stdin_seek(void *instream, curl_off_t offset, int whence);
 
 int formparse(mm_ptr<struct OperationConfig> config,
               mm_array_ptr<const char> input,
-              mm_ptr<struct tool_mime *> mimeroot,
-              mm_ptr<struct tool_mime *> mimecurrent,
+              mm_ptr<mm_ptr<struct tool_mime>> mimeroot,
+              mm_ptr<mm_ptr<struct tool_mime>> mimecurrent,
               bool literal_value);
-CURLcode tool2curlmime(CURL *curl, struct tool_mime *m, curl_mime **mime);
-void tool_mime_free(struct tool_mime *mime);
+CURLcode tool2curlmime(CURL *curl, mm_ptr<struct tool_mime> m, curl_mime **mime);
+void tool_mime_free(mm_ptr<struct tool_mime> mime);
 
 #endif /* HEADER_CURL_TOOL_FORMPARSE_H */
