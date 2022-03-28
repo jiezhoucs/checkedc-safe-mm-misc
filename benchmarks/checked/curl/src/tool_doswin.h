@@ -38,8 +38,8 @@ typedef enum {
   SANITIZE_ERR_LAST /* never use! */
 } SANITIZEcode;
 
-SANITIZEcode sanitize_file_name(char **const sanitized, const char *file_name,
-                                int flags);
+SANITIZEcode sanitize_file_name(mm_array_ptr<char> *const sanitized,
+                                mm_array_ptr<const char> file_name, int flags);
 #ifdef UNITTESTS
 SANITIZEcode truncate_dryrun(const char *path, const size_t truncate_pos);
 SANITIZEcode msdosify(char **const sanitized, const char *file_name,

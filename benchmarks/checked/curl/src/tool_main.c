@@ -191,7 +191,7 @@ static CURLcode main_init(struct GlobalConfig *config)
 
 static void free_globalconfig(struct GlobalConfig *config)
 {
-  Curl_safefree(config->trace_dump);
+  mm_Curl_safefree(char, config->trace_dump);
 
   if(config->errors_fopened && config->errors)
     fclose(config->errors);
@@ -201,7 +201,7 @@ static void free_globalconfig(struct GlobalConfig *config)
     fclose(config->trace_stream);
   config->trace_stream = NULL;
 
-  Curl_safefree(config->libcurl);
+  mm_Curl_safefree(char, config->libcurl);
 }
 
 /*

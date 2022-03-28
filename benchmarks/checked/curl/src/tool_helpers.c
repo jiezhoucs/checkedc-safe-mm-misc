@@ -101,7 +101,7 @@ int SetHTTPrequest(mm_ptr<struct OperationConfig> config, HttpReq req, mm_ptr<Ht
 }
 
 void customrequest_helper(mm_ptr<struct OperationConfig> config, HttpReq req,
-                          char *method)
+                          mm_array_ptr<char> method)
 {
   /* this mirrors the HttpReq enum in tool_sdecls.h */
   const char *dflt[]= {
@@ -114,11 +114,11 @@ void customrequest_helper(mm_ptr<struct OperationConfig> config, HttpReq req,
 
   if(!method)
     ;
-  else if(curl_strequal(method, dflt[req])) {
+  else if(mm_strcasecompare_0(method, dflt[req])) {
     notef(config->global, "Unnecessary use of -X or --request, %s is already "
           "inferred.\n", dflt[req]);
   }
-  else if(curl_strequal(method, "head")) {
+  else if(mm_strcasecompare_0(method, "head")) {
     warnf(config->global,
           "Setting custom HTTP method to HEAD with -X/--request may not work "
           "the way you want. Consider using -I/--head instead.\n");

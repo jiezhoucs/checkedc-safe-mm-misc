@@ -65,30 +65,30 @@ bool tool_create_output_file(mm_ptr<struct OutStruct> outs,
   if(outs->is_cd_filename) {
     /* don't overwrite existing files */
     int fd;
-    char *name = outs->filename;
-    char *aname = NULL;
+    mm_array_ptr<char> name = outs->filename;
+    mm_array_ptr<char> aname = NULL;
     if(config->output_dir) {
-      aname = aprintf("%s/%s", config->output_dir, name);
+      aname = mmize_str(aprintf("%s/%s", _GETCHARPTR(config->output_dir), _GETCHARPTR(name)));
       if(!aname) {
         errorf(global, "out of memory\n");
         return FALSE;
       }
       name = aname;
     }
-    fd = open(name, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, OPENMODE);
+    fd = open(_GETCHARPTR(name), O_CREAT | O_WRONLY | O_EXCL | O_BINARY, OPENMODE);
     if(fd != -1) {
       file = fdopen(fd, "wb");
       if(!file)
         close(fd);
     }
-    free(aname);
+    MM_FREE(char, aname);
   }
   else
     /* open file for writing */
-    file = fopen(outs->filename, "wb");
+    file = mm_fopen(outs->filename, "wb");
 
   if(!file) {
-    warnf(global, "Failed to create the file %s: %s\n", outs->filename,
+    warnf(global, "Failed to create the file %s: %s\n", _GETCHARPTR(outs->filename),
           strerror(errno));
     return FALSE;
   }
@@ -117,30 +117,30 @@ bool tool_create_output_file_unchecked(struct OutStruct *outs,
   if(outs->is_cd_filename) {
     /* don't overwrite existing files */
     int fd;
-    char *name = outs->filename;
-    char *aname = NULL;
+    mm_array_ptr<char> name = outs->filename;
+    mm_array_ptr<char> aname = NULL;
     if(config->output_dir) {
-      aname = aprintf("%s/%s", config->output_dir, name);
+      aname = mmize_str(aprintf("%s/%s", _GETCHARPTR(config->output_dir), _GETCHARPTR(name)));
       if(!aname) {
         errorf(global, "out of memory\n");
         return FALSE;
       }
       name = aname;
     }
-    fd = open(name, O_CREAT | O_WRONLY | O_EXCL | O_BINARY, OPENMODE);
+    fd = open(_GETCHARPTR(name), O_CREAT | O_WRONLY | O_EXCL | O_BINARY, OPENMODE);
     if(fd != -1) {
       file = fdopen(fd, "wb");
       if(!file)
         close(fd);
     }
-    free(aname);
+    MM_FREE(char, aname);
   }
   else
     /* open file for writing */
-    file = fopen(outs->filename, "wb");
+    file = mm_fopen(outs->filename, "wb");
 
   if(!file) {
-    warnf(global, "Failed to create the file %s: %s\n", outs->filename,
+    warnf(global, "Failed to create the file %s: %s\n", _GETCHARPTR(outs->filename),
           strerror(errno));
     return FALSE;
   }

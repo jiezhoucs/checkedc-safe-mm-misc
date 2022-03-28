@@ -63,7 +63,7 @@ size_t tool_mime_stdin_read(char *buffer,
 int tool_mime_stdin_seek(void *instream, curl_off_t offset, int whence);
 
 int formparse(mm_ptr<struct OperationConfig> config,
-              const char *input,
+              mm_array_ptr<const char> input,
               mm_ptr<struct tool_mime *> mimeroot,
               mm_ptr<struct tool_mime *> mimecurrent,
               bool literal_value);

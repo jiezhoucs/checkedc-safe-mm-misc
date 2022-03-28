@@ -23,7 +23,7 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-void tool_help(char *category);
+void tool_help(mm_array_ptr<char> category);
 void tool_list_engines(void);
 void tool_version_info(void);
 

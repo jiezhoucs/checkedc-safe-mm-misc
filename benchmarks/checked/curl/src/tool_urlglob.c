@@ -440,8 +440,8 @@ static CURLcode glob_parse(mm_ptr<struct URLGlob> glob, char *pattern,
   return res;
 }
 
-CURLcode glob_url(mm_ptr<mm_ptr<struct URLGlob>> glob, char *url, mm_ptr<unsigned long> urlnum,
-                  FILE *error)
+CURLcode glob_url(mm_ptr<mm_ptr<struct URLGlob>> glob, mm_array_ptr<char> url,
+                  mm_ptr<unsigned long> urlnum, FILE *error)
 {
   /*
    * We can deal with any-size, just make a buffer with the same length
@@ -454,7 +454,7 @@ CURLcode glob_url(mm_ptr<mm_ptr<struct URLGlob>> glob, char *url, mm_ptr<unsigne
 
   *glob = NULL;
 
-  glob_buffer = MM_ARRAY_ALLOC(char, strlen(url) + 1);
+  glob_buffer = MM_ARRAY_ALLOC(char, mm_strlen(url) + 1);
   if(!glob_buffer)
     return CURLE_OUT_OF_MEMORY;
   glob_buffer[0] = 0;
@@ -464,10 +464,11 @@ CURLcode glob_url(mm_ptr<mm_ptr<struct URLGlob>> glob, char *url, mm_ptr<unsigne
     MM_curl_free(char, glob_buffer);
     return CURLE_OUT_OF_MEMORY;
   }
-  glob_expand->urllen = strlen(url);
+  glob_expand->urllen = mm_strlen(url);
   glob_expand->glob_buffer = glob_buffer;
 
-  res = glob_parse(glob_expand, url, 1, &amount);
+  // TODO
+  res = glob_parse(glob_expand, _GETCHARPTR(url), 1, &amount);
   if(!res)
     *urlnum = amount;
   else {
@@ -477,7 +478,7 @@ CURLcode glob_url(mm_ptr<mm_ptr<struct URLGlob>> glob, char *url, mm_ptr<unsigne
       if(glob_expand->pos) {
         msnprintf(text, sizeof(text), "%s in URL position %zu:\n%s\n%*s^",
                   glob_expand->error,
-                  glob_expand->pos, url, (int)glob_expand->pos - 1, " ");
+                  glob_expand->pos, _GETCHARPTR(url), (int)glob_expand->pos - 1, " ");
         t = text;
       }
       else
@@ -519,7 +520,7 @@ void glob_cleanup(mm_ptr<struct URLGlob> glob)
   MM_curl_free(struct URLGlob, glob);
 }
 
-CURLcode glob_next_url(mm_ptr<char *> globbed, mm_ptr<struct URLGlob> glob)
+CURLcode glob_next_url(mm_ptr<mm_array_ptr<char>> globbed, mm_ptr<struct URLGlob> glob)
 {
   mm_ptr<struct URLPattern> pat = NULL;
   size_t i;
@@ -606,7 +607,7 @@ CURLcode glob_next_url(mm_ptr<char *> globbed, mm_ptr<struct URLGlob> glob)
     }
   }
 
-  *globbed = strdup(_GETARRAYPTR(char, glob->glob_buffer));
+  *globbed = mm_strdup(glob->glob_buffer);
   if(!*globbed)
     return CURLE_OUT_OF_MEMORY;
 
@@ -615,7 +616,7 @@ CURLcode glob_next_url(mm_ptr<char *> globbed, mm_ptr<struct URLGlob> glob)
 
 #define MAX_OUTPUT_GLOB_LENGTH (10*1024)
 
-CURLcode glob_match_url(mm_ptr<char *> result, char *filename, mm_ptr<struct URLGlob> glob)
+CURLcode glob_match_url(mm_ptr<mm_array_ptr<char>> result, char *filename, mm_ptr<struct URLGlob> glob)
 {
   char numbuf[18];
   char *appendthis = (char *)"";
@@ -704,7 +705,7 @@ CURLcode glob_match_url(mm_ptr<char *> result, char *filename, mm_ptr<struct URL
     return CURLE_OK;
   }
 #else
-  *result = _GETCHARPTR(curlx_dyn_ptr(&dyn));
+  *result = curlx_dyn_ptr(&dyn);
   return CURLE_OK;
 #endif /* MSDOS || WIN32 */
 }

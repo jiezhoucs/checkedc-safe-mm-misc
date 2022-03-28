@@ -108,8 +108,8 @@ alternate data stream (ADS) cannot be truncated in any case.
 Success: (SANITIZE_ERR_OK) *sanitized points to a sanitized copy of file_name.
 Failure: (!= SANITIZE_ERR_OK) *sanitized is NULL.
 */
-SANITIZEcode sanitize_file_name(char **const sanitized, const char *file_name,
-                                int flags)
+SANITIZEcode sanitize_file_name(mm_array_ptr<char const> *sanitized,
+                                mm_array_ptr<const char> file_name, int flags)
 {
   mm_array_ptr<char> p = NULL, target = NULL;
   size_t len;
@@ -139,10 +139,11 @@ SANITIZEcode sanitize_file_name(char **const sanitized, const char *file_name,
        does not discount the path information therefore we shouldn't use it. */
     max_sanitized_len = (PATH_MAX-1 > 255) ? 255 : PATH_MAX-1;
 
-  len = strlen(file_name);
+  len = mm_strlen(file_name);
   if(len > max_sanitized_len) {
     if(!(flags & SANITIZE_ALLOW_TRUNCATE) ||
-       truncate_dryrun(file_name, max_sanitized_len))
+        // TODO
+       truncate_dryrun(_GETCHARPTR(file_name), max_sanitized_len))
       return SANITIZE_ERR_INVALID_PATH;
 
     len = max_sanitized_len;
@@ -152,7 +153,7 @@ SANITIZEcode sanitize_file_name(char **const sanitized, const char *file_name,
   if(!target)
     return SANITIZE_ERR_OUT_OF_MEMORY;
 
-  strncpy(_GETCHARPTR(target), file_name, len);
+  mm_strncpy(target, file_name, len);
   target[len] = '\0';
 
 #ifndef MSDOS

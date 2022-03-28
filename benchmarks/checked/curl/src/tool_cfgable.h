@@ -40,9 +40,9 @@ struct State {
   mm_ptr<struct getout> urlnode;
   mm_ptr<struct URLGlob> inglob;
   mm_ptr<struct URLGlob> urls;
-  char *outfiles;
+  mm_array_ptr<char> outfiles;
   mm_array_ptr<char> httpgetfields;
-  char *uploadfile;
+  mm_array_ptr<char> uploadfile;
   unsigned long infilenum; /* number of files to upload */
   unsigned long up;  /* upload file counter within a single upload glob */
   unsigned long urlnum; /* how many iterations this single URL has with ranges
@@ -52,14 +52,14 @@ struct State {
 
 struct OperationConfig {
   bool remote_time;
-  char *random_file;
-  char *egd_file;
-  char *useragent;
+  mm_array_ptr<char> random_file;
+  mm_array_ptr<char> egd_file;
+  mm_array_ptr<char> useragent;
   struct curl_slist *cookies;  /* cookies to serialize into a single line */
-  char *cookiejar;          /* write to this file */
+  mm_array_ptr<char> cookiejar;          /* write to this file */
   struct curl_slist *cookiefiles;  /* file(s) to load cookies from */
-  char *altsvc;             /* alt-svc cache file name */
-  char *hsts;               /* HSTS cache file name */
+  mm_array_ptr<char> altsvc;             /* alt-svc cache file name */
+  mm_array_ptr<char> hsts;               /* HSTS cache file name */
   bool cookiesession;       /* new session? */
   bool encoding;            /* Accept-Encoding please */
   bool tr_encoding;         /* Transfer-Encoding please */
@@ -73,46 +73,46 @@ struct OperationConfig {
   bool proto_present;
   long proto_redir;
   bool proto_redir_present;
-  char *proto_default;
+  mm_array_ptr<char> proto_default;
   curl_off_t resume_from;
   mm_array_ptr<char> postfields;
   curl_off_t postfieldsize;
-  char *referer;
+  mm_array_ptr<char> referer;
   double timeout;
   double connecttimeout;
   long maxredirs;
   curl_off_t max_filesize;
-  char *output_dir;
-  char *headerfile;
-  char *ftpport;
-  char *iface;
+  mm_array_ptr<char> output_dir;
+  mm_array_ptr<char> headerfile;
+  mm_array_ptr<char> ftpport;
+  mm_array_ptr<char> iface;
   long localport;
   long localportrange;
   unsigned short porttouse;
-  char *range;
+  mm_array_ptr<char> range;
   long low_speed_limit;
   long low_speed_time;
-  char *dns_servers;   /* dot notation: 1.1.1.1;2.2.2.2 */
-  char *dns_interface; /* interface name */
-  char *dns_ipv4_addr; /* dot notation */
-  char *dns_ipv6_addr; /* dot notation */
-  char *userpwd;
-  char *login_options;
-  char *tls_username;
-  char *tls_password;
-  char *tls_authtype;
-  char *proxy_tls_username;
-  char *proxy_tls_password;
-  char *proxy_tls_authtype;
-  char *proxyuserpwd;
-  char *proxy;
+  mm_array_ptr<char> dns_servers;   /* dot notation: 1.1.1.1;2.2.2.2 */
+  mm_array_ptr<char> dns_interface; /* interface name */
+  mm_array_ptr<char> dns_ipv4_addr; /* dot notation */
+  mm_array_ptr<char> dns_ipv6_addr; /* dot notation */
+  mm_array_ptr<char> userpwd;
+  mm_array_ptr<char> login_options;
+  mm_array_ptr<char> tls_username;
+  mm_array_ptr<char> tls_password;
+  mm_array_ptr<char> tls_authtype;
+  mm_array_ptr<char> proxy_tls_username;
+  mm_array_ptr<char> proxy_tls_password;
+  mm_array_ptr<char> proxy_tls_authtype;
+  mm_array_ptr<char> proxyuserpwd;
+  mm_array_ptr<char> proxy;
   int proxyver;             /* set to CURLPROXY_HTTP* define */
-  char *noproxy;
-  char *mail_from;
+  mm_array_ptr<char> noproxy;
+  mm_array_ptr<char> mail_from;
   struct curl_slist *mail_rcpt;
-  char *mail_auth;
+  mm_array_ptr<char> mail_auth;
   bool mail_rcpt_allowfails; /* --mail-rcpt-allowfails */
-  char *sasl_authzid;       /* Authorisation identity (identity to use) */
+  mm_array_ptr<char> sasl_authzid;       /* Authorisation identity (identity to use) */
   bool sasl_ir;             /* Enable/disable SASL initial response */
   bool proxytunnel;
   bool ftp_append;          /* APPE on ftp */
@@ -129,45 +129,45 @@ struct OperationConfig {
                                changed */
   bool netrc_opt;
   bool netrc;
-  char *netrc_file;
+  mm_array_ptr<char> netrc_file;
   mm_ptr<struct getout> url_list;  /* point to the first node */
   mm_ptr<struct getout> url_last;  /* point to the last/current node */
   mm_ptr<struct getout> url_get;   /* point to the node to fill in URL */
   mm_ptr<struct getout> url_out;   /* point to the node to fill in outfile */
   mm_ptr<struct getout> url_ul;    /* point to the node to fill in upload */
-  char *doh_url;
-  char *cipher_list;
-  char *proxy_cipher_list;
-  char *cipher13_list;
-  char *proxy_cipher13_list;
-  char *cert;
-  char *proxy_cert;
-  char *cert_type;
-  char *proxy_cert_type;
-  char *cacert;
-  char *proxy_cacert;
-  char *capath;
-  char *proxy_capath;
-  char *crlfile;
-  char *proxy_crlfile;
-  char *pinnedpubkey;
-  char *proxy_pinnedpubkey;
-  char *key;
-  char *proxy_key;
-  char *key_type;
-  char *proxy_key_type;
-  char *key_passwd;
-  char *proxy_key_passwd;
-  char *pubkey;
-  char *hostpubmd5;
-  char *engine;
-  char *etag_save_file;
-  char *etag_compare_file;
+  mm_array_ptr<char> doh_url;
+  mm_array_ptr<char> cipher_list;
+  mm_array_ptr<char> proxy_cipher_list;
+  mm_array_ptr<char> cipher13_list;
+  mm_array_ptr<char> proxy_cipher13_list;
+  mm_array_ptr<char> cert;
+  mm_array_ptr<char> proxy_cert;
+  mm_array_ptr<char> cert_type;
+  mm_array_ptr<char> proxy_cert_type;
+  mm_array_ptr<char> cacert;
+  mm_array_ptr<char> proxy_cacert;
+  mm_array_ptr<char> capath;
+  mm_array_ptr<char> proxy_capath;
+  mm_array_ptr<char> crlfile;
+  mm_array_ptr<char> proxy_crlfile;
+  mm_array_ptr<char> pinnedpubkey;
+  mm_array_ptr<char> proxy_pinnedpubkey;
+  mm_array_ptr<char> key;
+  mm_array_ptr<char> proxy_key;
+  mm_array_ptr<char> key_type;
+  mm_array_ptr<char> proxy_key_type;
+  mm_array_ptr<char> key_passwd;
+  mm_array_ptr<char> proxy_key_passwd;
+  mm_array_ptr<char> pubkey;
+  mm_array_ptr<char> hostpubmd5;
+  mm_array_ptr<char> engine;
+  mm_array_ptr<char> etag_save_file;
+  mm_array_ptr<char> etag_compare_file;
   bool crlf;
-  char *customrequest;
-  char *ssl_ec_curves;
-  char *krblevel;
-  char *request_target;
+  mm_array_ptr<char> customrequest;
+  mm_array_ptr<char> ssl_ec_curves;
+  mm_array_ptr<char> krblevel;
+  mm_array_ptr<char> request_target;
   long httpversion;
   bool http09_allowed;
   bool nobuffer;
@@ -220,13 +220,13 @@ struct OperationConfig {
   bool ftp_ssl_control;
   bool ftp_ssl_ccc;
   int ftp_ssl_ccc_mode;
-  char *preproxy;
+  mm_array_ptr<char> preproxy;
   int socks5_gssapi_nec;    /* The NEC reference server does not protect the
                                encryption type exchange */
   unsigned long socks5_auth;/* auth bitmask for socks5 proxies */
-  char *proxy_service_name; /* set authentication service name for HTTP and
+  mm_array_ptr<char> proxy_service_name; /* set authentication service name for HTTP and
                                SOCKS5 proxies */
-  char *service_name;       /* set authentication service name for DIGEST-MD5,
+  mm_array_ptr<char> service_name;       /* set authentication service name for DIGEST-MD5,
                                Kerberos 5 and SPNEGO */
 
   bool tcp_nodelay;
@@ -237,8 +237,8 @@ struct OperationConfig {
   long retry_delay;         /* delay between retries (in seconds) */
   long retry_maxtime;       /* maximum time to keep retrying */
 
-  char *ftp_account;        /* for ACCT */
-  char *ftp_alternative_to_user;  /* send command if USER/PASS fails */
+  mm_array_ptr<char> ftp_account;        /* for ACCT */
+  mm_array_ptr<char> ftp_alternative_to_user;  /* send command if USER/PASS fails */
   int ftp_filemethod;
   long tftp_blksize;        /* TFTP BLKSIZE option */
   bool tftp_no_options;     /* do not send TFTP options requests */
@@ -271,10 +271,10 @@ struct OperationConfig {
   bool ssl_auto_client_cert;   /* automatically locate and use a client
                                   certificate for authentication (Schannel) */
   bool proxy_ssl_auto_client_cert; /* proxy version of ssl_auto_client_cert */
-  char *oauth_bearer;             /* OAuth 2.0 bearer token */
+  mm_array_ptr<char> oauth_bearer;             /* OAuth 2.0 bearer token */
   bool nonpn;                     /* enable/disable TLS NPN extension */
   bool noalpn;                    /* enable/disable TLS ALPN extension */
-  char *unix_socket_path;         /* path to Unix domain socket */
+  mm_array_ptr<char> unix_socket_path;         /* path to Unix domain socket */
   bool abstract_unix_socket;      /* path to an abstract Unix domain socket */
   bool falsestart;
   bool path_as_is;
@@ -288,7 +288,7 @@ struct OperationConfig {
                                      0 is valid. default: CURL_HET_DEFAULT. */
   bool haproxy_protocol;          /* whether to send HAProxy protocol v1 */
   bool disallow_username_in_url;  /* disallow usernames in URLs */
-  char *aws_sigv4;
+  mm_array_ptr<char> aws_sigv4;
   struct GlobalConfig *global;
   mm_ptr<struct OperationConfig> prev;
   mm_ptr<struct OperationConfig> next;   /* Always last in the struct */
@@ -304,13 +304,13 @@ struct GlobalConfig {
   bool isatty;                    /* Updated internally if output is a tty */
   FILE *errors;                   /* Error stream, defaults to stderr */
   bool errors_fopened;            /* Whether error stream isn't stderr */
-  char *trace_dump;               /* file to dump the network trace to */
+  mm_array_ptr<char> trace_dump;               /* file to dump the network trace to */
   FILE *trace_stream;
   bool trace_fopened;
   trace tracetype;
   bool tracetime;                 /* include timestamp? */
   int progressmode;               /* CURL_PROGRESS_BAR / CURL_PROGRESS_STATS */
-  char *libcurl;                  /* Output libcurl code to this file name */
+  mm_array_ptr<char> libcurl;                  /* Output libcurl code to this file name */
   bool fail_early;                /* exit on first transfer error */
   bool styled_output;             /* enable fancy output style detection */
 #ifdef CURLDEBUG
@@ -319,7 +319,7 @@ struct GlobalConfig {
   bool parallel;
   long parallel_max;
   bool parallel_connect;
-  char *help_category;            /* The help category, if set */
+  mm_array_ptr<char> help_category;            /* The help category, if set */
   mm_ptr<struct OperationConfig> first;
   mm_ptr<struct OperationConfig> current;
   mm_ptr<struct OperationConfig> last;   /* Always last in the struct */

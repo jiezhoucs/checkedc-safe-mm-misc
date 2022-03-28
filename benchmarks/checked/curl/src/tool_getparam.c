@@ -49,32 +49,19 @@
 
 #define GetStr(str,val) do { \
   if(*(str)) { \
-    free(*(str)); \
-    *(str) = NULL; \
-  } \
-  if((val)) {              \
-    *(str) = strdup((val)); \
-    if(!(*(str)))          \
-      return PARAM_NO_MEM; \
-  } \
-} while(0)
-
-// Checked C: Fix mm_strdup_from_raw?
-#define mm_GetStr(str,val) do { \
-  if(*(str)) { \
     MM_FREE(char, *(str)); \
     *(str) = NULL; \
   } \
   if((val)) {              \
-    *(str) = mm_strdup_from_raw((val)); \
+    *(str) = mm_strdup((val)); \
     if(!(*(str)))          \
       return PARAM_NO_MEM; \
   } \
 } while(0)
 
 struct LongShort {
-  const char *letter; /* short name option */
-  const char *lname;  /* long name option */
+  mm_array_ptr<const char> letter; /* short name option */
+  mm_array_ptr<const char> lname;  /* long name option */
   enum {
     ARG_NONE,   /* stand-alone but not a boolean */
     ARG_BOOL,   /* accepts a --no-[name] prefix */
@@ -360,13 +347,13 @@ static const struct LongShort aliases[]= {
 #ifndef UNITTESTS
 static
 #endif
-void parse_cert_parameter(const char *cert_parameter,
+void parse_cert_parameter(mm_array_ptr<const char> cert_parameter,
                           mm_array_ptr<char> *certname,
-                          char **passphrase)
+                          mm_array_ptr<char> *passphrase)
 {
-  size_t param_length = strlen(cert_parameter);
+  size_t param_length = mm_strlen(cert_parameter);
   size_t span;
-  const char *param_place = NULL;
+  mm_array_ptr<const char> param_place = NULL;
   mm_array_ptr<char> certname_place = NULL;
   *certname = NULL;
   *passphrase = NULL;
@@ -379,9 +366,9 @@ void parse_cert_parameter(const char *cert_parameter,
    * looks like a RFC7512 PKCS#11 URI which can be used as-is.
    * Also if cert_parameter contains no colon nor backslash, this
    * means no passphrase was given and no characters escaped */
-  if(curl_strnequal(cert_parameter, "pkcs11:", 7) ||
-     !strpbrk(cert_parameter, ":\\")) {
-    *certname = mm_strdup_from_raw(cert_parameter);
+  if(strncasecompare(cert_parameter, "pkcs11:", 7) ||
+     !mm_strpbrk(cert_parameter, ":\\")) {
+    *certname = mm_strdup(cert_parameter);
     return;
   }
   /* deal with escaped chars; find unescaped colon if it exists */
@@ -392,8 +379,8 @@ void parse_cert_parameter(const char *cert_parameter,
   *certname = certname_place;
   param_place = cert_parameter;
   while(*param_place) {
-    span = strcspn(param_place, ":\\");
-    strncpy(_GETCHARPTR(certname_place), param_place, span);
+    span = mm_strcspn(param_place, ":\\");
+    mm_strncpy(certname_place, param_place, span);
     param_place += span;
     certname_place += span;
     /* we just ate all the non-special chars. now we're on either a special
@@ -446,7 +433,7 @@ void parse_cert_parameter(const char *cert_parameter,
        * above; if we're still here, this is a separating colon */
       param_place++;
       if(*param_place) {
-        *passphrase = strdup(param_place);
+        *passphrase = mm_strdup(param_place);
       }
       goto done;
     }
@@ -484,15 +471,16 @@ static size_t replace_url_encoded_space_by_plus(char *url)
 }
 
 static void
-GetFileAndPassword(char *nextarg, mm_ptr<mm_array_ptr<char>> file, mm_ptr<char *> password)
+GetFileAndPassword(mm_array_ptr<char> nextarg, mm_ptr<mm_array_ptr<char>> file,
+                   mm_ptr<mm_array_ptr<char>> password)
 {
   mm_array_ptr<char> certname = NULL;
-  char *passphrase;
+  mm_array_ptr<char> passphrase = NULL;
   parse_cert_parameter(nextarg, &certname, &passphrase);
   MM_curl_free(char, *file);
   *file = certname;
   if(passphrase) {
-    Curl_safefree(*password);
+    mm_Curl_safefree(char, *password);
     *password = passphrase;
   }
   cleanarg(nextarg);
@@ -551,7 +539,7 @@ static ParameterError GetSizeParameter(struct GlobalConfig *global,
 }
 
 ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
-                            char *nextarg,    /* NULL if unset */
+                            mm_array_ptr<char> nextarg,    /* NULL if unset */
                             bool *usedarg,    /* set to TRUE if the arg
                                                  has been used */
                             struct GlobalConfig *global,
@@ -560,8 +548,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
   char letter;
   char subletter = '\0'; /* subletters can only occur on long options */
   int rc;
-  // TODO?
-  const char *parse = NULL;
+  mm_array_ptr<const char> parse = NULL;
   unsigned int j;
   time_t now;
   int hit = -1;
@@ -588,11 +575,10 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
     }
 
     for(j = 0; j < sizeof(aliases)/sizeof(aliases[0]); j++) {
-        // TODO
-      if(strncasecompare_raw(aliases[j].lname, _GETCHARPTR(word), fnam)) {
+      if(strncasecompare(aliases[j].lname, word, fnam)) {
         longopt = TRUE;
         numhits++;
-        if(strcasecompare(aliases[j].lname, _GETCHARPTR(word))) {
+        if(mm_strcasecompare(aliases[j].lname, word)) {
           parse = aliases[j].letter;
           hit = j;
           numhits = 1; /* a single unique hit */
@@ -616,7 +602,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
   else {
     flag++; /* prefixed with one dash, pass it */
     hit = -1;
-    parse = _GETCHARPTR(flag);
+    parse = flag;
   }
 
   do {
@@ -646,7 +632,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
     if(aliases[hit].desc >= ARG_STRING) {
       /* this option requires an extra parameter */
       if(!longopt && parse[1]) {
-        nextarg = (char *)&parse[1]; /* this is the actual extra parameter */
+        nextarg = &parse[1]; /* this is the actual extra parameter */
         singleopt = TRUE;   /* don't loop anymore after this */
       }
       else if(!nextarg)
@@ -658,7 +644,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
          (nextarg[0] == '-') && nextarg[1]) {
         /* if the file name looks like a command line option */
         warnf(global, "The file name argument '%s' looks like a flag.\n",
-              nextarg);
+              _GETCHARPTR(nextarg));
       }
     }
     else if((aliases[hit].desc == ARG_NONE) && !toggle)
@@ -736,7 +722,8 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
       case 'i': /* --limit-rate */
       {
         curl_off_t value;
-        ParameterError pe = GetSizeParameter(global, nextarg, "rate", &value);
+        // TODO
+        ParameterError pe = GetSizeParameter(global, _GETCHARPTR(nextarg), "rate", &value);
 
         if(pe != PARAM_OK)
            return pe;
@@ -824,7 +811,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         break;
 
       case 'R': /* --create-file-mode */
-        err = oct2nummax(_GETPTR(long, &config->create_file_mode), nextarg, 0777);
+        err = oct2nummax(&config->create_file_mode, nextarg, 0777);
         if(err)
           return err;
         break;
@@ -832,7 +819,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
       case 's': /* --max-redirs */
         /* specified max no of redirects (http(s)), this accepts -1 as a
            special condition */
-        err = str2num(_GETPTR(long, &config->maxredirs), nextarg);
+        err = str2num(&config->maxredirs, nextarg);
         if(err)
           return err;
         if(config->maxredirs < -1)
@@ -857,10 +844,10 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         break;
 
       case 'v': /* --stderr */
-        if(strcmp(nextarg, "-")) {
-          FILE *newfile = fopen(nextarg, FOPEN_WRITETEXT);
+        if(mm_strcmp(nextarg, "-")) {
+          FILE *newfile = mm_fopen(nextarg, FOPEN_WRITETEXT);
           if(!newfile)
-            warnf(global, "Failed to open %s!\n", nextarg);
+            warnf(global, "Failed to open %s!\n", _GETCHARPTR(nextarg));
           else {
             if(global->errors_fopened)
               fclose(global->errors);
@@ -889,7 +876,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         {
           curl_off_t value;
           ParameterError pe =
-            GetSizeParameter(global, nextarg, "max-filesize", &value);
+            GetSizeParameter(global, _GETCHARPTR(nextarg), "max-filesize", &value);
 
           if(pe != PARAM_OK)
              return pe;
@@ -945,7 +932,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         config->ftp_ssl = toggle;
         break;
       case 'b': /* --ftp-pasv */
-        Curl_safefree(config->ftpport);
+        mm_Curl_safefree(char, config->ftpport);
         break;
       case 'c': /* --socks5 specifies a socks5 proxy to use, and resolves
                    the name locally and passes on the resolved address */
@@ -975,7 +962,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         config->proxybasic = toggle;
         break;
       case 'g': /* --retry */
-        err = str2unum(_GETPTR(long, &config->req_retry), nextarg);
+        err = str2unum(&config->req_retry, nextarg);
         if(err)
           return err;
         break;
@@ -983,12 +970,12 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         config->retry_connrefused = toggle;
         break;
       case 'h': /* --retry-delay */
-        err = str2unummax(_GETPTR(long, &config->retry_delay), nextarg, LONG_MAX/1000);
+        err = str2unummax(&config->retry_delay, nextarg, LONG_MAX/1000);
         if(err)
           return err;
         break;
       case 'i': /* --retry-max-time */
-        err = str2unummax(_GETPTR(long, &config->retry_maxtime), nextarg, LONG_MAX/1000);
+        err = str2unummax(&config->retry_maxtime, nextarg, LONG_MAX/1000);
         if(err)
           return err;
         break;
@@ -1019,13 +1006,14 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         config->ftp_skip_ip = toggle;
         break;
       case 'r': /* --ftp-method (undocumented at this point) */
-        config->ftp_filemethod = ftpfilemethod(_GETPTR(struct OperationConfig, config), nextarg);
+        config->ftp_filemethod = ftpfilemethod(_GETPTR(struct OperationConfig, config), _GETCHARPTR(nextarg));
         break;
       case 's': { /* --local-port */
         /* 16bit base 10 is 5 digits, but we allow 6 so that this catches
            overflows, not just truncates */
         char lrange[7]="";
-        char *p = nextarg;
+        // TODO
+        char *p = _GETCHARPTR(nextarg);
         while(ISDIGIT(*p))
           p++;
         if(*p) {
@@ -1036,13 +1024,13 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         else
           rc = 0;
 
-        err = str2unum(_GETPTR(long, &config->localport), nextarg);
+        err = str2unum(&config->localport, nextarg);
         if(err || (config->localport > 65535))
           return PARAM_BAD_USE;
         if(!rc)
           config->localportrange = 1; /* default number of ports to try */
         else {
-          err = str2unum(_GETPTR(long, &config->localportrange), lrange);
+          err = str2unum(&config->localportrange, lrange);
           if(err || (config->localportrange > 65535))
             return PARAM_BAD_USE;
           config->localportrange -= (config->localport-1);
@@ -1074,7 +1062,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         break;
       case 'j': /* --ftp-ssl-ccc-mode */
         config->ftp_ssl_ccc = TRUE;
-        config->ftp_ssl_ccc_mode = ftpcccmethod(_GETPTR(struct OperationConfig, config), nextarg);
+        config->ftp_ssl_ccc_mode = ftpcccmethod(config, nextarg);
         break;
       case 'z': /* --libcurl */
 #ifdef CURL_DISABLE_LIBCURL_OPTION
@@ -1095,7 +1083,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         config->nokeepalive = (!toggle)?TRUE:FALSE;
         break;
       case '3': /* --keepalive-time */
-        err = str2unum(_GETPTR(long, &config->alivetime), nextarg);
+        err = str2unum(&config->alivetime, nextarg);
         if(err)
           return err;
         break;
@@ -1118,7 +1106,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         config->proxyver = CURLPROXY_HTTP_1_0;
         break;
       case '9': /* --tftp-blksize */
-        err = str2unum(_GETPTR(long, &config->tftp_blksize), nextarg);
+        err = str2unum(&config->tftp_blksize, nextarg);
         if(err)
           return err;
         break;
@@ -1219,7 +1207,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         config->ssh_compression = toggle;
         break;
       case '~': /* --happy-eyeballs-timeout-ms */
-        err = str2unum(_GETPTR(long, &config->happy_eyeballs_timeout_ms), nextarg);
+        err = str2unum(&config->happy_eyeballs_timeout_ms, nextarg);
         if(err)
           return err;
         /* 0 is a valid value for this timeout */
@@ -1342,7 +1330,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         if(nextarg[0] == '@') {
           nextarg++;
         }
-        else if(strchr(nextarg, '=')) {
+        else if(mm_strchr(nextarg, '=')) {
           /* A cookie string must have a =-letter */
           err = add2list(&config->cookies, nextarg);
           if(err)
@@ -1365,7 +1353,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
       break;
     case 'C':
       /* This makes us continue an ftp transfer at given position */
-      if(strcmp(nextarg, "-")) {
+      if(mm_strcmp(nextarg, "-")) {
         err = str2offset(&config->resume_from, nextarg);
         if(err)
           return err;
@@ -1392,12 +1380,12 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
          * Case 2: we first load the file using that name and then encode
          * the content.
          */
-        const char *p = strchr(nextarg, '=');
+        mm_array_ptr<const char> p = mm_strchr(nextarg, '=');
         size_t nlen;
         char is_file;
         if(!p)
           /* there was no '=' letter, check for a '@' instead */
-          p = strchr(nextarg, '@');
+          p = mm_strchr(nextarg, '@');
         if(p) {
           nlen = p - nextarg; /* length of the name part */
           is_file = *p++; /* pass the separator */
@@ -1409,16 +1397,16 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         }
         if('@' == is_file) {
           /* a '@' letter, it means that a file name or - (stdin) follows */
-          if(!strcmp("-", p)) {
+          if(!mm_strcmp("-", p)) {
             file = stdin;
             set_binmode(stdin);
           }
           else {
-            file = fopen(p, "rb");
+            file = mm_fopen(p, "rb");
             if(!file)
               warnf(global,
                     "Couldn't read data from file \"%s\", this makes "
-                    "an empty POST.\n", nextarg);
+                    "an empty POST.\n", _GETCHARPTR(nextarg));
           }
 
           err = file2memory(&postdata, &size, file);
@@ -1429,7 +1417,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
             return err;
         }
         else {
-          mm_GetStr(&postdata, p);
+          GetStr(&postdata, p);
           if(postdata)
             size = mm_strlen(postdata);
         }
@@ -1459,7 +1447,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
               return PARAM_NO_MEM;
             }
             if(nlen > 0) { /* only append '=' if we have a name */
-              msnprintf(_GETCHARPTR(n), outlen, "%.*s=%s", nlen, nextarg, enc);
+              msnprintf(_GETCHARPTR(n), outlen, "%.*s=%s", nlen, _GETCHARPTR(nextarg), enc);
               size = outlen-1;
             }
             else {
@@ -1478,16 +1466,16 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
            or - (stdin) follows */
         nextarg++; /* pass the @ */
 
-        if(!strcmp("-", nextarg)) {
+        if(!mm_strcmp("-", nextarg)) {
           file = stdin;
           if(subletter == 'b') /* forced data-binary */
             set_binmode(stdin);
         }
         else {
-          file = fopen(nextarg, "rb");
+          file = fopen(_GETCHARPTR(nextarg), "rb");
           if(!file)
             warnf(global, "Couldn't read data from file \"%s\", this makes "
-                  "an empty POST.\n", nextarg);
+                  "an empty POST.\n", _GETCHARPTR(nextarg));
         }
 
         if(subletter == 'b')
@@ -1513,7 +1501,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         }
       }
       else {
-        mm_GetStr(&postdata, nextarg);
+        GetStr(&postdata, nextarg);
         if(postdata)
           size = mm_strlen(postdata);
       }
@@ -1571,7 +1559,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
       break;
     case 'e':
     {
-      char *ptr = strstr(nextarg, ";auto");
+      mm_array_ptr<char> ptr = mm_strstr(nextarg, ";auto");
       if(ptr) {
         /* Automatic referer requested, this may be combined with a
            set initial one */
@@ -1607,7 +1595,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         break;
       case 'f': /* crypto engine */
         GetStr(&config->engine, nextarg);
-        if(config->engine && curl_strequal(config->engine, "list"))
+        if(config->engine && mm_strcasecompare_0(config->engine, "list"))
           return PARAM_ENGINES_REQUESTED;
         break;
       case 'g': /* CA cert directory */
@@ -1618,7 +1606,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         break;
       case 'i': /* --hostpubmd5 md5 of the host public key */
         GetStr(&config->hostpubmd5, nextarg);
-        if(!config->hostpubmd5 || strlen(config->hostpubmd5) != 32)
+        if(!config->hostpubmd5 || mm_strlen(config->hostpubmd5) != 32)
           return PARAM_BAD_USE;
         break;
       case 'j': /* CRL file */
@@ -1639,7 +1627,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
       case 'm': /* TLS authentication type */
         if(curlinfo->features & CURL_VERSION_TLSAUTH_SRP) {
           GetStr(&config->tls_authtype, nextarg);
-          if(!curl_strequal(config->tls_authtype, "SRP"))
+          if(!mm_strcasecompare_0(config->tls_authtype, "SRP"))
             return PARAM_LIBCURL_DOESNT_SUPPORT; /* only support TLS-SRP */
         }
         else
@@ -1711,7 +1699,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
       case 'w': /* TLS authentication type for proxy */
         if(curlinfo->features & CURL_VERSION_TLSAUTH_SRP) {
           GetStr(&config->proxy_tls_authtype, nextarg);
-          if(!curl_strequal(config->proxy_tls_authtype, "SRP"))
+          if(!mm_strcasecompare_0(config->proxy_tls_authtype, "SRP"))
             return PARAM_LIBCURL_DOESNT_SUPPORT; /* only support TLS-SRP */
         }
         else
@@ -1858,7 +1846,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
     case 'h': /* h for help */
       if(toggle) {
         if(nextarg) {
-          global->help_category = strdup(nextarg);
+          global->help_category = mm_strdup(nextarg);
           if(!global->help_category)
             return PARAM_NO_MEM;
         }
@@ -1872,8 +1860,8 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         /* read many headers from a file or stdin */
         mm_array_ptr<char> string = NULL;
         size_t len;
-        bool use_stdin = !strcmp(&nextarg[1], "-");
-        FILE *file = use_stdin?stdin:fopen(&nextarg[1], FOPEN_READTEXT);
+        bool use_stdin = !mm_strcmp(&nextarg[1], "-");
+        FILE *file = use_stdin?stdin:mm_fopen(&nextarg[1], FOPEN_READTEXT);
         if(!file)
           warnf(global, "Failed to open %s!\n", &nextarg[1]);
         else {
@@ -1884,9 +1872,9 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
             mm_array_ptr<char> h = mm_strtok(string, "\r\n", string);
             while(h) {
               if(subletter == 'p') /* --proxy-header */
-                err = add2list(&config->proxyheaders, _GETCHARPTR(h));
+                err = add2list(&config->proxyheaders, h);
               else
-                err = add2list(&config->headers, _GETCHARPTR(h));
+                err = add2list(&config->headers, h);
               if(err)
                 break;
               h = mm_strtok(NULL, "\r\n", string);
@@ -1935,7 +1923,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
     case 'K': /* parse config file */
       if(parseconfig(nextarg, global))
         warnf(global, "error trying read config from the '%s' file\n",
-              nextarg);
+              _GETCHARPTR(nextarg));
       break;
     case 'l':
       config->dirlistonly = toggle; /* only list the names of the FTP dir */
@@ -2081,10 +2069,10 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
          (and won't actually be range by definition). The man page previously
          claimed that to be a good way, why this code is added to work-around
          it. */
-      if(ISDIGIT(*nextarg) && !strchr(nextarg, '-')) {
+      if(ISDIGIT(*nextarg) && !mm_strchr(nextarg, '-')) {
         char buffer[32];
         curl_off_t off;
-        if(curlx_strtoofft(nextarg, NULL, 10, &off)) {
+        if(curlx_strtoofft(_GETCHARPTR(nextarg), NULL, 10, &off)) {
           warnf(global, "unsupported range point\n");
           return PARAM_BAD_USE;
         }
@@ -2092,14 +2080,14 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
               "A specified range MUST include at least one dash (-). "
               "Appending one for you!\n");
         msnprintf(buffer, sizeof(buffer), "%" CURL_FORMAT_CURL_OFF_T "-", off);
-        Curl_safefree(config->range);
-        config->range = strdup(buffer);
+        mm_Curl_safefree(char, config->range);
+        config->range = mm_strdup_from_raw(buffer);
         if(!config->range)
           return PARAM_NO_MEM;
       }
       {
         /* byte range requested */
-        const char *tmp_range = nextarg;
+        mm_array_ptr<const char> tmp_range = nextarg;
         while(*tmp_range != '\0') {
           if(!ISDIGIT(*tmp_range) && *tmp_range != '-' && *tmp_range != ',') {
             warnf(global, "Invalid character is found in given range. "
@@ -2187,8 +2175,8 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
     case 'v':
       if(toggle) {
         /* the '%' thing here will cause the trace get sent to stderr */
-        Curl_safefree(global->trace_dump);
-        global->trace_dump = strdup("%");
+        mm_Curl_safefree(char, global->trace_dump);
+        global->trace_dump = mm_strdup_from_raw("%");
         if(!global->trace_dump)
           return PARAM_NO_MEM;
         if(global->tracetype && (global->tracetype != TRACE_PLAIN))
@@ -2211,15 +2199,15 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         /* the data begins with a '@' letter, it means that a file name
            or - (stdin) follows */
         FILE *file;
-        const char *fname;
+        mm_array_ptr<const char> fname = NULL;
         nextarg++; /* pass the @ */
-        if(!strcmp("-", nextarg)) {
+        if(!mm_strcmp("-", nextarg)) {
           fname = "<stdin>";
           file = stdin;
         }
         else {
           fname = nextarg;
-          file = fopen(nextarg, FOPEN_READTEXT);
+          file = mm_fopen(nextarg, FOPEN_READTEXT);
         }
         mm_Curl_safefree(char, config->writeout);
         err = file2string(&config->writeout, file);
@@ -2228,10 +2216,10 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         if(err)
           return err;
         if(!config->writeout)
-          warnf(global, "Failed to read %s", fname);
+          warnf(global, "Failed to read %s", _GETCHARPTR(fname));
       }
       else
-        mm_GetStr(&config->writeout, nextarg);
+        GetStr(&config->writeout, nextarg);
       break;
     case 'x':
       switch(subletter) {
@@ -2251,7 +2239,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
       break;
     case 'y':
       /* low speed time */
-      err = str2unum(_GETPTR(long, &config->low_speed_time), nextarg);
+      err = str2unum(&config->low_speed_time, nextarg);
       if(err)
         return err;
       if(!config->low_speed_limit)
@@ -2259,7 +2247,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
       break;
     case 'Y':
       /* low speed limit */
-      err = str2unum(_GETPTR(long, &config->low_speed_limit), nextarg);
+      err = str2unum(&config->low_speed_limit, nextarg);
       if(err)
         return err;
       if(!config->low_speed_time)
@@ -2271,7 +2259,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         global->parallel = toggle;
         break;
       case 'b':   /* --parallel-max */
-        err = str2unum(_GETPTR(long, &global->parallel_max), nextarg);
+        err = str2unum_raw_val(&global->parallel_max, nextarg);
         if(err)
           return err;
         if((global->parallel_max > MAX_PARALLEL) ||
@@ -2304,7 +2292,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         break;
       }
       now = time(NULL);
-      config->condtime = (curl_off_t)curl_getdate(nextarg, &now);
+      config->condtime = (curl_off_t)curl_getdate(_GETCHARPTR(nextarg), &now);
       if(-1 == config->condtime) {
         /* now let's see if it is a file name to get the time from instead! */
         curl_off_t filetime = getfiletime(nextarg, global);
@@ -2358,8 +2346,7 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
           ? curlx_convert_tchar_to_UTF8(argv[i + 1])
           : NULL;
 
-        // TODO
-        result = getparameter(orig_opt, _GETCHARPTR(nextarg), &passarg, global, config);
+        result = getparameter(orig_opt, nextarg, &passarg, global, config);
         mm_Curl_safefree(char, nextarg);
         config = global->last;
         if(result == PARAM_NEXT_OPERATION) {
@@ -2396,7 +2383,7 @@ ParameterError parse_args(struct GlobalConfig *global, int argc,
       bool used;
 
       /* Just add the URL please */
-      result = getparameter("--url", _GETCHARPTR(orig_opt), &used, global,
+      result = getparameter("--url", orig_opt, &used, global,
                             config);
     }
 

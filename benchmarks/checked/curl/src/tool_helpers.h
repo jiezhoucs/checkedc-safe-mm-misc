@@ -29,6 +29,6 @@ int SetHTTPrequest(mm_ptr<struct OperationConfig> config, HttpReq req,
                    mm_ptr<HttpReq> store);
 
 void customrequest_helper(mm_ptr<struct OperationConfig> config, HttpReq req,
-                          char *method);
+                          mm_array_ptr<char> method);
 
 #endif /* HEADER_CURL_TOOL_HELPERS_H */

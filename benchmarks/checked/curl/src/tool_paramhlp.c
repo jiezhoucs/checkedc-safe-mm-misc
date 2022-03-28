@@ -109,15 +109,15 @@ ParameterError file2memory(mm_array_ptr<char> *bufp, size_t *size, FILE *file)
   return PARAM_OK;
 }
 
-void cleanarg(char *str)
+void cleanarg(mm_array_ptr<char> str)
 {
 #ifdef HAVE_WRITABLE_ARGV
   /* now that GetStr has copied the contents of nextarg, wipe the next
    * argument out so that the username:password isn't displayed in the
    * system process list */
   if(str) {
-    size_t len = strlen(str);
-    memset(str, ' ', len);
+    size_t len = mm_strlen(str);
+    mm_memset(str, ' ', len);
   }
 #else
   (void)str;
@@ -133,16 +133,32 @@ void cleanarg(char *str)
  * data.
  */
 /* No need to convert long *val to mm_ptr type. */
-static ParameterError getnum(long *val, const char *str, int base)
+static ParameterError getnum(mm_ptr<long> val, mm_array_ptr<const char> str, int base)
 {
   if(str) {
-    char *endptr = NULL;
+    mm_array_ptr<char> endptr = NULL;
     long num;
     errno = 0;
-    num = strtol(str, &endptr, base);
+    num = mm_strtol(str, &endptr, base);
     if(errno == ERANGE)
       return PARAM_NUMBER_TOO_LARGE;
-    if((endptr != str) && (endptr == str + strlen(str))) {
+    if((endptr != str) && (endptr == str + mm_strlen(str))) {
+      *val = num;
+      return PARAM_OK;  /* Ok */
+    }
+  }
+  return PARAM_BAD_NUMERIC; /* badness */
+}
+
+static ParameterError getnum_raw_val(long *val, mm_array_ptr<const char> str, int base) {
+  if(str) {
+    mm_array_ptr<char> endptr = NULL;
+    long num;
+    errno = 0;
+    num = mm_strtol(str, &endptr, base);
+    if(errno == ERANGE)
+      return PARAM_NUMBER_TOO_LARGE;
+    if((endptr != str) && (endptr == str + mm_strlen(str))) {
       *val = num;
       return PARAM_OK;  /* Ok */
     }
@@ -151,12 +167,12 @@ static ParameterError getnum(long *val, const char *str, int base)
 }
 
 /* No need to convert long *val to mm_ptr type. */
-ParameterError str2num(long *val, const char *str)
+ParameterError str2num(mm_ptr<long> val, mm_array_ptr<const char> str)
 {
   return getnum(val, str, 10);
 }
 
-ParameterError oct2nummax(long *val, const char *str, long max)
+ParameterError oct2nummax(mm_ptr<long> val, mm_array_ptr<const char> str, long max)
 {
   ParameterError result = getnum(val, str, 8);
   if(result != PARAM_OK)
@@ -179,9 +195,19 @@ ParameterError oct2nummax(long *val, const char *str, long max)
  */
 
 /* No need to convert long *val to mm_ptr type. */
-ParameterError str2unum(long *val, const char *str)
+ParameterError str2unum(mm_ptr<long> val, mm_array_ptr<const char> str)
 {
   ParameterError result = getnum(val, str, 10);
+  if(result != PARAM_OK)
+    return result;
+  if(*val < 0)
+    return PARAM_NEGATIVE_NUMERIC;
+
+  return PARAM_OK;
+}
+
+ParameterError str2unum_raw_val(long *val, mm_array_ptr<const char> str) {
+  ParameterError result = getnum_raw_val(val, str, 10);
   if(result != PARAM_OK)
     return result;
   if(*val < 0)
@@ -201,7 +227,7 @@ ParameterError str2unum(long *val, const char *str)
  */
 
 /* No need to convert long *val to mm_ptr type. */
-ParameterError str2unummax(long *val, const char *str, long max)
+ParameterError str2unummax(mm_ptr<long> val, mm_array_ptr<const char> str, long max)
 {
   ParameterError result = str2unum(val, str);
   if(result != PARAM_OK)
@@ -225,20 +251,20 @@ ParameterError str2unummax(long *val, const char *str, long max)
  * data.
  */
 
-static ParameterError str2double(double *val, const char *str, long max)
+static ParameterError str2double(mm_ptr<double> val, mm_array_ptr<const char> str, long max)
 {
   if(str) {
-    char *endptr;
+    mm_array_ptr<char> endptr = NULL;
     double num;
     errno = 0;
-    num = strtod(str, &endptr);
+    num = mm_strtod(str, &endptr);
     if(errno == ERANGE)
       return PARAM_NUMBER_TOO_LARGE;
     if(num > max) {
       /* too large */
       return PARAM_NUMBER_TOO_LARGE;
     }
-    if((endptr != str) && (endptr == str + strlen(str))) {
+    if((endptr != str) && (endptr == str + mm_strlen(str))) {
       *val = num;
       return PARAM_OK;  /* Ok */
     }
@@ -258,7 +284,7 @@ static ParameterError str2double(double *val, const char *str, long max)
  * data.
  */
 
-ParameterError str2udouble(mm_ptr<double> valp, const char *str, long max)
+ParameterError str2udouble(mm_ptr<double> valp, mm_array_ptr<const char> str, long max)
 {
   double value;
   ParameterError result = str2double(&value, str, max);
@@ -282,11 +308,11 @@ ParameterError str2udouble(mm_ptr<double> valp, const char *str, long max)
  * data.
  */
 
-long proto2num(mm_ptr<struct OperationConfig> config, mm_ptr<long> val, const char *str)
+long proto2num(mm_ptr<struct OperationConfig> config, mm_ptr<long> val, mm_array_ptr<const char> str)
 {
-  char *buffer;
+  mm_array_ptr<char> buffer = NULL;
   const char *sep = ",";
-  char *token;
+  mm_array_ptr<char> token = NULL;
 
   static struct sprotos {
     const char *name;
@@ -321,15 +347,15 @@ long proto2num(mm_ptr<struct OperationConfig> config, mm_ptr<long> val, const ch
   if(!str)
     return 1;
 
-  buffer = strdup(str); /* because strtok corrupts it */
+  buffer = mm_strdup(str); /* because strtok corrupts it */
   if(!buffer)
     return 1;
 
   /* Allow strtok() here since this isn't used threaded */
   /* !checksrc! disable BANNEDFUNC 2 */
-  for(token = strtok(buffer, sep);
+  for(token = mm_strtok(buffer, sep, buffer);
       token;
-      token = strtok(NULL, sep)) {
+      token = mm_strtok(NULL, sep, buffer)) {
     enum e_action { allow, deny, set } action = allow;
 
     struct sprotos const *pp;
@@ -347,13 +373,13 @@ long proto2num(mm_ptr<struct OperationConfig> config, mm_ptr<long> val, const ch
         action = allow;
         break;
       default: /* Includes case of terminating NULL */
-        Curl_safefree(buffer);
+        mm_Curl_safefree(char, buffer);
         return 1;
       }
     }
 
     for(pp = protos; pp->name; pp++) {
-      if(curl_strequal(token, pp->name)) {
+      if(mm_strcasecompare_0(token, pp->name)) {
         switch(action) {
         case deny:
           *val &= ~(pp->bit);
@@ -374,10 +400,10 @@ long proto2num(mm_ptr<struct OperationConfig> config, mm_ptr<long> val, const ch
          if no protocols are allowed */
       if(action == set)
         *val = 0;
-      warnf(config->global, "unrecognized protocol '%s'\n", token);
+      warnf(config->global, "unrecognized protocol '%s'\n", _GETCHARPTR(token));
     }
   }
-  Curl_safefree(buffer);
+  mm_Curl_safefree(char, buffer);
   return 0;
 }
 
@@ -389,14 +415,15 @@ long proto2num(mm_ptr<struct OperationConfig> config, mm_ptr<long> val, const ch
  * @return PARAM_LIBCURL_UNSUPPORTED_PROTOCOL  protocol not supported
  * @return PARAM_REQUIRES_PARAMETER   missing parameter
  */
-int check_protocol(const char *str)
+int check_protocol(mm_array_ptr<const char> str)
 {
   const char * const *pp;
   const curl_version_info_data *curlinfo = curl_version_info(CURLVERSION_NOW);
   if(!str)
     return PARAM_REQUIRES_PARAMETER;
   for(pp = curlinfo->protocols; *pp; pp++) {
-    if(curl_strequal(*pp, str))
+    // TODO
+    if(curl_strequal(*pp, _GETCHARPTR(str)))
       return PARAM_OK;
   }
   return PARAM_LIBCURL_UNSUPPORTED_PROTOCOL;
@@ -410,16 +437,17 @@ int check_protocol(const char *str)
  * @param str  the buffer containing the offset
  * @return PARAM_OK if successful, a parameter specific error enum if failure.
  */
-ParameterError str2offset(mm_ptr<curl_off_t> val, const char *str)
+ParameterError str2offset(mm_ptr<curl_off_t> val, mm_array_ptr<const char> str)
 {
-  char *endptr;
+  mm_array_ptr<char> endptr = NULL;
   if(str[0] == '-')
     /* offsets aren't negative, this indicates weird input */
     return PARAM_NEGATIVE_NUMERIC;
 
 #if(SIZEOF_CURL_OFF_T > SIZEOF_LONG)
   {
-    CURLofft offt = curlx_strtoofft(str, &endptr, 0, val);
+    // TODO
+    CURLofft offt = curlx_strtoofft(_GETCHARPTR(str), &endptr, 0, val);
     if(CURL_OFFT_FLOW == offt)
       return PARAM_NUMBER_TOO_LARGE;
     else if(CURL_OFFT_INVAL == offt)
@@ -427,11 +455,11 @@ ParameterError str2offset(mm_ptr<curl_off_t> val, const char *str)
   }
 #else
   errno = 0;
-  *val = strtol(str, &endptr, 0);
+  *val = mm_strtol(str, &endptr, 0);
   if((*val == LONG_MIN || *val == LONG_MAX) && errno == ERANGE)
     return PARAM_NUMBER_TOO_LARGE;
 #endif
-  if((endptr != str) && (endptr == str + strlen(str)))
+  if((endptr != str) && (endptr == str + mm_strlen(str)))
     return PARAM_OK;
 
   return PARAM_BAD_NUMERIC;
@@ -491,9 +519,9 @@ static CURLcode checkpasswd(const char *kind, /* for what purpose */
   return CURLE_OK;
 }
 
-ParameterError add2list(mm_ptr<struct curl_slist *> list, const char *ptr)
+ParameterError add2list(mm_ptr<struct curl_slist *> list, mm_array_ptr<const char> ptr)
 {
-  struct curl_slist *newlist = curl_slist_append(*list, ptr);
+  struct curl_slist *newlist = curl_slist_append(*list, _GETCHARPTR(ptr));
   if(newlist)
     *list = newlist;
   else
@@ -517,30 +545,30 @@ int ftpfilemethod(struct OperationConfig *config, const char *str)
   return CURLFTPMETHOD_MULTICWD;
 }
 
-int ftpcccmethod(struct OperationConfig *config, const char *str)
+int ftpcccmethod(mm_ptr<struct OperationConfig> config, mm_array_ptr<const char> str)
 {
-  if(curl_strequal("passive", str))
+  if(mm_strcasecompare("passive", str))
     return CURLFTPSSL_CCC_PASSIVE;
-  if(curl_strequal("active", str))
+  if(mm_strcasecompare("active", str))
     return CURLFTPSSL_CCC_ACTIVE;
 
   warnf(config->global, "unrecognized ftp CCC method '%s', using default\n",
-        str);
+        _GETCHARPTR(str));
 
   return CURLFTPSSL_CCC_PASSIVE;
 }
 
-long delegation(mm_ptr<struct OperationConfig> config, const char *str)
+long delegation(mm_ptr<struct OperationConfig> config, mm_array_ptr<const char> str)
 {
-  if(curl_strequal("none", str))
+  if(mm_strcasecompare("none", str))
     return CURLGSSAPI_DELEGATION_NONE;
-  if(curl_strequal("policy", str))
+  if(mm_strcasecompare("policy", str))
     return CURLGSSAPI_DELEGATION_POLICY_FLAG;
-  if(curl_strequal("always", str))
+  if(mm_strcasecompare("always", str))
     return CURLGSSAPI_DELEGATION_FLAG;
 
   warnf(config->global, "unrecognized delegation method '%s', using none\n",
-        str);
+        _GETCHARPTR(str));
 
   return CURLGSSAPI_DELEGATION_NONE;
 }
@@ -548,9 +576,9 @@ long delegation(mm_ptr<struct OperationConfig> config, const char *str)
 /*
  * my_useragent: returns allocated string with default user agent
  */
-static char *my_useragent(void)
+static mm_array_ptr<char> my_useragent(void)
 {
-  return strdup(CURL_NAME "/" CURL_VERSION);
+  return mm_strdup_from_raw(CURL_NAME "/" CURL_VERSION);
 }
 
 CURLcode get_args(mm_ptr<struct OperationConfig> config, const size_t i)
@@ -593,7 +621,7 @@ CURLcode get_args(mm_ptr<struct OperationConfig> config, const size_t i)
  * data.
  */
 
-ParameterError str2tls_max(mm_ptr<long> val, const char *str)
+ParameterError str2tls_max(mm_ptr<long> val, mm_array_ptr<const char> str)
 {
    static struct s_tls_max {
     const char *tls_max_str;
@@ -609,7 +637,7 @@ ParameterError str2tls_max(mm_ptr<long> val, const char *str)
   if(!str)
     return PARAM_REQUIRES_PARAMETER;
   for(i = 0; i < sizeof(tls_max_array)/sizeof(tls_max_array[0]); i++) {
-    if(!strcmp(str, tls_max_array[i].tls_max_str)) {
+    if(!mm_strcmp(str, tls_max_array[i].tls_max_str)) {
       *val = tls_max_array[i].tls_max;
       return PARAM_OK;
     }

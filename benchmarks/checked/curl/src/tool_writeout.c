@@ -188,13 +188,14 @@ static int writeString(FILE *stream, const struct writeoutvar *wovar,
       break;
     case VAR_EFFECTIVE_FILENAME:
       if(per->outs.filename) {
-        strinfo = per->outs.filename;
+        // TODO
+        strinfo = _GETCHARPTR(per->outs.filename);
         valid = true;
       }
       break;
     case VAR_INPUT_URL:
       if(per->this_url) {
-        strinfo = per->this_url;
+        strinfo = _GETCHARPTR(per->this_url);
         valid = true;
       }
       break;

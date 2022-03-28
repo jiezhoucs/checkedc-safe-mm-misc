@@ -25,7 +25,7 @@
 
 struct GlobalConfig;
 
-curl_off_t getfiletime(const char *filename, struct GlobalConfig *global);
+curl_off_t getfiletime(mm_array_ptr<const char> filename, struct GlobalConfig *global);
 
 #if defined(HAVE_UTIME) || defined(HAVE_UTIMES) ||      \
   (defined(WIN32) && (SIZEOF_CURL_OFF_T >= 8))

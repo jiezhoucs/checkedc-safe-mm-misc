@@ -173,7 +173,8 @@ CURLcode easysrc_cleanup(void)
 void dumpeasysrc(struct GlobalConfig *config)
 {
   struct curl_slist *ptr;
-  char *o = config->libcurl;
+  // TODO
+  char *o = _GETCHARPTR(config->libcurl);
 
   FILE *out;
   bool fopened = FALSE;

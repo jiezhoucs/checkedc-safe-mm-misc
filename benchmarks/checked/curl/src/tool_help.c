@@ -899,11 +899,12 @@ static void print_category(curlhelp_t category)
 }
 
 /* Prints category if found. If not, it returns 1 */
-static int get_category_content(const char *category)
+static int get_category_content(mm_array_ptr<const char> category)
 {
   unsigned int i;
   for(i = 0; categories[i].opt; ++i)
-    if(curl_strequal(categories[i].opt, category)) {
+    // TODO
+    if(curl_strequal(categories[i].opt, _GETCHARPTR(category))) {
       printf("%s: %s\n", categories[i].opt, categories[i].desc);
       print_category(categories[i].category);
       return 0;
@@ -920,7 +921,7 @@ static void get_categories(void)
 }
 
 
-void tool_help(char *category)
+void tool_help(mm_array_ptr<char> category)
 {
   puts("Usage: curl [options...] <url>");
   /* If no category was provided */
@@ -933,18 +934,18 @@ void tool_help(char *category)
     puts(category_note);
   }
   /* Lets print everything if "all" was provided */
-  else if(curl_strequal(category, "all"))
+  else if(mm_strcasecompare_0(category, "all"))
     /* Print everything except hidden */
     print_category(~(CURLHELP_HIDDEN));
   /* Lets handle the string "category" differently to not print an errormsg */
-  else if(curl_strequal(category, "category"))
+  else if(mm_strcasecompare_0(category, "category"))
     get_categories();
   /* Otherwise print category and handle the case if the cat was not found */
   else if(get_category_content(category)) {
     puts("Invalid category provided, here is a list of all categories:\n");
     get_categories();
   }
-  free(category);
+  MM_FREE(char, category);
 }
 
 static int

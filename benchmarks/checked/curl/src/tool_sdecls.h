@@ -60,7 +60,7 @@
  */
 
 struct OutStruct {
-  char *filename;
+  mm_array_ptr<char> filename;
   bool alloc_filename;
   bool is_cd_filename;
   bool s_isreg;
@@ -95,9 +95,9 @@ struct InStruct {
 
 struct getout {
   mm_ptr<struct getout> next;      /* next one */
-  char          *url;       /* the URL we deal with */
-  char          *outfile;   /* where to store the output */
-  char          *infile;    /* file to upload, if GETOUT_UPLOAD is set */
+  mm_array_ptr<char>    url;       /* the URL we deal with */
+  mm_array_ptr<char>    outfile;   /* where to store the output */
+  mm_array_ptr<char>    infile;    /* file to upload, if GETOUT_UPLOAD is set */
   int            flags;     /* options - composed of GETOUT_* bits */
   int            num;       /* which URL number in an invocation */
 };

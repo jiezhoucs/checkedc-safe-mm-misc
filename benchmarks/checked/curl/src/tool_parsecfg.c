@@ -75,13 +75,13 @@ static FILE *execpath(const char *filename)
 
 
 /* return 0 on everything-is-fine, and non-zero otherwise */
-int parseconfig(const char *filename, struct GlobalConfig *global)
+int parseconfig(mm_array_ptr<const char> filename, struct GlobalConfig *global)
 {
   FILE *file = NULL;
   bool usedarg = FALSE;
   int rc = 0;
   mm_ptr<struct OperationConfig> operation = global->last;
-  char *pathalloc = NULL;
+  mm_array_ptr<char> pathalloc = NULL;
 
   if(!filename || !*filename) {
     /* NULL or no file name attempts to load .curlrc from the homedir! */
@@ -89,7 +89,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
     char *home = homedir(".curlrc");
 #ifndef WIN32
     if(home) {
-      pathalloc = curl_maprintf("%s%s.curlrc", home, DIR_CHAR);
+      pathalloc = mmize_str(curl_maprintf("%s%s.curlrc", home, DIR_CHAR));
       if(!pathalloc) {
         free(home);
         return 1; /* out of memory */
@@ -111,7 +111,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
         }
 
         /* Check if the file exists - if not, try _curlrc */
-        file = fopen(pathalloc, FOPEN_READTEXT);
+        file = fopen(_GETCHARPTR(pathalloc), FOPEN_READTEXT);
         if(file) {
           filename = pathalloc;
           break;
@@ -131,8 +131,8 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
   }
 
   if(!file && filename) { /* no need to fopen() again */
-    if(strcmp(filename, "-"))
-      file = fopen(filename, FOPEN_READTEXT);
+    if(mm_strcmp(filename, "-"))
+      file = fopen(_GETCHARPTR(filename), FOPEN_READTEXT);
     else
       file = stdin;
   }
@@ -229,7 +229,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
           default:
             warnf(operation->global, "%s:%d: warning: '%s' uses unquoted "
                   "whitespace in the line that may cause side-effects!\n",
-                  filename, lineno, _GETCHARPTR(option));
+                  _GETCHARPTR(filename), lineno, _GETCHARPTR(option));
           }
         }
         if(!*param)
@@ -241,7 +241,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
 #ifdef DEBUG_CONFIG
       fprintf(stderr, "PARAM: \"%s\"\n",(param ? _GETCHARPTR(param) : "(null)"));
 #endif
-      res = getparameter(option, _GETCHARPTR(param), &usedarg, global, operation);
+      res = getparameter(option, param, &usedarg, global, operation);
       operation = global->last;
 
       if(!res && param && *param && !usedarg)
@@ -273,7 +273,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
 
       if(res != PARAM_OK && res != PARAM_NEXT_OPERATION) {
         /* the help request isn't really an error */
-        if(!strcmp(filename, "-")) {
+        if(!mm_strcmp(filename, "-")) {
           filename = "<stdin>";
         }
         if(res != PARAM_HELP_REQUESTED &&
@@ -282,7 +282,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
            res != PARAM_ENGINES_REQUESTED) {
           const char *reason = param2text(res);
           warnf(operation->global, "%s:%d: warning: '%s' %s\n",
-                filename, lineno, _GETCHARPTR(option), reason);
+                _GETCHARPTR(filename), lineno, _GETCHARPTR(option), reason);
         }
       }
 
@@ -300,7 +300,7 @@ int parseconfig(const char *filename, struct GlobalConfig *global)
   else
     rc = 1; /* couldn't open the file */
 
-  curl_free(pathalloc);
+  MM_FREE(char, pathalloc);
   return rc;
 }
 

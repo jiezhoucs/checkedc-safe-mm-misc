@@ -36,7 +36,7 @@
 
 #include "memdebug.h" /* keep this as LAST include */
 
-static char *parse_filename(const char *ptr, size_t len);
+static mm_array_ptr<char> parse_filename(const char *str, size_t len);
 
 #ifdef WIN32
 #define BOLD
@@ -137,7 +137,7 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
     /* look for the 'filename=' parameter
        (encoded filenames (*=) are not supported) */
     for(;;) {
-      char *filename;
+      mm_array_ptr<char> filename = NULL;
       size_t len;
 
       while(*p && (p < end) && !ISALPHA(*p))
@@ -145,7 +145,7 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
       if(p > end - 9)
         break;
 
-      if(memcmp(p, "filename=", 9)) {
+      if(mm_memcmp(p, "filename=", 9)) {
         /* no match, find next parameter */
         while((p < end) && (*p != ';'))
           p++;
@@ -161,7 +161,7 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
       if(filename) {
         if(outs->stream) {
           /* indication of problem, get out! */
-          free(filename);
+          MM_FREE(char, filename);
           return failure;
         }
 
@@ -216,21 +216,21 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
 /*
  * Copies a file name part and returns an ALLOCATED data buffer.
  */
-static char *parse_filename(const char *ptr, size_t len)
+static mm_array_ptr<char> parse_filename(const char *ptr, size_t len)
 {
-  char *copy;
-  char *p;
-  char *q;
+  mm_array_ptr<char> copy = NULL;
+  mm_array_ptr<char> p = NULL;
+  mm_array_ptr<char> q = NULL;
   char  stop = '\0';
 
   /* simple implementation of strndup() */
   /* Checked C: Cannot port the next line. copy will be returned and later
    * its raw ptr will extracted and set to outs->filename (in tool_header_cb)
    * which will be freed and thus causing a free error. */
-  copy = malloc(len + 1);
+  copy = MM_ARRAY_ALLOC(char, len + 1);
   if(!copy)
     return NULL;
-  memcpy(copy, ptr, len);
+  mm_memcpy(copy, ptr, len);
   copy[len] = '\0';
 
   p = copy;
@@ -243,16 +243,16 @@ static char *parse_filename(const char *ptr, size_t len)
     stop = ';';
 
   /* scan for the end letter and stop there */
-  q = strchr(p, stop);
+  q = mm_strchr(p, stop);
   if(q)
     *q = '\0';
 
   /* if the filename contains a path, only use filename portion */
-  q = strrchr(p, '/');
+  q = mm_strrchr(p, '/');
   if(q) {
     p = q + 1;
     if(!*p) {
-      Curl_safefree(copy);
+      mm_Curl_safefree(char, copy);
       return NULL;
     }
   }
@@ -260,32 +260,32 @@ static char *parse_filename(const char *ptr, size_t len)
   /* If the filename contains a backslash, only use filename portion. The idea
      is that even systems that don't handle backslashes as path separators
      probably want the path removed for convenience. */
-  q = strrchr(p, '\\');
+  q = mm_strrchr(p, '\\');
   if(q) {
     p = q + 1;
     if(!*p) {
-      Curl_safefree(copy);
+      mm_Curl_safefree(char, copy);
       return NULL;
     }
   }
 
   /* make sure the file name doesn't end in \r or \n */
-  q = strchr(p, '\r');
+  q = mm_strchr(p, '\r');
   if(q)
     *q = '\0';
 
-  q = strchr(p, '\n');
+  q = mm_strchr(p, '\n');
   if(q)
     *q = '\0';
 
   if(copy != p)
-    memmove(copy, p, strlen(p) + 1);
+    mm_memmove(copy, p, mm_strlen(p) + 1);
 
 #if defined(MSDOS) || defined(WIN32)
   {
     char *sanitized;
     SANITIZEcode sc = sanitize_file_name(&sanitized, copy, 0);
-    Curl_safefree(copy);
+    mm_Curl_safefree(char, copy);
     if(sc)
       return NULL;
     copy = sanitized;
@@ -301,9 +301,9 @@ static char *parse_filename(const char *ptr, size_t len)
     char *tdir = curlx_getenv("CURL_TESTDIR");
     if(tdir) {
       char buffer[512]; /* suitably large */
-      msnprintf(buffer, sizeof(buffer), "%s/%s", tdir, copy);
-      Curl_safefree(copy);
-      copy = strdup(buffer); /* clone the buffer, we don't use the libcurl
+      msnprintf(buffer, sizeof(buffer), "%s/%s", tdir, _GETCHARPTR(copy));
+      mm_Curl_safefree(char, copy);
+      copy = mm_strdup_from_raw(buffer); /* clone the buffer, we don't use the libcurl
                                 aprintf() or similar since we want to use the
                                 same memory code as the "real" parse_filename
                                 function */

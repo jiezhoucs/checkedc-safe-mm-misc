@@ -51,7 +51,7 @@ typedef enum {
 struct GlobalConfig;
 struct OperationConfig;
 
-ParameterError getparameter(mm_array_ptr<const char> flag, char *nextarg, bool *usedarg,
+ParameterError getparameter(mm_array_ptr<const char> flag, mm_array_ptr<char> nextarg, bool *usedarg,
                             struct GlobalConfig *global,
                             mm_ptr<struct OperationConfig> operation);
 

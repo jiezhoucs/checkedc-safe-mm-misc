@@ -747,7 +747,7 @@ static int get_param_part(mm_ptr<struct OperationConfig> config, char endchar,
   } while(0)
 
 int formparse(mm_ptr<struct OperationConfig> config,
-              const char *input,
+              mm_array_ptr<const char> input,
               mm_ptr<struct tool_mime *> mimeroot,
               mm_ptr<struct tool_mime *> mimecurrent,
               bool literal_value)
@@ -772,7 +772,7 @@ int formparse(mm_ptr<struct OperationConfig> config,
   }
 
   /* Make a copy we can overwrite. */
-  NULL_CHECK(contents, mm_strdup_from_raw(input), 2);
+  NULL_CHECK(contents, mm_strdup(input), 2);
 
   /* Scan for the end of the name. */
   contp = mm_strchr(contents, '=');

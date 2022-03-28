@@ -36,9 +36,9 @@ struct per_transfer {
   long retry_sleep_default;
   long retry_sleep;
   struct timeval retrystart;
-  char *this_url;
+  mm_array_ptr<char> this_url;
   unsigned int urlnum; /* the index of the given URL */
-  char *outfile;
+  mm_array_ptr<char> outfile;
   bool infdopen; /* TRUE if infd needs closing */
   int infd;
   bool noprogress;
@@ -69,9 +69,9 @@ struct per_transfer {
   bool ultotal_added;
 
   /* NULL or malloced */
-  char *separator_err;
-  char *separator;
-  char *uploadfile;
+  mm_array_ptr<char> separator_err;
+  mm_array_ptr<char> separator;
+  mm_array_ptr<char> uploadfile;
 };
 
 CURLcode operate(struct GlobalConfig *config, int argc, argv_item_t argv[]);

@@ -27,12 +27,12 @@ struct OperationConfig;
 
 void clean_getout(mm_ptr<struct OperationConfig> config);
 
-bool output_expected(const char *url, const char *uploadfile);
+bool output_expected(mm_array_ptr<const char> url, mm_array_ptr<const char> uploadfile);
 
-bool stdin_upload(const char *uploadfile);
+bool stdin_upload(mm_array_ptr<const char> uploadfile);
 
-char *add_file_name_to_url(char *url, const char *filename);
+mm_array_ptr<char> add_file_name_to_url(mm_array_ptr<char> url, mm_array_ptr<const char> filename);
 
-CURLcode get_url_file_name(mm_ptr<char *> filename, const char *url);
+CURLcode get_url_file_name(mm_ptr<mm_array_ptr<char>> filename, mm_array_ptr<const char> url);
 
 #endif /* HEADER_CURL_TOOL_OPERHLP_H */

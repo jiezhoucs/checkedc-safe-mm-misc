@@ -35,7 +35,7 @@
 #pragma GCC diagnostic ignored "-Wformat"
 #endif
 
-curl_off_t getfiletime(const char *filename, struct GlobalConfig *global)
+curl_off_t getfiletime(mm_array_ptr<const char> filename, struct GlobalConfig *global)
 {
   curl_off_t result = -1;
 
@@ -78,7 +78,7 @@ curl_off_t getfiletime(const char *filename, struct GlobalConfig *global)
   }
 #else
   struct_stat statbuf;
-  if(-1 != stat(filename, &statbuf)) {
+  if(-1 != stat(_GETCHARPTR(filename), &statbuf)) {
     result = (curl_off_t)statbuf.st_mtime;
   }
   else if(errno != ENOENT) {

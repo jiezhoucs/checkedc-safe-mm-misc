@@ -70,9 +70,9 @@ struct URLGlob {
   size_t pos;        /* column position of error or 0 */
 };
 
-CURLcode glob_url(mm_ptr<mm_ptr<struct URLGlob>>, char *, mm_ptr<unsigned long>, FILE *);
-CURLcode glob_next_url(mm_ptr<char *>, mm_ptr<struct URLGlob>);
-CURLcode glob_match_url(mm_ptr<char *>, char *, mm_ptr<struct URLGlob>);
+CURLcode glob_url(mm_ptr<mm_ptr<struct URLGlob>>, mm_array_ptr<char>, mm_ptr<unsigned long>, FILE *);
+CURLcode glob_next_url(mm_ptr<mm_array_ptr<char>>, mm_ptr<struct URLGlob>);
+CURLcode glob_match_url(mm_ptr<mm_array_ptr<char>>, char *, mm_ptr<struct URLGlob>);
 void glob_cleanup(mm_ptr<struct URLGlob> glob);
 
 #endif /* HEADER_CURL_TOOL_URLGLOB_H */

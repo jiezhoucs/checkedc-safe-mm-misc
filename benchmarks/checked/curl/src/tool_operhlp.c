@@ -42,9 +42,9 @@ void clean_getout(mm_ptr<struct OperationConfig> config)
 
     while(node) {
       next = node->next;
-      Curl_safefree(node->url);
-      Curl_safefree(node->outfile);
-      Curl_safefree(node->infile);
+      mm_Curl_safefree(char, node->url);
+      mm_Curl_safefree(char, node->outfile);
+      mm_Curl_safefree(char, node->infile);
       MM_curl_free(struct getout, node);
       node = next;
     }
@@ -52,30 +52,30 @@ void clean_getout(mm_ptr<struct OperationConfig> config)
   }
 }
 
-bool output_expected(const char *url, const char *uploadfile)
+bool output_expected(mm_array_ptr<const char> url, mm_array_ptr<const char> uploadfile)
 {
   if(!uploadfile)
     return TRUE;  /* download */
-  if(checkprefix_raw("http://", url) || checkprefix_raw("https://", url))
+  if(checkprefix("http://", url) || checkprefix("https://", url))
     return TRUE;   /* HTTP(S) upload */
 
   return FALSE; /* non-HTTP upload, probably no output should be expected */
 }
 
-bool stdin_upload(const char *uploadfile)
+bool stdin_upload(mm_array_ptr<const char> uploadfile)
 {
-  return (!strcmp(uploadfile, "-") ||
-          !strcmp(uploadfile, ".")) ? TRUE : FALSE;
+  return (!mm_strcmp(uploadfile, "-") ||
+          !mm_strcmp(uploadfile, ".")) ? TRUE : FALSE;
 }
 
 /*
  * Adds the file name to the URL if it doesn't already have one.
  * url will be freed before return if the returned pointer is different
  */
-char *add_file_name_to_url(char *url, const char *filename)
+mm_array_ptr<char> add_file_name_to_url(mm_array_ptr<char> url, mm_array_ptr<const char> filename)
 {
   /* If no file name part is given in the URL, we add this file name */
-  char *ptr = strstr(url, "://");
+  mm_array_ptr<char> ptr = mm_strstr(url, "://");
   CURL *curl = curl_easy_init(); /* for url escaping */
   if(!curl)
     return NULL; /* error! */
@@ -83,7 +83,7 @@ char *add_file_name_to_url(char *url, const char *filename)
     ptr += 3;
   else
     ptr = url;
-  ptr = strrchr(ptr, '/');
+  ptr = mm_strrchr(ptr, '/');
   if(!ptr || !*++ptr) {
     /* The URL has no file name part, add the local file name. In order
        to be able to do so, we have to create a new URL in another
@@ -91,8 +91,8 @@ char *add_file_name_to_url(char *url, const char *filename)
 
     /* We only want the part of the local path that is on the right
        side of the rightmost slash and backslash. */
-    const char *filep = strrchr(filename, '/');
-    char *file2 = strrchr(filep?filep:filename, '\\');
+    mm_array_ptr<const char> filep = mm_strrchr(filename, '/');
+    mm_array_ptr<char> file2 = mm_strrchr(filep?filep:filename, '\\');
     char *encfile;
 
     if(file2)
@@ -103,15 +103,16 @@ char *add_file_name_to_url(char *url, const char *filename)
       filep = filename;
 
     /* URL encode the file name */
-    encfile = curl_easy_escape(curl, filep, 0 /* use strlen */);
+    // TODO?
+    encfile = curl_easy_escape(curl, _GETCHARPTR(filep), 0 /* use strlen */);
     if(encfile) {
-      char *urlbuffer;
+      mm_array_ptr<char> urlbuffer = NULL;
       if(ptr)
         /* there is a trailing slash on the URL */
-        urlbuffer = aprintf("%s%s", url, encfile);
+        urlbuffer = mmize_str(aprintf("%s%s", _GETCHARPTR(url), encfile));
       else
         /* there is no trailing slash on the URL */
-        urlbuffer = aprintf("%s/%s", url, encfile);
+        urlbuffer = mmize_str(aprintf("%s/%s", _GETCHARPTR(url), encfile));
 
       curl_free(encfile);
 
@@ -120,7 +121,7 @@ char *add_file_name_to_url(char *url, const char *filename)
         goto end;
       }
 
-      Curl_safefree(url);
+      mm_Curl_safefree(char, url);
       url = urlbuffer; /* use our new URL instead! */
     }
   }
@@ -133,21 +134,21 @@ char *add_file_name_to_url(char *url, const char *filename)
  * Returns a pointer to a heap-allocated string or NULL if
  * no name part, at location indicated by first argument.
  */
-CURLcode get_url_file_name(mm_ptr<char *> filename, const char *url)
+CURLcode get_url_file_name(mm_ptr<mm_array_ptr<char>> filename, mm_array_ptr<const char> url)
 {
-  const char *pc, *pc2;
+  mm_array_ptr<const char> pc = NULL, pc2 = NULL;
 
   *filename = NULL;
 
   /* Find and get the remote file name */
-  pc = strstr(url, "://");
+  pc = mm_strstr(url, "://");
   if(pc)
     pc += 3;
   else
     pc = url;
 
-  pc2 = strrchr(pc, '\\');
-  pc = strrchr(pc, '/');
+  pc2 = mm_strrchr(pc, '\\');
+  pc = mm_strrchr(pc, '/');
   if(pc2 && (!pc || pc < pc2))
     pc = pc2;
 
@@ -158,15 +159,15 @@ CURLcode get_url_file_name(mm_ptr<char *> filename, const char *url)
     /* no slash => empty string */
     pc = "";
 
-  *filename = strdup(pc);
+  *filename = mm_strdup(pc);
   if(!*filename)
     return CURLE_OUT_OF_MEMORY;
 
 #if defined(MSDOS) || defined(WIN32)
   {
-    char *sanitized;
+    mm_array_ptr<char> sanitized = NULL;
     SANITIZEcode sc = sanitize_file_name(&sanitized, *filename, 0);
-    Curl_safefree(*filename);
+    mm_Curl_safefree(char, *filename);
     if(sc)
       return CURLE_URL_MALFORMAT;
     *filename = sanitized;
