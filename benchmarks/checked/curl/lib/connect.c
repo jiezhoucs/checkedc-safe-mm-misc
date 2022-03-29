@@ -252,8 +252,7 @@ static CURLcode bindlocal(struct Curl_easy *data,
                                                 "random" */
   /* how many port numbers to try to bind to, increasing one at a time */
   int portnum = data->set.localportrange;
-  // TODO
-  const char *dev = _GETCHARPTR(data->set.str[STRING_DEVICE]);
+  mm_array_ptr<const char> dev = data->set.str[STRING_DEVICE];
   int error;
 #ifdef IP_BIND_ADDRESS_NO_PORT
   int on = 1;
@@ -268,7 +267,7 @@ static CURLcode bindlocal(struct Curl_easy *data,
 
   memset(&sa, 0, sizeof(struct Curl_sockaddr_storage));
 
-  if(dev && (strlen(dev)<255) ) {
+  if(dev && (mm_strlen(dev)<255) ) {
     char myhost[256] = "";
     int done = 0; /* -1 for error, 1 for address found */
     bool is_interface = FALSE;
@@ -276,12 +275,12 @@ static CURLcode bindlocal(struct Curl_easy *data,
     static const char *if_prefix = "if!";
     static const char *host_prefix = "host!";
 
-    if(strncmp(if_prefix, dev, strlen(if_prefix)) == 0) {
+    if(mm_strncmp(if_prefix, dev, strlen(if_prefix)) == 0) {
       dev += strlen(if_prefix);
       is_interface = TRUE;
     }
-    else if(strncmp(host_prefix, dev, strlen(host_prefix)) == 0) {
-      dev += strlen(host_prefix);
+    else if(mm_strncmp(host_prefix, dev, strlen(host_prefix)) == 0) {
+      dev += mm_strlen(host_prefix);
       is_host = TRUE;
     }
 
@@ -304,7 +303,7 @@ static CURLcode bindlocal(struct Curl_easy *data,
        * to use it straight away.
        */
       if(setsockopt(sockfd, SOL_SOCKET, SO_BINDTODEVICE,
-                    dev, (curl_socklen_t)strlen(dev) + 1) == 0) {
+                    _GETCHARPTR(dev), (curl_socklen_t)mm_strlen(dev) + 1) == 0) {
         /* This is typically "errno 1, error: Operation not permitted" if
          * you're not running as root or another suitable privileged
          * user.
@@ -315,12 +314,12 @@ static CURLcode bindlocal(struct Curl_easy *data,
       }
 #endif
 
-      switch(Curl_if2ip(af, scope, conn->scope_id, dev,
+      switch(Curl_if2ip(af, scope, conn->scope_id, _GETCHARPTR(dev),
                         myhost, sizeof(myhost))) {
         case IF2IP_NOT_FOUND:
           if(is_interface) {
             /* Do not fall back to treating it as a host name */
-            failf(data, "Couldn't bind to interface '%s'", dev);
+            failf(data, "Couldn't bind to interface '%s'", _GETCHARPTR(dev));
             return CURLE_INTERFACE_FAILED;
           }
           break;
@@ -333,7 +332,7 @@ static CURLcode bindlocal(struct Curl_easy *data,
            * We now have the numerical IP address in the 'myhost' buffer
            */
           infof(data, "Local Interface %s is ip %s using address family %i",
-                dev, myhost, af);
+                _GETCHARPTR(dev), myhost, af);
           done = 1;
           break;
       }
@@ -366,7 +365,7 @@ static CURLcode bindlocal(struct Curl_easy *data,
         /* convert the resolved address, sizeof myhost >= INET_ADDRSTRLEN */
         Curl_printable_address(h->addr, myhost, sizeof(myhost));
         infof(data, "Name '%s' family %i resolved to '%s' family %i",
-              dev, af, myhost, h->addr->ai_family);
+              _GETCHARPTR(dev), af, myhost, h->addr->ai_family);
         Curl_resolv_unlock(data, h);
         if(af != h->addr->ai_family) {
           /* bad IP version combo, signal the caller to try another address
@@ -423,7 +422,7 @@ static CURLcode bindlocal(struct Curl_easy *data,
          the error buffer, so the user receives this error message instead of a
          generic resolve error. */
       data->state.errorbuf = FALSE;
-      failf(data, "Couldn't bind to '%s'", dev);
+      failf(data, "Couldn't bind to '%s'", _GETCHARPTR(dev));
       return CURLE_INTERFACE_FAILED;
     }
   }
@@ -798,15 +797,13 @@ static CURLcode connect_SOCKS(struct Curl_easy *data, int sockindex,
     switch(conn->socks_proxy.proxytype) {
     case CURLPROXY_SOCKS5:
     case CURLPROXY_SOCKS5_HOSTNAME:
-      // TODO
       pxresult = Curl_SOCKS5(conn->socks_proxy.user, conn->socks_proxy.passwd,
-                             _GETCHARPTR(host), port, sockindex, data, done);
+                             host, port, sockindex, data, done);
       break;
 
     case CURLPROXY_SOCKS4:
     case CURLPROXY_SOCKS4A:
-      // TODO
-      pxresult = Curl_SOCKS4(conn->socks_proxy.user, _GETCHARPTR(host), port, sockindex,
+      pxresult = Curl_SOCKS4(conn->socks_proxy.user, host, port, sockindex,
                              data, done);
       break;
 

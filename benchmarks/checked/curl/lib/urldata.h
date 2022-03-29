@@ -620,7 +620,7 @@ struct dohdata {
   struct dnsprobe probe[DOH_PROBE_SLOTS];
   unsigned int pending; /* still outstanding requests */
   int port;
-  const char *host;
+  mm_array_ptr<const char> host;
 };
 
 /*
@@ -704,7 +704,7 @@ struct SingleRequest {
     struct TELNET *telnet;
   } p;
 #ifndef CURL_DISABLE_DOH
-  struct dohdata *doh; /* DoH specific data for this request */
+  mm_ptr<struct dohdata> doh; /* DoH specific data for this request */
 #endif
   BIT(header);        /* incoming data has HTTP header */
   BIT(content_range); /* set TRUE if Content-Range: was found */
@@ -953,7 +953,7 @@ struct connectdata {
 #endif
 
   struct hostname host;
-  char *hostname_resolve; /* host name to resolve to address, allocated */
+  mm_array_ptr<char> hostname_resolve; /* host name to resolve to address, allocated */
   mm_array_ptr<char> secondaryhostname; /* secondary socket host name (ftp) */
   struct hostname conn_to_host; /* the host to connect to. valid only if
                                    bits.conn_to_host is set */

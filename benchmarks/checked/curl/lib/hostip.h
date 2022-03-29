@@ -88,12 +88,12 @@ enum resolve_t {
   CURLRESOLV_PENDING  =  1
 };
 enum resolve_t Curl_resolv(struct Curl_easy *data,
-                           const char *hostname,
+                           mm_array_ptr<const char> hostname,
                            int port,
                            bool allowDOH,
                            struct Curl_dns_entry **dnsentry);
 enum resolve_t Curl_resolv_timeout(struct Curl_easy *data,
-                                   const char *hostname, int port,
+                                   mm_array_ptr<const char> hostname, int port,
                                    struct Curl_dns_entry **dnsentry,
                                    timediff_t timeoutms);
 
@@ -171,7 +171,7 @@ void Curl_printable_address(const struct Curl_addrinfo *ip,
  */
 struct Curl_dns_entry *
 Curl_fetch_addr(struct Curl_easy *data,
-                const char *hostname,
+                mm_array_ptr<const char> hostname,
                 int port);
 
 /*
@@ -181,7 +181,7 @@ Curl_fetch_addr(struct Curl_easy *data,
  */
 struct Curl_dns_entry *
 Curl_cache_addr(struct Curl_easy *data, struct Curl_addrinfo *addr,
-                const char *hostname, int port);
+                mm_array_ptr<const char> hostname, int port);
 
 #ifndef INADDR_NONE
 #define CURL_INADDR_NONE (in_addr_t) ~0

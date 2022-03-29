@@ -186,7 +186,7 @@ int Curl_SOCKS_getsock(struct connectdata *conn, curl_socket_t *sock,
 *   Nonsupport "Identification Protocol (RFC1413)"
 */
 CURLproxycode Curl_SOCKS4(const char *proxy_user,
-                          const char *hostname,
+                          mm_array_ptr<const char> hostname,
                           int remote_port,
                           int sockindex,
                           struct Curl_easy *data,
@@ -215,9 +215,9 @@ CURLproxycode Curl_SOCKS4(const char *proxy_user,
     conn->ip_version = CURL_IPRESOLVE_V4;
     if(conn->bits.httpproxy)
       infof(data, "SOCKS4%s: connecting to HTTP proxy %s port %d",
-            protocol4a ? "a" : "", hostname, remote_port);
+            protocol4a ? "a" : "", _GETCHARPTR(hostname), remote_port);
 
-    infof(data, "SOCKS4 communication to %s:%d", hostname, remote_port);
+    infof(data, "SOCKS4 communication to %s:%d", _GETCHARPTR(hostname), remote_port);
 
     /*
      * Compose socks4 request
@@ -244,7 +244,7 @@ CURLproxycode Curl_SOCKS4(const char *proxy_user,
         return CURLPX_RESOLVE_HOST;
       else if(rc == CURLRESOLV_PENDING) {
         sxstate(data, CONNECT_RESOLVING);
-        infof(data, "SOCKS4 non-blocking resolve of %s", hostname);
+        infof(data, "SOCKS4 non-blocking resolve of %s", _GETCHARPTR(hostname));
         return CURLPX_OK;
       }
       sxstate(data, CONNECT_RESOLVED);
@@ -264,7 +264,7 @@ CURLproxycode Curl_SOCKS4(const char *proxy_user,
       data->state.async.dns = dns;
       data->state.async.done = TRUE;
 #endif
-      infof(data, "Hostname '%s' was found", hostname);
+      infof(data, "Hostname '%s' was found", _GETCHARPTR(hostname));
       sxstate(data, CONNECT_RESOLVED);
     }
     else {
@@ -306,11 +306,11 @@ CURLproxycode Curl_SOCKS4(const char *proxy_user,
         Curl_resolv_unlock(data, dns); /* not used anymore from now on */
       }
       else
-        failf(data, "SOCKS4 connection to %s not supported", hostname);
+        failf(data, "SOCKS4 connection to %s not supported", _GETCHARPTR(hostname));
     }
     else
       failf(data, "Failed to resolve \"%s\" for SOCKS4 connect.",
-            hostname);
+            _GETCHARPTR(hostname));
 
     if(!hp)
       return CURLPX_RESOLVE_HOST;
@@ -347,9 +347,9 @@ CURLproxycode Curl_SOCKS4(const char *proxy_user,
         socksreq[6] = 0;
         socksreq[7] = 1;
         /* append hostname */
-        hostnamelen = strlen(hostname) + 1; /* length including NUL */
+        hostnamelen = mm_strlen(hostname) + 1; /* length including NUL */
         if(hostnamelen <= 255)
-          strcpy((char *)socksreq + packetsize, hostname);
+          mm_strcpy((char *)socksreq + packetsize, hostname);
         else {
           failf(data, "SOCKS4: too long host name");
           return CURLPX_LONG_HOSTNAME;
@@ -485,7 +485,7 @@ CURLproxycode Curl_SOCKS4(const char *proxy_user,
  */
 CURLproxycode Curl_SOCKS5(const char *proxy_user,
                           const char *proxy_password,
-                          const char *hostname,
+                          mm_array_ptr<const char> hostname,
                           int remote_port,
                           int sockindex,
                           struct Curl_easy *data,
@@ -517,7 +517,7 @@ CURLproxycode Curl_SOCKS5(const char *proxy_user,
   curl_socket_t sockfd = conn->sock[sockindex];
   bool socks5_resolve_local =
     (conn->socks_proxy.proxytype == CURLPROXY_SOCKS5) ? TRUE : FALSE;
-  const size_t hostname_len = strlen(hostname);
+  const size_t hostname_len = mm_strlen(hostname);
   ssize_t len = 0;
   const unsigned long auth = data->set.socks5auth;
   bool allow_gssapi = FALSE;
@@ -531,7 +531,7 @@ CURLproxycode Curl_SOCKS5(const char *proxy_user,
   case CONNECT_SOCKS_INIT:
     if(conn->bits.httpproxy)
       infof(data, "SOCKS5: connecting to HTTP proxy %s port %d",
-            hostname, remote_port);
+            _GETCHARPTR(hostname), remote_port);
 
     /* RFC1928 chapter 5 specifies max 255 chars for domain name in packet */
     if(!socks5_resolve_local && hostname_len > 255) {
@@ -780,7 +780,7 @@ CURLproxycode Curl_SOCKS5(const char *proxy_user,
       data->state.async.dns = dns;
       data->state.async.done = TRUE;
 #endif
-      infof(data, "SOCKS5: hostname '%s' found", hostname);
+      infof(data, "SOCKS5: hostname '%s' found", _GETCHARPTR(hostname));
     }
 
     if(!dns) {
@@ -800,12 +800,12 @@ CURLproxycode Curl_SOCKS5(const char *proxy_user,
       hp = dns->addr;
     if(!hp) {
       failf(data, "Failed to resolve \"%s\" for SOCKS5 connect.",
-            hostname);
+            _GETCHARPTR(hostname));
       return CURLPX_RESOLVE_HOST;
     }
 
     Curl_printable_address(hp, dest, sizeof(dest));
-    destlen = strlen(dest);
+    destlen = mm_strlen(dest);
     msnprintf(dest + destlen, sizeof(dest) - destlen, ":%d", remote_port);
 
     len = 0;
@@ -858,10 +858,10 @@ CURLproxycode Curl_SOCKS5(const char *proxy_user,
     if(!socks5_resolve_local) {
       socksreq[len++] = 3; /* ATYP: domain name = 3 */
       socksreq[len++] = (char) hostname_len; /* one byte address length */
-      memcpy(&socksreq[len], hostname, hostname_len); /* address w/o NULL */
+      mm_memcpy(&socksreq[len], hostname, hostname_len); /* address w/o NULL */
       len += hostname_len;
       infof(data, "SOCKS5 connect to %s:%d (remotely resolved)",
-            hostname, remote_port);
+            _GETCHARPTR(hostname), remote_port);
     }
     /* FALLTHROUGH */
 
@@ -933,7 +933,7 @@ CURLproxycode Curl_SOCKS5(const char *proxy_user,
       CURLproxycode rc = CURLPX_REPLY_UNASSIGNED;
       int code = socksreq[1];
       failf(data, "Can't complete SOCKS5 connection to %s. (%d)",
-            hostname, (unsigned char)socksreq[1]);
+            _GETCHARPTR(hostname), (unsigned char)socksreq[1]);
       if(code < 9) {
         /* RFC 1928 section 6 lists: */
         static const CURLproxycode lookup[] = {

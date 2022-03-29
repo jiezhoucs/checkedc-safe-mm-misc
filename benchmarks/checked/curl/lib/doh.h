@@ -33,7 +33,7 @@
  */
 
 struct Curl_addrinfo *Curl_doh(struct Curl_easy *data,
-                               const char *hostname,
+                               mm_array_ptr<const char> hostname,
                                int port,
                                int *waitp);
 
@@ -88,9 +88,9 @@ struct dohentry {
 
 
 #ifdef DEBUGBUILD
-DOHcode doh_encode(const char *host,
+DOHcode doh_encode(mm_array_ptr<const char> host,
                    DNStype dnstype,
-                   unsigned char *dnsp, /* buffer */
+                   mm_array_ptr<unsigned char> dnsp, /* buffer */
                    size_t len,  /* buffer size */
                    size_t *olen); /* output length */
 DOHcode doh_decode(const unsigned char *doh,

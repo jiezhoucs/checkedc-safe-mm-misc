@@ -1872,8 +1872,7 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
         hostname = conn->host.name;
 
       /* check if we have the name resolved by now */
-      // TODO
-      dns = Curl_fetch_addr(data, _GETCHARPTR(hostname), (int)conn->port);
+      dns = Curl_fetch_addr(data, hostname, (int)conn->port);
 
       if(dns) {
 #ifdef CURLRES_ASYNCH

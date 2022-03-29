@@ -172,9 +172,9 @@ void Curl_printable_address(const struct Curl_addrinfo *ai, char *buf,
  * the DNS caching. Without alloc.
  */
 static void
-create_hostcache_id(const char *name, int port, char *ptr, size_t buflen)
+create_hostcache_id(mm_array_ptr<const char> name, int port, char *ptr, size_t buflen)
 {
-  size_t len = strlen(name);
+  size_t len = mm_strlen(name);
   if(len > (buflen - 7))
     len = buflen - 7;
   /* store and lower case the name */
@@ -258,7 +258,7 @@ sigjmp_buf curl_jmpenv;
 
 /* lookup address, returns entry if found and not stale */
 static struct Curl_dns_entry *fetch_addr(struct Curl_easy *data,
-                                         const char *hostname,
+                                         mm_array_ptr<const char> hostname,
                                          int port)
 {
   struct Curl_dns_entry *dns = NULL;
@@ -314,7 +314,7 @@ static struct Curl_dns_entry *fetch_addr(struct Curl_easy *data,
  */
 struct Curl_dns_entry *
 Curl_fetch_addr(struct Curl_easy *data,
-                const char *hostname,
+                mm_array_ptr<const char> hostname,
                 int port)
 {
   struct Curl_dns_entry *dns = NULL;
@@ -414,7 +414,7 @@ UNITTEST CURLcode Curl_shuffle_addr(struct Curl_easy *data,
 struct Curl_dns_entry *
 Curl_cache_addr(struct Curl_easy *data,
                 struct Curl_addrinfo *addr,
-                const char *hostname,
+                mm_array_ptr<const char> hostname,
                 int port)
 {
   char entry_id[MAX_HOSTCACHE_LEN];
@@ -599,7 +599,7 @@ bool Curl_host_is_ipnum(const char *hostname)
  */
 
 enum resolve_t Curl_resolv(struct Curl_easy *data,
-                           const char *hostname,
+                           mm_array_ptr<const char> hostname,
                            int port,
                            bool allowDOH,
                            struct Curl_dns_entry **entry)
@@ -617,7 +617,7 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
   dns = fetch_addr(data, hostname, port);
 
   if(dns) {
-    infof(data, "Hostname %s was found in DNS cache", hostname);
+    infof(data, "Hostname %s was found in DNS cache", _GETCHARPTR(hostname));
     dns->inuse++; /* we use it! */
     rc = CURLRESOLV_RESOLVED;
   }
@@ -672,29 +672,30 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
 
 #ifndef USE_RESOLVE_ON_IPS
     /* First check if this is an IPv4 address string */
-    if(Curl_inet_pton(AF_INET, hostname, &in) > 0)
+    if(Curl_inet_pton(AF_INET, _GETCHARPTR(hostname), &in) > 0)
       /* This is a dotted IP address 123.123.123.123-style */
-      addr = Curl_ip2addr(AF_INET, &in, hostname, port);
+      // TODO?
+      addr = Curl_ip2addr(AF_INET, &in, _GETCHARPTR(hostname), port);
 #ifdef ENABLE_IPV6
     if(!addr) {
       struct in6_addr in6;
       /* check if this is an IPv6 address string */
-      if(Curl_inet_pton(AF_INET6, hostname, &in6) > 0)
+      if(Curl_inet_pton(AF_INET6, _GETCHARPTR(hostname), &in6) > 0)
         /* This is an IPv6 address literal */
-        addr = Curl_ip2addr(AF_INET6, &in6, hostname, port);
+        addr = Curl_ip2addr(AF_INET6, &in6, _GETCHARPTR(hostname), port);
     }
 #endif /* ENABLE_IPV6 */
 
 #else /* if USE_RESOLVE_ON_IPS */
     /* First check if this is an IPv4 address string */
-    if(Curl_inet_pton(AF_INET, hostname, &in) > 0)
+    if(Curl_inet_pton(AF_INET, _GETCHARPTR(hostname), &in) > 0)
       /* This is a dotted IP address 123.123.123.123-style */
       ipnum = TRUE;
 #ifdef ENABLE_IPV6
     else {
       struct in6_addr in6;
       /* check if this is an IPv6 address string */
-      if(Curl_inet_pton(AF_INET6, hostname, &in6) > 0)
+      if(Curl_inet_pton(AF_INET6, _GETCHARPTR(hostname), &in6) > 0)
         /* This is an IPv6 address literal */
         ipnum = TRUE;
     }
@@ -706,7 +707,7 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
       if(conn->ip_version == CURL_IPRESOLVE_V6 && !Curl_ipv6works(data))
         return CURLRESOLV_ERROR;
 
-      if(strcasecompare(hostname, "localhost"))
+      if(mm_strcasecompare(hostname, "localhost"))
         addr = get_localhost(port);
       else if(allowDOH && data->set.doh && !ipnum)
         addr = Curl_doh(data, hostname, port, &respwait);
@@ -718,7 +719,8 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
         /* If Curl_getaddrinfo() returns NULL, 'respwait' might be set to a
            non-zero value indicating that we need to wait for the response to
            the resolve call */
-        addr = Curl_getaddrinfo(data, hostname, port, &respwait);
+        // TODO
+        addr = Curl_getaddrinfo(data, _GETCHARPTR(hostname), port, &respwait);
       }
     }
     if(!addr) {
@@ -796,7 +798,7 @@ void alarmfunc(int sig)
  */
 
 enum resolve_t Curl_resolv_timeout(struct Curl_easy *data,
-                                   const char *hostname,
+                                   mm_array_ptr<const char> hostname,
                                    int port,
                                    struct Curl_dns_entry **entry,
                                    timediff_t timeoutms)

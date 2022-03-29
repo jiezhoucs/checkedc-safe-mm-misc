@@ -77,15 +77,15 @@ static const char *doh_strerror(DOHcode code)
 
 /* @unittest 1655
  */
-UNITTEST DOHcode doh_encode(const char *host,
+UNITTEST DOHcode doh_encode(mm_array_ptr<const char> host,
                             DNStype dnstype,
-                            unsigned char *dnsp, /* buffer */
+                            mm_array_ptr<unsigned char> dnsp, /* buffer */
                             size_t len,  /* buffer size */
-                            size_t *olen) /* output length */
+                            mm_ptr<size_t> olen) /* output length */
 {
-  const size_t hostlen = strlen(host);
-  unsigned char *orig = dnsp;
-  const char *hostp = host;
+  const size_t hostlen = mm_strlen(host);
+  mm_array_ptr<unsigned char> orig = dnsp;
+  mm_array_ptr<const char> hostp = host;
 
   /* The expected output length is 16 bytes more than the length of
    * the QNAME-encoding of the host name.
@@ -137,11 +137,11 @@ UNITTEST DOHcode doh_encode(const char *host,
   /* encode each label and store it in the QNAME */
   while(*hostp) {
     size_t labellen;
-    char *dot = strchr(hostp, '.');
+    mm_array_ptr<char> dot = mm_strchr(hostp, '.');
     if(dot)
       labellen = dot - hostp;
     else
-      labellen = strlen(hostp);
+      labellen = mm_strlen(hostp);
     if((labellen > 63) || (!labellen)) {
       /* label is too long or too short, error out */
       *olen = 0;
@@ -149,7 +149,7 @@ UNITTEST DOHcode doh_encode(const char *host,
     }
     /* label is non-empty, process it */
     *dnsp++ = (unsigned char)labellen;
-    memcpy(dnsp, hostp, labellen);
+    mm_memcpy(dnsp, hostp, labellen);
     dnsp += labellen;
     hostp += labellen;
     /* advance past dot, but only if there is one */
@@ -190,7 +190,7 @@ doh_write_cb(const void *contents, size_t size, size_t nmemb, void *userp)
 static int doh_done(struct Curl_easy *doh, CURLcode result)
 {
   struct Curl_easy *data = doh->set.dohfor;
-  struct dohdata *dohp = data->req.doh;
+  mm_ptr<struct dohdata> dohp = data->req.doh;
   /* so one of the DoH request done for the 'data' transfer is now complete! */
   dohp->pending--;
   infof(data, "a DoH request is completed, %u to go", dohp->pending);
@@ -216,16 +216,16 @@ do {                                          \
 } while(0)
 
 static CURLcode dohprobe(struct Curl_easy *data,
-                         struct dnsprobe *p, DNStype dnstype,
-                         const char *host,
-                         const char *url, CURLM *multi,
+                         mm_ptr<struct dnsprobe> p, DNStype dnstype,
+                         mm_array_ptr<const char> host,
+                         mm_array_ptr<const char> url, CURLM *multi,
                          struct curl_slist *headers)
 {
   struct Curl_easy *doh = NULL;
-  char *nurl = NULL;
+  mm_array_ptr<char> nurl = NULL;
   CURLcode result = CURLE_OK;
   timediff_t timeout_ms;
-  DOHcode d = doh_encode(host, dnstype, p->dohbuffer, sizeof(p->dohbuffer),
+  DOHcode d = doh_encode(host, dnstype, &p->dohbuffer, sizeof(p->dohbuffer),
                          &p->dohlen);
   if(d) {
     failf(data, "Failed to encode DoH packet [%d]", d);
@@ -233,7 +233,7 @@ static CURLcode dohprobe(struct Curl_easy *data,
   }
 
   p->dnstype = dnstype;
-  Curl_dyn_init(&p->serverdoh, DYN_DOH_RESPONSE);
+  Curl_dyn_init(_GETDYNBUFPTR(&p->serverdoh), DYN_DOH_RESPONSE);
 
   /* Note: this is code for sending the DoH request with GET but there's still
      no logic that actually enables this. We should either add that ability or
@@ -245,7 +245,7 @@ static CURLcode dohprobe(struct Curl_easy *data,
                                    &b64, &b64len);
     if(result)
       goto error;
-    nurl = aprintf("%s?dns=%s", url, b64);
+    nurl = mmize_str(aprintf("%s?dns=%s", _GETCHARPTR(url), b64));
     free(b64);
     if(!nurl) {
       result = CURLE_OUT_OF_MEMORY;
@@ -264,8 +264,9 @@ static CURLcode dohprobe(struct Curl_easy *data,
   if(!result) {
     /* pass in the struct pointer via a local variable to please coverity and
        the gcc typecheck helpers */
-    struct dynbuf *resp = &p->serverdoh;
-    ERROR_CHECK_SETOPT(CURLOPT_URL, url);
+    // TODO?
+    struct dynbuf *resp = GETPTR(struct dynbuf, &p->serverdoh);
+    ERROR_CHECK_SETOPT(CURLOPT_URL, _GETCHARPTR(url));
     ERROR_CHECK_SETOPT(CURLOPT_WRITEFUNCTION, doh_write_cb);
     ERROR_CHECK_SETOPT(CURLOPT_WRITEDATA, resp);
     if(!data->set.doh_get) {
@@ -377,11 +378,11 @@ static CURLcode dohprobe(struct Curl_easy *data,
   }
   else
     goto error;
-  free(nurl);
+  MM_FREE(char, nurl);
   return CURLE_OK;
 
   error:
-  free(nurl);
+  MM_FREE(char, nurl);
   Curl_close(&doh);
   return result;
 }
@@ -392,13 +393,13 @@ static CURLcode dohprobe(struct Curl_easy *data,
  */
 
 struct Curl_addrinfo *Curl_doh(struct Curl_easy *data,
-                               const char *hostname,
+                               mm_array_ptr<const char> hostname,
                                int port,
                                int *waitp)
 {
   CURLcode result = CURLE_OK;
   int slot;
-  struct dohdata *dohp;
+  mm_ptr<struct dohdata> dohp = NULL;
   struct connectdata *conn = data->conn;
   *waitp = TRUE; /* this never returns synchronously */
   (void)hostname;
@@ -408,7 +409,7 @@ struct Curl_addrinfo *Curl_doh(struct Curl_easy *data,
   DEBUGASSERT(conn);
 
   /* start clean, consider allocating this struct on demand */
-  dohp = data->req.doh = calloc(sizeof(struct dohdata), 1);
+  dohp = data->req.doh = MM_SINGLE_CALLOC(struct dohdata);
   if(!dohp)
     return NULL;
 
@@ -423,8 +424,7 @@ struct Curl_addrinfo *Curl_doh(struct Curl_easy *data,
 
   /* create IPv4 DoH request */
   result = dohprobe(data, &dohp->probe[DOH_PROBE_SLOT_IPADDR_V4],
-      // TODO
-                    DNS_TYPE_A, hostname, _GETCHARPTR(data->set.str[STRING_DOH]),
+                    DNS_TYPE_A, hostname, data->set.str[STRING_DOH],
                     data->multi, dohp->headers);
   if(result)
     goto error;
@@ -433,7 +433,7 @@ struct Curl_addrinfo *Curl_doh(struct Curl_easy *data,
   if(Curl_ipv6works(data)) {
     /* create IPv6 DoH request */
     result = dohprobe(data, &dohp->probe[DOH_PROBE_SLOT_IPADDR_V6],
-                      DNS_TYPE_AAAA, hostname, _GETCHARPTR(data->set.str[STRING_DOH]),
+                      DNS_TYPE_AAAA, hostname, data->set.str[STRING_DOH],
                       data->multi, dohp->headers);
     if(result)
       goto error;
@@ -445,9 +445,9 @@ struct Curl_addrinfo *Curl_doh(struct Curl_easy *data,
   curl_slist_free_all(dohp->headers);
   data->req.doh->headers = NULL;
   for(slot = 0; slot < DOH_PROBE_SLOTS; slot++) {
-    Curl_close(&dohp->probe[slot].easy);
+    Curl_close(_GETPTR(struct Curl_easy *, &dohp->probe[slot].easy));
   }
-  Curl_safefree(data->req.doh);
+  mm_Curl_safefree(struct dohdata, data->req.doh);
   return NULL;
 }
 
@@ -815,7 +815,7 @@ static void showdoh(struct Curl_easy *data,
  */
 
 static struct Curl_addrinfo *
-doh2ai(const struct dohentry *de, const char *hostname, int port)
+doh2ai(const struct dohentry *de, mm_array_ptr<const char> hostname, int port)
 {
   struct Curl_addrinfo *ai;
   struct Curl_addrinfo *prevai = NULL;
@@ -826,7 +826,7 @@ doh2ai(const struct dohentry *de, const char *hostname, int port)
 #endif
   CURLcode result = CURLE_OK;
   int i;
-  size_t hostlen = strlen(hostname) + 1; /* include zero terminator */
+  size_t hostlen = mm_strlen(hostname) + 1; /* include zero terminator */
 
   if(!de)
     /* no input == no output! */
@@ -856,7 +856,7 @@ doh2ai(const struct dohentry *de, const char *hostname, int port)
     }
     ai->ai_addr = (void *)((char *)ai + sizeof(struct Curl_addrinfo));
     ai->ai_canonname = (void *)((char *)ai->ai_addr + ss_size);
-    memcpy(ai->ai_canonname, hostname, hostlen);
+    mm_memcpy(ai->ai_canonname, hostname, hostlen);
 
     if(!firstai)
       /* store the pointer we want to return from this function */
@@ -926,7 +926,7 @@ CURLcode Curl_doh_is_resolved(struct Curl_easy *data,
                               struct Curl_dns_entry **dnsp)
 {
   CURLcode result;
-  struct dohdata *dohp = data->req.doh;
+  mm_ptr<struct dohdata> dohp = data->req.doh;
   *dnsp = NULL; /* defaults to no response */
   if(!dohp)
     return CURLE_OUT_OF_MEMORY;
@@ -946,22 +946,23 @@ CURLcode Curl_doh_is_resolved(struct Curl_easy *data,
     /* remove DoH handles from multi handle and close them */
     for(slot = 0; slot < DOH_PROBE_SLOTS; slot++) {
       curl_multi_remove_handle(data->multi, dohp->probe[slot].easy);
-      Curl_close(&dohp->probe[slot].easy);
+      // TODO?
+      Curl_close(_GETPTR(struct Curl_easy*, &dohp->probe[slot].easy));
     }
     /* parse the responses, create the struct and return it! */
     de_init(&de);
     for(slot = 0; slot < DOH_PROBE_SLOTS; slot++) {
-      struct dnsprobe *p = &dohp->probe[slot];
+      mm_ptr<struct dnsprobe> p = &dohp->probe[slot];
       if(!p->dnstype)
         continue;
-      rc[slot] = doh_decode(Curl_dyn_uptr(&p->serverdoh),
-                            Curl_dyn_len(&p->serverdoh),
+      rc[slot] = doh_decode(Curl_dyn_uptr(_GETDYNBUFPTR(&p->serverdoh)),
+                            Curl_dyn_len(_GETDYNBUFPTR(&p->serverdoh)),
                             p->dnstype,
                             &de);
-      Curl_dyn_free(&p->serverdoh);
+      Curl_dyn_free(_GETDYNBUFPTR(&p->serverdoh));
       if(rc[slot]) {
         infof(data, "DoH: %s type %s for %s", doh_strerror(rc[slot]),
-              type2name(p->dnstype), dohp->host);
+              type2name(p->dnstype), _GETCHARPTR(dohp->host));
       }
     } /* next slot */
 
@@ -971,7 +972,7 @@ CURLcode Curl_doh_is_resolved(struct Curl_easy *data,
       struct Curl_dns_entry *dns;
       struct Curl_addrinfo *ai;
 
-      infof(data, "DoH Host name: %s", dohp->host);
+      infof(data, "DoH Host name: %s", _GETCHARPTR(dohp->host));
       showdoh(data, &de);
 
       ai = doh2ai(&de, dohp->host, dohp->port);
@@ -1004,7 +1005,7 @@ CURLcode Curl_doh_is_resolved(struct Curl_easy *data,
 
     /* All done */
     de_cleanup(&de);
-    Curl_safefree(data->req.doh);
+    mm_Curl_safefree(struct dohdata, data->req.doh);
     return result;
 
   } /* !dohp->pending */

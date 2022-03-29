@@ -467,10 +467,10 @@ CURLcode Curl_close(struct Curl_easy **datap)
 
 #ifndef CURL_DISABLE_DOH
   if(data->req.doh) {
-    Curl_dyn_free(&data->req.doh->probe[0].serverdoh);
-    Curl_dyn_free(&data->req.doh->probe[1].serverdoh);
+    Curl_dyn_free(_GETDYNBUFPTR(&data->req.doh->probe[0].serverdoh));
+    Curl_dyn_free(_GETDYNBUFPTR(&data->req.doh->probe[1].serverdoh));
     curl_slist_free_all(data->req.doh->headers);
-    Curl_safefree(data->req.doh);
+    mm_Curl_safefree(struct dohdata, data->req.doh);
   }
 #endif
 
@@ -790,7 +790,7 @@ static void conn_free(struct connectdata *conn)
   Curl_dyn_free(&conn->trailer);
   MM_FREE(char, conn->host.rawalloc); /* host name buffer */
   MM_FREE(char, conn->conn_to_host.rawalloc); /* host name buffer */
-  Curl_safefree(conn->hostname_resolve);
+  mm_Curl_safefree(char, conn->hostname_resolve);
   MM_FREE(char, conn->secondaryhostname);
   MM_ARRAY_FREE(struct http_connect_state, conn->connect_state);
 
@@ -2203,8 +2203,8 @@ void Curl_free_request_state(struct Curl_easy *data)
 
 #ifndef CURL_DISABLE_DOH
   if(data->req.doh) {
-    Curl_close(&data->req.doh->probe[0].easy);
-    Curl_close(&data->req.doh->probe[1].easy);
+    Curl_close(_GETPTR(struct Curl_easy*, &data->req.doh->probe[0].easy));
+    Curl_close(_GETPTR(struct Curl_easy*, &data->req.doh->probe[1].easy));
   }
 #endif
 }
@@ -3401,8 +3401,7 @@ static CURLcode resolve_server(struct Curl_easy *data,
         conn->port = conn->remote_port;
 
       /* Resolve target host right on */
-      // TODO
-      conn->hostname_resolve = strdup(_GETCHARPTR(connhost->name));
+      conn->hostname_resolve = mm_strdup(connhost->name);
       if(!conn->hostname_resolve)
         return CURLE_OUT_OF_MEMORY;
       rc = Curl_resolv_timeout(data, conn->hostname_resolve, (int)conn->port,
@@ -3430,8 +3429,7 @@ static CURLcode resolve_server(struct Curl_easy *data,
         &conn->socks_proxy.host : &conn->http_proxy.host;
 
       /* resolve proxy */
-      // TODO
-      conn->hostname_resolve = strdup(_GETCHARPTR(host->name));
+      conn->hostname_resolve = mm_strdup(host->name);
       if(!conn->hostname_resolve)
         return CURLE_OUT_OF_MEMORY;
       rc = Curl_resolv_timeout(data, conn->hostname_resolve, (int)conn->port,
@@ -3529,7 +3527,7 @@ static void reuse_conn(struct Curl_easy *data,
   conn->conn_to_host = old_conn->conn_to_host;
   conn->conn_to_port = old_conn->conn_to_port;
   conn->remote_port = old_conn->remote_port;
-  Curl_safefree(conn->hostname_resolve);
+  mm_Curl_safefree(char, conn->hostname_resolve);
 
   conn->hostname_resolve = old_conn->hostname_resolve;
   old_conn->hostname_resolve = NULL;

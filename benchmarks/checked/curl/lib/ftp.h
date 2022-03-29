@@ -134,7 +134,7 @@ struct ftp_conn {
   /* newhost is the (allocated) IP addr or host name to connect the data
      connection to */
   unsigned short newport;
-  char *newhost;
+  mm_array_ptr<char> newhost;
   char *prevpath;   /* url-decoded conn->path from the previous transfer */
   char transfertype; /* set by ftp_transfertype for use by Curl_client_write()a
                         and others (A/I or zero) */
