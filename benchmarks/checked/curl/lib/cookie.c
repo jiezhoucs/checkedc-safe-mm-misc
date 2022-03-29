@@ -149,7 +149,7 @@ static bool tailmatch(mm_array_ptr<const char> cooke_domain, mm_array_ptr<const 
  * matching cookie path and url path
  * RFC6265 5.1.4 Paths and Path-Match
  */
-static bool pathmatch(const char *cookie_path, const char *request_uri)
+static bool pathmatch(mm_array_ptr<const char> cookie_path, mm_array_ptr<const char> request_uri)
 {
   size_t cookie_path_len;
   size_t uri_path_len;
@@ -158,13 +158,13 @@ static bool pathmatch(const char *cookie_path, const char *request_uri)
   bool ret = FALSE;
 
   /* cookie_path must not have last '/' separator. ex: /sample */
-  cookie_path_len = strlen(cookie_path);
+  cookie_path_len = mm_strlen(cookie_path);
   if(1 == cookie_path_len) {
     /* cookie_path must be '/' */
     return TRUE;
   }
 
-  uri_path = mm_strdup_from_raw(request_uri);
+  uri_path = mm_strdup(request_uri);
   if(!uri_path)
     return FALSE;
   pos = mm_strchr(uri_path, '?');
@@ -727,7 +727,6 @@ Curl_cookie_add(struct Curl_easy *data,
 
     if(co->maxage) {
       CURLofft offt;
-      // TODO
       offt = curlx_strtoofft((*co->maxage == '\"')?
                              _GETCHARPTR(&co->maxage[1]):_GETCHARPTR(&co->maxage[0]), NULL, 10,
                              _GETPTR(curl_off_t, &co->expires));
@@ -750,7 +749,6 @@ Curl_cookie_add(struct Curl_easy *data,
        * Note that if the date couldn't get parsed for whatever reason, the
        * cookie will be treated as a session cookie
        */
-        // TODO
       co->expires = Curl_getdate_capped(_GETCHARPTR(co->expirestr));
 
       /*
@@ -908,7 +906,6 @@ Curl_cookie_add(struct Curl_easy *data,
         }
         break;
       case 4:
-        // TODO
         if(curlx_strtoofft(_GETCHARPTR(ptr), NULL, 10, _GETPTR(long, &co->expires)))
           badcookie = TRUE;
         break;
@@ -1209,7 +1206,6 @@ mm_ptr<struct CookieInfo> Curl_cookie_init(struct Curl_easy *data,
     line = MM_ARRAY_ALLOC(char, MAX_COOKIE_LINE);
     if(!line)
       goto fail;
-    // TODO
     while(Curl_get_line(_GETCHARPTR(line), MAX_COOKIE_LINE, fp)) {
       if(checkprefix("Set-Cookie:", line)) {
         /* This is a cookie line, get it! */
@@ -1392,8 +1388,7 @@ mm_ptr<struct Cookie> Curl_cookie_getlist(mm_ptr<struct CookieInfo> c,
          * now check the left part of the path with the cookies path
          * requirement
          */
-          // TODO
-        if(!co->spath || pathmatch(_GETCHARPTR(co->spath), _GETCHARPTR(path)) ) {
+        if(!co->spath || pathmatch(co->spath, path) ) {
 
           /*
            * and now, we know this is a match and we should create an
