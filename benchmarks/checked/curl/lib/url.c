@@ -342,7 +342,7 @@ static void up_free(struct Curl_easy *data)
 {
   struct urlpieces *up = &data->state.up;
   Curl_safefree(up->scheme);
-  Curl_safefree(up->hostname);
+  mm_Curl_safefree(char, up->hostname);
   Curl_safefree(up->port);
   Curl_safefree(up->user);
   Curl_safefree(up->password);
@@ -1926,7 +1926,7 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
   CURLcode result;
   CURLU *uh;
   CURLUcode uc;
-  char *hostname;
+  mm_array_ptr<char> hostname = NULL;
   bool use_set_uh = (data->set.uh && !data->state.this_is_a_follow);
 
   up_free(data); /* cleanup previous leftovers first */
@@ -1981,7 +1981,7 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
   if(uc)
     return Curl_uc_to_curlcode(uc);
 
-  uc = curl_url_get(uh, CURLUPART_HOST, &data->state.up.hostname, 0);
+  uc = mm_curl_url_get(uh, CURLUPART_HOST, &data->state.up.hostname, 0);
   if(uc) {
     if(!strcasecompare("file", data->state.up.scheme))
       return CURLE_OUT_OF_MEMORY;
@@ -2103,14 +2103,14 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
     conn->bits.ipv6_ip = TRUE;
     /* cut off the brackets! */
     hostname++;
-    hlen = strlen(hostname);
+    hlen = mm_strlen(hostname);
     hostname[hlen - 1] = 0;
 
     zonefrom_url(uh, data, conn);
   }
 
   /* make sure the connect struct gets its own copy of the host name */
-  conn->host.rawalloc = mm_strdup_from_raw(hostname ? hostname : "");
+  conn->host.rawalloc = hostname? mm_strdup(hostname) : mm_strdup_from_raw( "");
   if(!conn->host.rawalloc)
     return CURLE_OUT_OF_MEMORY;
   conn->host.name = conn->host.rawalloc;

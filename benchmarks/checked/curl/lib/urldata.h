@@ -1304,7 +1304,7 @@ struct time_node {
 /* individual pieces of the URL */
 struct urlpieces {
   char *scheme;
-  char *hostname;
+  mm_array_ptr<char> hostname;
   char *port;
   char *user;
   char *password;
@@ -1922,7 +1922,7 @@ struct Curl_easy {
 #endif
   struct SingleRequest req;    /* Request-specific data */
   struct UserDefined set;      /* values set by the libcurl user */
-  struct CookieInfo *cookies;  /* the cookies, read from files and servers.
+  mm_ptr<struct CookieInfo> cookies;  /* the cookies, read from files and servers.
                                   NOTE that the 'cookie' field in the
                                   UserDefined struct defines if the "engine"
                                   is to be used or not. */

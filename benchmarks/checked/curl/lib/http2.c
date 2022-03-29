@@ -1058,7 +1058,6 @@ static int on_header(nghttp2_session *session, const nghttp2_frame *frame,
     /* This is a trailer */
     H2BUGF(infof(data_s, "h2 trailer: %.*s: %.*s", namelen, name, valuelen,
                  value));
-    // TODO
     result = Curl_dyn_addf(_GETPTR(struct dynbuf, &stream->trailer_recvbuf),
                            "%.*s: %.*s\r\n", namelen, name,
                            valuelen, value);
@@ -1749,7 +1748,6 @@ static ssize_t http2_recv(struct Curl_easy *data, int sockindex,
 
     if(httpc->inbuflen == 0) {
       nread = ((Curl_recv *)httpc->recv_underlying)(
-              // TODO?
         data, FIRSTSOCKET, _GETCHARPTR(httpc->inbuf), H2_BUFSIZE, err);
 
       if(nread == -1) {
@@ -1845,7 +1843,6 @@ static bool contains_trailers(const char *p, size_t len)
       ;
     if(p == end || (size_t)(end - p) < sizeof("trailers") - 1)
       return FALSE;
-    // TODO
     if(strncasecompare_raw("trailers", p, sizeof("trailers") - 1)) {
       p += sizeof("trailers") - 1;
       for(; p != end && (*p == ' ' || *p == '\t'); ++p)
@@ -1876,7 +1873,6 @@ static header_instruction inspect_header(const char *name, size_t namelen,
                                          const char *value, size_t valuelen) {
   switch(namelen) {
   case 2:
-    // TODO
     if(!strncasecompare_raw("te", name, namelen))
       return HEADERINST_FORWARD;
 
@@ -2237,7 +2233,6 @@ CURLcode Curl_http2_setup(struct Curl_easy *data,
   stream->upload_left = 0;
   stream->upload_mem = NULL;
   stream->upload_len = 0;
-  // TODO
   stream->mem = _GETCHARPTR(data->state.buffer);
   stream->len = data->set.buffer_size;
 

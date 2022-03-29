@@ -84,7 +84,7 @@ CURLcode Curl_input_ntlm(struct Curl_easy *data,
       unsigned char *hdr;
       size_t hdrlen;
 
-      // TODO
+      // TODO?
       result = Curl_base64_decode(_GETCHARPTR(header), &hdr, &hdrlen);
       if(!result) {
         struct bufref hdrbuf;
@@ -139,7 +139,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
   /* point to the username, password, service and host */
   const char *userp;
   const char *passwdp;
-  const char *service = NULL;
+  mm_array_ptr<const char> service = NULL;
   mm_array_ptr<const char> hostname = NULL;
 
   /* point to the correct struct with this */
@@ -156,9 +156,8 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
     allocuserpwd = &data->state.aptr.proxyuserpwd;
     userp = data->state.aptr.proxyuser;
     passwdp = data->state.aptr.proxypasswd;
-    // TODO
-    service = _GETCHARPTR(data->set.str[STRING_PROXY_SERVICE_NAME]) ?
-      _GETCHARPTR(data->set.str[STRING_PROXY_SERVICE_NAME]) : "HTTP";
+    service = data->set.str[STRING_PROXY_SERVICE_NAME];
+    if (!service) service = "HTTP";
     hostname = conn->http_proxy.host.name;
     ntlm = &conn->proxyntlm;
     state = &conn->proxy_ntlm_state;
@@ -171,9 +170,8 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
     allocuserpwd = &data->state.aptr.userpwd;
     userp = data->state.aptr.user;
     passwdp = data->state.aptr.passwd;
-    // TODO
-    service = _GETCHARPTR(data->set.str[STRING_SERVICE_NAME]) ?
-      _GETCHARPTR(data->set.str[STRING_SERVICE_NAME]) : "HTTP";
+    service = data->set.str[STRING_SERVICE_NAME];
+    if (!service) service = "HTTP";
     hostname = conn->host.name;
     ntlm = &conn->ntlm;
     state = &conn->http_ntlm_state;
@@ -205,9 +203,8 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
   case NTLMSTATE_TYPE1:
   default: /* for the weird cases we (re)start here */
     /* Create a type-1 message */
-    // TODO
     result = Curl_auth_create_ntlm_type1_message(data, userp, passwdp,
-                                                 service, _GETCHARPTR(hostname),
+                                                 service, hostname,
                                                  ntlm, &ntlmmsg);
     if(!result) {
       DEBUGASSERT(Curl_bufref_len(&ntlmmsg) != 0);

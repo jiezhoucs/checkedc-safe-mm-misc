@@ -93,7 +93,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
                                              const struct bufref *chlg,
                                              const char *userp,
                                              const char *passwdp,
-                                             const char *service,
+                                             mm_array_ptr<const char> service,
                                              struct bufref *out);
 
 /* This is used to decode a HTTP DIGEST challenge message */
@@ -142,8 +142,8 @@ bool Curl_auth_is_ntlm_supported(void);
 CURLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
                                              const char *userp,
                                              const char *passwdp,
-                                             const char *service,
-                                             const char *host,
+                                             mm_array_ptr<const char> service,
+                                             mm_array_ptr<const char> host,
                                              struct ntlmdata *ntlm,
                                              struct bufref *out);
 
@@ -165,14 +165,14 @@ void Curl_auth_cleanup_ntlm(struct ntlmdata *ntlm);
 
 /* This is used to generate a base64 encoded OAuth 2.0 message */
 CURLcode Curl_auth_create_oauth_bearer_message(const char *user,
-                                               const char *host,
+                                               mm_array_ptr<const char> host,
                                                const long port,
-                                               const char *bearer,
+                                               mm_array_ptr<const char> bearer,
                                                struct bufref *out);
 
 /* This is used to generate a base64 encoded XOAuth 2.0 message */
 CURLcode Curl_auth_create_xoauth_bearer_message(const char *user,
-                                                const char *bearer,
+                                                mm_array_ptr<const char> bearer,
                                                 struct bufref *out);
 
 #if defined(USE_KERBEROS5)

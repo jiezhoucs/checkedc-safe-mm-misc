@@ -62,9 +62,66 @@
  * contents at will.
  */
 
+static int mm_hostmatch(mm_array_ptr<char> hostname, mm_array_ptr<char> pattern)
+{
+  mm_array_ptr<const char> pattern_label_end = NULL, pattern_wildcard = NULL,
+    hostname_label_end = NULL;
+  int wildcard_enabled;
+  size_t prefixlen, suffixlen;
+
+  /* normalize pattern and hostname by stripping off trailing dots */
+  size_t len = mm_strlen(hostname);
+  if(hostname[len-1]=='.')
+    hostname[len-1] = 0;
+  len = mm_strlen(pattern);
+  if(pattern[len-1]=='.')
+    pattern[len-1] = 0;
+
+  pattern_wildcard = mm_strchr(pattern, '*');
+  if(!pattern_wildcard)
+    return mm_strcasecompare(pattern, hostname) ?
+      CURL_HOST_MATCH : CURL_HOST_NOMATCH;
+
+  /* detect IP address as hostname and fail the match if so */
+  if(Curl_host_is_ipnum(_GETCHARPTR(hostname)))
+    return CURL_HOST_NOMATCH;
+
+  /* We require at least 2 dots in pattern to avoid too wide wildcard
+     match. */
+  wildcard_enabled = 1;
+  pattern_label_end = mm_strchr(pattern, '.');
+  if(!pattern_label_end || mm_strchr(pattern_label_end + 1, '.') == NULL ||
+     pattern_wildcard > pattern_label_end ||
+     strncasecompare(pattern, "xn--", 4)) {
+    wildcard_enabled = 0;
+  }
+  if(!wildcard_enabled)
+    return mm_strcasecompare(pattern, hostname) ?
+      CURL_HOST_MATCH : CURL_HOST_NOMATCH;
+
+  hostname_label_end = mm_strchr(hostname, '.');
+  if(!hostname_label_end ||
+     !mm_strcasecompare(pattern_label_end, hostname_label_end))
+    return CURL_HOST_NOMATCH;
+
+  /* The wildcard must match at least one character, so the left-most
+     label of the hostname is at least as large as the left-most label
+     of the pattern. */
+  if(hostname_label_end - hostname < pattern_label_end - pattern)
+    return CURL_HOST_NOMATCH;
+
+  prefixlen = pattern_wildcard - pattern;
+  suffixlen = pattern_label_end - (pattern_wildcard + 1);
+  return strncasecompare(pattern, hostname, prefixlen) &&
+    strncasecompare(pattern_wildcard + 1, hostname_label_end - suffixlen,
+                    suffixlen) ?
+    CURL_HOST_MATCH : CURL_HOST_NOMATCH;
+}
+
 static int hostmatch(char *hostname, char *pattern)
 {
-  const char *pattern_label_end, *pattern_wildcard, *hostname_label_end;
+  const char *pattern_label_end = NULL, *pattern_wildcard = NULL,
+    *hostname_label_end = NULL;
   int wildcard_enabled;
   size_t prefixlen, suffixlen;
 
@@ -91,7 +148,6 @@ static int hostmatch(char *hostname, char *pattern)
   pattern_label_end = strchr(pattern, '.');
   if(!pattern_label_end || strchr(pattern_label_end + 1, '.') == NULL ||
      pattern_wildcard > pattern_label_end ||
-     // TODO?
      strncasecompare_raw(pattern, "xn--", 4)) {
     wildcard_enabled = 0;
   }
@@ -112,11 +168,33 @@ static int hostmatch(char *hostname, char *pattern)
 
   prefixlen = pattern_wildcard - pattern;
   suffixlen = pattern_label_end - (pattern_wildcard + 1);
-  // TODO?
   return strncasecompare_raw(pattern, hostname, prefixlen) &&
     strncasecompare_raw(pattern_wildcard + 1, hostname_label_end - suffixlen,
                     suffixlen) ?
     CURL_HOST_MATCH : CURL_HOST_NOMATCH;
+}
+
+
+int mm_Curl_cert_hostcheck(mm_array_ptr<const char> match_pattern, mm_array_ptr<const char> hostname)
+{
+  int res = 0;
+  if(!match_pattern || !*match_pattern ||
+      !hostname || !*hostname) /* sanity check */
+    ;
+  else {
+    mm_array_ptr<char> matchp = mm_strdup(match_pattern);
+    if(matchp) {
+      mm_array_ptr<char> hostp = mm_strdup(hostname);
+      if(hostp) {
+        if(mm_hostmatch(hostp, matchp) == CURL_HOST_MATCH)
+          res = 1;
+        MM_FREE(char, hostp);
+      }
+      MM_FREE(char, matchp);
+    }
+  }
+
+  return res;
 }
 
 int Curl_cert_hostcheck(const char *match_pattern, const char *hostname)
@@ -140,5 +218,6 @@ int Curl_cert_hostcheck(const char *match_pattern, const char *hostname)
 
   return res;
 }
+
 
 #endif /* OPENSSL, GSKIT or schannel+wince */

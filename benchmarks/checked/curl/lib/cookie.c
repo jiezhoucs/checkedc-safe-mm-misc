@@ -104,7 +104,7 @@ Example set of cookies:
 #include "curl_memory.h"
 #include "memdebug.h"
 
-static void strstore(mm_ptr<mm_array_ptr<char>> str, const char *newstr);
+static void strstore(mm_ptr<mm_array_ptr<char>> str, mm_array_ptr<const char> newstr);
 
 static void freecookie(mm_ptr<struct Cookie> co)
 {
@@ -119,15 +119,15 @@ static void freecookie(mm_ptr<struct Cookie> co)
   MM_FREE(struct Cookie, co);
 }
 
-static bool tailmatch(const char *cooke_domain, const char *hostname)
+static bool tailmatch(mm_array_ptr<const char> cooke_domain, mm_array_ptr<const char> hostname)
 {
-  size_t cookie_domain_len = strlen(cooke_domain);
-  size_t hostname_len = strlen(hostname);
+  size_t cookie_domain_len = mm_strlen(cooke_domain);
+  size_t hostname_len = mm_strlen(hostname);
 
   if(hostname_len < cookie_domain_len)
     return FALSE;
 
-  if(!strcasecompare(cooke_domain, hostname + hostname_len-cookie_domain_len))
+  if(!mm_strcasecompare(cooke_domain, hostname + hostname_len-cookie_domain_len))
     return FALSE;
 
   /*
@@ -277,7 +277,6 @@ static size_t cookiehash(mm_array_ptr<const char> const domain)
   mm_array_ptr<const char> top = NULL;
   size_t len;
 
-  // TODO
   if(!domain || Curl_host_is_ipnum(_GETCHARPTR(domain)))
     return 0;
 
@@ -332,9 +331,8 @@ void Curl_cookie_loadfiles(struct Curl_easy *data)
   if(list) {
     Curl_share_lock(data, CURL_LOCK_DATA_COOKIE, CURL_LOCK_ACCESS_SINGLE);
     while(list) {
-      struct CookieInfo *newcookies = Curl_cookie_init(data,
-          // TODO
-                                        _GETCHARPTR(list->data),
+      mm_ptr<struct CookieInfo> newcookies = Curl_cookie_init(data,
+                                        list->data,
                                         data->cookies,
                                         data->set.cookiesession);
       if(!newcookies)
@@ -362,10 +360,10 @@ void Curl_cookie_loadfiles(struct Curl_easy *data)
  * parsing in a last-wins scenario. The caller is responsible for checking
  * for OOM errors.
  */
-static void strstore(mm_ptr<mm_array_ptr<char>> str, const char *newstr)
+static void strstore(mm_ptr<mm_array_ptr<char>> str, mm_array_ptr<const char> newstr)
 {
   MM_FREE(char, *str);
-  *str = mm_strdup_from_raw(newstr);
+  *str = mm_strdup(newstr);
 }
 
 /*
@@ -377,7 +375,7 @@ static void strstore(mm_ptr<mm_array_ptr<char>> str, const char *newstr)
  * more cookies expire, then processing will exit early in case this timestamp
  * is in the future.
  */
-static void remove_expired(struct CookieInfo *cookies)
+static void remove_expired(mm_ptr<struct CookieInfo> cookies)
 {
   mm_ptr<struct Cookie> co = NULL, nx = NULL;
   curl_off_t now = (curl_off_t)time(NULL);
@@ -427,9 +425,9 @@ static void remove_expired(struct CookieInfo *cookies)
 }
 
 /* Make sure domain contains a dot or is localhost. */
-static bool bad_domain(const char *domain)
+static bool bad_domain(mm_array_ptr<const char> domain)
 {
-  return !strchr(domain, '.') && !strcasecompare(domain, "localhost");
+  return !mm_strchr(domain, '.') && !mm_strcasecompare(domain, "localhost");
 }
 
 /*
@@ -449,11 +447,11 @@ Curl_cookie_add(struct Curl_easy *data,
                  * must only be used very carefully for things that can deal
                  * with data being NULL. Such as infof() and similar
                  */
-                struct CookieInfo *c,
+                mm_array_ptr<struct CookieInfo> c,
                 bool httpheader, /* TRUE if HTTP header-style line */
                 bool noexpire, /* if TRUE, skip remove_expired() */
                 mm_array_ptr<char> lineptr,   /* first character of the line */
-                const char *domain, /* default domain */
+                mm_array_ptr<const char> domain, /* default domain */
                 const char *path,   /* full path used when this cookie is set,
                                        used to get default path for the cookie
                                        unless set */
@@ -507,7 +505,7 @@ Curl_cookie_add(struct Curl_easy *data,
          * headers that have the same string property set more than once,
          * and then we use the last one.
          */
-        const char *whatptr;
+        mm_array_ptr<const char> whatptr = NULL;
         bool done = FALSE;
         bool sep;
         size_t len = strlen(what);
@@ -574,7 +572,7 @@ Curl_cookie_add(struct Curl_easy *data,
             break;
           }
           co->name = mm_strdup_from_raw(name);
-          co->value = mm_strdup_from_raw(whatptr);
+          co->value = mm_strdup(whatptr);
           done = TRUE;
           if(!co->name || !co->value) {
             badcookie = TRUE;
@@ -645,10 +643,10 @@ Curl_cookie_add(struct Curl_easy *data,
             domain = ":";
 #endif
 
-          is_ip = Curl_host_is_ipnum(domain ? domain : whatptr);
+          is_ip = Curl_host_is_ipnum(domain ? _GETCHARPTR(domain) : _GETCHARPTR(whatptr));
 
           if(!domain
-             || (is_ip && !strcmp(whatptr, domain))
+             || (is_ip && !mm_strcmp(whatptr, domain))
              || (!is_ip && tailmatch(whatptr, domain))) {
             strstore(&co->domain, whatptr);
             if(!co->domain) {
@@ -666,7 +664,7 @@ Curl_cookie_add(struct Curl_easy *data,
              */
             badcookie = TRUE;
             infof(data, "skipped cookie with bad tailmatch domain: %s",
-                  whatptr);
+                  _GETCHARPTR(whatptr));
           }
         }
         else if(strcasecompare("version", name)) {
@@ -768,7 +766,7 @@ Curl_cookie_add(struct Curl_easy *data,
     if(!badcookie && !co->domain) {
       if(domain) {
         /* no domain was given in the header line, set the default */
-        co->domain = mm_strdup_from_raw(domain);
+        co->domain = mm_strdup(domain);
         if(!co->domain)
           badcookie = TRUE;
       }
@@ -1161,22 +1159,22 @@ Curl_cookie_add(struct Curl_easy *data,
  *
  * Returns NULL on out of memory. Invalid cookies are ignored.
  */
-struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
-                                    const char *file,
-                                    struct CookieInfo *inc,
+mm_ptr<struct CookieInfo> Curl_cookie_init(struct Curl_easy *data,
+                                    mm_array_ptr<const char> file,
+                                    mm_ptr<struct CookieInfo> inc,
                                     bool newsession)
 {
-  struct CookieInfo *c;
+  mm_ptr<struct CookieInfo> c = NULL;
   FILE *fp = NULL;
   bool fromfile = TRUE;
   mm_array_ptr<char> line = NULL;
 
   if(NULL == inc) {
     /* we didn't get a struct, create one */
-    c = calloc(1, sizeof(struct CookieInfo));
+    c = MM_SINGLE_CALLOC(struct CookieInfo);
     if(!c)
       return NULL; /* failed to get memory */
-    c->filename = strdup(file?file:"none"); /* copy the name just in case */
+    c->filename = file? mm_strdup(file) : mm_strdup("none"); /* copy the name just in case */
     if(!c->filename)
       goto fail; /* failed to get memory */
     /*
@@ -1191,7 +1189,7 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
   }
   c->running = FALSE; /* this is not running, this is init */
 
-  if(file && !strcmp(file, "-")) {
+  if(file && !mm_strcmp(file, "-")) {
     fp = stdin;
     fromfile = FALSE;
   }
@@ -1200,7 +1198,7 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
     fp = NULL;
   }
   else
-    fp = file?fopen(file, FOPEN_READTEXT):NULL;
+    fp = file?mm_fopen(file, FOPEN_READTEXT):NULL;
 
   c->newsession = newsession; /* new session? */
 
@@ -1354,7 +1352,7 @@ static mm_ptr<struct Cookie> dup_cookie(mm_ptr<struct Cookie> src)
  *
  * It shall only return cookies that haven't expired.
  */
-mm_ptr<struct Cookie> Curl_cookie_getlist(struct CookieInfo *c,
+mm_ptr<struct Cookie> Curl_cookie_getlist(mm_ptr<struct CookieInfo> c,
                                    mm_array_ptr<const char> host,
                                    mm_array_ptr<const char> path,
                                    bool secure)
@@ -1373,7 +1371,6 @@ mm_ptr<struct Cookie> Curl_cookie_getlist(struct CookieInfo *c,
   remove_expired(c);
 
   /* check if host is an IP(v4|v6) address */
-  // TODO
   is_ip = Curl_host_is_ipnum(_GETCHARPTR(host));
 
   co = c->cookies[myhash];
@@ -1384,8 +1381,7 @@ mm_ptr<struct Cookie> Curl_cookie_getlist(struct CookieInfo *c,
 
       /* now check if the domain is correct */
       if(!co->domain ||
-              // TODO
-         (co->tailmatch && !is_ip && tailmatch(_GETCHARPTR(co->domain), _GETCHARPTR(host))) ||
+         (co->tailmatch && !is_ip && tailmatch(co->domain, host)) ||
          ((!co->tailmatch || is_ip) && mm_strcasecompare(host, co->domain)) ) {
         /*
          * the right part of the host matches the domain stuff in the
@@ -1467,7 +1463,7 @@ fail:
  *
  * Clear all existing cookies and reset the counter.
  */
-void Curl_cookie_clearall(struct CookieInfo *cookies)
+void Curl_cookie_clearall(mm_ptr<struct CookieInfo> cookies)
 {
   if(cookies) {
     unsigned int i;
@@ -1499,7 +1495,7 @@ void Curl_cookie_freelist(mm_ptr<struct Cookie> co)
  *
  * Free all session cookies in the cookies list.
  */
-void Curl_cookie_clearsess(struct CookieInfo *cookies)
+void Curl_cookie_clearsess(mm_ptr<struct CookieInfo> cookies)
 {
   mm_ptr<struct Cookie> first = NULL, curr = NULL, next = NULL, prev = NULL;
   unsigned int i;
@@ -1540,14 +1536,14 @@ void Curl_cookie_clearsess(struct CookieInfo *cookies)
  *
  * Free a "cookie object" previous created with Curl_cookie_init().
  */
-void Curl_cookie_cleanup(struct CookieInfo *c)
+void Curl_cookie_cleanup(mm_ptr<struct CookieInfo> c)
 {
   if(c) {
     unsigned int i;
-    free(c->filename);
+    MM_FREE(char, c->filename);
     for(i = 0; i < COOKIE_HASH_SIZE; i++)
       Curl_cookie_freelist(c->cookies[i]);
-    free(c); /* free the base struct as well */
+    MM_FREE(struct CookieInfo, c); /* free the base struct as well */
   }
 }
 
@@ -1593,7 +1589,7 @@ static mm_array_ptr<char> get_netscape_format(mm_ptr<const struct Cookie> co)
  * The function returns non-zero on write failure.
  */
 static CURLcode cookie_output(struct Curl_easy *data,
-                              struct CookieInfo *c, mm_array_ptr<const char> filename)
+                              mm_ptr<struct CookieInfo> c, mm_array_ptr<const char> filename)
 {
   mm_ptr<struct Cookie> co = NULL;
   FILE *out = NULL;

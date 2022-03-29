@@ -807,7 +807,7 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
      * Set cookie file name to dump all cookies to when we're done.
      */
   {
-    struct CookieInfo *newcookies;
+    mm_ptr<struct CookieInfo> newcookies = NULL;
     result = mm_Curl_setstropt(&data->set.str[STRING_COOKIEJAR],
                             va_arg(param, mm_array_ptr<char>));
 

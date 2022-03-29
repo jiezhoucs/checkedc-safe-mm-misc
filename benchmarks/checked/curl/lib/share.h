@@ -52,7 +52,7 @@ struct Curl_share {
   struct conncache conn_cache;
   struct Curl_hash hostcache;
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_COOKIES)
-  struct CookieInfo *cookies;
+  mm_ptr<struct CookieInfo> cookies;
 #endif
 #ifdef USE_LIBPSL
   struct PslCache psl;

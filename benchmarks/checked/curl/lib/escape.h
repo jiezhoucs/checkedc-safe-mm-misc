@@ -37,4 +37,10 @@ CURLcode Curl_urldecode(struct Curl_easy *data,
                         char **ostring, size_t *olen,
                         enum urlreject ctrl);
 
+CURLcode mm_Curl_urldecode(struct Curl_easy *data,
+                        mm_array_ptr<const char> string, size_t length,
+                        mm_array_ptr<char> *ostring, size_t *olen,
+                        enum urlreject ctrl);
+
+
 #endif /* HEADER_CURL_ESCAPE_H */

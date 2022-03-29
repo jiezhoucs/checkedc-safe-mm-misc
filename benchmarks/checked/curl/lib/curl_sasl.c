@@ -319,17 +319,13 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct Curl_easy *data,
   struct bufref resp;
   saslstate state1 = SASL_STOP;
   saslstate state2 = SASL_FINAL;
-  // TODO
-  const char * const hostname = _GETCHARPTR(SSL_HOST_NAME());
+  mm_array_ptr<const char> const hostname = SSL_HOST_NAME();
   const long int port = SSL_HOST_PORT();
 #if defined(USE_KERBEROS5) || defined(USE_NTLM)
-  // TODO
-  const char *service = _GETCHARPTR(data->set.str[STRING_SERVICE_NAME]) ?
-    _GETCHARPTR(data->set.str[STRING_SERVICE_NAME]) :
-    sasl->params->service;
+  mm_array_ptr<const char> service = data->set.str[STRING_SERVICE_NAME];
+  if (!service) service = sasl->params->service;
 #endif
-  // TODO
-  const char *oauth_bearer = _GETCHARPTR(data->set.str[STRING_BEARER]);
+  mm_array_ptr<const char> oauth_bearer = data->set.str[STRING_BEARER];
   struct bufref nullmsg;
 
   Curl_bufref_init(&nullmsg);
@@ -507,18 +503,14 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
   CURLcode result = CURLE_OK;
   saslstate newstate = SASL_FINAL;
   struct bufref resp;
-  // TODO
-  const char * const hostname = _GETCHARPTR(SSL_HOST_NAME());
+  mm_array_ptr<const char> const hostname = SSL_HOST_NAME();
   const long int port = SSL_HOST_PORT();
 #if !defined(CURL_DISABLE_CRYPTO_AUTH) || defined(USE_KERBEROS5) ||     \
   defined(USE_NTLM)
-  // TODO
-  const char *service = _GETCHARPTR(data->set.str[STRING_SERVICE_NAME]) ?
-    _GETCHARPTR(data->set.str[STRING_SERVICE_NAME]) :
-    sasl->params->service;
+  mm_array_ptr<const char> service = data->set.str[STRING_SERVICE_NAME];
+  if (!service) service = sasl->params->service;
 #endif
-  // TODO
-  const char *oauth_bearer = _GETCHARPTR(data->set.str[STRING_BEARER]);
+  mm_array_ptr<const char> oauth_bearer = data->set.str[STRING_BEARER];
   struct bufref serverdata;
 
   Curl_bufref_init(&serverdata);

@@ -60,7 +60,7 @@ struct CookieInfo {
   /* linked list of cookies we know of */
   mm_array_ptr<struct Cookie> cookies[COOKIE_HASH_SIZE];
 
-  char *filename;  /* file we read from/write to */
+  mm_array_ptr<char> filename;  /* file we read from/write to */
   long numcookies; /* number of cookies in the "jar" */
   bool running;    /* state info, for cookie adding information */
   bool newsession; /* new session, discard session cookies on load */
@@ -92,16 +92,16 @@ struct Curl_easy;
  */
 
 mm_ptr<struct Cookie> Curl_cookie_add(struct Curl_easy *data,
-                               struct CookieInfo *c, bool header,
+                               mm_array_ptr<struct CookieInfo> c, bool header,
                                bool noexpiry, mm_array_ptr<char> lineptr,
-                               const char *domain, const char *path,
+                               mm_array_ptr<const char> domain, const char *path,
                                bool secure);
 
-mm_ptr<struct Cookie> Curl_cookie_getlist(struct CookieInfo *c, mm_array_ptr<const char> host,
+mm_ptr<struct Cookie> Curl_cookie_getlist(mm_ptr<struct CookieInfo> c, mm_array_ptr<const char> host,
                                    mm_array_ptr<const char> path, bool secure);
 void Curl_cookie_freelist(mm_ptr<struct Cookie> cookies);
-void Curl_cookie_clearall(struct CookieInfo *cookies);
-void Curl_cookie_clearsess(struct CookieInfo *cookies);
+void Curl_cookie_clearall(mm_ptr<struct CookieInfo> cookies);
+void Curl_cookie_clearsess(mm_ptr<struct CookieInfo> cookies);
 
 #if defined(CURL_DISABLE_HTTP) || defined(CURL_DISABLE_COOKIES)
 #define Curl_cookie_list(x) NULL
@@ -111,9 +111,9 @@ void Curl_cookie_clearsess(struct CookieInfo *cookies);
 #define Curl_flush_cookies(x,y) Curl_nop_stmt
 #else
 void Curl_flush_cookies(struct Curl_easy *data, bool cleanup);
-void Curl_cookie_cleanup(struct CookieInfo *c);
-struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
-                                    const char *file, struct CookieInfo *inc,
+void Curl_cookie_cleanup(mm_ptr<struct CookieInfo> c);
+mm_ptr<struct CookieInfo> Curl_cookie_init(struct Curl_easy *data,
+                                    mm_array_ptr<const char> file, mm_ptr<struct CookieInfo> inc,
                                     bool newsession);
 struct curl_slist *Curl_cookie_list(struct Curl_easy *data);
 void Curl_cookie_loadfiles(struct Curl_easy *data);

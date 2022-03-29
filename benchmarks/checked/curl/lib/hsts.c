@@ -109,7 +109,7 @@ static struct stsentry *hsts_entry(void)
 }
 
 static CURLcode hsts_create(struct hsts *h,
-                            const char *hostname,
+                            mm_array_ptr<const char> hostname,
                             bool subdomains,
                             curl_off_t expires)
 {
@@ -119,7 +119,7 @@ static CURLcode hsts_create(struct hsts *h,
 
   sts->expires = expires;
   sts->includeSubDomains = subdomains;
-  sts->host = strdup(hostname);
+  sts->host = mm_strdup(hostname);
   if(!sts->host) {
     free(sts);
     return CURLE_OUT_OF_MEMORY;
@@ -128,7 +128,7 @@ static CURLcode hsts_create(struct hsts *h,
   return CURLE_OK;
 }
 
-CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
+CURLcode Curl_hsts_parse(struct hsts *h, mm_array_ptr<const char> hostname,
                          const char *header)
 {
   const char *p = header;
@@ -139,7 +139,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
   struct stsentry *sts;
   time_t now = time(NULL);
 
-  if(Curl_host_is_ipnum(hostname))
+  if(Curl_host_is_ipnum(_GETCHARPTR(hostname)))
     /* "explicit IP address identification of all forms is excluded."
        / RFC 6797 */
     return CURLE_OK;
@@ -234,12 +234,12 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
  * The 'subdomain' argument tells the function if subdomain matching should be
  * attempted.
  */
-struct stsentry *Curl_hsts(struct hsts *h, const char *hostname,
+struct stsentry *Curl_hsts(struct hsts *h, mm_array_ptr<const char> hostname,
                            bool subdomain)
 {
   if(h) {
     time_t now = time(NULL);
-    size_t hlen = strlen(hostname);
+    size_t hlen = mm_strlen(hostname);
     struct Curl_llist_element *e;
     struct Curl_llist_element *n;
     for(e = h->list.head; e; e = n) {
@@ -252,15 +252,15 @@ struct stsentry *Curl_hsts(struct hsts *h, const char *hostname,
         continue;
       }
       if(subdomain && sts->includeSubDomains) {
-        size_t ntail = strlen(sts->host);
+        size_t ntail = mm_strlen(sts->host);
         if(ntail < hlen) {
           size_t offs = hlen - ntail;
           if((hostname[offs-1] == '.') &&
-             Curl_strncasecompare_raw(&hostname[offs], sts->host, ntail))
+             Curl_strncasecompare(&hostname[offs], sts->host, ntail))
             return sts;
         }
       }
-      if(Curl_strcasecompare(hostname, sts->host))
+      if(mm_strcasecompare(hostname, sts->host))
         return sts;
     }
   }
@@ -280,8 +280,8 @@ static CURLcode hsts_push(struct Curl_easy *data,
   struct tm stamp;
   CURLcode result;
 
-  e.name = (char *)sts->host;
-  e.namelen = strlen(sts->host);
+  e.name = (mm_array_ptr<char>)sts->host;
+  e.namelen = mm_strlen(sts->host);
   e.includeSubDomains = sts->includeSubDomains;
 
   if(sts->expires != TIME_T_MAX) {
@@ -313,13 +313,13 @@ static CURLcode hsts_out(struct stsentry *sts, FILE *fp)
     if(result)
       return result;
     fprintf(fp, "%s%s \"%d%02d%02d %02d:%02d:%02d\"\n",
-            sts->includeSubDomains ? ".": "", sts->host,
+            sts->includeSubDomains ? ".": "", _GETCHARPTR(sts->host),
             stamp.tm_year + 1900, stamp.tm_mon + 1, stamp.tm_mday,
             stamp.tm_hour, stamp.tm_min, stamp.tm_sec);
   }
   else
     fprintf(fp, "%s%s \"%s\"\n",
-            sts->includeSubDomains ? ".": "", sts->host, UNLIMITED);
+            sts->includeSubDomains ? ".": "", _GETCHARPTR(sts->host), UNLIMITED);
   return CURLE_OK;
 }
 
@@ -415,7 +415,7 @@ static CURLcode hsts_add(struct hsts *h, char *line)
     time_t expires = strcmp(date, UNLIMITED) ? Curl_getdate_capped(date) :
       TIME_T_MAX;
     CURLcode result;
-    char *p = host;
+    mm_array_ptr<char> p = host;
     bool subdomain = FALSE;
     if(p[0] == '.') {
       p++;

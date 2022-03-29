@@ -89,7 +89,7 @@ typedef enum {
 
 /* Protocol dependent SASL parameters */
 struct SASLproto {
-  const char *service;     /* The service name */
+  mm_array_ptr<const char> service;     /* The service name */
   int contcode;            /* Code to receive when continuation is expected */
   int finalcode;           /* Code to receive upon authentication success */
   size_t maxirlen;         /* Maximum initial response length */

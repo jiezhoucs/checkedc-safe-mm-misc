@@ -33,7 +33,7 @@ extern time_t deltatime;
 
 struct stsentry {
   struct Curl_llist_element node;
-  const char *host;
+  mm_array_ptr<const char> host;
   bool includeSubDomains;
   curl_off_t expires; /* the timestamp of this entry's expiry */
 };
@@ -47,9 +47,9 @@ struct hsts {
 
 struct hsts *Curl_hsts_init(void);
 void Curl_hsts_cleanup(struct hsts **hp);
-CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
+CURLcode Curl_hsts_parse(struct hsts *h, mm_array_ptr<const char> hostname,
                          const char *sts);
-struct stsentry *Curl_hsts(struct hsts *h, const char *hostname,
+struct stsentry *Curl_hsts(struct hsts *h, mm_array_ptr<const char> hostname,
                            bool subdomain);
 CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
                         mm_array_ptr<const char> file);
