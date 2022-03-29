@@ -409,7 +409,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
   /* Close down all open SSL info and sessions */
   Curl_ssl_close_all(data);
   MM_curl_free(char, data->state.first_host);
-  Curl_safefree(data->state.scratch);
+  mm_Curl_safefree(char, data->state.scratch);
   Curl_ssl_free_certinfo(data);
 
   /* Cleanup possible redirect junk */

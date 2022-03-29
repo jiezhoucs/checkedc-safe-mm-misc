@@ -251,17 +251,16 @@ static CURLcode file_upload(struct Curl_easy *data)
   int fd;
   int mode;
   CURLcode result = CURLE_OK;
-  char *buf = _GETCHARPTR(data->state.buffer);
+  mm_array_ptr<char> buf = data->state.buffer;
   curl_off_t bytecount = 0;
   struct_stat file_stat;
-  const char *buf2;
+  mm_array_ptr<const char> buf2 = NULL;
 
   /*
    * Since FILE: doesn't do the full init, we need to provide some extra
    * assignments here.
    */
-  // TODO?
-  data->req.upload_fromhere = buf;
+  data->req.upload_fromhere = _GETCHARPTR(buf);
 
   if(!dir)
     return CURLE_FILE_COULDNT_READ_FILE; /* fix: better error code */
@@ -330,7 +329,7 @@ static CURLcode file_upload(struct Curl_easy *data)
       buf2 = buf;
 
     /* write the data to the target */
-    nwrite = write(fd, buf2, nread);
+    nwrite = mm_write(fd, buf2, nread);
     if(nwrite != nread) {
       result = CURLE_SEND_ERROR;
       break;

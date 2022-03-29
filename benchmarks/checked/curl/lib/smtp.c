@@ -1811,16 +1811,16 @@ CURLcode Curl_smtp_escape_eob(struct Curl_easy *data, const ssize_t nread)
   ssize_t i;
   ssize_t si;
   struct SMTP *smtp = data->req.p.smtp;
-  char *scratch = data->state.scratch;
-  char *newscratch = NULL;
-  char *oldscratch = NULL;
+  mm_array_ptr<char> scratch = data->state.scratch;
+  mm_array_ptr<char> newscratch = NULL;
+  mm_array_ptr<char> oldscratch = NULL;
   size_t eob_sent;
 
   /* Do we need to allocate a scratch buffer? */
   if(!scratch || data->set.crlf) {
     oldscratch = scratch;
 
-    scratch = newscratch = malloc(2 * data->set.upload_buffer_size);
+    scratch = newscratch = MM_ARRAY_ALLOC(char, 2 * data->set.upload_buffer_size);
     if(!newscratch) {
       failf(data, "Failed to alloc scratch buffer!");
 
@@ -1846,7 +1846,7 @@ CURLcode Curl_smtp_escape_eob(struct Curl_easy *data, const ssize_t nread)
     }
     else if(smtp->eob) {
       /* A previous substring matched so output that first */
-      memcpy(&scratch[si], &SMTP_EOB[eob_sent], smtp->eob - eob_sent);
+      mm_memcpy(&scratch[si], &SMTP_EOB[eob_sent], smtp->eob - eob_sent);
       si += smtp->eob - eob_sent;
 
       /* Then compare the first byte */
@@ -1864,7 +1864,7 @@ CURLcode Curl_smtp_escape_eob(struct Curl_easy *data, const ssize_t nread)
     /* Do we have a match for CRLF. as per RFC-5321, sect. 4.5.2 */
     if(SMTP_EOB_FIND_LEN == smtp->eob) {
       /* Copy the replacement data to the target buffer */
-      memcpy(&scratch[si], &SMTP_EOB_REPL[eob_sent],
+      mm_memcpy(&scratch[si], &SMTP_EOB_REPL[eob_sent],
              SMTP_EOB_REPL_LEN - eob_sent);
       si += SMTP_EOB_REPL_LEN - eob_sent;
       smtp->eob = 0;
@@ -1876,26 +1876,26 @@ CURLcode Curl_smtp_escape_eob(struct Curl_easy *data, const ssize_t nread)
 
   if(smtp->eob - eob_sent) {
     /* A substring matched before processing ended so output that now */
-    memcpy(&scratch[si], &SMTP_EOB[eob_sent], smtp->eob - eob_sent);
+    mm_memcpy(&scratch[si], &SMTP_EOB[eob_sent], smtp->eob - eob_sent);
     si += smtp->eob - eob_sent;
   }
 
   /* Only use the new buffer if we replaced something */
   if(si != nread) {
     /* Upload from the new (replaced) buffer instead */
-    data->req.upload_fromhere = scratch;
+    data->req.upload_fromhere = _GETCHARPTR(scratch);
 
     /* Save the buffer so it can be freed later */
     data->state.scratch = scratch;
 
     /* Free the old scratch buffer */
-    free(oldscratch);
+    MM_FREE(char, oldscratch);
 
     /* Set the new amount too */
     data->req.upload_present = si;
   }
   else
-    free(newscratch);
+    MM_FREE(char, newscratch);
 
   return CURLE_OK;
 }

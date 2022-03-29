@@ -137,7 +137,6 @@ static size_t trailers_read(char *buffer, size_t size, size_t nitems,
   size_t to_copy = (size*nitems < bytes_left) ? size*nitems : bytes_left;
   if(to_copy) {
     memcpy(buffer,
-        // TODO
            _GETCHARPTR(Curl_dyn_ptr(trailers_buf)) + data->state.trailers_bytes_sent,
            to_copy);
     data->state.trailers_bytes_sent += to_copy;
@@ -604,7 +603,6 @@ static CURLcode readwrite_data(struct Curl_easy *data,
 
     if(bytestoread) {
       /* receive data from the network! */
-        // TODO
       result = Curl_read(data, conn->sockfd, _GETCHARPTR(buf), bytestoread, &nread);
 
       /* read would've blocked */
@@ -819,7 +817,6 @@ static CURLcode readwrite_data(struct Curl_easy *data,
           /* Don't let excess data pollute body writes */
           if(k->maxdownload == -1 || (curl_off_t)headlen <= k->maxdownload)
             result = Curl_client_write(data, CLIENTWRITE_BODY,
-                // TODO
                                        _GETCHARPTR(Curl_dyn_ptr(&data->state.headerb)),
                                        headlen);
           else
@@ -977,7 +974,6 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
       if(result)
         return result;
       /* init the "upload from here" pointer */
-      // TODO
       k->upload_fromhere = _GETCHARPTR(data->state.ulbuf);
 
       if(!k->upload_done) {
@@ -1042,7 +1038,7 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
          (data->set.crlf))) {
         /* Do we need to allocate a scratch buffer? */
         if(!data->state.scratch) {
-          data->state.scratch = malloc(2 * data->set.upload_buffer_size);
+          data->state.scratch = MM_ARRAY_ALLOC(char, 2 * data->set.upload_buffer_size);
           if(!data->state.scratch) {
             failf(data, "Failed to alloc scratch buffer!");
 
@@ -1077,7 +1073,7 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
           nread = si;
 
           /* upload from the new (replaced) buffer instead */
-          k->upload_fromhere = data->state.scratch;
+          k->upload_fromhere = _GETCHARPTR(data->state.scratch);
 
           /* set the new amount too */
           k->upload_present = nread;
@@ -1151,7 +1147,6 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
       result = Curl_get_upload_buffer(data);
       if(result)
         return result;
-      // TODO
       k->upload_fromhere = _GETCHARPTR(data->state.ulbuf);
       k->upload_present = 0; /* no more bytes left */
 
@@ -1424,11 +1419,9 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
   if(!data->state.url && data->set.uh) {
     CURLUcode uc;
     MM_FREE(char, data->set.str[STRING_SET_URL]);
-    // TODO
-    char *tmp_string_set_url = NULL;
-    uc = curl_url_get(data->set.uh,
-                      CURLUPART_URL, &tmp_string_set_url, 0);
-    data->set.str[STRING_SET_URL] = mmize_str(tmp_string_set_url);
+    mm_array_ptr<char> string_set_url = NULL;
+    uc = mm_curl_url_get(data->set.uh, CURLUPART_URL, &string_set_url, 0);
+    data->set.str[STRING_SET_URL] = string_set_url;
     if(uc) {
       failf(data, "No URL set!");
       return CURLE_URL_MALFORMAT;
@@ -1531,7 +1524,6 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
 
   if(!result)
     result = Curl_setstropt(&data->state.aptr.user,
-        // TODO
                             _GETCHARPTR(data->set.str[STRING_USERNAME]));
   if(!result)
     result = Curl_setstropt(&data->state.aptr.passwd,
@@ -1648,7 +1640,6 @@ CURLcode Curl_follow(struct Curl_easy *data,
     disallowport = TRUE;
 
   DEBUGASSERT(data->state.uh);
-  // TODO
   uc = curl_url_set(data->state.uh, CURLUPART_URL, _GETCHARPTR(newurl),
                     (type == FOLLOW_FAKE) ? CURLU_NON_SUPPORT_SCHEME :
                     ((type == FOLLOW_REDIR) ? CURLU_URLENCODE : 0) |
