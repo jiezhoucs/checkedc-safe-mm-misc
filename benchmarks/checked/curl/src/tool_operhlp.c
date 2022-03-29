@@ -103,7 +103,6 @@ mm_array_ptr<char> add_file_name_to_url(mm_array_ptr<char> url, mm_array_ptr<con
       filep = filename;
 
     /* URL encode the file name */
-    // TODO?
     encfile = curl_easy_escape(curl, _GETCHARPTR(filep), 0 /* use strlen */);
     if(encfile) {
       mm_array_ptr<char> urlbuffer = NULL;

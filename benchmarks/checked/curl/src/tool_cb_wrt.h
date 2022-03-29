@@ -32,7 +32,6 @@ size_t tool_write_cb(char *buffer, size_t sz, size_t nmemb, void *userdata);
 /* create a local file for writing, return TRUE on success */
 bool tool_create_output_file(mm_ptr<struct OutStruct> outs,
                              mm_ptr<struct OperationConfig> config);
-// TODO: Ideally we should remove the next unchecked function.
 bool tool_create_output_file_unchecked(struct OutStruct *outs,
                              mm_ptr<struct OperationConfig> config);
 

@@ -903,8 +903,7 @@ static int get_category_content(mm_array_ptr<const char> category)
 {
   unsigned int i;
   for(i = 0; categories[i].opt; ++i)
-    // TODO
-    if(curl_strequal(categories[i].opt, _GETCHARPTR(category))) {
+    if(mm_strcasecompare_1(categories[i].opt, category)) {
       printf("%s: %s\n", categories[i].opt, categories[i].desc);
       print_category(categories[i].category);
       return 0;

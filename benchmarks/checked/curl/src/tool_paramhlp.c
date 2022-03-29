@@ -422,8 +422,7 @@ int check_protocol(mm_array_ptr<const char> str)
   if(!str)
     return PARAM_REQUIRES_PARAMETER;
   for(pp = curlinfo->protocols; *pp; pp++) {
-    // TODO
-    if(curl_strequal(*pp, _GETCHARPTR(str)))
+    if(mm_strcasecompare_1(*pp, str))
       return PARAM_OK;
   }
   return PARAM_LIBCURL_UNSUPPORTED_PROTOCOL;
@@ -446,7 +445,6 @@ ParameterError str2offset(mm_ptr<curl_off_t> val, mm_array_ptr<const char> str)
 
 #if(SIZEOF_CURL_OFF_T > SIZEOF_LONG)
   {
-    // TODO
     CURLofft offt = curlx_strtoofft(_GETCHARPTR(str), &endptr, 0, val);
     if(CURL_OFFT_FLOW == offt)
       return PARAM_NUMBER_TOO_LARGE;

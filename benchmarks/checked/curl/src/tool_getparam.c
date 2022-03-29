@@ -490,14 +490,14 @@ GetFileAndPassword(mm_array_ptr<char> nextarg, mm_ptr<mm_array_ptr<char>> file,
  * We support a 'G', 'M' or 'K' suffix too.
   */
 static ParameterError GetSizeParameter(struct GlobalConfig *global,
-                                       const char *arg,
+                                       mm_array_ptr<const char> arg,
                                        const char *which,
                                        curl_off_t *value_out)
 {
   char *unit;
   curl_off_t value;
 
-  if(curlx_strtoofft(arg, &unit, 0, &value)) {
+  if(curlx_strtoofft(_GETCHARPTR(arg), &unit, 0, &value)) {
     warnf(global, "invalid number specified for %s\n", which);
     return PARAM_BAD_USE;
   }
@@ -722,8 +722,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
       case 'i': /* --limit-rate */
       {
         curl_off_t value;
-        // TODO
-        ParameterError pe = GetSizeParameter(global, _GETCHARPTR(nextarg), "rate", &value);
+        ParameterError pe = GetSizeParameter(global, nextarg, "rate", &value);
 
         if(pe != PARAM_OK)
            return pe;
@@ -876,7 +875,7 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         {
           curl_off_t value;
           ParameterError pe =
-            GetSizeParameter(global, _GETCHARPTR(nextarg), "max-filesize", &value);
+            GetSizeParameter(global, nextarg, "max-filesize", &value);
 
           if(pe != PARAM_OK)
              return pe;
@@ -1012,13 +1011,12 @@ ParameterError getparameter(mm_array_ptr<const char> flag, /* f or -long-flag */
         /* 16bit base 10 is 5 digits, but we allow 6 so that this catches
            overflows, not just truncates */
         char lrange[7]="";
-        // TODO
-        char *p = _GETCHARPTR(nextarg);
+        mm_array_ptr<char> p = nextarg;
         while(ISDIGIT(*p))
           p++;
         if(*p) {
           /* if there's anything more than a plain decimal number */
-          rc = sscanf(p, " - %6s", lrange);
+          rc = sscanf(_GETCHARPTR(p), " - %6s", lrange);
           *p = 0; /* null-terminate to make str2unum() work below */
         }
         else

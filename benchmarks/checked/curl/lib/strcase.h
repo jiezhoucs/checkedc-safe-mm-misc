@@ -38,6 +38,7 @@
 #define mm_strncasecompare(a,b,c) mm_Curl_strncasecompare(a,b,c)
 #define mm_strcasecompare(a,b) mm_Curl_strcasecompare(a,b)
 #define mm_strcasecompare_0(a,b) mm_Curl_strcasecompare_0(a,b)
+#define mm_strcasecompare_1(a,b) mm_Curl_strcasecompare_1(a,b)
 #define mm_strncasecompare_0(a,b,c) mm_Curl_strncasecompare_0(a,b,c)
 
 int Curl_strcasecompare(const char *first, const char *second);
@@ -46,6 +47,7 @@ int Curl_strncasecompare(mm_array_ptr<const char> first, mm_array_ptr<const char
 int Curl_strncasecompare_raw(const char *first, const char *second, size_t max);
 
 int mm_Curl_strcasecompare_0(mm_array_ptr<const char> first, const char *second);
+int mm_Curl_strcasecompare_1(const char *first, mm_array_ptr<const char> second);
 int mm_Curl_strcasecompare(mm_array_ptr<const char> first, mm_array_ptr<const char> second);
 int mm_Curl_strncasecompare_0(mm_array_ptr<const char> first, const char *second, size_t max);
 int mm_Curl_strncasecompare(mm_array_ptr<const char> first, mm_array_ptr<const char> second, size_t max);

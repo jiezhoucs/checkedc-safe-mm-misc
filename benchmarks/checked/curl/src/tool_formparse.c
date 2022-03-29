@@ -168,11 +168,11 @@ void tool_mime_free(mm_ptr<struct tool_mime> mime)
       tool_mime_free(mime->subparts);
     if(mime->prev)
       tool_mime_free(mime->prev);
-    CONST_SAFEFREE(mime->name);
-    CONST_SAFEFREE(mime->filename);
-    CONST_SAFEFREE(mime->type);
-    CONST_SAFEFREE(mime->encoder);
-    CONST_SAFEFREE(mime->data);
+    mm_Curl_safefree(char, mime->name);
+    mm_Curl_safefree(char, mime->filename);
+    mm_Curl_safefree(char, mime->type);
+    mm_Curl_safefree(char, mime->encoder);
+    mm_Curl_safefree(char, mime->data);
     curl_slist_free_all(mime->headers);
     MM_FREE(struct tool_mime, mime);
   }

@@ -173,19 +173,18 @@ CURLcode easysrc_cleanup(void)
 void dumpeasysrc(struct GlobalConfig *config)
 {
   struct curl_slist *ptr;
-  // TODO
-  char *o = _GETCHARPTR(config->libcurl);
+  mm_array_ptr<char> o = config->libcurl;
 
   FILE *out;
   bool fopened = FALSE;
-  if(strcmp(o, "-")) {
-    out = fopen(o, FOPEN_WRITETEXT);
+  if(mm_strcmp(o, "-")) {
+    out = mm_fopen(o, FOPEN_WRITETEXT);
     fopened = TRUE;
   }
   else
     out = stdout;
   if(!out)
-    warnf(config, "Failed to open %s to write libcurl code!\n", o);
+    warnf(config, "Failed to open %s to write libcurl code!\n", _GETCHARPTR(o));
   else {
     int i;
     const char *c;

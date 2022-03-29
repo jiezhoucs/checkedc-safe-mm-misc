@@ -81,7 +81,7 @@ static int multiply(unsigned long *amount, long with)
   return 0;
 }
 
-static CURLcode glob_set(mm_ptr<struct URLGlob> glob, char **patternp,
+static CURLcode glob_set(mm_ptr<struct URLGlob> glob, mm_array_ptr<char> *patternp,
                          size_t *posp, unsigned long *amount,
                          int globindex)
 {
@@ -91,8 +91,8 @@ static CURLcode glob_set(mm_ptr<struct URLGlob> glob, char **patternp,
   mm_ptr<struct URLPattern> pat = NULL;
   bool done = FALSE;
   mm_array_ptr<char> buf = glob->glob_buffer;
-  char *pattern = *patternp;
-  char *opattern = pattern;
+  mm_array_ptr<char> pattern = *patternp;
+  mm_array_ptr<char> opattern = pattern;
   size_t opos = *posp-1;
 
   pat = &glob->pattern[glob->size];
@@ -175,7 +175,7 @@ static CURLcode glob_set(mm_ptr<struct URLGlob> glob, char **patternp,
   return CURLE_OK;
 }
 
-static CURLcode glob_range(mm_ptr<struct URLGlob> glob, char **patternp,
+static CURLcode glob_range(mm_ptr<struct URLGlob> glob, mm_array_ptr<char> *patternp,
                            size_t *posp, unsigned long *amount,
                            int globindex)
 {
@@ -187,8 +187,8 @@ static CURLcode glob_range(mm_ptr<struct URLGlob> glob, char **patternp,
   */
   mm_ptr<struct URLPattern> pat = NULL;
   int rc;
-  char *pattern = *patternp;
-  char *c;
+  mm_array_ptr<char> pattern = *patternp;
+  mm_array_ptr<char> c = NULL;
 
   pat = &glob->pattern[glob->size];
   pat->globindex = globindex;
@@ -202,14 +202,14 @@ static CURLcode glob_range(mm_ptr<struct URLGlob> glob, char **patternp,
 
     pat->type = UPTCharRange;
 
-    rc = sscanf(pattern, "%c-%c%c", &min_c, &max_c, &end_c);
+    rc = sscanf(_GETCHARPTR(pattern), "%c-%c%c", &min_c, &max_c, &end_c);
 
     if(rc == 3) {
       if(end_c == ':') {
-        char *endp;
+        mm_array_ptr<char> endp = NULL;
         errno = 0;
-        step = strtoul(&pattern[4], &endp, 10);
-        if(errno || &pattern[4] == endp || *endp != ']')
+        step = mm_strtoul(&pattern[4], &endp, 10);
+        if(errno || (pattern + 4) == endp || *endp != ']')
           step = 0;
         else
           pattern = endp + 1;
@@ -246,7 +246,7 @@ static CURLcode glob_range(mm_ptr<struct URLGlob> glob, char **patternp,
     unsigned long min_n;
     unsigned long max_n = 0;
     unsigned long step_n = 0;
-    char *endp;
+    mm_array_ptr<char> endp = NULL;
 
     pat->type = UPTNumRange;
     pat->content.NumRange.padlength = 0;
@@ -262,7 +262,7 @@ static CURLcode glob_range(mm_ptr<struct URLGlob> glob, char **patternp,
     }
 
     errno = 0;
-    min_n = strtoul(pattern, &endp, 10);
+    min_n = mm_strtoul(pattern, &endp, 10);
     if(errno || (endp == pattern))
       endp = NULL;
     else {
@@ -277,14 +277,14 @@ static CURLcode glob_range(mm_ptr<struct URLGlob> glob, char **patternp,
           goto fail;
         }
         errno = 0;
-        max_n = strtoul(pattern, &endp, 10);
+        max_n = mm_strtoul(pattern, &endp, 10);
         if(errno)
           /* overflow */
           endp = NULL;
         else if(*endp == ':') {
           pattern = endp + 1;
           errno = 0;
-          step_n = strtoul(pattern, &endp, 10);
+          step_n = mm_strtoul(pattern, &endp, 10);
           if(errno)
             /* over/underflow situation */
             endp = NULL;
@@ -328,7 +328,7 @@ static CURLcode glob_range(mm_ptr<struct URLGlob> glob, char **patternp,
 
 #define MAX_IP6LEN 128
 
-static bool peek_ipv6(const char *str, size_t *skip)
+static bool peek_ipv6(mm_array_ptr<const char> str, size_t *skip)
 {
   /*
    * Scan for a potential IPv6 literal.
@@ -337,7 +337,7 @@ static bool peek_ipv6(const char *str, size_t *skip)
    */
   char hostname[MAX_IP6LEN];
   CURLU *u;
-  char *endbr = strchr(str, ']');
+  mm_array_ptr<char> endbr = mm_strchr(str, ']');
   size_t hlen;
   CURLUcode rc;
   if(!endbr)
@@ -351,7 +351,7 @@ static bool peek_ipv6(const char *str, size_t *skip)
   if(!u)
     return FALSE;
 
-  memcpy(hostname, str, hlen);
+  mm_memcpy(hostname, str, hlen);
   hostname[hlen] = 0;
 
   /* ask to "guess scheme" as then it works without a https:// prefix */
@@ -363,7 +363,7 @@ static bool peek_ipv6(const char *str, size_t *skip)
   return rc ? FALSE : TRUE;
 }
 
-static CURLcode glob_parse(mm_ptr<struct URLGlob> glob, char *pattern,
+static CURLcode glob_parse(mm_ptr<struct URLGlob> glob, mm_array_ptr<char> pattern,
                            size_t pos, unsigned long *amount)
 {
   /* processes a literal string component of a URL
@@ -384,7 +384,7 @@ static CURLcode glob_parse(mm_ptr<struct URLGlob> glob, char *pattern,
         if(!peek_ipv6(pattern, &skip) && (pattern[1] == ']'))
           skip = 2;
         if(skip) {
-          memcpy(_GETARRAYPTR(char, buf), pattern, skip);
+          mm_memcpy(buf, pattern, skip);
           buf += skip;
           pattern += skip;
           sublen += skip;
@@ -468,8 +468,7 @@ CURLcode glob_url(mm_ptr<mm_ptr<struct URLGlob>> glob, mm_array_ptr<char> url,
   glob_expand->urllen = mm_strlen(url);
   glob_expand->glob_buffer = glob_buffer;
 
-  // TODO
-  res = glob_parse(glob_expand, _GETCHARPTR(url), 1, &amount);
+  res = glob_parse(glob_expand, url, 1, &amount);
   if(!res)
     *urlnum = amount;
   else {

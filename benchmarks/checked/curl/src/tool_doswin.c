@@ -142,8 +142,7 @@ SANITIZEcode sanitize_file_name(mm_array_ptr<char const> *sanitized,
   len = mm_strlen(file_name);
   if(len > max_sanitized_len) {
     if(!(flags & SANITIZE_ALLOW_TRUNCATE) ||
-        // TODO
-       truncate_dryrun(_GETCHARPTR(file_name), max_sanitized_len))
+       truncate_dryrun(file_name, max_sanitized_len))
       return SANITIZE_ERR_INVALID_PATH;
 
     len = max_sanitized_len;
@@ -259,14 +258,14 @@ SANITIZE_ERR_OK: Good -- 'path' can be truncated
 SANITIZE_ERR_INVALID_PATH: Bad -- 'path' cannot be truncated
 != SANITIZE_ERR_OK && != SANITIZE_ERR_INVALID_PATH: Error
 */
-SANITIZEcode truncate_dryrun(const char *path, const size_t truncate_pos)
+SANITIZEcode truncate_dryrun(mm_array_ptr<const char> path, const size_t truncate_pos)
 {
   size_t len;
 
   if(!path)
     return SANITIZE_ERR_BAD_ARGUMENT;
 
-  len = strlen(path);
+  len = mm_strlen(path);
 
   if(truncate_pos > len)
     return SANITIZE_ERR_BAD_ARGUMENT;
@@ -274,12 +273,12 @@ SANITIZEcode truncate_dryrun(const char *path, const size_t truncate_pos)
   if(!len || !truncate_pos)
     return SANITIZE_ERR_INVALID_PATH;
 
-  if(strpbrk(&path[truncate_pos - 1], "\\/:"))
+  if(mm_strpbrk(&path[truncate_pos - 1], "\\/:"))
     return SANITIZE_ERR_INVALID_PATH;
 
   /* C:\foo can be truncated but C:\foo:ads can't */
   if(truncate_pos > 1) {
-    const char *p = &path[truncate_pos - 1];
+    mm_array_ptr<const char> p = &path[truncate_pos - 1];
     do {
       --p;
       if(*p == ':')
