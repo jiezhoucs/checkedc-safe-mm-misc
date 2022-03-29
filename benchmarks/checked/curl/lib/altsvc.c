@@ -137,7 +137,7 @@ static struct altsvc *altsvc_create(mm_array_ptr<char> srchost,
 }
 
 /* only returns SERIOUS errors */
-static CURLcode altsvc_add(struct altsvcinfo *asi, char *line)
+static CURLcode altsvc_add(struct altsvcinfo *asi, mm_array_ptr<char> line)
 {
   /* Example line:
      h2 example.com 443 h3 shiny.example.com 8443 "20191231 10:00:00" 1
@@ -153,7 +153,7 @@ static CURLcode altsvc_add(struct altsvcinfo *asi, char *line)
   unsigned int persist;
   int rc;
 
-  rc = sscanf(line,
+  rc = sscanf(_GETCHARPTR(line),
               "%" MAX_ALTSVC_ALPNLENSTR "s %" MAX_ALTSVC_HOSTLENSTR "s %u "
               "%" MAX_ALTSVC_ALPNLENSTR "s %" MAX_ALTSVC_HOSTLENSTR "s %u "
               "\"%" MAX_ALTSVC_DATELENSTR "[^\"]\" %u %u",
@@ -187,23 +187,24 @@ static CURLcode altsvc_add(struct altsvcinfo *asi, char *line)
 static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
 {
   CURLcode result = CURLE_OK;
-  char *line = NULL;
+  mm_array_ptr<char> line = NULL;
   FILE *fp;
 
   /* we need a private copy of the file name so that the altsvc cache file
      name survives an easy handle reset */
-  free(asi->filename);
-  asi->filename = strdup(file);
+  MM_FREE(char, asi->filename);
+  asi->filename = mm_strdup_from_raw(file);
   if(!asi->filename)
     return CURLE_OUT_OF_MEMORY;
 
   fp = fopen(file, FOPEN_READTEXT);
   if(fp) {
-    line = malloc(MAX_ALTSVC_LINE);
+    line = MM_ARRAY_ALLOC(char, MAX_ALTSVC_LINE);
     if(!line)
       goto fail;
-    while(Curl_get_line(line, MAX_ALTSVC_LINE, fp)) {
-      char *lineptr = line;
+    // TODO
+    while(Curl_get_line(_GETCHARPTR(line), MAX_ALTSVC_LINE, fp)) {
+      mm_array_ptr<char> lineptr = line;
       while(*lineptr && ISBLANK(*lineptr))
         lineptr++;
       if(*lineptr == '#')
@@ -212,14 +213,14 @@ static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
 
       altsvc_add(asi, lineptr);
     }
-    free(line); /* free the line buffer */
+    MM_FREE(char, line); /* free the line buffer */
     fclose(fp);
   }
   return result;
 
   fail:
-  Curl_safefree(asi->filename);
-  free(line);
+  mm_Curl_safefree(char, asi->filename);
+  MM_FREE(char, line);
   fclose(fp);
   return CURLE_OUT_OF_MEMORY;
 }
@@ -313,7 +314,7 @@ void Curl_altsvc_cleanup(struct altsvcinfo **altsvcp)
       n = e->next;
       altsvc_free(as);
     }
-    free(altsvc->filename);
+    MM_FREE(char, altsvc->filename);
     free(altsvc);
     *altsvcp = NULL; /* clear the pointer */
   }
@@ -323,13 +324,13 @@ void Curl_altsvc_cleanup(struct altsvcinfo **altsvcp)
  * Curl_altsvc_save() writes the altsvc cache to a file.
  */
 CURLcode Curl_altsvc_save(struct Curl_easy *data,
-                          struct altsvcinfo *altsvc, const char *file)
+                          struct altsvcinfo *altsvc, mm_array_ptr<const char> file)
 {
   struct Curl_llist_element *e;
   struct Curl_llist_element *n;
   CURLcode result = CURLE_OK;
   FILE *out;
-  char *tempstore;
+  mm_array_ptr<char> tempstore = NULL;
   unsigned char randsuffix[9];
 
   if(!altsvc)
@@ -347,11 +348,11 @@ CURLcode Curl_altsvc_save(struct Curl_easy *data,
   if(Curl_rand_hex(data, randsuffix, sizeof(randsuffix)))
     return CURLE_FAILED_INIT;
 
-  tempstore = aprintf("%s.%s.tmp", file, randsuffix);
+  tempstore = mmize_str(aprintf("%s.%s.tmp", _GETCHARPTR(file), randsuffix));
   if(!tempstore)
     return CURLE_OUT_OF_MEMORY;
 
-  out = fopen(tempstore, FOPEN_WRITETEXT);
+  out = mm_fopen(tempstore, FOPEN_WRITETEXT);
   if(!out)
     result = CURLE_WRITE_ERROR;
   else {
@@ -370,9 +371,9 @@ CURLcode Curl_altsvc_save(struct Curl_easy *data,
       result = CURLE_WRITE_ERROR;
 
     if(result)
-      unlink(tempstore);
+      unlink(_GETCHARPTR(tempstore));
   }
-  free(tempstore);
+  MM_FREE(char, tempstore);
   return result;
 }
 

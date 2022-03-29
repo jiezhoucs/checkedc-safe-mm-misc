@@ -22,6 +22,8 @@
  *
  ***************************************************************************/
 
-int Curl_rename(const char *oldpath, const char *newpath);
+#include <safe_mm_checked.h>
+
+int Curl_rename(mm_array_ptr<const char> oldpath, mm_array_ptr<const char> newpath);
 
 #endif /* HEADER_CURL_RENAME_H */

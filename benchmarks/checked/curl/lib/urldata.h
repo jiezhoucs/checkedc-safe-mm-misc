@@ -1429,7 +1429,7 @@ struct UrlState {
     char *userpwd;
     char *rangeline;
     char *ref;
-    char *host;
+    mm_array_ptr<char> host;
     mm_array_ptr<char> cookiehost;
     char *rtsp_transport;
     char *te; /* TE: request header */

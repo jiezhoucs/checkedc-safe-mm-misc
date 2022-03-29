@@ -97,7 +97,7 @@ void Curl_hsts_cleanup(struct hsts **hp)
       n = e->next;
       hsts_free(sts);
     }
-    free(h->filename);
+    MM_FREE(char, h->filename);
     free(h);
     *hp = NULL;
   }
@@ -328,13 +328,13 @@ static CURLcode hsts_out(struct stsentry *sts, FILE *fp)
  * Curl_https_save() writes the HSTS cache to file and callback.
  */
 CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
-                        const char *file)
+                        mm_array_ptr<const char> file)
 {
   struct Curl_llist_element *e;
   struct Curl_llist_element *n;
   CURLcode result = CURLE_OK;
   FILE *out;
-  char *tempstore;
+  mm_array_ptr<char> tempstore = NULL;
   unsigned char randsuffix[9];
 
   if(!h)
@@ -352,11 +352,11 @@ CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
   if(Curl_rand_hex(data, randsuffix, sizeof(randsuffix)))
     return CURLE_FAILED_INIT;
 
-  tempstore = aprintf("%s.%s.tmp", file, randsuffix);
+  tempstore = mmize_str(aprintf("%s.%s.tmp", _GETCHARPTR(file), randsuffix));
   if(!tempstore)
     return CURLE_OUT_OF_MEMORY;
 
-  out = fopen(tempstore, FOPEN_WRITETEXT);
+  out = mm_fopen(tempstore, FOPEN_WRITETEXT);
   if(!out)
     result = CURLE_WRITE_ERROR;
   else {
@@ -375,9 +375,9 @@ CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
       result = CURLE_WRITE_ERROR;
 
     if(result)
-      unlink(tempstore);
+      mm_unlink(tempstore);
   }
-  free(tempstore);
+  MM_FREE(char, tempstore);
   skipsave:
   if(data->set.hsts_write) {
     /* if there's a write callback */
@@ -489,8 +489,8 @@ static CURLcode hsts_load(struct hsts *h, const char *file)
 
   /* we need a private copy of the file name so that the hsts cache file
      name survives an easy handle reset */
-  free(h->filename);
-  h->filename = strdup(file);
+  MM_FREE(char, h->filename);
+  h->filename = mm_strdup_from_raw(file);
   if(!h->filename)
     return CURLE_OUT_OF_MEMORY;
 
@@ -515,7 +515,7 @@ static CURLcode hsts_load(struct hsts *h, const char *file)
   return result;
 
   fail:
-  Curl_safefree(h->filename);
+  mm_Curl_safefree(char, h->filename);
   fclose(fp);
   return CURLE_OUT_OF_MEMORY;
 }

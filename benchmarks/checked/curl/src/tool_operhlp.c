@@ -184,7 +184,7 @@ CURLcode get_url_file_name(mm_ptr<mm_array_ptr<char>> filename, mm_array_ptr<con
       char buffer[512]; /* suitably large */
       msnprintf(buffer, sizeof(buffer), "%s/%s", tdir, *filename);
       Curl_safefree(*filename);
-      *filename = strdup(buffer); /* clone the buffer */
+      *filename = mm_strdup_from_raw(buffer); /* clone the buffer */
       curl_free(tdir);
       if(!*filename)
         return CURLE_OUT_OF_MEMORY;

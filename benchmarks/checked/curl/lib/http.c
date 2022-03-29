@@ -182,7 +182,6 @@ static CURLcode http_setup_conn(struct Curl_easy *data,
   if(!http)
     return CURLE_OUT_OF_MEMORY;
 
-  // TODO?
   Curl_mime_initpart(_GETPTR(curl_mimepart, &http->form), data);
   data->req.p.http = http;
 
@@ -1635,7 +1634,6 @@ CURLcode Curl_http_done(struct Curl_easy *data,
   Curl_dyn_free(_GETDYNBUFPTR(&http->send_buffer));
   Curl_http2_done(data, premature);
   Curl_quic_done(data, premature);
-  // TODO
   Curl_mime_cleanpart(_GETPTR(curl_mimepart, &http->form));
   Curl_dyn_reset(&data->state.headerb);
   Curl_hyper_done(data);
@@ -2091,7 +2089,7 @@ CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn)
 
     data->state.first_remote_port = conn->remote_port;
   }
-  Curl_safefree(data->state.aptr.host);
+  mm_Curl_safefree(char, data->state.aptr.host);
 
   ptr = Curl_checkheaders(data, "Host");
   if(ptr && (!data->state.this_is_a_follow ||
@@ -2132,8 +2130,7 @@ CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn)
 #endif
 
     if(strcmp("Host:", _GETCHARPTR(ptr))) {
-        // TODO?
-      data->state.aptr.host = aprintf("Host:%s\r\n", _GETCHARPTR(&ptr[5]));
+      data->state.aptr.host = mmize_str(aprintf("Host:%s\r\n", _GETCHARPTR(&ptr[5])));
       if(!data->state.aptr.host)
         return CURLE_OUT_OF_MEMORY;
     }
@@ -2152,16 +2149,16 @@ CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn)
         (conn->remote_port == PORT_HTTP)) )
       /* if(HTTPS on port 443) OR (HTTP on port 80) then don't include
          the port number in the host string */
-      data->state.aptr.host = aprintf("Host: %s%s%s\r\n",
+      data->state.aptr.host = mmize_str(aprintf("Host: %s%s%s\r\n",
                                     conn->bits.ipv6_ip?"[":"",
                                     _GETCHARPTR(host),
-                                    conn->bits.ipv6_ip?"]":"");
+                                    conn->bits.ipv6_ip?"]":""));
     else
-      data->state.aptr.host = aprintf("Host: %s%s%s:%d\r\n",
+      data->state.aptr.host = mmize_str(aprintf("Host: %s%s%s:%d\r\n",
                                     conn->bits.ipv6_ip?"[":"",
                                     _GETCHARPTR(host),
                                     conn->bits.ipv6_ip?"]":"",
-                                    conn->remote_port);
+                                    conn->remote_port));
 
     if(!data->state.aptr.host)
       /* without Host: we can't make a nice request */
@@ -2300,7 +2297,6 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
     break;
   case HTTPREQ_POST_FORM:
     /* Convert the form structure into a mime structure. */
-    // TODO
     Curl_mime_cleanpart(_GETPTR(curl_mimepart, &http->form));
     result = Curl_getformdata(data, _GETPTR(curl_mimepart, &http->form), data->set.httppost,
                               data->state.fread_func);
@@ -2672,7 +2668,6 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
         /* set the pointer to mark that we will send the post body using the
            read callback, but only if we're not in authenticate negotiation */
         if(!conn->bits.authneg)
-            // TODO??
           http->postdata = &http->postdata;
       }
     }
@@ -2878,7 +2873,6 @@ CURLcode Curl_http_resume(struct Curl_easy *data,
             curlx_sotouz(data->state.resume_from - passed);
 
           size_t actuallyread =
-            // TODO?
             data->state.fread_func(_GETCHARPTR(data->state.buffer), 1, readthisamountnow,
                                    data->state.in);
 
@@ -3200,7 +3194,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
                   "%s",/* Alt-Used */
 
                   httpstring,
-                  (data->state.aptr.host?data->state.aptr.host:""),
+                  (data->state.aptr.host?_GETCHARPTR(data->state.aptr.host):""),
                   data->state.aptr.proxyuserpwd?
                   data->state.aptr.proxyuserpwd:"",
                   data->state.aptr.userpwd?data->state.aptr.userpwd:"",
@@ -4352,7 +4346,6 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
       }
     }
 
-    // TODO?
     result = Curl_convert_from_network(data, _GETCHARPTR(headp), strlen(_GETCHARPTR(headp)));
     /* Curl_convert_from_network calls failf if unsuccessful */
     if(result)

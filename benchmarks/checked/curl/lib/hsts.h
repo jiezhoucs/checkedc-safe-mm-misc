@@ -41,7 +41,7 @@ struct stsentry {
 /* The HSTS cache. Needs to be able to tailmatch host names. */
 struct hsts {
   struct Curl_llist list;
-  char *filename;
+  mm_array_ptr<char> filename;
   unsigned int flags;
 };
 
@@ -52,7 +52,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
 struct stsentry *Curl_hsts(struct hsts *h, const char *hostname,
                            bool subdomain);
 CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
-                        const char *file);
+                        mm_array_ptr<const char> file);
 CURLcode Curl_hsts_loadfile(struct Curl_easy *data,
                             struct hsts *h, const char *file);
 CURLcode Curl_hsts_loadcb(struct Curl_easy *data,

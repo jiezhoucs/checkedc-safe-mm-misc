@@ -427,10 +427,9 @@ CURLcode Curl_close(struct Curl_easy **datap)
   Curl_dyn_free(&data->state.headerb);
   MM_curl_free(char, data->state.ulbuf);
   Curl_flush_cookies(data, TRUE);
-  // TODO
-  Curl_altsvc_save(data, data->asi, _GETCHARPTR(data->set.str[STRING_ALTSVC]));
+  Curl_altsvc_save(data, data->asi, data->set.str[STRING_ALTSVC]);
   Curl_altsvc_cleanup(&data->asi);
-  Curl_hsts_save(data, data->hsts, _GETCHARPTR(data->set.str[STRING_HSTS]));
+  Curl_hsts_save(data, data->hsts, data->set.str[STRING_HSTS]);
   Curl_hsts_cleanup(&data->hsts);
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_CRYPTO_AUTH)
   Curl_http_auth_cleanup_digest(data);
@@ -458,8 +457,8 @@ CURLcode Curl_close(struct Curl_easy **datap)
   Curl_safefree(data->state.aptr.te);
   Curl_safefree(data->state.aptr.rangeline);
   Curl_safefree(data->state.aptr.ref);
-  Curl_safefree(data->state.aptr.host);
-  MM_curl_free(char, data->state.aptr.cookiehost);
+  mm_Curl_safefree(char, data->state.aptr.host);
+  mm_Curl_safefree(char, data->state.aptr.cookiehost);
   Curl_safefree(data->state.aptr.rtsp_transport);
   Curl_safefree(data->state.aptr.user);
   Curl_safefree(data->state.aptr.passwd);

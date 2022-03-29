@@ -36,7 +36,7 @@
 #include "memdebug.h"
 
 /* return 0 on success, 1 on error */
-int Curl_rename(const char *oldpath, const char *newpath)
+int Curl_rename(mm_array_ptr<const char> oldpath, mm_array_ptr<const char> newpath)
 {
 #ifdef WIN32
   /* rename() on Windows doesn't overwrite, so we can't use it here.
@@ -62,7 +62,7 @@ int Curl_rename(const char *oldpath, const char *newpath)
     Sleep(1);
   }
 #else
-  if(rename(oldpath, newpath))
+  if(rename(_GETCHARPTR(oldpath), _GETCHARPTR(newpath)))
     return 1;
 #endif
   return 0;
