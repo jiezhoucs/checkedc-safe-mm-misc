@@ -25,6 +25,8 @@
 
 #include "safe_mm_checked.h"
 
+#include "mm_curl_lib.h"
+
 typedef enum {
   HTTPREQ_GET,
   HTTPREQ_POST,
@@ -76,7 +78,7 @@ CURLcode Curl_add_timecondition(struct Curl_easy *data,
 CURLcode Curl_add_custom_headers(struct Curl_easy *data,
                                  bool is_connect,
 #ifndef USE_HYPER
-                                 struct dynbuf *req
+                                 mm_ptr<struct dynbuf> req
 #else
                                  void *headers
 #endif
@@ -90,7 +92,7 @@ void Curl_http_method(struct Curl_easy *data, struct connectdata *conn,
 CURLcode Curl_http_useragent(struct Curl_easy *data);
 CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn);
 CURLcode Curl_http_target(struct Curl_easy *data, struct connectdata *conn,
-                          struct dynbuf *req);
+                          mm_ptr<struct dynbuf> req);
 CURLcode Curl_http_statusline(struct Curl_easy *data,
                               struct connectdata *conn);
 CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
@@ -100,7 +102,7 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
                         Curl_HttpReq httpreq,
                         const char **teep);
 CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
-                            struct dynbuf *r, Curl_HttpReq httpreq);
+                            mm_ptr<struct dynbuf> r, Curl_HttpReq httpreq);
 bool Curl_use_http_1_1plus(const struct Curl_easy *data,
                            const struct connectdata *conn);
 #ifndef CURL_DISABLE_COOKIES

@@ -1431,7 +1431,6 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
   data->state.prefer_ascii = data->set.prefer_ascii;
   data->state.list_only = data->set.list_only;
   data->state.httpreq = data->set.method;
-  // TODO
   data->state.url = _GETCHARPTR(data->set.str[STRING_SET_URL]);
 
   /* Init the SSL session ID cache here. We do it here since we want to do it

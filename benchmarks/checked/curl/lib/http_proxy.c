@@ -46,7 +46,6 @@
 #include "curl_printf.h"
 #include "curl_memory.h"
 #include "memdebug.h"
-
 /*
  * Perform SSL initialization for HTTPS proxy.  Sets
  * proxy_ssl_connected connection bit when complete.  Can be
@@ -170,9 +169,8 @@ static CURLcode connect_init(struct Curl_easy *data, bool reinit)
     if(!s)
       return CURLE_OUT_OF_MEMORY;
     infof(data, "allocate connect buffer!");
-    // TODO
     conn->connect_state = s;
-    Curl_dyn_init(_GETDYNBUFPTR(&s->rcvbuf), DYN_PROXY_CONNECT_HEADERS);
+    mm_Curl_dyn_init(&s->rcvbuf, DYN_PROXY_CONNECT_HEADERS);
 
     /* Curl_proxyCONNECT is based on a pointer to a struct HTTP at the
      * member conn->proto.http; we want [protocol] through HTTP and we have
@@ -190,8 +188,7 @@ static CURLcode connect_init(struct Curl_easy *data, bool reinit)
   else {
     DEBUGASSERT(conn->connect_state);
     s = conn->connect_state;
-    // TODO
-    Curl_dyn_reset(_GETDYNBUFPTR(&s->rcvbuf));
+    mm_Curl_dyn_reset(&s->rcvbuf);
   }
   s->tunnel_state = TUNNEL_INIT;
   s->keepon = KEEPON_CONNECT;
@@ -206,9 +203,8 @@ static void connect_done(struct Curl_easy *data)
   mm_ptr<struct http_connect_state> s = conn->connect_state;
   if(s->tunnel_state != TUNNEL_EXIT) {
     s->tunnel_state = TUNNEL_EXIT;
-    // TODO
-    Curl_dyn_free(_GETDYNBUFPTR(&s->rcvbuf));
-    Curl_dyn_free(_GETDYNBUFPTR(&s->req));
+    mm_Curl_dyn_free(&s->rcvbuf);
+    mm_Curl_dyn_free(&s->req);
 
     /* retore the protocol pointer */
     data->req.p.http = s->prot_save;
@@ -277,8 +273,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
     timediff_t check;
     if(TUNNEL_INIT == s->tunnel_state) {
       /* BEGIN CONNECT PHASE */
-      // TODO
-      struct dynbuf *req = GETPTR(struct dynbuf, &s->req);
+      mm_ptr<struct dynbuf> req = &s->req;
       mm_array_ptr<char> hostheader = NULL;
       char *host = NULL;
 
@@ -292,7 +287,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
       data->req.newurl = NULL;
 
       /* initialize send-buffer */
-      Curl_dyn_init(req, DYN_HTTP_REQUEST);
+      mm_Curl_dyn_init(req, DYN_HTTP_REQUEST);
 
       result = CONNECT_host(data, conn,
                             hostname, remote_port, &hostheader, &host);
@@ -308,7 +303,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
           (conn->http_proxy.proxytype == CURLPROXY_HTTP_1_0) ? "1.0" : "1.1";
 
         result =
-          Curl_dyn_addf(req,
+          mm_Curl_dyn_addf(req,
                         "CONNECT %s HTTP/%s\r\n"
                         "%s"  /* Host: */
                         "%s", /* Proxy-Authorization */
@@ -320,22 +315,23 @@ static CURLcode CONNECT(struct Curl_easy *data,
 
         if(!result && !Curl_checkProxyheaders(data, conn, "User-Agent") &&
            data->set.str[STRING_USERAGENT])
-          result = Curl_dyn_addf(req, "User-Agent: %s\r\n",
+          result = mm_Curl_dyn_addf(req, "User-Agent: %s\r\n",
                                  _GETCHARPTR(data->set.str[STRING_USERAGENT]));
 
         if(!result && !Curl_checkProxyheaders(data, conn, "Proxy-Connection"))
-          result = Curl_dyn_add(req, "Proxy-Connection: Keep-Alive\r\n");
+          result = mm_Curl_dyn_add(req, "Proxy-Connection: Keep-Alive\r\n");
 
         if(!result)
           result = Curl_add_custom_headers(data, TRUE, req);
 
         if(!result)
           /* CRLF terminate the request */
-          result = Curl_dyn_add(req, "\r\n");
+          result = mm_Curl_dyn_add(req, "\r\n");
 
         if(!result) {
           /* Send the connect request to the proxy */
-          result = Curl_buffer_send(req, data, &data->info.request_size, 0,
+          // TODO
+          result = Curl_buffer_send(_GETDYNBUFPTR(req), data, &data->info.request_size, 0,
                                     sockindex);
         }
         if(result)
@@ -463,8 +459,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
           continue;
         }
 
-        // TODO
-        if(Curl_dyn_addn(_GETDYNBUFPTR(&s->rcvbuf), &byte, 1)) {
+        if(mm_Curl_dyn_addn(&s->rcvbuf, &byte, 1)) {
           failf(data, "CONNECT response too large!");
           return CURLE_RECV_ERROR;
         }
@@ -473,9 +468,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
         if(byte != 0x0a)
           continue;
 
-        // TODO
-        linep = Curl_dyn_ptr(_GETDYNBUFPTR(&s->rcvbuf));
-        perline = Curl_dyn_len(_GETDYNBUFPTR(&s->rcvbuf)); /* amount of bytes in this line */
+        linep = mm_Curl_dyn_ptr(&s->rcvbuf);
+        perline = mm_Curl_dyn_len(&s->rcvbuf); /* amount of bytes in this line */
 
         /* convert from the network encoding */
         result = Curl_convert_from_network(data, linep, perline);
@@ -620,8 +614,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
           data->info.httpproxycode = k->httpcode;
         }
 
-        // TODO
-        Curl_dyn_reset(_GETDYNBUFPTR(&s->rcvbuf));
+        mm_Curl_dyn_reset(&s->rcvbuf);
       } /* while there's buffer left and loop is requested */
 
       if(Curl_pgrsUpdate(data))
@@ -682,8 +675,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
     if(conn->bits.proxy_connect_closed)
       /* this is not an error, just part of the connection negotiation */
       return CURLE_OK;
-    // TODO
-    Curl_dyn_free(_GETDYNBUFPTR(&s->rcvbuf));
+    mm_Curl_dyn_free(&s->rcvbuf);
     failf(data, "Received HTTP code %d from proxy after CONNECT",
           data->req.httpcode);
     return CURLE_RECV_ERROR;
@@ -705,8 +697,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
   data->req.ignorebody = FALSE; /* put it (back) to non-ignore state */
   conn->bits.rewindaftersend = FALSE; /* make sure this isn't set for the
                                          document request  */
-  // TODO
-  Curl_dyn_free(_GETDYNBUFPTR(&s->rcvbuf));
+  mm_Curl_dyn_free(&s->rcvbuf);
   return CURLE_OK;
 }
 #else

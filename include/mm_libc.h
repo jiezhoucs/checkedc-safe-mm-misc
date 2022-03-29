@@ -18,6 +18,8 @@
 #define mm_fopen(p,m) fopen(_GETCHARPTR(p),m)
 #define mm_open(p,f) open(_GETCHARPTR(p),f)
 #define mm_stat(p,s) stat(_GETCHARPTR(p),s)
+#define mm_unlink(p) unlink(_GETCHARPTR(p))
+#define mm_write(f,b,c) write(f,_GETCHARPTR(b),c)
 
 mm_array_ptr<char> mm_strchr(mm_array_ptr<const char> p, int c);
 mm_array_ptr<char> mm_strrchr(mm_array_ptr<const char> p, int c);

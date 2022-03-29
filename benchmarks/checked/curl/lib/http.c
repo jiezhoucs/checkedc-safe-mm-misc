@@ -1631,7 +1631,7 @@ CURLcode Curl_http_done(struct Curl_easy *data,
   if(!http)
     return CURLE_OK;
 
-  Curl_dyn_free(_GETDYNBUFPTR(&http->send_buffer));
+  mm_Curl_dyn_free(&http->send_buffer);
   Curl_http2_done(data, premature);
   Curl_quic_done(data, premature);
   Curl_mime_cleanpart(_GETPTR(curl_mimepart, &http->form));
@@ -1706,7 +1706,7 @@ static const char *get_http_string(const struct Curl_easy *data,
 /* check and possibly add an Expect: header */
 static CURLcode expect100(struct Curl_easy *data,
                           struct connectdata *conn,
-                          struct dynbuf *req)
+                          mm_ptr<struct dynbuf> req)
 {
   CURLcode result = CURLE_OK;
   data->state.expect100header = FALSE; /* default to false unless it is set
@@ -1722,7 +1722,7 @@ static CURLcode expect100(struct Curl_easy *data,
         Curl_compareheader(ptr, "Expect:", "100-continue");
     }
     else {
-      result = Curl_dyn_add(req, "Expect: 100-continue\r\n");
+      result = mm_Curl_dyn_add(req, "Expect: 100-continue\r\n");
       if(!result)
         data->state.expect100header = TRUE;
     }
@@ -1785,7 +1785,7 @@ CURLcode Curl_http_compile_trailers(struct curl_slist *trailers,
 CURLcode Curl_add_custom_headers(struct Curl_easy *data,
                                  bool is_connect,
 #ifndef USE_HYPER
-                                 struct dynbuf *req
+                                 mm_ptr<struct dynbuf> req
 #else
                                  void *req
 #endif
@@ -1857,7 +1857,7 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
               semicolonp = mm_strdup(headers->data);
               if(!semicolonp) {
 #ifndef USE_HYPER
-                Curl_dyn_free(req);
+                mm_Curl_dyn_free(req);
 #endif
                 return CURLE_OUT_OF_MEMORY;
               }
@@ -1922,7 +1922,7 @@ CURLcode Curl_add_custom_headers(struct Curl_easy *data,
 #ifdef USE_HYPER
             result = Curl_hyper_header(data, req, compare);
 #else
-            result = Curl_dyn_addf(req, "%s\r\n", _GETCHARPTR(compare));
+            result = mm_Curl_dyn_addf(req, "%s\r\n", _GETCHARPTR(compare));
 #endif
           }
           if(semicolonp)
@@ -2172,7 +2172,7 @@ CURLcode Curl_http_host(struct Curl_easy *data, struct connectdata *conn)
  */
 CURLcode Curl_http_target(struct Curl_easy *data,
                           struct connectdata *conn,
-                          struct dynbuf *r)
+                          mm_ptr<struct dynbuf> r)
 {
   CURLcode result = CURLE_OK;
   mm_array_ptr<const char> path = data->state.up.path;
@@ -2193,7 +2193,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
 
     /* and no fragment part */
     CURLUcode uc;
-    char *url;
+    mm_array_ptr<char> url = NULL;
     CURLU *h = curl_url_dup(data->state.uh);
     if(!h)
       return CURLE_OUT_OF_MEMORY;
@@ -2227,7 +2227,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
     /* Extract the URL to use in the request. Store in STRING_TEMP_URL for
        clean-up reasons if the function returns before the free() further
        down. */
-    uc = curl_url_get(h, CURLUPART_URL, &url, CURLU_NO_DEFAULT_PORT);
+    uc = mm_curl_url_get(h, CURLUPART_URL, &url, CURLU_NO_DEFAULT_PORT);
     if(uc) {
       curl_url_cleanup(h);
       return CURLE_OUT_OF_MEMORY;
@@ -2236,10 +2236,9 @@ CURLcode Curl_http_target(struct Curl_easy *data,
     curl_url_cleanup(h);
 
     /* target or url */
-    // TODO
-    result = Curl_dyn_add(r, _GETCHARPTR(data->set.str[STRING_TARGET])?
-      _GETCHARPTR(data->set.str[STRING_TARGET]):url);
-    free(url);
+    result = data->set.str[STRING_TARGET]? mm_Curl_dyn_add(r, data->set.str[STRING_TARGET]) :
+        mm_Curl_dyn_add(r, url);
+    MM_FREE(char, url);
     if(result)
       return (result);
 
@@ -2258,7 +2257,8 @@ CURLcode Curl_http_target(struct Curl_easy *data,
           }
         }
         if(!type) {
-          result = Curl_dyn_addf(r, ";type=%c",
+            // TODO
+          result = mm_Curl_dyn_addf(r, ";type=%c",
                                  data->state.prefer_ascii ? 'a' : 'i');
           if(result)
             return result;
@@ -2272,12 +2272,11 @@ CURLcode Curl_http_target(struct Curl_easy *data,
     (void)conn; /* not used in disabled-proxy builds */
 #endif
   {
-      // TODO
-    result = Curl_dyn_add(r, _GETCHARPTR(path));
+    result = mm_Curl_dyn_add(r, path);
     if(result)
       return result;
     if(query)
-      result = Curl_dyn_addf(r, "?%s", query);
+      result = mm_Curl_dyn_addf(r, "?%s", query);
   }
 
   return result;
@@ -2374,7 +2373,7 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
 }
 
 CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
-                            struct dynbuf *r, Curl_HttpReq httpreq)
+                            mm_ptr<struct dynbuf> r, Curl_HttpReq httpreq)
 {
 #ifndef USE_HYPER
   /* Hyper always handles the body separately */
@@ -2400,7 +2399,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     if((http->postsize != -1) && !data->req.upload_chunky &&
        (conn->bits.authneg || !Curl_checkheaders(data, "Content-Length"))) {
       /* only add Content-Length if not uploading chunked */
-      result = Curl_dyn_addf(r, "Content-Length: %" CURL_FORMAT_CURL_OFF_T
+      result = mm_Curl_dyn_addf(r, "Content-Length: %" CURL_FORMAT_CURL_OFF_T
                              "\r\n", http->postsize);
       if(result)
         return result;
@@ -2413,7 +2412,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     }
 
     /* end of headers */
-    result = Curl_dyn_add(r, "\r\n");
+    result = mm_Curl_dyn_add(r, "\r\n");
     if(result)
       return result;
 
@@ -2421,7 +2420,8 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     Curl_pgrsSetUploadSize(data, http->postsize);
 
     /* this sends the buffer and frees all the buffer resources */
-    result = Curl_buffer_send(r, data, &data->info.request_size, 0,
+    // TODO?
+    result = Curl_buffer_send(_GETDYNBUFPTR(r), data, &data->info.request_size, 0,
                               FIRSTSOCKET);
     if(result)
       failf(data, "Failed sending PUT request");
@@ -2438,11 +2438,11 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     /* This is form posting using mime data. */
     if(conn->bits.authneg) {
       /* nothing to post! */
-      result = Curl_dyn_add(r, "Content-Length: 0\r\n\r\n");
+      result = mm_Curl_dyn_add(r, "Content-Length: 0\r\n\r\n");
       if(result)
         return result;
 
-      result = Curl_buffer_send(r, data, &data->info.request_size, 0,
+      result = Curl_buffer_send(_GETDYNBUFPTR(r), data, &data->info.request_size, 0,
                                 FIRSTSOCKET);
       if(result)
         failf(data, "Failed sending POST request");
@@ -2461,7 +2461,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
        (conn->bits.authneg || !Curl_checkheaders(data, "Content-Length"))) {
       /* we allow replacing this header if not during auth negotiation,
          although it isn't very wise to actually set your own */
-      result = Curl_dyn_addf(r,
+      result = mm_Curl_dyn_addf(r,
                              "Content-Length: %" CURL_FORMAT_CURL_OFF_T
                              "\r\n", http->postsize);
       if(result)
@@ -2474,7 +2474,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
       struct curl_slist *hdr;
 
       for(hdr = http->sendit->curlheaders; hdr; hdr = hdr->next) {
-        result = Curl_dyn_addf(r, "%s\r\n", _GETCHARPTR(hdr->data));
+        result = mm_Curl_dyn_addf(r, "%s\r\n", _GETCHARPTR(hdr->data));
         if(result)
           return result;
       }
@@ -2499,7 +2499,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
       data->state.expect100header = FALSE;
 
     /* make the request end in a true CRLF */
-    result = Curl_dyn_add(r, "\r\n");
+    result = mm_Curl_dyn_add(r, "\r\n");
     if(result)
       return result;
 
@@ -2512,7 +2512,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     http->sending = HTTPSEND_BODY;
 
     /* this sends the buffer and frees all the buffer resources */
-    result = Curl_buffer_send(r, data, &data->info.request_size, 0,
+    result = Curl_buffer_send(_GETDYNBUFPTR(r), data, &data->info.request_size, 0,
                               FIRSTSOCKET);
     if(result)
       failf(data, "Failed sending POST request");
@@ -2541,14 +2541,14 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
        (conn->bits.authneg || !Curl_checkheaders(data, "Content-Length"))) {
       /* we allow replacing this header if not during auth negotiation,
          although it isn't very wise to actually set your own */
-      result = Curl_dyn_addf(r, "Content-Length: %" CURL_FORMAT_CURL_OFF_T
+      result = mm_Curl_dyn_addf(r, "Content-Length: %" CURL_FORMAT_CURL_OFF_T
                              "\r\n", http->postsize);
       if(result)
         return result;
     }
 
     if(!Curl_checkheaders(data, "Content-Type")) {
-      result = Curl_dyn_add(r, "Content-Type: application/"
+      result = mm_Curl_dyn_add(r, "Content-Type: application/"
                             "x-www-form-urlencoded\r\n");
       if(result)
         return result;
@@ -2588,16 +2588,14 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
            get the data duplicated with malloc() and family. */
 
         /* end of headers! */
-        result = Curl_dyn_add(r, "\r\n");
+        result = mm_Curl_dyn_add(r, "\r\n");
         if(result)
           return result;
 
         if(!data->req.upload_chunky) {
           /* We're not sending it 'chunked', append it to the request
              already now to reduce the number if send() calls */
-            // TODO
-          result = Curl_dyn_addn(r, _GETCHARPTR(data->set.postfields),
-                                 (size_t)http->postsize);
+          result = mm_Curl_dyn_addn(r, data->set.postfields, (size_t)http->postsize);
           included_body = http->postsize;
         }
         else {
@@ -2605,18 +2603,17 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
             char chunk[16];
             /* Append the POST data chunky-style */
             msnprintf(chunk, sizeof(chunk), "%x\r\n", (int)http->postsize);
-            result = Curl_dyn_add(r, chunk);
+            result = mm_Curl_dyn_add(r, chunk);
             if(!result) {
               included_body = http->postsize + strlen(chunk);
-              result = Curl_dyn_addn(r, _GETCHARPTR(data->set.postfields),
-                                     (size_t)http->postsize);
+              result = mm_Curl_dyn_addn(r, data->set.postfields, (size_t)http->postsize);
               if(!result)
-                result = Curl_dyn_add(r, "\r\n");
+                result = mm_Curl_dyn_add(r, "\r\n");
               included_body += 2;
             }
           }
           if(!result) {
-            result = Curl_dyn_add(r, "\x30\x0d\x0a\x0d\x0a");
+            result = mm_Curl_dyn_add(r, "\x30\x0d\x0a\x0d\x0a");
             /* 0  CR  LF  CR  LF */
             included_body += 5;
           }
@@ -2639,7 +2636,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
         Curl_pgrsSetUploadSize(data, http->postsize);
 
         /* end of headers! */
-        result = Curl_dyn_add(r, "\r\n");
+        result = mm_Curl_dyn_add(r, "\r\n");
         if(result)
           return result;
       }
@@ -2648,14 +2645,14 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
 #endif
     {
        /* end of headers! */
-      result = Curl_dyn_add(r, "\r\n");
+      result = mm_Curl_dyn_add(r, "\r\n");
       if(result)
         return result;
 
       if(data->req.upload_chunky && conn->bits.authneg) {
         /* Chunky upload is selected and we're negotiating auth still, send
            end-of-data only */
-        result = Curl_dyn_add(r, (char *)"\x30\x0d\x0a\x0d\x0a");
+        result = mm_Curl_dyn_add(r, "\x30\x0d\x0a\x0d\x0a");
         /* 0  CR  LF  CR  LF */
         if(result)
           return result;
@@ -2672,7 +2669,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
       }
     }
     /* issue the request */
-    result = Curl_buffer_send(r, data, &data->info.request_size, included_body,
+    result = Curl_buffer_send(_GETDYNBUFPTR(r), data, &data->info.request_size, included_body,
                               FIRSTSOCKET);
 
     if(result)
@@ -2683,12 +2680,12 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     break;
 
   default:
-    result = Curl_dyn_add(r, "\r\n");
+    result = mm_Curl_dyn_add(r, "\r\n");
     if(result)
       return result;
 
     /* issue the request */
-    result = Curl_buffer_send(r, data, &data->info.request_size, 0,
+    result = Curl_buffer_send(_GETDYNBUFPTR(r), data, &data->info.request_size, 0,
                               FIRSTSOCKET);
 
     if(result)
@@ -3833,8 +3830,8 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
         /* check if this looks like a protocol header */
         statusline st =
           checkprotoprefix(data, conn,
-                           Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb)),
-                           Curl_dyn_len(_GETDYNBUFPTR(&data->state.headerb)));
+                           Curl_dyn_ptr(&data->state.headerb),
+                           Curl_dyn_len(&data->state.headerb));
 
         if(st == STATUS_BAD) {
           /* this is not the beginning of a protocol first header line */
@@ -3871,7 +3868,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
     if(!k->headerline) {
       /* the first read header */
       statusline st = checkprotoprefix(data, conn,
-                                       Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb)),
+                                       Curl_dyn_ptr(&data->state.headerb),
                                        Curl_dyn_len(&data->state.headerb));
       if(st == STATUS_BAD) {
         streamclose(conn, "bad HTTP: No end-of-message indicator");
@@ -4027,7 +4024,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
 
       headerlen = Curl_dyn_len(&data->state.headerb);
       result = Curl_client_write(data, writetype,
-                                 _GETCHARPTR(Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb))),
+                                 _GETCHARPTR(Curl_dyn_ptr(&data->state.headerb)),
                                  headerlen);
       if(result)
         return result;
@@ -4305,7 +4302,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
           if(!nc) {
             statusline check =
               checkhttpprefix(data,
-                              Curl_dyn_ptr(_GETDYNBUFPTR(&data->state.headerb)),
+                              Curl_dyn_ptr(&data->state.headerb),
                               Curl_dyn_len(&data->state.headerb));
             if(check == STATUS_DONE) {
               nc = 1;

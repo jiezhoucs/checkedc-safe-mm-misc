@@ -211,7 +211,8 @@ LIB_CFILES =         \
   version_win32.c    \
   warnless.c         \
   wildcard.c         \
-  x509asn1.c
+  x509asn1.c	     \
+  mm_curl_lib.c
 
 LIB_HFILES =         \
   altsvc.h           \
@@ -332,7 +333,8 @@ LIB_HFILES =         \
   version_win32.h    \
   warnless.h         \
   wildcard.h         \
-  x509asn1.h
+  x509asn1.h		 \
+  mm_curl_lib.h
 
 LIB_RCFILES = libcurl.rc
 
