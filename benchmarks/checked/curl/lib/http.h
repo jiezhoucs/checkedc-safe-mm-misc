@@ -59,7 +59,7 @@ mm_array_ptr<char> Curl_checkProxyheaders(struct Curl_easy *data,
                              const struct connectdata *conn,
                              const char *thisheader);
 #ifndef USE_HYPER
-CURLcode Curl_buffer_send(struct dynbuf *in,
+CURLcode Curl_buffer_send(mm_ptr<struct dynbuf> in,
                           struct Curl_easy *data,
                           curl_off_t *bytes_written,
                           curl_off_t included_body_bytes,

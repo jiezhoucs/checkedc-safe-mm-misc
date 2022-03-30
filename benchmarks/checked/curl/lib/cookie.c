@@ -452,7 +452,7 @@ Curl_cookie_add(struct Curl_easy *data,
                 bool noexpire, /* if TRUE, skip remove_expired() */
                 mm_array_ptr<char> lineptr,   /* first character of the line */
                 mm_array_ptr<const char> domain, /* default domain */
-                const char *path,   /* full path used when this cookie is set,
+                mm_ptr<const char> path,   /* full path used when this cookie is set,
                                        used to get default path for the cookie
                                        unless set */
                 bool secure)  /* TRUE if connection is over secure origin */
@@ -776,17 +776,17 @@ Curl_cookie_add(struct Curl_easy *data,
        * passed-in path to this function MAY have a '?' and following part that
        * MUST NOT be stored as part of the path.
        */
-      char *queryp = strchr(path, '?');
+      mm_array_ptr<char> queryp = mm_strchr(path, '?');
 
       /*
        * queryp is where the interesting part of the path ends, so now we
        * want to the find the last
        */
-      char *endslash;
+      mm_ptr<char> endslash = NULL;
       if(!queryp)
-        endslash = strrchr(path, '/');
+        endslash = mm_strrchr(path, '/');
       else
-        endslash = memrchr(path, '/', (queryp - path));
+        endslash = mm_memrchr(path, '/', (queryp - path));
       if(endslash) {
         size_t pathlen = (endslash-path + 1); /* include end slash */
         co->path = MM_ARRAY_ALLOC(char, pathlen + 1); /* one extra for the zero byte */

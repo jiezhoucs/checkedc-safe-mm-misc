@@ -330,8 +330,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
 
         if(!result) {
           /* Send the connect request to the proxy */
-          // TODO
-          result = Curl_buffer_send(_GETDYNBUFPTR(req), data, &data->info.request_size, 0,
+          result = Curl_buffer_send(req, data, &data->info.request_size, 0,
                                     sockindex);
         }
         if(result)

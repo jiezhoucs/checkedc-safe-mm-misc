@@ -94,7 +94,7 @@ struct Curl_easy;
 mm_ptr<struct Cookie> Curl_cookie_add(struct Curl_easy *data,
                                mm_array_ptr<struct CookieInfo> c, bool header,
                                bool noexpiry, mm_array_ptr<char> lineptr,
-                               mm_array_ptr<const char> domain, const char *path,
+                               mm_array_ptr<const char> domain, mm_ptr<const char> path,
                                bool secure);
 
 mm_ptr<struct Cookie> Curl_cookie_getlist(mm_ptr<struct CookieInfo> c, mm_array_ptr<const char> host,

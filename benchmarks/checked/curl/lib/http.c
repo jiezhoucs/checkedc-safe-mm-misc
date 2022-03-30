@@ -1218,7 +1218,7 @@ static size_t readmoredata(char *buffer,
  *
  * Returns CURLcode
  */
-CURLcode Curl_buffer_send(struct dynbuf *in,
+CURLcode Curl_buffer_send(mm_ptr<struct dynbuf> in,
                           struct Curl_easy *data,
                           /* add the number of sent bytes to this
                              counter */
@@ -1244,8 +1244,8 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
   /* The looping below is required since we use non-blocking sockets, but due
      to the circumstances we will just loop and try again and again etc */
 
-  ptr = Curl_dyn_ptr(in);
-  size = Curl_dyn_len(in);
+  ptr = mm_Curl_dyn_ptr(in);
+  size = mm_Curl_dyn_len(in);
 
   headersize = size - (size_t)included_body_bytes; /* the initial part that
                                                       isn't body is header */
@@ -1256,7 +1256,7 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
   /* Curl_convert_to_network calls failf if unsuccessful */
   if(result) {
     /* conversion failed, free memory and return to the caller */
-    Curl_dyn_free(in);
+    mm_Curl_dyn_free(in);
     return result;
   }
 
@@ -1287,7 +1287,7 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
     result = Curl_get_upload_buffer(data);
     if(result) {
       /* malloc failed, free memory and return to the caller */
-      Curl_dyn_free(in);
+      mm_Curl_dyn_free(in);
       return result;
     }
     /* We never send more than upload_buffer_size bytes in one single chunk
@@ -1298,7 +1298,7 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
     if(sendsize > (size_t)data->set.upload_buffer_size)
       sendsize = (size_t)data->set.upload_buffer_size;
 
-    memcpy(_GETCHARPTR(data->state.ulbuf), _GETCHARPTR(ptr), sendsize);
+    mm_memcpy(data->state.ulbuf, ptr, sendsize);
     ptr = data->state.ulbuf;
   }
   else {
@@ -1368,7 +1368,7 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
 
         size -= amount;
 
-        ptr = Curl_dyn_ptr(in) + amount;
+        ptr = mm_Curl_dyn_ptr(in) + amount;
 
         /* backup the currently set pointers */
         http->backup.fread_func = data->state.fread_func;
@@ -1405,7 +1405,7 @@ CURLcode Curl_buffer_send(struct dynbuf *in,
         return CURLE_SEND_ERROR;
     }
   }
-  Curl_dyn_free(in);
+  mm_Curl_dyn_free(in);
 
   /* no remaining header data */
   data->req.pendingheader = 0;
@@ -2257,7 +2257,6 @@ CURLcode Curl_http_target(struct Curl_easy *data,
           }
         }
         if(!type) {
-            // TODO
           result = mm_Curl_dyn_addf(r, ";type=%c",
                                  data->state.prefer_ascii ? 'a' : 'i');
           if(result)
@@ -2420,8 +2419,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     Curl_pgrsSetUploadSize(data, http->postsize);
 
     /* this sends the buffer and frees all the buffer resources */
-    // TODO?
-    result = Curl_buffer_send(_GETDYNBUFPTR(r), data, &data->info.request_size, 0,
+    result = Curl_buffer_send(r, data, &data->info.request_size, 0,
                               FIRSTSOCKET);
     if(result)
       failf(data, "Failed sending PUT request");
@@ -2442,7 +2440,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
       if(result)
         return result;
 
-      result = Curl_buffer_send(_GETDYNBUFPTR(r), data, &data->info.request_size, 0,
+      result = Curl_buffer_send(r, data, &data->info.request_size, 0,
                                 FIRSTSOCKET);
       if(result)
         failf(data, "Failed sending POST request");
@@ -2512,7 +2510,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
     http->sending = HTTPSEND_BODY;
 
     /* this sends the buffer and frees all the buffer resources */
-    result = Curl_buffer_send(_GETDYNBUFPTR(r), data, &data->info.request_size, 0,
+    result = Curl_buffer_send(r, data, &data->info.request_size, 0,
                               FIRSTSOCKET);
     if(result)
       failf(data, "Failed sending POST request");
@@ -2669,7 +2667,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
       }
     }
     /* issue the request */
-    result = Curl_buffer_send(_GETDYNBUFPTR(r), data, &data->info.request_size, included_body,
+    result = Curl_buffer_send(r, data, &data->info.request_size, included_body,
                               FIRSTSOCKET);
 
     if(result)
@@ -2685,8 +2683,7 @@ CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
       return result;
 
     /* issue the request */
-    result = Curl_buffer_send(_GETDYNBUFPTR(r), data, &data->info.request_size, 0,
-                              FIRSTSOCKET);
+    result = Curl_buffer_send(r, data, &data->info.request_size, 0, FIRSTSOCKET);
 
     if(result)
       failf(data, "Failed sending HTTP request");
@@ -3594,8 +3591,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
                     CURL_LOCK_ACCESS_SINGLE);
     Curl_cookie_add(data, data->cookies, TRUE, FALSE,
                     headp + strlen("Set-Cookie:"), host,
-                    // TODO
-                    _GETCHARPTR(data->state.up.path), secure_context);
+                    data->state.up.path, secure_context);
     Curl_share_unlock(data, CURL_LOCK_DATA_COOKIE);
   }
 #endif
