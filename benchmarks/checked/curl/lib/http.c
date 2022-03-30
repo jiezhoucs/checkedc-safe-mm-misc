@@ -1344,11 +1344,11 @@ CURLcode Curl_buffer_send(mm_ptr<struct dynbuf> in,
     size_t bodylen = amount - headlen;
 
     /* this data _may_ contain binary stuff */
-    Curl_debug(data, CURLINFO_HEADER_OUT, _GETCHARPTR(ptr), headlen);
+    mm_Curl_debug(data, CURLINFO_HEADER_OUT, ptr, headlen);
     if(bodylen)
       /* there was body data sent beyond the initial header part, pass that on
          to the debug callback too */
-      Curl_debug(data, CURLINFO_DATA_OUT, _GETCHARPTR(ptr) + headlen, bodylen);
+      mm_Curl_debug(data, CURLINFO_DATA_OUT, ptr + headlen, bodylen);
 
     /* 'amount' can never be a very large value here so typecasting it so a
        signed 31 bit value should not cause problems even if ssize_t is
@@ -2323,7 +2323,6 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
       cthdr = "multipart/form-data";
 
     curl_mime_headers(http->sendit, data->set.headers, 0);
-    // TODO
     result = Curl_mime_prepare_headers(http->sendit, cthdr,
                                        NULL, MIMESTRATEGY_FORM);
     curl_mime_headers(http->sendit, NULL, 0);
@@ -4181,7 +4180,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
           k->keepon &= ~KEEP_RECV;
         }
 
-        Curl_debug(data, CURLINFO_HEADER_IN, _GETCHARPTR(str_start), headerlen);
+        mm_Curl_debug(data, CURLINFO_HEADER_IN, str_start, headerlen);
         break; /* exit header line loop */
       }
 
@@ -4357,8 +4356,7 @@ CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
     if(data->set.include_header)
       writetype |= CLIENTWRITE_BODY;
 
-    // TODO?
-    Curl_debug(data, CURLINFO_HEADER_IN, _GETCHARPTR(headp),
+    mm_Curl_debug(data, CURLINFO_HEADER_IN, headp,
                Curl_dyn_len(&data->state.headerb));
 
     result = Curl_client_write(data, writetype, _GETCHARPTR(headp),

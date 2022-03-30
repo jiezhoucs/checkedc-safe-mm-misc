@@ -121,8 +121,7 @@ static int http2_getsock(struct Curl_easy *data,
 static void http2_stream_free(mm_ptr<struct HTTP> http)
 {
   if(http) {
-    // TODO
-    Curl_dyn_free(_GETPTR(struct dynbuf, &http->header_recvbuf));
+    mm_Curl_dyn_free(&http->header_recvbuf);
     for(; http->push_headers_used > 0; --http->push_headers_used) {
       MM_FREE(char, http->push_headers[http->push_headers_used - 1]);
     }
@@ -488,8 +487,7 @@ static struct Curl_easy *duphandle(struct Curl_easy *data)
     }
     else {
       second->req.p.http = http;
-      // TODO
-      Curl_dyn_init(_GETPTR(struct dynbuf, &http->header_recvbuf), DYN_H2_HEADERS);
+      mm_Curl_dyn_init(&http->header_recvbuf, DYN_H2_HEADERS);
       Curl_http2_setup_req(second);
       second->state.stream_weight = data->state.stream_weight;
     }
@@ -640,9 +638,8 @@ static int push_promise(struct Curl_easy *data,
       rv = CURL_PUSH_DENY;
       goto fail;
     }
-    // TODO
-    Curl_dyn_init(_GETPTR(struct dynbuf, &newstream->header_recvbuf), DYN_H2_HEADERS);
-    Curl_dyn_init(_GETPTR(struct dynbuf, &newstream->trailer_recvbuf), DYN_H2_TRAILERS);
+    mm_Curl_dyn_init(&newstream->header_recvbuf, DYN_H2_HEADERS);
+    mm_Curl_dyn_init(&newstream->trailer_recvbuf, DYN_H2_TRAILERS);
   }
   else {
     H2BUGF(infof(data, "Got PUSH_PROMISE, ignore it!"));
@@ -751,14 +748,11 @@ static int on_frame_recv(nghttp2_session *session, const nghttp2_frame *frame,
       stream->status_code = -1;
     }
 
-    // TODO
-    result = Curl_dyn_add(_GETPTR(struct dynbuf, &stream->header_recvbuf), "\r\n");
+    result = mm_Curl_dyn_add(&stream->header_recvbuf, "\r\n");
     if(result)
       return NGHTTP2_ERR_CALLBACK_FAILURE;
 
-    // TODO
-    left = Curl_dyn_len(_GETPTR(struct dynbuf, &stream->header_recvbuf)) -
-      stream->nread_header_recvbuf;
+    left = mm_Curl_dyn_len(&stream->header_recvbuf) - stream->nread_header_recvbuf;
     ncopy = CURLMIN(stream->len, left);
 
     memcpy(_GETCHARPTR(&stream->mem[stream->memlen]),
@@ -1075,17 +1069,14 @@ static int on_header(nghttp2_session *session, const nghttp2_frame *frame,
     stream->status_code = decode_status_code(value, valuelen);
     DEBUGASSERT(stream->status_code != -1);
 
-    // TODO
-    result = Curl_dyn_add(_GETPTR(struct dynbuf, &stream->header_recvbuf), "HTTP/2 ");
+    result = mm_Curl_dyn_add(&stream->header_recvbuf, "HTTP/2 ");
     if(result)
       return NGHTTP2_ERR_CALLBACK_FAILURE;
-    // TODO
     result = Curl_dyn_addn(_GETDYNBUFPTR(&stream->header_recvbuf), value, valuelen);
     if(result)
       return NGHTTP2_ERR_CALLBACK_FAILURE;
     /* the space character after the status code is mandatory */
-    // TODO
-    result = Curl_dyn_add(_GETDYNBUFPTR(&stream->header_recvbuf), " \r\n");
+    result = mm_Curl_dyn_add(&stream->header_recvbuf, " \r\n");
     if(result)
       return NGHTTP2_ERR_CALLBACK_FAILURE;
     /* if we receive data for another handle, wake that up */
@@ -1100,20 +1091,16 @@ static int on_header(nghttp2_session *session, const nghttp2_frame *frame,
   /* nghttp2 guarantees that namelen > 0, and :status was already
      received, and this is not pseudo-header field . */
   /* convert to a HTTP1-style header */
-  // TODO
   result = Curl_dyn_addn(_GETDYNBUFPTR(&stream->header_recvbuf), name, namelen);
   if(result)
     return NGHTTP2_ERR_CALLBACK_FAILURE;
-  // TODO
-  result = Curl_dyn_add(_GETDYNBUFPTR(&stream->header_recvbuf), ": ");
+  result = mm_Curl_dyn_add(&stream->header_recvbuf, ": ");
   if(result)
     return NGHTTP2_ERR_CALLBACK_FAILURE;
-  // TODO
   result = Curl_dyn_addn(_GETDYNBUFPTR(&stream->header_recvbuf), value, valuelen);
   if(result)
     return NGHTTP2_ERR_CALLBACK_FAILURE;
-  // TODO
-  result = Curl_dyn_add(_GETDYNBUFPTR(&stream->header_recvbuf), "\r\n");
+  result = mm_Curl_dyn_add(&stream->header_recvbuf, "\r\n");
   if(result)
     return NGHTTP2_ERR_CALLBACK_FAILURE;
   /* if we receive data for another handle, wake that up */
@@ -1214,9 +1201,8 @@ void Curl_http2_done(struct Curl_easy *data, bool premature)
 
   /* there might be allocated resources done before this got the 'h2' pointer
      setup */
-  // TODO
-  Curl_dyn_free(_GETDYNBUFPTR(&http->header_recvbuf));
-  Curl_dyn_free(_GETDYNBUFPTR(&http->trailer_recvbuf));
+  mm_Curl_dyn_free(&http->header_recvbuf);
+  mm_Curl_dyn_free(&http->trailer_recvbuf);
   if(http->push_headers) {
     /* if they weren't used and then freed before */
     for(; http->push_headers_used > 0; --http->push_headers_used) {
@@ -1533,8 +1519,7 @@ static ssize_t http2_handle_stream_close(struct connectdata *conn,
     return -1;
   }
 
-  // TODO
-  if(Curl_dyn_len(_GETDYNBUFPTR(&stream->trailer_recvbuf))) {
+  if(mm_Curl_dyn_len(&stream->trailer_recvbuf)) {
     mm_array_ptr<char> trailp = Curl_dyn_ptr(_GETDYNBUFPTR(&stream->trailer_recvbuf));
     mm_array_ptr<char> lf = NULL;
 
@@ -1547,7 +1532,7 @@ static ssize_t http2_handle_stream_close(struct connectdata *conn,
         break;
       len = lf + 1 - trailp;
 
-      Curl_debug(data, CURLINFO_HEADER_IN, _GETCHARPTR(trailp), len);
+      mm_Curl_debug(data, CURLINFO_HEADER_IN, trailp, len);
       /* pass the trailers one by one to the callback */
       result = Curl_client_write(data, CLIENTWRITE_HEADER, _GETCHARPTR(trailp), len);
       if(result) {
@@ -1647,15 +1632,13 @@ static ssize_t http2_recv(struct Curl_easy *data, int sockindex,
    * identifies as its owner at this time.
    */
 
-  // TODO
   if(stream->bodystarted &&
-     stream->nread_header_recvbuf < Curl_dyn_len(_GETDYNBUFPTR(&stream->header_recvbuf))) {
+     stream->nread_header_recvbuf < mm_Curl_dyn_len(&stream->header_recvbuf)) {
     /* If there is header data pending for this stream to return, do that */
     size_t left =
-      // TODO
-      Curl_dyn_len(_GETDYNBUFPTR(&stream->header_recvbuf)) - stream->nread_header_recvbuf;
+      mm_Curl_dyn_len(&stream->header_recvbuf) - stream->nread_header_recvbuf;
     size_t ncopy = CURLMIN(len, left);
-    memcpy(mem, _GETCHARPTR((Curl_dyn_ptr(_GETDYNBUFPTR(&stream->header_recvbuf)))) +
+    memcpy(mem, _GETCHARPTR((mm_Curl_dyn_ptr(&stream->header_recvbuf))) +
            stream->nread_header_recvbuf, ncopy);
     stream->nread_header_recvbuf += ncopy;
 
@@ -2226,9 +2209,8 @@ CURLcode Curl_http2_setup(struct Curl_easy *data,
 
   stream->stream_id = -1;
 
-  // TODO
-  Curl_dyn_init(_GETDYNBUFPTR(&stream->header_recvbuf), DYN_H2_HEADERS);
-  Curl_dyn_init(_GETDYNBUFPTR(&stream->trailer_recvbuf), DYN_H2_TRAILERS);
+  mm_Curl_dyn_init(&stream->header_recvbuf, DYN_H2_HEADERS);
+  mm_Curl_dyn_init(&stream->trailer_recvbuf, DYN_H2_TRAILERS);
 
   stream->upload_left = 0;
   stream->upload_mem = NULL;
@@ -2251,8 +2233,7 @@ CURLcode Curl_http2_setup(struct Curl_easy *data,
 
   result = http2_init(data, conn);
   if(result) {
-    // TODO
-    Curl_dyn_free(_GETDYNBUFPTR(&stream->header_recvbuf));
+    mm_Curl_dyn_free(&stream->header_recvbuf);
     return result;
   }
 

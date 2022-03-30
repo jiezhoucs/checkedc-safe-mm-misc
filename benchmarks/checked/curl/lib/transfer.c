@@ -724,17 +724,16 @@ static CURLcode readwrite_data(struct Curl_easy *data,
       /* pass data to the debug function before it gets "dechunked" */
       if(data->set.verbose) {
         if(k->badheader) {
-          Curl_debug(data, CURLINFO_DATA_IN,
-              // TODO
-                     _GETCHARPTR(Curl_dyn_ptr(&data->state.headerb)),
+          mm_Curl_debug(data, CURLINFO_DATA_IN,
+                     Curl_dyn_ptr(&data->state.headerb),
                      Curl_dyn_len(&data->state.headerb));
           if(k->badheader == HEADER_PARTHEADER)
-            Curl_debug(data, CURLINFO_DATA_IN,
-                       _GETCHARPTR(k->str), (size_t)nread);
+            mm_Curl_debug(data, CURLINFO_DATA_IN,
+                       k->str, (size_t)nread);
         }
         else
-          Curl_debug(data, CURLINFO_DATA_IN,
-                     _GETCHARPTR(k->str), (size_t)nread);
+          mm_Curl_debug(data, CURLINFO_DATA_IN,
+                     k->str, (size_t)nread);
       }
 
 #ifndef CURL_DISABLE_HTTP

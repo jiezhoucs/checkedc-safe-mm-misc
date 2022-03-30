@@ -176,7 +176,7 @@ struct curl_httppost {
                                        CURL_HTTPPOST_LARGE */
   char *buffer;                     /* pointer to allocated buffer contents */
   long bufferlength;                /* length of buffer field */
-  char *contenttype;                /* Content-Type */
+  mm_array_ptr<char> contenttype;                /* Content-Type */
   struct curl_slist *contentheader; /* list of extra headers for this form */
   struct curl_httppost *more;       /* if one field name has more than one
                                        file, this link should link to following
@@ -966,7 +966,7 @@ typedef enum {
 
 
 struct curl_hstsentry {
-  char *name;
+  mm_array_ptr<char> name;
   size_t namelen;
   unsigned int includeSubDomains:1;
   char expire[18]; /* YYYYMMDD HH:MM:SS [null-terminated] */
@@ -2318,7 +2318,7 @@ CURL_EXTERN CURLcode curl_mime_filename(curl_mimepart *part,
  *
  * Set mime part type.
  */
-CURL_EXTERN CURLcode curl_mime_type(curl_mimepart *part, const char *mimetype);
+CURL_EXTERN CURLcode curl_mime_type(curl_mimepart *part, mm_array_ptr<const char> mimetype);
 
 /*
  * NAME curl_mime_encoder()

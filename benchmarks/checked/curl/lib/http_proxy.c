@@ -477,8 +477,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
           return result;
 
         /* output debug if that is requested */
-        // TODO
-        Curl_debug(data, CURLINFO_HEADER_IN, _GETCHARPTR(linep), perline);
+        Curl_debug(data, CURLINFO_HEADER_IN, linep, perline);
 
         if(!data->set.suppress_connect_headers) {
           /* send the header to the callback */

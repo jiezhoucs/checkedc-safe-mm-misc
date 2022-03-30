@@ -52,6 +52,8 @@
 #include "curl_memory.h"
 #include "memdebug.h"
 
+#include <mm_libc.h>
+
 #ifdef CURL_DO_LINEEND_CONV
 /*
  * convert_lineends() changes CRLF (\r\n) end-of-line markers to a single LF
@@ -777,6 +779,82 @@ int Curl_debug(struct Curl_easy *data, curl_infotype type,
     }
 #ifdef CURL_DOES_CONVERSIONS
     free(buf);
+#endif
+  }
+  return rc;
+}
+
+/* return 0 on success */
+int mm_Curl_debug(struct Curl_easy *data, curl_infotype type,
+                  mm_array_ptr<char> ptr, size_t size)
+{
+  int rc = 0;
+  if(data->set.verbose) {
+    static const char s_infotype[CURLINFO_END][3] = {
+      "* ", "< ", "> ", "{ ", "} ", "{ ", "} " };
+
+#ifdef CURL_DOES_CONVERSIONS
+    mm_array_ptr<char> buf = NULL;
+    size_t conv_size = 0;
+
+    switch(type) {
+    case CURLINFO_HEADER_OUT:
+      buf = mm_Curl_memdup(ptr, size);
+      if(!buf)
+        return 1;
+      conv_size = size;
+
+      /* Special processing is needed for this block if it
+       * contains both headers and data (separated by CRLFCRLF).
+       * We want to convert just the headers, leaving the data as-is.
+       */
+      if(size > 4) {
+        size_t i;
+        for(i = 0; i < size-4; i++) {
+          if(mm_memcmp(&buf[i], "\x0d\x0a\x0d\x0a", 4) == 0) {
+            /* convert everything through this CRLFCRLF but no further */
+            conv_size = i + 4;
+            break;
+          }
+        }
+      }
+
+      Curl_convert_from_network(data, _GETCHARPTR(buf), conv_size);
+      /* Curl_convert_from_network calls failf if unsuccessful */
+      /* we might as well continue even if it fails...   */
+      ptr = buf; /* switch pointer to use my buffer instead */
+      break;
+    default:
+      /* leave everything else as-is */
+      break;
+    }
+#endif /* CURL_DOES_CONVERSIONS */
+
+    if(data->set.fdebug) {
+      Curl_set_in_callback(data, true);
+      rc = (*data->set.fdebug)(data, type, _GETCHARPTR(ptr), size, data->set.debugdata);
+      Curl_set_in_callback(data, false);
+    }
+    else {
+      switch(type) {
+      case CURLINFO_TEXT:
+      case CURLINFO_HEADER_OUT:
+      case CURLINFO_HEADER_IN:
+        fwrite(s_infotype[type], 2, 1, data->set.err);
+        mm_fwrite(ptr, size, 1, data->set.err);
+#ifdef CURL_DOES_CONVERSIONS
+        if(size != conv_size) {
+          /* we had untranslated data so we need an explicit newline */
+          fwrite("\n", 1, 1, data->set.err);
+        }
+#endif
+        break;
+      default: /* nada */
+        break;
+      }
+    }
+#ifdef CURL_DOES_CONVERSIONS
+    MM_FREE(char, buf);
 #endif
   }
   return rc;

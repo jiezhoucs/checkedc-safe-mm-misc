@@ -110,6 +110,8 @@ CURL_EXTERN CURLU *curl_url_dup(CURLU *in);
 CURL_EXTERN CURLUcode curl_url_get(CURLU *handle, CURLUPart what,
                                    char **part, unsigned int flags);
 
+CURL_EXTERN CURLUcode mm_curl_url_get(CURLU *handle, CURLUPart what,
+                                   mm_array_ptr<char> *part, unsigned int flags);
 /*
  * curl_url_set() sets a specific part of the URL in a CURLU handle. Returns
  * error code. The passed in string will be copied. Passing a NULL instead of

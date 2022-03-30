@@ -84,7 +84,6 @@ CURLcode Curl_input_ntlm(struct Curl_easy *data,
       unsigned char *hdr;
       size_t hdrlen;
 
-      // TODO?
       result = Curl_base64_decode(_GETCHARPTR(header), &hdr, &hdrlen);
       if(!result) {
         struct bufref hdrbuf;
