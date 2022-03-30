@@ -506,7 +506,7 @@ static int set_transfer_url(struct Curl_easy *data,
 
   v = curl_pushheader_byname(hp, ":scheme");
   if(v) {
-    uc = curl_url_set(u, CURLUPART_SCHEME, _GETCHARPTR(v), 0);
+    uc = mm_curl_url_set(u, CURLUPART_SCHEME, v, 0);
     if(uc) {
       rc = 1;
       goto fail;
@@ -515,7 +515,7 @@ static int set_transfer_url(struct Curl_easy *data,
 
   v = curl_pushheader_byname(hp, ":authority");
   if(v) {
-    uc = curl_url_set(u, CURLUPART_HOST, _GETCHARPTR(v), 0);
+    uc = mm_curl_url_set(u, CURLUPART_HOST, v, 0);
     if(uc) {
       rc = 2;
       goto fail;
@@ -524,7 +524,7 @@ static int set_transfer_url(struct Curl_easy *data,
 
   v = curl_pushheader_byname(hp, ":path");
   if(v) {
-    uc = curl_url_set(u, CURLUPART_PATH, _GETCHARPTR(v), 0);
+    uc = mm_curl_url_set(u, CURLUPART_PATH, v, 0);
     if(uc) {
       rc = 3;
       goto fail;

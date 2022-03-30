@@ -42,7 +42,7 @@ CURLcode Curl_range(struct Curl_easy *data)
   if(data->state.use_range && data->state.range) {
     CURLofft from_t;
     CURLofft to_t;
-    from_t = curlx_strtoofft(data->state.range, &ptr, 0, &from);
+    from_t = curlx_strtoofft(_GETCHARPTR(data->state.range), &ptr, 0, &from);
     if(from_t == CURL_OFFT_FLOW)
       return CURLE_RANGE_ERROR;
     while(*ptr && (ISSPACE(*ptr) || (*ptr == '-')))

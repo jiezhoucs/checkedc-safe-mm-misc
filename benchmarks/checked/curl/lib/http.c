@@ -2199,7 +2199,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
       return CURLE_OUT_OF_MEMORY;
 
     if(conn->host.dispname != conn->host.name) {
-      uc = curl_url_set(h, CURLUPART_HOST, _GETCHARPTR(conn->host.name), 0);
+      uc = mm_curl_url_set(h, CURLUPART_HOST, conn->host.name, 0);
       if(uc) {
         curl_url_cleanup(h);
         return CURLE_OUT_OF_MEMORY;
@@ -2773,7 +2773,7 @@ CURLcode Curl_http_range(struct Curl_easy *data,
       /* if a line like this was already allocated, free the previous one */
       free(data->state.aptr.rangeline);
       data->state.aptr.rangeline = aprintf("Range: bytes=%s\r\n",
-                                           data->state.range);
+                                           _GETCHARPTR(data->state.range));
     }
     else if((httpreq == HTTPREQ_POST || httpreq == HTTPREQ_PUT) &&
             !Curl_checkheaders(data, "Content-Range")) {
@@ -2798,7 +2798,7 @@ CURLcode Curl_http_range(struct Curl_easy *data,
         data->state.aptr.rangeline =
           aprintf("Content-Range: bytes %s%" CURL_FORMAT_CURL_OFF_T
                   "/%" CURL_FORMAT_CURL_OFF_T "\r\n",
-                  data->state.range, total_expected_size-1,
+                  _GETCHARPTR(data->state.range), total_expected_size-1,
                   total_expected_size);
       }
       else {
@@ -2806,7 +2806,7 @@ CURLcode Curl_http_range(struct Curl_easy *data,
            append total size */
         data->state.aptr.rangeline =
           aprintf("Content-Range: bytes %s/%" CURL_FORMAT_CURL_OFF_T "\r\n",
-                  data->state.range, data->state.infilesize);
+                  _GETCHARPTR(data->state.range), data->state.infilesize);
       }
       if(!data->state.aptr.rangeline)
         return CURLE_OUT_OF_MEMORY;

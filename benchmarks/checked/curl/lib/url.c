@@ -401,7 +401,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
                       field! */
 
   if(data->state.rangestringalloc)
-    free(data->state.range);
+    MM_FREE(char, data->state.range);
 
   /* freed here just in case DONE wasn't called */
   Curl_free_request_state(data);
@@ -785,7 +785,7 @@ static void conn_free(struct connectdata *conn)
 #endif
   Curl_safefree(conn->user);
   mm_Curl_safefree(char, conn->passwd);
-  Curl_safefree(conn->sasl_authzid);
+  mm_Curl_safefree(char, conn->sasl_authzid);
   Curl_safefree(conn->options);
   Curl_dyn_free(&conn->trailer);
   MM_FREE(char, conn->host.rawalloc); /* host name buffer */
@@ -796,11 +796,11 @@ static void conn_free(struct connectdata *conn)
 
   conn_reset_all_postponed_data(conn);
   Curl_llist_destroy(&conn->easyq, NULL);
-  Curl_safefree(conn->localdev);
+  mm_Curl_safefree(char, conn->localdev);
   Curl_free_primary_ssl_config(&conn->ssl_config);
 
 #ifdef USE_UNIX_SOCKETS
-  Curl_safefree(conn->unix_domain_socket);
+  mm_Curl_safefree(char, conn->unix_domain_socket);
 #endif
 
 #ifdef USE_SSL
@@ -927,8 +927,7 @@ proxy_info_matches(const struct proxy_info *data,
 {
   if((data->proxytype == needle->proxytype) &&
      (data->port == needle->port) &&
-     // TODO
-     Curl_safe_strcasecompare(_GETCHARPTR(data->host.name), _GETCHARPTR(needle->host.name)))
+     mm_strcasecompare(data->host.name, needle->host.name))
     return TRUE;
 
   return FALSE;
@@ -1232,7 +1231,7 @@ ConnectionExists(struct Curl_easy *data,
       if(needle->unix_domain_socket) {
         if(!check->unix_domain_socket)
           continue;
-        if(strcmp(needle->unix_domain_socket, check->unix_domain_socket))
+        if(mm_strcmp(needle->unix_domain_socket, check->unix_domain_socket))
           continue;
         if(needle->bits.abstract_unix_socket !=
            check->bits.abstract_unix_socket)
@@ -1328,7 +1327,7 @@ ConnectionExists(struct Curl_easy *data,
         if((check->localport != needle->localport) ||
            (check->localportrange != needle->localportrange) ||
            (needle->localdev &&
-            (!check->localdev || strcmp(check->localdev, needle->localdev))))
+            (!check->localdev || mm_strcmp(check->localdev, needle->localdev))))
           continue;
       }
 
@@ -1361,9 +1360,8 @@ ConnectionExists(struct Curl_easy *data,
         if((strcasecompare(needle->handler->scheme, check->handler->scheme) ||
             (get_protocol_family(check->handler) ==
              needle->handler->protocol && check->bits.tls_upgraded)) &&
-           (!needle->bits.conn_to_host || strcasecompare(
-                                     // TODO
-            _GETCHARPTR(needle->conn_to_host.name), _GETCHARPTR(check->conn_to_host.name))) &&
+           (!needle->bits.conn_to_host || mm_strcasecompare(
+            needle->conn_to_host.name, check->conn_to_host.name)) &&
            (!needle->bits.conn_to_port ||
              needle->conn_to_port == check->conn_to_port) &&
            strcasecompare(_GETCHARPTR(needle->host.name), _GETCHARPTR(check->host.name)) &&
@@ -1555,6 +1553,22 @@ bool Curl_is_ASCII_name(const char *hostname)
   return TRUE;
 }
 
+bool mm_Curl_is_ASCII_name(mm_array_ptr<const char> hostname)
+{
+  /* get an UNSIGNED local version of the pointer */
+  mm_array_ptr<const unsigned char> ch = (mm_array_ptr<const unsigned char>)hostname;
+
+  if(!hostname) /* bad input, consider it ASCII! */
+    return TRUE;
+
+  while(*ch) {
+    if(*ch++ & 0x80)
+      return FALSE;
+  }
+  return TRUE;
+}
+
+
 /*
  * Strip single trailing dot in the hostname,
  * primarily for SNI and http host header.
@@ -1586,8 +1600,7 @@ CURLcode Curl_idnconvert_hostname(struct Curl_easy *data,
   host->dispname = host->name;
 
   /* Check name for non-ASCII and convert hostname to ACE form if we can */
-  // TODO
-  if(!Curl_is_ASCII_name(_GETCHARPTR(host->name))) {
+  if(!mm_Curl_is_ASCII_name(host->name)) {
 #ifdef USE_LIBIDN2
     if(idn2_check_version(IDN2_VERSION)) {
       mm_array_ptr<char> ace_hostname = NULL;
@@ -1778,8 +1791,7 @@ static struct connectdata *allocate_conn(struct Curl_easy *data)
 
   /* Store the local bind parameters that will be used for this connection */
   if(data->set.str[STRING_DEVICE]) {
-    // TODO
-    conn->localdev = strdup(_GETCHARPTR(data->set.str[STRING_DEVICE]));
+    conn->localdev = mm_strdup(data->set.str[STRING_DEVICE]);
     if(!conn->localdev)
       goto error;
   }
@@ -1796,7 +1808,7 @@ static struct connectdata *allocate_conn(struct Curl_easy *data)
   error:
 
   Curl_llist_destroy(&conn->easyq, NULL);
-  free(conn->localdev);
+  MM_FREE(char, conn->localdev);
 #ifdef USE_SSL
   free(conn->ssl_extra);
 #endif
@@ -2073,10 +2085,7 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
   else if(uc != CURLUE_NO_OPTIONS)
     return Curl_uc_to_curlcode(uc);
 
-  // TODO
-  char *tmp = GETPTR(char, data->state.up.path);
-  uc = curl_url_get(uh, CURLUPART_PATH, &tmp, 0);
-  data->state.up.path = mmize_str(tmp);
+  uc = mm_curl_url_get(uh, CURLUPART_PATH, &data->state.up.path, 0);
   if(uc)
     return Curl_uc_to_curlcode(uc);
 
@@ -2133,13 +2142,12 @@ static CURLcode setup_range(struct Curl_easy *data)
   s->resume_from = data->set.set_resume_from;
   if(s->resume_from || data->set.str[STRING_SET_RANGE]) {
     if(s->rangestringalloc)
-      free(s->range);
+      MM_FREE(char, s->range);
 
     if(s->resume_from)
-      s->range = aprintf("%" CURL_FORMAT_CURL_OFF_T "-", s->resume_from);
+      s->range = mmize_str(aprintf("%" CURL_FORMAT_CURL_OFF_T "-", s->resume_from));
     else
-      // TODO
-      s->range = strdup(_GETCHARPTR(data->set.str[STRING_SET_RANGE]));
+      s->range = mm_strdup(data->set.str[STRING_SET_RANGE]);
 
     s->rangestringalloc = (s->range) ? TRUE : FALSE;
 
@@ -2215,7 +2223,7 @@ void Curl_free_request_state(struct Curl_easy *data)
 * Checks if the host is in the noproxy list. returns true if it matches
 * and therefore the proxy should NOT be used.
 ****************************************************************/
-static bool check_noproxy(const char *name, const char *no_proxy)
+static bool check_noproxy(mm_array_ptr<const char> name, mm_array_ptr<const char> no_proxy)
 {
   /* no_proxy=domain1.dom,host.domain2.dom
    *   (a comma-separated list of hosts which should
@@ -2228,24 +2236,24 @@ static bool check_noproxy(const char *name, const char *no_proxy)
     const char *separator = ", ";
     size_t no_proxy_len;
     size_t namelen;
-    char *endptr;
-    if(strcasecompare("*", no_proxy)) {
+    mm_array_ptr<char> endptr = NULL;
+    if(mm_strcasecompare("*", no_proxy)) {
       return TRUE;
     }
 
     /* NO_PROXY was specified and it wasn't just an asterisk */
 
-    no_proxy_len = strlen(no_proxy);
+    no_proxy_len = mm_strlen(no_proxy);
     if(name[0] == '[') {
       /* IPv6 numerical address */
-      endptr = strchr(name, ']');
+      endptr = mm_strchr(name, ']');
       if(!endptr)
         return FALSE;
       name++;
       namelen = endptr - name;
     }
     else
-      namelen = strlen(name);
+      namelen = mm_strlen(name);
 
     for(tok_start = 0; tok_start < no_proxy_len; tok_start = tok_end + 1) {
       while(tok_start < no_proxy_len &&
@@ -2271,9 +2279,8 @@ static bool check_noproxy(const char *name, const char *no_proxy)
 
       if((tok_end - tok_start) <= namelen) {
         /* Match the last part of the name to the domain we are checking. */
-        const char *checkn = name + namelen - (tok_end - tok_start);
-        // TODO
-        if(strncasecompare_raw(no_proxy + tok_start, checkn,
+        mm_array_ptr<const char> checkn = name + namelen - (tok_end - tok_start);
+        if(strncasecompare(no_proxy + tok_start, checkn,
                            tok_end - tok_start)) {
           if((tok_end - tok_start) == namelen || *(checkn - 1) == '.') {
             /* We either have an exact match, or the previous character is a .
@@ -2296,10 +2303,10 @@ static bool check_noproxy(const char *name, const char *no_proxy)
 * name and is not limited to HTTP proxies only.
 * The returned pointer must be freed by the caller (unless NULL)
 ****************************************************************/
-static char *detect_proxy(struct Curl_easy *data,
+static mm_array_ptr<char> detect_proxy(struct Curl_easy *data,
                           struct connectdata *conn)
 {
-  char *proxy = NULL;
+  mm_array_ptr<char> proxy = NULL;
 
   /* If proxy was not specified, we check for default proxy environment
    * variables, to enable i.e Lynx compliance:
@@ -2321,7 +2328,7 @@ static char *detect_proxy(struct Curl_easy *data,
   char proxy_env[128];
   const char *protop = conn->handler->scheme;
   char *envp = proxy_env;
-  char *prox;
+  mm_array_ptr<char> prox = NULL;
 #ifdef CURL_DISABLE_VERBOSE_STRINGS
   (void)data;
 #endif
@@ -2367,7 +2374,7 @@ static char *detect_proxy(struct Curl_easy *data,
     }
   }
   if(proxy)
-    infof(data, "Uses proxy env variable %s == '%s'", envp, proxy);
+    infof(data, "Uses proxy env variable %s == '%s'", envp, _GETCHARPTR(proxy));
 
   return proxy;
 }
@@ -2379,7 +2386,7 @@ static char *detect_proxy(struct Curl_easy *data,
  * that may exist registered to the same proxy host.
  */
 static CURLcode parse_proxy(struct Curl_easy *data,
-                            struct connectdata *conn, char *proxy,
+                            struct connectdata *conn, mm_array_ptr<char> proxy,
                             curl_proxytype proxytype)
 {
   char *portptr = NULL;
@@ -2396,7 +2403,7 @@ static CURLcode parse_proxy(struct Curl_easy *data,
 
   /* When parsing the proxy, allowing non-supported schemes since we have
      these made up ones for proxies. Guess scheme for URLs without it. */
-  uc = curl_url_set(uhp, CURLUPART_URL, proxy,
+  uc = mm_curl_url_set(uhp, CURLUPART_URL, proxy,
                     CURLU_NON_SUPPORT_SCHEME|CURLU_GUESS_SCHEME);
   if(!uc) {
     /* parsed okay as a URL */
@@ -2421,13 +2428,13 @@ static CURLcode parse_proxy(struct Curl_easy *data,
       ; /* leave it as HTTP or HTTP/1.0 */
     else {
       /* Any other xxx:// reject! */
-      failf(data, "Unsupported proxy scheme for \'%s\'", proxy);
+      failf(data, "Unsupported proxy scheme for \'%s\'", _GETCHARPTR(proxy));
       result = CURLE_COULDNT_CONNECT;
       goto error;
     }
   }
   else {
-    failf(data, "Unsupported proxy syntax in \'%s\'", proxy);
+    failf(data, "Unsupported proxy syntax in \'%s\'", _GETCHARPTR(proxy));
     result = CURLE_COULDNT_RESOLVE_PROXY;
     goto error;
   }
@@ -2437,7 +2444,7 @@ static CURLcode parse_proxy(struct Curl_easy *data,
 #endif
     if(proxytype == CURLPROXY_HTTPS) {
       failf(data, "Unsupported proxy \'%s\', libcurl is built without the "
-                  "HTTPS-proxy support.", proxy);
+                  "HTTPS-proxy support.", _GETCHARPTR(proxy));
       result = CURLE_NOT_BUILT_IN;
       goto error;
     }
@@ -2567,9 +2574,9 @@ static CURLcode parse_proxy_auth(struct Curl_easy *data,
 static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
                                               struct connectdata *conn)
 {
-  char *proxy = NULL;
-  char *socksproxy = NULL;
-  char *no_proxy = NULL;
+  mm_array_ptr<char> proxy = NULL;
+  mm_array_ptr<char> socksproxy = NULL;
+  mm_array_ptr<char> no_proxy = NULL;
   CURLcode result = CURLE_OK;
 
   /*************************************************************
@@ -2585,8 +2592,7 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
    * Detect what (if any) proxy to use
    *************************************************************/
   if(data->set.str[STRING_PROXY]) {
-    // TODO
-    proxy = strdup(_GETCHARPTR(data->set.str[STRING_PROXY]));
+    proxy = mm_strdup(data->set.str[STRING_PROXY]);
     /* if global proxy is set, this is it */
     if(NULL == proxy) {
       failf(data, "memory shortage");
@@ -2596,8 +2602,7 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
   }
 
   if(data->set.str[STRING_PRE_PROXY]) {
-    // TODO
-    socksproxy = strdup(_GETCHARPTR(data->set.str[STRING_PRE_PROXY]));
+    socksproxy = mm_strdup(data->set.str[STRING_PRE_PROXY]);
     /* if global socks proxy is set, this is it */
     if(NULL == socksproxy) {
       failf(data, "memory shortage");
@@ -2614,15 +2619,15 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
       no_proxy = curl_getenv(p);
     }
     if(no_proxy) {
-      infof(data, "Uses proxy env variable %s == '%s'", p, no_proxy);
+      infof(data, "Uses proxy env variable %s == '%s'", p, _GETCHARPTR(no_proxy));
     }
   }
 
   // TODO
-  if(check_noproxy(_GETCHARPTR(conn->host.name), _GETCHARPTR(data->set.str[STRING_NOPROXY]) ?
-      _GETCHARPTR(data->set.str[STRING_NOPROXY]) : no_proxy)) {
-    Curl_safefree(proxy);
-    Curl_safefree(socksproxy);
+  if(check_noproxy(conn->host.name, data->set.str[STRING_NOPROXY] ?
+      data->set.str[STRING_NOPROXY] : no_proxy)) {
+    mm_Curl_safefree(char, proxy);
+    mm_Curl_safefree(char, socksproxy);
   }
 #ifndef CURL_DISABLE_HTTP
   else if(!proxy && !socksproxy)
@@ -2630,24 +2635,24 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
     proxy = detect_proxy(data, conn);
 #endif /* CURL_DISABLE_HTTP */
 
-  Curl_safefree(no_proxy);
+  mm_Curl_safefree(char, no_proxy);
 
 #ifdef USE_UNIX_SOCKETS
   /* For the time being do not mix proxy and unix domain sockets. See #1274 */
   if(proxy && conn->unix_domain_socket) {
-    free(proxy);
+    MM_FREE(char, proxy);
     proxy = NULL;
   }
 #endif
 
   if(proxy && (!*proxy || (conn->handler->flags & PROTOPT_NONETWORK))) {
-    free(proxy);  /* Don't bother with an empty proxy string or if the
+    MM_FREE(char, proxy);  /* Don't bother with an empty proxy string or if the
                      protocol doesn't work with network */
     proxy = NULL;
   }
   if(socksproxy && (!*socksproxy ||
                     (conn->handler->flags & PROTOPT_NONETWORK))) {
-    free(socksproxy);  /* Don't bother with an empty socks proxy string or if
+    MM_FREE(char, socksproxy);  /* Don't bother with an empty socks proxy string or if
                           the protocol doesn't work with network */
     socksproxy = NULL;
   }
@@ -2660,7 +2665,7 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
   if(proxy || socksproxy) {
     if(proxy) {
       result = parse_proxy(data, conn, proxy, conn->http_proxy.proxytype);
-      Curl_safefree(proxy); /* parse_proxy copies the proxy string */
+      mm_Curl_safefree(char, proxy); /* parse_proxy copies the proxy string */
       if(result)
         goto out;
     }
@@ -2669,7 +2674,7 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
       result = parse_proxy(data, conn, socksproxy,
                            conn->socks_proxy.proxytype);
       /* parse_proxy copies the socks proxy string */
-      Curl_safefree(socksproxy);
+      mm_Curl_safefree(char, socksproxy);
       if(result)
         goto out;
     }
@@ -2733,8 +2738,8 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
 
 out:
 
-  free(socksproxy);
-  free(proxy);
+  MM_FREE(char, socksproxy);
+  MM_FREE(char, proxy);
   return result;
 }
 #endif /* CURL_DISABLE_PROXY */
@@ -3359,7 +3364,7 @@ static CURLcode resolve_server(struct Curl_easy *data,
       /* Unix domain sockets are local. The host gets ignored, just use the
        * specified domain socket address. Do not cache "DNS entries". There is
        * no DNS involved and we already have the filesystem path available */
-      const char *path = conn->unix_domain_socket;
+      mm_array_ptr<const char> path = conn->unix_domain_socket;
 
       hostaddr = calloc(1, sizeof(struct Curl_dns_entry));
       if(!hostaddr)
@@ -3373,7 +3378,7 @@ static CURLcode resolve_server(struct Curl_easy *data,
         else {
           /* Long paths are not supported for now */
           if(longpath) {
-            failf(data, "Unix socket path too long: '%s'", path);
+            failf(data, "Unix socket path too long: '%s'", _GETCHARPTR(path));
             result = CURLE_COULDNT_RESOLVE_HOST;
           }
           else
@@ -3547,11 +3552,11 @@ static void reuse_conn(struct Curl_easy *data,
   Curl_safefree(old_conn->user);
   mm_Curl_safefree(char, old_conn->passwd);
   Curl_safefree(old_conn->options);
-  Curl_safefree(old_conn->localdev);
+  mm_Curl_safefree(char, old_conn->localdev);
   Curl_llist_destroy(&old_conn->easyq, NULL);
 
 #ifdef USE_UNIX_SOCKETS
-  Curl_safefree(old_conn->unix_domain_socket);
+  mm_Curl_safefree(char, old_conn->unix_domain_socket);
 #endif
 }
 
@@ -3616,8 +3621,7 @@ static CURLcode create_conn(struct Curl_easy *data,
     goto out;
 
   if(data->set.str[STRING_SASL_AUTHZID]) {
-    // TODO
-    conn->sasl_authzid = strdup(_GETCHARPTR(data->set.str[STRING_SASL_AUTHZID]));
+    conn->sasl_authzid = mm_strdup(data->set.str[STRING_SASL_AUTHZID]);
     if(!conn->sasl_authzid) {
       result = CURLE_OUT_OF_MEMORY;
       goto out;
@@ -3626,8 +3630,7 @@ static CURLcode create_conn(struct Curl_easy *data,
 
 #ifdef USE_UNIX_SOCKETS
   if(data->set.str[STRING_UNIX_SOCKET_PATH]) {
-    // TODO
-    conn->unix_domain_socket = strdup(_GETCHARPTR(data->set.str[STRING_UNIX_SOCKET_PATH]));
+    conn->unix_domain_socket = mm_strdup(data->set.str[STRING_UNIX_SOCKET_PATH]);
     if(!conn->unix_domain_socket) {
       result = CURLE_OUT_OF_MEMORY;
       goto out;
@@ -3705,8 +3708,7 @@ static CURLcode create_conn(struct Curl_easy *data,
    * Do this after the hostnames have been IDN-converted.
    *************************************************************/
   if(conn->bits.conn_to_host &&
-          // TODO
-     strcasecompare(_GETCHARPTR(conn->conn_to_host.name), _GETCHARPTR(conn->host.name))) {
+     mm_strcasecompare(conn->conn_to_host.name, conn->host.name)) {
     conn->bits.conn_to_host = FALSE;
   }
 

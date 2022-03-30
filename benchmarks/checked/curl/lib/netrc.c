@@ -236,9 +236,9 @@ int Curl_parsenetrc(mm_array_ptr<const char> host,
 
   if(!netrcfile) {
     char *home = NULL;
-    char *homea = curl_getenv("HOME"); /* portable environment reader */
+    mm_array_ptr<char> homea = curl_getenv("HOME"); /* portable environment reader */
     if(homea) {
-      home = homea;
+      home = _GETCHARPTR(homea);
 #if defined(HAVE_GETPWUID_R) && defined(HAVE_GETEUID)
     }
     else {
@@ -265,7 +265,7 @@ int Curl_parsenetrc(mm_array_ptr<const char> host,
 
     filealloc = mmize_str(curl_maprintf("%s%s.netrc", home, DIR_CHAR));
     if(!filealloc) {
-      free(homea);
+      MM_FREE(char, homea);
       return -1;
     }
     retcode = parsenetrc(host, loginp, passwordp, login_changed,
@@ -276,7 +276,7 @@ int Curl_parsenetrc(mm_array_ptr<const char> host,
       /* fallback to the old-style "_netrc" file */
       filealloc = curl_maprintf("%s%s_netrc", home, DIR_CHAR);
       if(!filealloc) {
-        free(homea);
+        MM_FREE(char, homea);
         return -1;
       }
       retcode = parsenetrc(host, loginp, passwordp, login_changed,
@@ -284,7 +284,7 @@ int Curl_parsenetrc(mm_array_ptr<const char> host,
       free(filealloc);
     }
 #endif
-    free(homea);
+    MM_FREE(char, homea);
   }
   else
     retcode = parsenetrc(host, loginp, passwordp, login_changed,

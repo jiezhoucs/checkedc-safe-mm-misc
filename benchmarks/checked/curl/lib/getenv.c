@@ -27,7 +27,7 @@
 
 #include "memdebug.h"
 
-static char *GetEnv(const char *variable)
+static mm_array_ptr<char> GetEnv(const char *variable)
 {
 #if defined(_WIN32_WCE) || defined(CURL_WINDOWS_APP)
   (void)variable;
@@ -35,16 +35,16 @@ static char *GetEnv(const char *variable)
 #elif defined(WIN32)
   /* This uses Windows API instead of C runtime getenv() to get the environment
      variable since some changes aren't always visible to the latter. #4774 */
-  char *buf = NULL;
-  char *tmp;
+  mm_array_ptr<char> buf = NULL;
+  mm_array_ptr<char> tmp = NULL;
   DWORD bufsize;
   DWORD rc = 1;
   const DWORD max = 32768; /* max env var size from MSCRT source */
 
   for(;;) {
-    tmp = realloc(buf, rc);
+    tmp = mm_array_realloc<char>(buf, rc);
     if(!tmp) {
-      free(buf);
+      MM_FREE(char, buf);
       return NULL;
     }
 
@@ -53,7 +53,7 @@ static char *GetEnv(const char *variable)
 
     /* It's possible for rc to be 0 if the variable was found but empty.
        Since getenv doesn't make that distinction we ignore it as well. */
-    rc = GetEnvironmentVariableA(variable, buf, bufsize);
+    rc = GetEnvironmentVariableA(variable, _GETCHARPTR(buf), bufsize);
     if(!rc || rc == bufsize || rc > max) {
       free(buf);
       return NULL;
@@ -67,11 +67,11 @@ static char *GetEnv(const char *variable)
   }
 #else
   char *env = getenv(variable);
-  return (env && env[0])?strdup(env):NULL;
+  return (env && env[0])?mm_strdup_from_raw(env):NULL;
 #endif
 }
 
-char *curl_getenv(const char *v)
+mm_array_ptr<char> curl_getenv(const char *v)
 {
   return GetEnv(v);
 }

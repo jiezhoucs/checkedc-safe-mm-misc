@@ -212,7 +212,7 @@ int tool_progress_cb(void *clientp,
 void progressbarinit(mm_ptr<struct ProgressData> bar,
                      mm_ptr<struct OperationConfig> config)
 {
-  char *colp;
+  mm_array_ptr<char> colp = NULL;
   memset(_GETPTR(struct ProgressData, bar), 0, sizeof(struct ProgressData));
 
   /* pass this through to progress function so
@@ -223,12 +223,12 @@ void progressbarinit(mm_ptr<struct ProgressData> bar,
 
   colp = curlx_getenv("COLUMNS");
   if(colp) {
-    char *endptr;
-    long num = strtol(colp, &endptr, 10);
-    if((endptr != colp) && (endptr == colp + strlen(colp)) && (num > 20) &&
+    mm_array_ptr<char> endptr = NULL;
+    long num = mm_strtol(colp, &endptr, 10);
+    if((endptr != colp) && (endptr == colp + mm_strlen(colp)) && (num > 20) &&
        (num < 10000))
       bar->width = (int)num;
-    curl_free(colp);
+    MM_FREE(char, colp);
   }
 
   if(!bar->width) {

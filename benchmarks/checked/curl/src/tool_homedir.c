@@ -41,15 +41,16 @@
 
 static char *GetEnv(const char *variable)
 {
-  char *dupe, *env;
+  mm_array_ptr<char> dupe = NULL, env = NULL;
 
   env = curl_getenv(variable);
   if(!env)
     return NULL;
 
-  dupe = strdup(env);
-  curl_free(env);
-  return dupe;
+  dupe = mm_strdup(env);
+  MM_FREE(char, env);
+  // TODO
+  return _GETCHARPTR(dupe);
 }
 
 /* return the home directory of the current user as an allocated string */

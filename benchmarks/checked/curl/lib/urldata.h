@@ -981,7 +981,7 @@ struct connectdata {
   char *user;    /* user name string, allocated */
   mm_array_ptr<char> passwd;  /* password string, allocated */
   char *options; /* options string, allocated */
-  char *sasl_authzid;     /* authorisation identity string, allocated */
+  mm_array_ptr<char> sasl_authzid;     /* authorisation identity string, allocated */
   unsigned char httpversion; /* the HTTP version*10 reported by the server */
   struct curltime now;     /* "current" time */
   struct curltime created; /* creation time */
@@ -1104,7 +1104,7 @@ struct connectdata {
   mm_ptr<struct http_connect_state> connect_state; /* for HTTP CONNECT */
   struct connectbundle *bundle; /* The bundle we are member of */
 #ifdef USE_UNIX_SOCKETS
-  char *unix_domain_socket;
+  mm_array_ptr<char> unix_domain_socket;
 #endif
 #ifdef USE_HYPER
   /* if set, an alternative data transfer function */
@@ -1115,7 +1115,7 @@ struct connectdata {
      made and will serve the purpose of being used for comparison reasons so
      that subsequent bound-requested connections aren't accidentally re-using
      wrong connections. */
-  char *localdev;
+  mm_array_ptr<char> localdev;
   int localportrange;
   int cselect_bits; /* bitmask of socket events */
   int waitfor;      /* current READ/WRITE bits to wait for */
@@ -1378,7 +1378,7 @@ struct UrlState {
   /* for FTP downloads: how many CRLFs did we converted to LFs? */
   curl_off_t crlf_conversions;
 #endif
-  char *range; /* range, if used. See README for detailed specification on
+  mm_array_ptr<char> range; /* range, if used. See README for detailed specification on
                   this syntax. */
   curl_off_t resume_from; /* continue [ftp] transfer from here */
 

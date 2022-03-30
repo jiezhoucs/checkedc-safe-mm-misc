@@ -78,7 +78,7 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port);
 struct Curl_addrinfo *Curl_str2addr(char *dotted, int port);
 
 #ifdef USE_UNIX_SOCKETS
-struct Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath,
+struct Curl_addrinfo *Curl_unix2addr(mm_array_ptr<const char> path, bool *longpath,
                                      bool abstract);
 #endif
 

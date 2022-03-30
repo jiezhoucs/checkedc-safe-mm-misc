@@ -467,7 +467,7 @@ struct Curl_addrinfo *Curl_str2addr(char *address, int port)
  * struct initialized with this path.
  * Set '*longpath' to TRUE if the error is a too long path.
  */
-struct Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath,
+struct Curl_addrinfo *Curl_unix2addr(mm_array_ptr<const char> path, bool *longpath,
                                      bool abstract)
 {
   struct Curl_addrinfo *ai;
@@ -485,7 +485,7 @@ struct Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath,
   sa_un->sun_family = AF_UNIX;
 
   /* sun_path must be able to store the NUL-terminated path */
-  path_len = strlen(path) + 1;
+  path_len = mm_strlen(path) + 1;
   if(path_len > sizeof(sa_un->sun_path)) {
     free(ai);
     *longpath = TRUE;
@@ -499,9 +499,9 @@ struct Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath,
 
   /* Abstract Unix domain socket have NULL prefix instead of suffix */
   if(abstract)
-    memcpy(sa_un->sun_path + 1, path, path_len - 1);
+    mm_memcpy(sa_un->sun_path + 1, path, path_len - 1);
   else
-    memcpy(sa_un->sun_path, path, path_len); /* copy NUL byte */
+    mm_memcpy(sa_un->sun_path, path, path_len); /* copy NUL byte */
 
   return ai;
 }

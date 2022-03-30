@@ -2406,12 +2406,12 @@ static CURLcode transfer_per_config(struct GlobalConfig *global,
      * specified by the user via CURLOPT_CAINFO / --cacert.
      */
     if(tls_backend_info->backend != CURLSSLBACKEND_SCHANNEL) {
-      char *env;
+      mm_array_ptr<char> env = NULL;
       env = curlx_getenv("CURL_CA_BUNDLE");
       if(env) {
-        config->cacert = mm_strdup_from_raw(env);
+        config->cacert = mm_strdup(env);
         if(!config->cacert) {
-          curl_free(env);
+          MM_FREE(char, env);
           errorf(global, "out of memory\n");
           return CURLE_OUT_OF_MEMORY;
         }
@@ -2419,9 +2419,9 @@ static CURLcode transfer_per_config(struct GlobalConfig *global,
       else {
         env = curlx_getenv("SSL_CERT_DIR");
         if(env) {
-          config->capath = mm_strdup_from_raw(env);
+          config->capath = mm_strdup(env);
           if(!config->capath) {
-            curl_free(env);
+            MM_FREE(char, env);
             helpf(global->errors, "out of memory\n");
             return CURLE_OUT_OF_MEMORY;
           }
@@ -2430,9 +2430,9 @@ static CURLcode transfer_per_config(struct GlobalConfig *global,
         else {
           env = curlx_getenv("SSL_CERT_FILE");
           if(env) {
-            config->cacert = mm_strdup_from_raw(env);
+            config->cacert = mm_strdup(env);
             if(!config->cacert) {
-              curl_free(env);
+              MM_FREE(char, env);
               errorf(global, "out of memory\n");
               return CURLE_OUT_OF_MEMORY;
             }
@@ -2441,7 +2441,7 @@ static CURLcode transfer_per_config(struct GlobalConfig *global,
       }
 
       if(env)
-        curl_free(env);
+        MM_FREE(char, env);
 #ifdef WIN32
       else {
         result = FindWin32CACert(config, tls_backend_info->backend,

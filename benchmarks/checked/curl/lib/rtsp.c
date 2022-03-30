@@ -427,7 +427,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
     /* Check to see if there is a range set in the custom headers */
     if(!Curl_checkheaders(data, "Range") && data->state.range) {
       Curl_safefree(data->state.aptr.rangeline);
-      data->state.aptr.rangeline = aprintf("Range: %s\r\n", data->state.range);
+      data->state.aptr.rangeline = aprintf("Range: %s\r\n", _GETCHARPTR(data->state.range));
       p_range = data->state.aptr.rangeline;
     }
   }
