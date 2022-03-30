@@ -2924,7 +2924,6 @@ static CURLcode override_login(struct Curl_easy *data,
 
   if(data->set.str[STRING_OPTIONS]) {
     MM_FREE(char, *optionsp);
-    // TODO
     *optionsp = mm_strdup(data->set.str[STRING_OPTIONS]);
     if(!*optionsp)
       return CURLE_OUT_OF_MEMORY;
@@ -2982,9 +2981,8 @@ static CURLcode override_login(struct Curl_easy *data,
       return result;
   }
   if(data->state.aptr.passwd) {
-    // TODO
-    uc = curl_url_set(data->state.uh, CURLUPART_PASSWORD,
-                      _GETCHARPTR(data->state.aptr.passwd), CURLU_URLENCODE);
+    uc = mm_curl_url_set(data->state.uh, CURLUPART_PASSWORD,
+                      data->state.aptr.passwd, CURLU_URLENCODE);
     if(uc)
       return Curl_uc_to_curlcode(uc);
     if(!*passwdp) {
@@ -3036,14 +3034,14 @@ static CURLcode set_login(struct connectdata *conn)
  * the hostname and -1 for the port.
  */
 static CURLcode parse_connect_to_host_port(struct Curl_easy *data,
-                                           const char *host,
-                                           char **hostname_result,
+                                           mm_array_ptr<const char> host,
+                                           mm_array_ptr<char> *hostname_result,
                                            int *port_result)
 {
-  char *host_dup;
-  char *hostptr;
-  char *host_portno;
-  char *portptr;
+  mm_array_ptr<char> host_dup = NULL;
+  mm_array_ptr<char> hostptr = NULL;
+  mm_array_ptr<char> host_portno = NULL;
+  mm_array_ptr<char> portptr = NULL;
   int port = -1;
   CURLcode result = CURLE_OK;
 
@@ -3057,7 +3055,7 @@ static CURLcode parse_connect_to_host_port(struct Curl_easy *data,
   if(!host || !*host)
     return CURLE_OK;
 
-  host_dup = strdup(host);
+  host_dup = mm_strdup(host);
   if(!host_dup)
     return CURLE_OUT_OF_MEMORY;
 
@@ -3069,12 +3067,12 @@ static CURLcode parse_connect_to_host_port(struct Curl_easy *data,
   /* detect and extract RFC6874-style IPv6-addresses */
   if(*hostptr == '[') {
 #ifdef ENABLE_IPV6
-    char *ptr = ++hostptr; /* advance beyond the initial bracket */
+    mm_array_ptr<char> ptr = ++hostptr; /* advance beyond the initial bracket */
     while(*ptr && (ISXDIGIT(*ptr) || (*ptr == ':') || (*ptr == '.')))
       ptr++;
     if(*ptr == '%') {
       /* There might be a zone identifier */
-      if(strncmp("%25", ptr, 3))
+      if(mm_strncmp("%25", ptr, 3))
         infof(data, "Please URL encode %% as %%25, see RFC 6874.");
       ptr++;
       /* Allow unreserved characters as defined in RFC 3986 */
@@ -3100,16 +3098,16 @@ static CURLcode parse_connect_to_host_port(struct Curl_easy *data,
   }
 
   /* Get port number off server.com:1080 */
-  host_portno = strchr(portptr, ':');
+  host_portno = mm_strchr(portptr, ':');
   if(host_portno) {
-    char *endp = NULL;
+    mm_array_ptr<char> endp = NULL;
     *host_portno = '\0'; /* cut off number from host name */
     host_portno++;
     if(*host_portno) {
-      long portparse = strtol(host_portno, &endp, 10);
+      long portparse = mm_strtol(host_portno, &endp, 10);
       if((endp && *endp) || (portparse < 0) || (portparse > 65535)) {
         failf(data, "No valid port number in connect to host string (%s)",
-              host_portno);
+              _GETCHARPTR(host_portno));
         result = CURLE_SETOPT_OPTION_SYNTAX;
         goto error;
       }
@@ -3120,7 +3118,7 @@ static CURLcode parse_connect_to_host_port(struct Curl_easy *data,
 
   /* now, clone the cleaned host name */
   if(hostptr) {
-    *hostname_result = strdup(hostptr);
+    *hostname_result = mm_strdup(hostptr);
     if(!*hostname_result) {
       result = CURLE_OUT_OF_MEMORY;
       goto error;
@@ -3130,7 +3128,7 @@ static CURLcode parse_connect_to_host_port(struct Curl_easy *data,
   *port_result = port;
 
   error:
-  free(host_dup);
+  MM_FREE(char, host_dup);
   return result;
 }
 
@@ -3140,12 +3138,12 @@ static CURLcode parse_connect_to_host_port(struct Curl_easy *data,
  */
 static CURLcode parse_connect_to_string(struct Curl_easy *data,
                                         struct connectdata *conn,
-                                        const char *conn_to_host,
-                                        char **host_result,
+                                        mm_array_ptr<const char> conn_to_host,
+                                        mm_array_ptr<char> *host_result,
                                         int *port_result)
 {
   CURLcode result = CURLE_OK;
-  const char *ptr = conn_to_host;
+  mm_array_ptr<const char> ptr = conn_to_host;
   int host_match = FALSE;
   int port_match = FALSE;
 
@@ -3167,8 +3165,7 @@ static CURLcode parse_connect_to_string(struct Curl_easy *data,
     if(!hostname_to_match)
       return CURLE_OUT_OF_MEMORY;
     hostname_to_match_len = strlen(hostname_to_match);
-    // TODO
-    host_match = strncasecompare_raw(ptr, hostname_to_match,
+    host_match = mm_strncasecompare_0(ptr, hostname_to_match,
                                  hostname_to_match_len);
     free(hostname_to_match);
     ptr += hostname_to_match_len;
@@ -3185,10 +3182,10 @@ static CURLcode parse_connect_to_string(struct Curl_easy *data,
     }
     else {
       /* check whether the URL's port matches */
-      char *ptr_next = strchr(ptr, ':');
+      mm_array_ptr<char> ptr_next = mm_strchr(ptr, ':');
       if(ptr_next) {
-        char *endp = NULL;
-        long port_to_match = strtol(ptr, &endp, 10);
+        mm_array_ptr<char> endp = NULL;
+        long port_to_match = mm_strtol(ptr, &endp, 10);
         if((endp == ptr_next) && (port_to_match == conn->remote_port)) {
           port_match = TRUE;
           ptr = ptr_next + 1;
@@ -3218,11 +3215,8 @@ static CURLcode parse_connect_to_slist(struct Curl_easy *data,
   int port = -1;
 
   while(conn_to_host && !host && port == -1) {
-    char *tmp_host = _GETCHARPTR(host);
-      // TODO
-    result = parse_connect_to_string(data, conn, _GETCHARPTR(conn_to_host->data),
-                                     &tmp_host, &port);
-    host = mmize_str(tmp_host);
+    result = parse_connect_to_string(data, conn, conn_to_host->data,
+                                     &host, &port);
     if(result)
       return result;
 
