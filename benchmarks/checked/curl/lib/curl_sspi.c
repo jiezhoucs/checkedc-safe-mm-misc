@@ -138,7 +138,7 @@ void Curl_sspi_global_cleanup(void)
  *
  * Returns CURLE_OK on success.
  */
-CURLcode Curl_create_sspi_identity(const char *userp, const char *passwdp,
+CURLcode Curl_create_sspi_identity(mm_array_ptr<const char> userp, mm_array_ptr<const char> passwdp,
                                    SEC_WINNT_AUTH_IDENTITY *identity)
 {
   xcharp_u useranddomain;
@@ -152,6 +152,7 @@ CURLcode Curl_create_sspi_identity(const char *userp, const char *passwdp,
   /* Initialize the identity */
   memset(identity, 0, sizeof(*identity));
 
+  // TODO?
   useranddomain.tchar_ptr = curlx_convert_UTF8_to_tchar((char *)userp);
   if(!useranddomain.tchar_ptr)
     return CURLE_OUT_OF_MEMORY;
@@ -196,6 +197,7 @@ CURLcode Curl_create_sspi_identity(const char *userp, const char *passwdp,
   curlx_unicodefree(useranddomain.tchar_ptr);
 
   /* Setup the identity's password and length */
+  // TODO?
   passwd.tchar_ptr = curlx_convert_UTF8_to_tchar((char *)passwdp);
   if(!passwd.tchar_ptr)
     return CURLE_OUT_OF_MEMORY;

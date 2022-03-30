@@ -68,7 +68,7 @@ void Curl_ntlm_core_lm_resp(const unsigned char *keys,
                             unsigned char *results);
 
 CURLcode Curl_ntlm_core_mk_lm_hash(struct Curl_easy *data,
-                                   const char *password,
+                                   mm_array_ptr<const char> password,
                                    unsigned char *lmbuffer /* 21 bytes */);
 
 #ifdef USE_NTRESPONSES

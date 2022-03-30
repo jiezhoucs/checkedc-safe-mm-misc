@@ -156,8 +156,7 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
   if(!path)
     return CURLE_OUT_OF_MEMORY;
 
-  // TODO
-  result = Curl_auth_create_digest_http_message(data, _GETCHARPTR(userp), _GETCHARPTR(passwdp), request,
+  result = Curl_auth_create_digest_http_message(data, userp, passwdp, request,
                                                 path, digest, &response, &len);
   free(path);
   if(result)

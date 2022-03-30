@@ -48,7 +48,7 @@ CURLcode Curl_override_sspi_http_realm(const char *chlg,
                                        SEC_WINNT_AUTH_IDENTITY *identity);
 
 /* This is used to generate an SSPI identity structure */
-CURLcode Curl_create_sspi_identity(const char *userp, const char *passwdp,
+CURLcode Curl_create_sspi_identity(mm_array_ptr<onst char> userp, mm_array_ptr<const char> passwdp,
                                    SEC_WINNT_AUTH_IDENTITY *identity);
 
 /* This is used to free an SSPI identity structure */

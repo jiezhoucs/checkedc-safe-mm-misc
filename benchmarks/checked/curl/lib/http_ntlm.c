@@ -202,8 +202,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
   case NTLMSTATE_TYPE1:
   default: /* for the weird cases we (re)start here */
     /* Create a type-1 message */
-      // TODO
-    result = Curl_auth_create_ntlm_type1_message(data, _GETCHARPTR(userp), passwdp,
+    result = Curl_auth_create_ntlm_type1_message(data, userp, passwdp,
                                                  service, hostname,
                                                  ntlm, &ntlmmsg);
     if(!result) {

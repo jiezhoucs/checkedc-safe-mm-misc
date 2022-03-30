@@ -396,7 +396,7 @@ void Curl_ntlm_core_lm_resp(const unsigned char *keys,
  * Set up lanmanager hashed password
  */
 CURLcode Curl_ntlm_core_mk_lm_hash(struct Curl_easy *data,
-                                   const char *password,
+                                   mm_array_ptr<const char> password,
                                    unsigned char *lmbuffer /* 21 bytes */)
 {
   CURLcode result;
@@ -404,9 +404,9 @@ CURLcode Curl_ntlm_core_mk_lm_hash(struct Curl_easy *data,
   static const unsigned char magic[] = {
     0x4B, 0x47, 0x53, 0x21, 0x40, 0x23, 0x24, 0x25 /* i.e. KGS!@#$% */
   };
-  size_t len = CURLMIN(strlen(password), 14);
+  size_t len = CURLMIN(mm_strlen(password), 14);
 
-  Curl_strntoupper((char *)pw, password, len);
+  mm_Curl_strntoupper((char *)pw, password, len);
   memset(&pw[len], 0, 14 - len);
 
   /*
