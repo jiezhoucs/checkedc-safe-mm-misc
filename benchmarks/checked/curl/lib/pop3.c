@@ -407,7 +407,7 @@ static CURLcode pop3_perform_user(struct Curl_easy *data,
 
   /* Send the USER command */
   result = Curl_pp_sendf(data, &conn->proto.pop3c.pp, "USER %s",
-                         conn->user ? conn->user : "");
+                         conn->user ? _GETCHARPTR(conn->user) : "");
   if(!result)
     state(data, POP3_USER);
 
@@ -457,7 +457,7 @@ static CURLcode pop3_perform_apop(struct Curl_easy *data,
   for(i = 0; i < MD5_DIGEST_LEN; i++)
     msnprintf(&secret[2 * i], 3, "%02x", digest[i]);
 
-  result = Curl_pp_sendf(data, &pop3c->pp, "APOP %s %s", conn->user, secret);
+  result = Curl_pp_sendf(data, &pop3c->pp, "APOP %s %s", _GETCHARPTR(conn->user), secret);
 
   if(!result)
     state(data, POP3_APOP);

@@ -449,7 +449,7 @@ CURLcode Curl_ntlm_core_mk_lm_hash(struct Curl_easy *data,
 }
 
 #ifdef USE_NTRESPONSES
-static void ascii_to_unicode_le(unsigned char *dest, const char *src,
+static void ascii_to_unicode_le(unsigned char *dest, mm_array_ptr<const char> src,
                                 size_t srclen)
 {
   size_t i;
@@ -462,7 +462,7 @@ static void ascii_to_unicode_le(unsigned char *dest, const char *src,
 #if defined(USE_NTLM_V2) && !defined(USE_WINDOWS_SSPI)
 
 static void ascii_uppercase_to_unicode_le(unsigned char *dest,
-                                          const char *src, size_t srclen)
+                                          mm_array_ptr<const char> src, size_t srclen)
 {
   size_t i;
   for(i = 0; i < srclen; i++) {
@@ -478,10 +478,10 @@ static void ascii_uppercase_to_unicode_le(unsigned char *dest,
  * @unittest: 1600
  */
 CURLcode Curl_ntlm_core_mk_nt_hash(struct Curl_easy *data,
-                                   const char *password,
+                                   mm_array_ptr<const char> password,
                                    unsigned char *ntbuffer /* 21 bytes */)
 {
-  size_t len = strlen(password);
+  size_t len = mm_strlen(password);
   unsigned char *pw;
   CURLcode result;
   if(len > SIZE_T_MAX/2) /* avoid integer overflow */
@@ -562,8 +562,8 @@ static void time2filetime(struct ms_filetime *ft, time_t t)
 /* This creates the NTLMv2 hash by using NTLM hash as the key and Unicode
  * (uppercase UserName + Domain) as the data
  */
-CURLcode Curl_ntlm_core_mk_ntlmv2_hash(const char *user, size_t userlen,
-                                       const char *domain, size_t domlen,
+CURLcode Curl_ntlm_core_mk_ntlmv2_hash(mm_array_ptr<const char> user, size_t userlen,
+                                       mm_array_ptr<const char> domain, size_t domlen,
                                        unsigned char *ntlmhash,
                                        unsigned char *ntlmv2hash)
 {

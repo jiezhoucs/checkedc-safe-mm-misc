@@ -115,7 +115,7 @@ static void ntlm_wb_cleanup(struct ntlmdata *ntlm)
 }
 
 static CURLcode ntlm_wb_init(struct Curl_easy *data, struct ntlmdata *ntlm,
-                             const char *userp)
+                             mm_array_ptr<const char> userp)
 {
   curl_socket_t sockfds[2];
   pid_t child_pid;
@@ -138,7 +138,7 @@ static CURLcode ntlm_wb_init(struct Curl_easy *data, struct ntlmdata *ntlm,
      ntlm->ntlm_auth_hlpr_pid)
     return CURLE_OK;
 
-  username = userp;
+  username = _GETCHARPTR(userp);
   /* The real ntlm_auth really doesn't like being invoked with an
      empty username. It won't make inferences for itself, and expects
      the client to do so (mostly because it's really designed for
@@ -161,7 +161,7 @@ static CURLcode ntlm_wb_init(struct Curl_easy *data, struct ntlmdata *ntlm,
     }
 #endif
     if(!username || !username[0])
-      username = userp;
+      username = _GETCHARPTR(userp);
   }
   slash = strpbrk(username, "\\/");
   if(slash) {
@@ -389,7 +389,7 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
      server, which is for a plain host or for a HTTP proxy */
   mm_array_ptr<char> *allocuserpwd;
   /* point to the name and password for this */
-  const char *userp;
+  mm_array_ptr<const char> userp = NULL;
   struct ntlmdata *ntlm;
   curlntlm *state;
   struct auth *authp;

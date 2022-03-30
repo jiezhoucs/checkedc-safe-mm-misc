@@ -782,7 +782,7 @@ static CURLcode check_telnet_options(struct Curl_easy *data)
   /* Add the user name as an environment variable if it
      was given on the command line */
   if(conn->bits.user_passwd) {
-    msnprintf(option_arg, sizeof(option_arg), "USER,%s", conn->user);
+    msnprintf(option_arg, sizeof(option_arg), "USER,%s", _GETCHARPTR(conn->user));
     beg = curl_slist_append(tn->telnet_vars, option_arg);
     if(!beg) {
       curl_slist_free_all(tn->telnet_vars);

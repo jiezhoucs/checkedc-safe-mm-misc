@@ -470,8 +470,8 @@ CURLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
  * Returns CURLE_OK on success.
  */
 CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
-                                             const char *userp,
-                                             const char *passwdp,
+                                             mm_array_ptr<const char> userp,
+                                             mm_array_ptr<const char> passwdp,
                                              struct ntlmdata *ntlm,
                                              struct bufref *out)
 {
@@ -507,8 +507,8 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
 #endif
   bool unicode = (ntlm->flags & NTLMFLAG_NEGOTIATE_UNICODE) ? TRUE : FALSE;
   char host[HOSTNAME_MAX + 1] = "";
-  const char *user;
-  const char *domain = "";
+  mm_array_ptr<const char> user = NULL;
+  mm_array_ptr<const char> domain = "";
   size_t hostoff = 0;
   size_t useroff = 0;
   size_t domoff = 0;
@@ -516,9 +516,9 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
   size_t userlen = 0;
   size_t domlen = 0;
 
-  user = strchr(userp, '\\');
+  user = mm_strchr(userp, '\\');
   if(!user)
-    user = strchr(userp, '/');
+    user = mm_strchr(userp, '/');
 
   if(user) {
     domain = userp;
@@ -528,7 +528,7 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
   else
     user = userp;
 
-  userlen = strlen(user);
+  userlen = mm_strlen(user);
 
   /* Get the machine's un-qualified host name as NTLM doesn't like the fully
      qualified domain name */
@@ -638,7 +638,8 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
     Curl_ntlm_core_lm_resp(ntbuffer, &ntlm->nonce[0], ntresp);
 #endif
 
-    result = Curl_ntlm_core_mk_lm_hash(data, passwdp, lmbuffer);
+    // TODO
+    result = Curl_ntlm_core_mk_lm_hash(data, _GETCHARPTR(passwdp), lmbuffer);
     if(result)
       return result;
 
@@ -799,17 +800,19 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
 
   DEBUGASSERT(size == domoff);
   if(unicode)
-    unicodecpy(&ntlmbuf[size], domain, domlen / 2);
+    // TODO
+    unicodecpy(&ntlmbuf[size], _GETCHARPTR(domain), domlen / 2);
   else
-    memcpy(&ntlmbuf[size], domain, domlen);
+    mm_memcpy(&ntlmbuf[size], domain, domlen);
 
   size += domlen;
 
   DEBUGASSERT(size == useroff);
   if(unicode)
-    unicodecpy(&ntlmbuf[size], user, userlen / 2);
+    // TODO
+    unicodecpy(&ntlmbuf[size], _GETCHARPTR(user), userlen / 2);
   else
-    memcpy(&ntlmbuf[size], user, userlen);
+    mm_memcpy(&ntlmbuf[size], user, userlen);
 
   size += userlen;
 

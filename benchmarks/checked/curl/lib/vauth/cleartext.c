@@ -57,7 +57,7 @@
  *
  * Returns CURLE_OK on success.
  */
-CURLcode Curl_auth_create_plain_message(const char *authzid,
+CURLcode Curl_auth_create_plain_message(mm_array_ptr<const char> authzid,
                                         const char *authcid,
                                         mm_array_ptr<const char> passwd,
                                         struct bufref *out)
@@ -68,7 +68,7 @@ CURLcode Curl_auth_create_plain_message(const char *authzid,
   size_t clen;
   size_t plen;
 
-  zlen = (authzid == NULL ? 0 : strlen(authzid));
+  zlen = (authzid == NULL ? 0 : mm_strlen(authzid));
   clen = strlen(authcid);
   plen = mm_strlen(passwd);
 
@@ -84,7 +84,7 @@ CURLcode Curl_auth_create_plain_message(const char *authzid,
 
   /* Calculate the reply */
   if(zlen)
-    memcpy(plainauth, authzid, zlen);
+    mm_memcpy(plainauth, authzid, zlen);
   plainauth[zlen] = '\0';
   memcpy(plainauth + zlen + 1, authcid, clen);
   plainauth[zlen + clen + 1] = '\0';

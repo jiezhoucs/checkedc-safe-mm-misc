@@ -863,7 +863,7 @@ struct proxy_info {
   struct hostname host;
   long port;
   curl_proxytype proxytype; /* what kind of proxy that is in use */
-  char *user;    /* proxy user name string, allocated */
+  mm_array_ptr<char> user;    /* proxy user name string, allocated */
   mm_array_ptr<char> passwd;  /* proxy password string, allocated */
 };
 
@@ -978,7 +978,7 @@ struct connectdata {
   char primary_ip[MAX_IPADR_LEN];
   unsigned char ip_version; /* copied from the Curl_easy at creation time */
 
-  char *user;    /* user name string, allocated */
+  mm_array_ptr<char> user;    /* user name string, allocated */
   mm_array_ptr<char> passwd;  /* password string, allocated */
   char *options; /* options string, allocated */
   mm_array_ptr<char> sasl_authzid;     /* authorisation identity string, allocated */
@@ -1306,7 +1306,7 @@ struct urlpieces {
   char *scheme;
   mm_array_ptr<char> hostname;
   char *port;
-  char *user;
+  mm_array_ptr<char> user;
   mm_array_ptr<char> password;
   char *options;
   mm_array_ptr<char> path;
@@ -1435,9 +1435,9 @@ struct UrlState {
     char *te; /* TE: request header */
 
     /* transfer credentials */
-    char *user;
+    mm_array_ptr<char> user;
     mm_array_ptr<char> passwd;
-    char *proxyuser;
+    mm_array_ptr<char> proxyuser;
     mm_array_ptr<char> proxypasswd;
   } aptr;
 

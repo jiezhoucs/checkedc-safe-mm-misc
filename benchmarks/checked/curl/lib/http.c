@@ -301,7 +301,7 @@ static CURLcode http_output_basic(struct Curl_easy *data, bool proxy)
   size_t size = 0;
   char *authorization = NULL;
   mm_array_ptr<char> *userp;
-  const char *user;
+  mm_array_ptr<const char> user = NULL;
   mm_array_ptr<const char> pwd = NULL;
   CURLcode result;
   char *out;
@@ -323,7 +323,7 @@ static CURLcode http_output_basic(struct Curl_easy *data, bool proxy)
     pwd = data->state.aptr.passwd;
   }
 
-  out = aprintf("%s:%s", user, pwd ? _GETCHARPTR(pwd) : "");
+  out = aprintf("%s:%s", _GETCHARPTR(user), pwd ? _GETCHARPTR(pwd) : "");
   if(!out)
     return CURLE_OUT_OF_MEMORY;
 
@@ -759,13 +759,13 @@ output_auth_headers(struct Curl_easy *data,
     infof(data, "%s auth using %s with user '%s'",
           proxy ? "Proxy" : "Server", auth,
           proxy ? (data->state.aptr.proxyuser ?
-                   data->state.aptr.proxyuser : "") :
+                   _GETCHARPTR(data->state.aptr.proxyuser) : "") :
           (data->state.aptr.user ?
-           data->state.aptr.user : ""));
+           _GETCHARPTR(data->state.aptr.user) : ""));
 #else
     infof(data, "Server auth using %s with user '%s'",
-          auth, data->state.aptr.user ?
-          data->state.aptr.user : "");
+          auth, _GETCHARPTR(data->state.aptr.user) ?
+          _GETCHARPTR(data->state.aptr.user) : "");
 #endif
     authstatus->multipass = (!authstatus->done) ? TRUE : FALSE;
   }

@@ -54,7 +54,7 @@ enum host_lookup_state {
  * Returns zero on success.
  */
 static int parsenetrc(mm_array_ptr<const char> host,
-                      char **loginp,
+                      mm_array_ptr<char> *loginp,
                       mm_array_ptr<char> *passwordp,
                       bool *login_changed,
                       bool *password_changed,
@@ -62,7 +62,7 @@ static int parsenetrc(mm_array_ptr<const char> host,
 {
   FILE *file;
   int retcode = NETRC_FILE_MISSING;
-  char *login = *loginp;
+  mm_array_ptr<char> login = *loginp;
   mm_array_ptr<char> password = *passwordp;
   bool specific_login = (login && *login != 0);
   bool login_alloc = FALSE;
@@ -140,14 +140,14 @@ static int parsenetrc(mm_array_ptr<const char> host,
           /* we are now parsing sub-keywords concerning "our" host */
           if(state_login) {
             if(specific_login) {
-              state_our_login = strcasecompare(login, tok);
+              state_our_login = mm_strcasecompare_0(login, tok);
             }
-            else if(!login || strcmp(login, tok)) {
+            else if(!login || mm_strcmp(login, tok)) {
               if(login_alloc) {
-                free(login);
+                MM_FREE(char, login);
                 login_alloc = FALSE;
               }
-              login = strdup(tok);
+              login = mm_strdup_from_raw(tok);
               if(!login) {
                 retcode = NETRC_FAILED; /* allocation failed */
                 goto out;
@@ -195,7 +195,7 @@ static int parsenetrc(mm_array_ptr<const char> host,
       *password_changed = FALSE;
       if(login_alloc) {
         if(*loginp)
-          free(*loginp);
+          MM_FREE(char, *loginp);
         *loginp = login;
         *login_changed = TRUE;
       }
@@ -208,7 +208,7 @@ static int parsenetrc(mm_array_ptr<const char> host,
     }
     else {
       if(login_alloc)
-        free(login);
+        MM_FREE(char, login);
       if(password_alloc)
         MM_FREE(char, password);
     }
@@ -225,7 +225,7 @@ static int parsenetrc(mm_array_ptr<const char> host,
  * in.
  */
 int Curl_parsenetrc(mm_array_ptr<const char> host,
-                    char **loginp,
+                    mm_array_ptr<char> *loginp,
                     mm_array_ptr<char> *passwordp,
                     bool *login_changed,
                     bool *password_changed,

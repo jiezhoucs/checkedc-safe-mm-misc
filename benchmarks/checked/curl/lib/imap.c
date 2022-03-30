@@ -512,7 +512,7 @@ static CURLcode imap_perform_login(struct Curl_easy *data,
   }
 
   /* Make sure the username and password are in the correct atom format */
-  user = imap_atom(conn->user, false);
+  user = imap_atom(_GETCHARPTR(conn->user), false);
   passwd = imap_atom(_GETCHARPTR(conn->passwd), false);
 
   /* Send the LOGIN command */

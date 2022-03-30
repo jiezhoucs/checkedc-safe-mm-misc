@@ -83,7 +83,7 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
   mm_array_ptr<char> *allocuserpwd;
 
   /* Point to the name and password for this */
-  const char *userp;
+  mm_array_ptr<const char> userp = NULL;
   mm_array_ptr<const char> passwdp = NULL;
 
   /* Point to the correct struct with this */
@@ -157,7 +157,7 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
     return CURLE_OUT_OF_MEMORY;
 
   // TODO
-  result = Curl_auth_create_digest_http_message(data, userp, _GETCHARPTR(passwdp), request,
+  result = Curl_auth_create_digest_http_message(data, _GETCHARPTR(userp), _GETCHARPTR(passwdp), request,
                                                 path, digest, &response, &len);
   free(path);
   if(result)

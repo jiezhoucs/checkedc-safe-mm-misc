@@ -1521,14 +1521,14 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
   }
 
   if(!result)
-    result = Curl_setstropt(&data->state.aptr.user,
-                            _GETCHARPTR(data->set.str[STRING_USERNAME]));
+    result = mm_Curl_setstropt(&data->state.aptr.user,
+                            data->set.str[STRING_USERNAME]);
   if(!result)
     result = mm_Curl_setstropt(&data->state.aptr.passwd,
                             data->set.str[STRING_PASSWORD]);
   if(!result)
-    result = Curl_setstropt(&data->state.aptr.proxyuser,
-                            _GETCHARPTR(data->set.str[STRING_PROXYUSERNAME]));
+    result = mm_Curl_setstropt(&data->state.aptr.proxyuser,
+                            data->set.str[STRING_PROXYUSERNAME]);
   if(!result)
     result = mm_Curl_setstropt(&data->state.aptr.proxypasswd,
                             data->set.str[STRING_PROXYPASSWORD]);

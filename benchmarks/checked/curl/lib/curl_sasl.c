@@ -343,7 +343,8 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct Curl_easy *data,
     sasl->authused = SASL_MECH_EXTERNAL;
 
     if(force_ir || data->set.sasl_ir)
-      result = Curl_auth_create_external_message(conn->user, &resp);
+        // TODO
+      result = Curl_auth_create_external_message(_GETCHARPTR(conn->user), &resp);
   }
   else if(conn->bits.user_passwd) {
 #if defined(USE_KERBEROS5)
@@ -417,8 +418,9 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct Curl_easy *data,
       sasl->authused = SASL_MECH_NTLM;
 
       if(force_ir || data->set.sasl_ir)
+          // TODO
         result = Curl_auth_create_ntlm_type1_message(data,
-                                                     conn->user, conn->passwd,
+                                                     _GETCHARPTR(conn->user), conn->passwd,
                                                      service,
                                                      hostname,
                                                      &conn->ntlm, &resp);
@@ -432,7 +434,8 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct Curl_easy *data,
       sasl->authused = SASL_MECH_OAUTHBEARER;
 
       if(force_ir || data->set.sasl_ir)
-        result = Curl_auth_create_oauth_bearer_message(conn->user,
+          // TODO
+        result = Curl_auth_create_oauth_bearer_message(_GETCHARPTR(conn->user),
                                                        hostname,
                                                        port,
                                                        oauth_bearer,
@@ -444,7 +447,8 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct Curl_easy *data,
       sasl->authused = SASL_MECH_XOAUTH2;
 
       if(force_ir || data->set.sasl_ir)
-        result = Curl_auth_create_xoauth_bearer_message(conn->user,
+          // TODO
+        result = Curl_auth_create_xoauth_bearer_message(_GETCHARPTR(conn->user),
                                                         oauth_bearer,
                                                         &resp);
     }
@@ -454,8 +458,9 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct Curl_easy *data,
       sasl->authused = SASL_MECH_PLAIN;
 
       if(force_ir || data->set.sasl_ir)
+          // TODO
         result = Curl_auth_create_plain_message(conn->sasl_authzid,
-                                                conn->user, conn->passwd,
+                                                _GETCHARPTR(conn->user), conn->passwd,
                                                 &resp);
     }
     else if(enabledmechs & SASL_MECH_LOGIN) {
@@ -465,7 +470,8 @@ CURLcode Curl_sasl_start(struct SASL *sasl, struct Curl_easy *data,
       sasl->authused = SASL_MECH_LOGIN;
 
       if(force_ir || data->set.sasl_ir)
-        result = Curl_auth_create_login_message(conn->user, &resp);
+          //TODO
+        result = Curl_auth_create_login_message(_GETCHARPTR(conn->user), &resp);
     }
   }
 
@@ -537,11 +543,13 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
     *progress = SASL_DONE;
     return result;
   case SASL_PLAIN:
+    // TODO
     result = Curl_auth_create_plain_message(conn->sasl_authzid,
-                                            conn->user, conn->passwd, &resp);
+                                            _GETCHARPTR(conn->user), conn->passwd, &resp);
     break;
   case SASL_LOGIN:
-    result = Curl_auth_create_login_message(conn->user, &resp);
+    // TODO
+    result = Curl_auth_create_login_message(_GETCHARPTR(conn->user), &resp);
     newstate = SASL_LOGIN_PASSWD;
     break;
   case SASL_LOGIN_PASSWD:
@@ -549,7 +557,8 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
     result = Curl_auth_create_login_message(_GETCHARPTR(conn->passwd), &resp);
     break;
   case SASL_EXTERNAL:
-    result = Curl_auth_create_external_message(conn->user, &resp);
+    //TODO
+    result = Curl_auth_create_external_message(_GETCHARPTR(conn->user), &resp);
     break;
 #ifndef CURL_DISABLE_CRYPTO_AUTH
 #ifdef USE_GSASL
@@ -565,7 +574,7 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
     result = get_server_message(sasl, data, &serverdata);
     if(!result)
       // TODO
-      result = Curl_auth_create_cram_md5_message(&serverdata, conn->user,
+      result = Curl_auth_create_cram_md5_message(&serverdata, _GETCHARPTR(conn->user),
                                                  _GETCHARPTR(conn->passwd), &resp);
     break;
   case SASL_DIGESTMD5:
@@ -573,7 +582,7 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
     if(!result)
       // TODO
       result = Curl_auth_create_digest_md5_message(data, &serverdata,
-                                                   conn->user, _GETCHARPTR(conn->passwd),
+                                                   _GETCHARPTR(conn->user), _GETCHARPTR(conn->passwd),
                                                    service, &resp);
     newstate = SASL_DIGESTMD5_RESP;
     break;
@@ -585,8 +594,9 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
 #ifdef USE_NTLM
   case SASL_NTLM:
     /* Create the type-1 message */
+    // TODO
     result = Curl_auth_create_ntlm_type1_message(data,
-                                                 conn->user, conn->passwd,
+                                                 _GETCHARPTR(conn->user), conn->passwd,
                                                  service, hostname,
                                                  &conn->ntlm, &resp);
     newstate = SASL_NTLM_TYPE2MSG;
@@ -598,9 +608,8 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
       result = Curl_auth_decode_ntlm_type2_message(data, &serverdata,
                                                    &conn->ntlm);
     if(!result)
-      // TODO
       result = Curl_auth_create_ntlm_type3_message(data, conn->user,
-                                                   _GETCHARPTR(conn->passwd), &conn->ntlm,
+                                                   conn->passwd, &conn->ntlm,
                                                    &resp);
     break;
 #endif
@@ -654,7 +663,8 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
   case SASL_OAUTH2:
     /* Create the authorisation message */
     if(sasl->authused == SASL_MECH_OAUTHBEARER) {
-      result = Curl_auth_create_oauth_bearer_message(conn->user,
+        // TODO
+      result = Curl_auth_create_oauth_bearer_message(_GETCHARPTR(conn->user),
                                                      hostname,
                                                      port,
                                                      oauth_bearer,
@@ -664,7 +674,8 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
       newstate = SASL_OAUTH2_RESP;
     }
     else
-      result = Curl_auth_create_xoauth_bearer_message(conn->user,
+        // TODO
+      result = Curl_auth_create_xoauth_bearer_message(_GETCHARPTR(conn->user),
                                                       oauth_bearer,
                                                       &resp);
     break;

@@ -27,7 +27,7 @@
 
 /* returns -1 on failure, 0 if the host is found, 1 is the host isn't found */
 int Curl_parsenetrc(mm_array_ptr<const char> host,
-                    char **loginp,
+                    mm_array_ptr<char> *loginp,
                     mm_array_ptr<char> *passwordp,
                     bool *login_changed,
                     bool *password_changed,

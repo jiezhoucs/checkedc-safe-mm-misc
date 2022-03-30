@@ -65,7 +65,7 @@ TCHAR *Curl_auth_build_spn(const char *service, const char *host,
 bool Curl_auth_user_contains_domain(const char *user);
 
 /* This is used to generate a PLAIN cleartext message */
-CURLcode Curl_auth_create_plain_message(const char *authzid,
+CURLcode Curl_auth_create_plain_message(mm_array_ptr<const char> authzid,
                                         const char *authcid,
                                         mm_array_ptr<const char> passwd,
                                         struct bufref *out);
@@ -154,8 +154,8 @@ CURLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
 
 /* This is used to generate a base64 encoded NTLM type-3 message */
 CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
-                                             const char *userp,
-                                             const char *passwdp,
+                                             mm_array_ptr<const char> userp,
+                                             mm_array_ptr<const char> passwdp,
                                              struct ntlmdata *ntlm,
                                              struct bufref *out);
 

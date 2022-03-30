@@ -798,13 +798,14 @@ static CURLcode connect_SOCKS(struct Curl_easy *data, int sockindex,
     case CURLPROXY_SOCKS5:
     case CURLPROXY_SOCKS5_HOSTNAME:
       // TODO
-      pxresult = Curl_SOCKS5(conn->socks_proxy.user, _GETCHARPTR(conn->socks_proxy.passwd),
+      pxresult = Curl_SOCKS5(_GETCHARPTR(conn->socks_proxy.user), _GETCHARPTR(conn->socks_proxy.passwd),
                              host, port, sockindex, data, done);
       break;
 
     case CURLPROXY_SOCKS4:
     case CURLPROXY_SOCKS4A:
-      pxresult = Curl_SOCKS4(conn->socks_proxy.user, host, port, sockindex,
+      // TODO
+      pxresult = Curl_SOCKS4(_GETCHARPTR(conn->socks_proxy.user), host, port, sockindex,
                              data, done);
       break;
 

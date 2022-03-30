@@ -82,7 +82,7 @@ bool Curl_auth_is_ntlm_supported(void)
  * Returns CURLE_OK on success.
  */
 CURLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
-                                             const char *userp,
+                                             mm_array_ptr<const char> userp,
                                              const char *passwdp,
                                              const char *service,
                                              const char *host,
@@ -121,7 +121,8 @@ CURLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
     CURLcode result;
 
     /* Populate our identity structure */
-    result = Curl_create_sspi_identity(userp, passwdp, &ntlm->identity);
+    // TODO
+    result = Curl_create_sspi_identity(_GETCHARPTR(userp), passwdp, &ntlm->identity);
     if(result)
       return result;
 
@@ -240,7 +241,7 @@ CURLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
  */
 CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
                                              const char *userp,
-                                             const char *passwdp,
+                                             mm_array_ptr<const char> passwdp,
                                              struct ntlmdata *ntlm,
                                              struct bufref *out)
 {

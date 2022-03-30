@@ -136,7 +136,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
   mm_array_ptr<char> *allocuserpwd;
 
   /* point to the username, password, service and host */
-  const char *userp;
+  mm_array_ptr<const char> userp = NULL;
   mm_array_ptr<const char> passwdp = NULL;
   mm_array_ptr<const char> service = NULL;
   mm_array_ptr<const char> hostname = NULL;
@@ -202,7 +202,8 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
   case NTLMSTATE_TYPE1:
   default: /* for the weird cases we (re)start here */
     /* Create a type-1 message */
-    result = Curl_auth_create_ntlm_type1_message(data, userp, passwdp,
+      // TODO
+    result = Curl_auth_create_ntlm_type1_message(data, _GETCHARPTR(userp), passwdp,
                                                  service, hostname,
                                                  ntlm, &ntlmmsg);
     if(!result) {
@@ -224,8 +225,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
 
   case NTLMSTATE_TYPE2:
     /* We already received the type-2 message, create a type-3 message */
-    // TODO
-    result = Curl_auth_create_ntlm_type3_message(data, userp, _GETCHARPTR(passwdp),
+    result = Curl_auth_create_ntlm_type3_message(data, userp, passwdp,
                                                  ntlm, &ntlmmsg);
     if(!result && Curl_bufref_len(&ntlmmsg)) {
       result = Curl_base64_encode(data,

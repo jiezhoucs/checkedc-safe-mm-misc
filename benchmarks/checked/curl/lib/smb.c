@@ -275,19 +275,19 @@ static CURLcode smb_connect(struct Curl_easy *data, bool *done)
   connkeep(conn, "SMB default");
 
   /* Parse the username, domain, and password */
-  slash = strchr(conn->user, '/');
+  slash = strchr(_GETCHARPTR(conn->user), '/');
   if(!slash)
-    slash = strchr(conn->user, '\\');
+    slash = strchr(_GETCHARPTR(conn->user), '\\');
 
   if(slash) {
     smbc->user = slash + 1;
-    smbc->domain = strdup(conn->user);
+    smbc->domain = strdup(_GETCHARPTR(conn->user));
     if(!smbc->domain)
       return CURLE_OUT_OF_MEMORY;
-    smbc->domain[slash - conn->user] = 0;
+    smbc->domain[slash - _GETCHARPTR(conn->user)] = 0;
   }
   else {
-    smbc->user = conn->user;
+    smbc->user = _GETCHARPTR(conn->user);
     smbc->domain = strdup(_GETCHARPTR(conn->host.name));
     if(!smbc->domain)
       return CURLE_OUT_OF_MEMORY;
@@ -462,7 +462,7 @@ static CURLcode smb_send_setup(struct Curl_easy *data)
   Curl_ntlm_core_mk_lm_hash(data, _GETCHARPTR(conn->passwd), lm_hash);
   Curl_ntlm_core_lm_resp(lm_hash, smbc->challenge, lm);
 #ifdef USE_NTRESPONSES
-  Curl_ntlm_core_mk_nt_hash(data, _GETCHARPTR(conn->passwd), nt_hash);
+  Curl_ntlm_core_mk_nt_hash(data, conn->passwd, nt_hash);
   Curl_ntlm_core_lm_resp(nt_hash, smbc->challenge, nt);
 #else
   memset(nt, 0, sizeof(nt));

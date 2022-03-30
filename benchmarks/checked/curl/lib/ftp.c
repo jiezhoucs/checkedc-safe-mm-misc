@@ -782,7 +782,7 @@ static CURLcode ftp_state_user(struct Curl_easy *data,
 {
   CURLcode result = Curl_pp_sendf(data,
                                   &conn->proto.ftpc.pp, "USER %s",
-                                  conn->user?conn->user:"");
+                                  conn->user?_GETCHARPTR(conn->user):"");
   if(!result) {
     state(data, FTP_USER);
     data->state.ftp_trying_alternative = FALSE;

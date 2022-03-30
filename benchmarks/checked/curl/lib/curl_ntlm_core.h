@@ -73,7 +73,7 @@ CURLcode Curl_ntlm_core_mk_lm_hash(struct Curl_easy *data,
 
 #ifdef USE_NTRESPONSES
 CURLcode Curl_ntlm_core_mk_nt_hash(struct Curl_easy *data,
-                                   const char *password,
+                                   mm_array_ptr<const char> password,
                                    unsigned char *ntbuffer /* 21 bytes */);
 
 #if defined(USE_NTLM_V2) && !defined(USE_WINDOWS_SSPI)
@@ -82,8 +82,8 @@ CURLcode Curl_hmac_md5(const unsigned char *key, unsigned int keylen,
                        const unsigned char *data, unsigned int datalen,
                        unsigned char *output);
 
-CURLcode Curl_ntlm_core_mk_ntlmv2_hash(const char *user, size_t userlen,
-                                       const char *domain, size_t domlen,
+CURLcode Curl_ntlm_core_mk_ntlmv2_hash(mm_array_ptr<const char> user, size_t userlen,
+                                       mm_array_ptr<const char> domain, size_t domlen,
                                        unsigned char *ntlmhash,
                                        unsigned char *ntlmv2hash);
 
