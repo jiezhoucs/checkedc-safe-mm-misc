@@ -158,10 +158,10 @@ static void auth_digest_sha256_to_ascii(unsigned char *source, /* 32 bytes */
 }
 
 /* Perform quoted-string escaping as described in RFC2616 and its errata */
-static char *auth_digest_string_quoted(const char *source)
+static char *auth_digest_string_quoted(mm_array_ptr<const char> source)
 {
   char *dest;
-  const char *s = source;
+  mm_array_ptr<const char> s = source;
   size_t n = 1; /* null terminator */
 
   /* Calculate size needed */
@@ -332,8 +332,8 @@ bool Curl_auth_is_digest_supported(void)
  */
 CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
                                              const struct bufref *chlg,
-                                             const char *userp,
-                                             const char *passwdp,
+                                             mm_array_ptr<const char> userp,
+                                             mm_array_ptr<const char> passwdp,
                                              mm_array_ptr<const char> service,
                                              struct bufref *out)
 {
@@ -390,13 +390,13 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     return CURLE_OUT_OF_MEMORY;
 
   Curl_MD5_update(ctxt, (const unsigned char *) userp,
-                  curlx_uztoui(strlen(userp)));
+                  curlx_uztoui(mm_strlen(userp)));
   Curl_MD5_update(ctxt, (const unsigned char *) ":", 1);
   Curl_MD5_update(ctxt, (const unsigned char *) realm,
                   curlx_uztoui(strlen(realm)));
   Curl_MD5_update(ctxt, (const unsigned char *) ":", 1);
   Curl_MD5_update(ctxt, (const unsigned char *) passwdp,
-                  curlx_uztoui(strlen(passwdp)));
+                  curlx_uztoui(mm_strlen(passwdp)));
   Curl_MD5_final(ctxt, digest);
 
   ctxt = Curl_MD5_init(Curl_DIGEST_MD5);
@@ -473,7 +473,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
   response = aprintf("username=\"%s\",realm=\"%s\",nonce=\"%s\","
                      "cnonce=\"%s\",nc=\"%s\",digest-uri=\"%s\",response=%s,"
                      "qop=%s",
-                     userp, realm, nonce,
+                     _GETCHARPTR(userp), realm, nonce,
                      cnonce, nonceCount, spn, resp_hash_hex, qop);
   free(spn);
   if(!response)
@@ -659,8 +659,8 @@ CURLcode Curl_auth_decode_digest_http_message(mm_array_ptr<const char> chlg,
  */
 static CURLcode auth_create_digest_http_message(
                   struct Curl_easy *data,
-                  const char *userp,
-                  const char *passwdp,
+                  mm_array_ptr<const char> userp,
+                  mm_array_ptr<const char> passwdp,
                   const unsigned char *request,
                   const unsigned char *uripath,
                   struct digestdata *digest,
@@ -701,7 +701,7 @@ static CURLcode auth_create_digest_http_message(
   }
 
   if(digest->userhash) {
-    hashthis = aprintf("%s:%s", userp, digest->realm);
+    hashthis = aprintf("%s:%s", _GETCHARPTR(userp), digest->realm);
     if(!hashthis)
       return CURLE_OUT_OF_MEMORY;
 
@@ -722,8 +722,8 @@ static CURLcode auth_create_digest_http_message(
            unq(nonce-value) ":" unq(cnonce-value)
   */
 
-  hashthis = aprintf("%s:%s:%s", digest->userhash ? userh : userp,
-                                 digest->realm, passwdp);
+  hashthis = aprintf("%s:%s:%s", digest->userhash ? userh : _GETCHARPTR(userp),
+                                 digest->realm, _GETCHARPTR(passwdp));
   if(!hashthis)
     return CURLE_OUT_OF_MEMORY;
 
@@ -813,7 +813,9 @@ static CURLcode auth_create_digest_http_message(
      characters.  algorithm and qop with standard values only contain web-safe
      characters.
   */
-  userp_quoted = auth_digest_string_quoted(digest->userhash ? userh : userp);
+
+  userp_quoted = digest->userhash ? auth_digest_string_quoted(userh) :
+                                    auth_digest_string_quoted(userp);
   if(!userp_quoted)
     return CURLE_OUT_OF_MEMORY;
 
@@ -915,8 +917,8 @@ static CURLcode auth_create_digest_http_message(
  * Returns CURLE_OK on success.
  */
 CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
-                                              const char *userp,
-                                              const char *passwdp,
+                                              mm_array_ptr<const char> userp,
+                                              mm_array_ptr<const char> passwdp,
                                               const unsigned char *request,
                                               const unsigned char *uripath,
                                               struct digestdata *digest,

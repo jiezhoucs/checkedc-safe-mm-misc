@@ -315,7 +315,7 @@ CURLcode Curl_auth_decode_ntlm_type2_message(struct Curl_easy *data,
 
 /* copy the source to the destination and fill in zeroes in every
    other destination byte! */
-static void unicodecpy(unsigned char *dest, const char *src, size_t length)
+static void unicodecpy(unsigned char *dest, mm_array_ptr<const char> src, size_t length)
 {
   size_t i;
   for(i = 0; i < length; i++) {
@@ -343,7 +343,7 @@ static void unicodecpy(unsigned char *dest, const char *src, size_t length)
  * Returns CURLE_OK on success.
  */
 CURLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
-                                             const char *userp,
+                                             mm_array_ptr<const char> userp,
                                              mm_array_ptr<const char> passwdp,
                                              mm_array_ptr<const char> service,
                                              mm_array_ptr<const char> hostname,
@@ -638,8 +638,7 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
     Curl_ntlm_core_lm_resp(ntbuffer, &ntlm->nonce[0], ntresp);
 #endif
 
-    // TODO
-    result = Curl_ntlm_core_mk_lm_hash(data, _GETCHARPTR(passwdp), lmbuffer);
+    result = Curl_ntlm_core_mk_lm_hash(data, passwdp, lmbuffer);
     if(result)
       return result;
 
@@ -800,8 +799,7 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
 
   DEBUGASSERT(size == domoff);
   if(unicode)
-    // TODO
-    unicodecpy(&ntlmbuf[size], _GETCHARPTR(domain), domlen / 2);
+    unicodecpy(&ntlmbuf[size], domain, domlen / 2);
   else
     mm_memcpy(&ntlmbuf[size], domain, domlen);
 
@@ -809,8 +807,7 @@ CURLcode Curl_auth_create_ntlm_type3_message(struct Curl_easy *data,
 
   DEBUGASSERT(size == useroff);
   if(unicode)
-    // TODO
-    unicodecpy(&ntlmbuf[size], _GETCHARPTR(user), userlen / 2);
+    unicodecpy(&ntlmbuf[size], user, userlen / 2);
   else
     mm_memcpy(&ntlmbuf[size], user, userlen);
 

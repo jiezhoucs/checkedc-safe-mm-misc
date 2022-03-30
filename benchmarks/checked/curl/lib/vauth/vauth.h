@@ -66,23 +66,23 @@ bool Curl_auth_user_contains_domain(const char *user);
 
 /* This is used to generate a PLAIN cleartext message */
 CURLcode Curl_auth_create_plain_message(mm_array_ptr<const char> authzid,
-                                        const char *authcid,
+                                        mm_array_ptr<const char> authcid,
                                         mm_array_ptr<const char> passwd,
                                         struct bufref *out);
 
 /* This is used to generate a LOGIN cleartext message */
-CURLcode Curl_auth_create_login_message(const char *value,
+CURLcode Curl_auth_create_login_message(mm_array_ptr<const char> value,
                                         struct bufref *out);
 
 /* This is used to generate an EXTERNAL cleartext message */
-CURLcode Curl_auth_create_external_message(const char *user,
+CURLcode Curl_auth_create_external_message(mm_array_ptr<const char> user,
                                            struct bufref *out);
 
 #if !defined(CURL_DISABLE_CRYPTO_AUTH)
 /* This is used to generate a CRAM-MD5 response message */
 CURLcode Curl_auth_create_cram_md5_message(const struct bufref *chlg,
-                                           const char *userp,
-                                           const char *passwdp,
+                                           mm_array_ptr<const char> userp,
+                                           mm_array_ptr<const char> passwdp,
                                            struct bufref *out);
 
 /* This is used to evaluate if DIGEST is supported */
@@ -91,8 +91,8 @@ bool Curl_auth_is_digest_supported(void);
 /* This is used to generate a base64 encoded DIGEST-MD5 response message */
 CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
                                              const struct bufref *chlg,
-                                             const char *userp,
-                                             const char *passwdp,
+                                             mm_array_ptr<const char> userp,
+                                             mm_array_ptr<const char> passwdp,
                                              mm_array_ptr<const char> service,
                                              struct bufref *out);
 
@@ -102,8 +102,8 @@ CURLcode Curl_auth_decode_digest_http_message(mm_array_ptr<const char> chlg,
 
 /* This is used to generate a HTTP DIGEST response message */
 CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
-                                              const char *userp,
-                                              const char *passwdp,
+                                              mm_array_ptr<const char> userp,
+                                              mm_array_ptr<const char> passwdp,
                                               const unsigned char *request,
                                               const unsigned char *uri,
                                               struct digestdata *digest,
@@ -140,7 +140,7 @@ bool Curl_auth_is_ntlm_supported(void);
 
 /* This is used to generate a base64 encoded NTLM type-1 message */
 CURLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
-                                             const char *userp,
+                                             mm_array_ptr<const char> userp,
                                              mm_array_ptr<const char> passwdp,
                                              mm_array_ptr<const char> service,
                                              mm_array_ptr<const char> host,
@@ -164,14 +164,14 @@ void Curl_auth_cleanup_ntlm(struct ntlmdata *ntlm);
 #endif /* USE_NTLM */
 
 /* This is used to generate a base64 encoded OAuth 2.0 message */
-CURLcode Curl_auth_create_oauth_bearer_message(const char *user,
+CURLcode Curl_auth_create_oauth_bearer_message(mm_array_ptr<const char> user,
                                                mm_array_ptr<const char> host,
                                                const long port,
                                                mm_array_ptr<const char> bearer,
                                                struct bufref *out);
 
 /* This is used to generate a base64 encoded XOAuth 2.0 message */
-CURLcode Curl_auth_create_xoauth_bearer_message(const char *user,
+CURLcode Curl_auth_create_xoauth_bearer_message(mm_array_ptr<const char> user,
                                                 mm_array_ptr<const char> bearer,
                                                 struct bufref *out);
 

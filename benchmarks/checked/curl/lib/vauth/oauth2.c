@@ -54,7 +54,7 @@
  *
  * Returns CURLE_OK on success.
  */
-CURLcode Curl_auth_create_oauth_bearer_message(const char *user,
+CURLcode Curl_auth_create_oauth_bearer_message(mm_array_ptr<const char> user,
                                                mm_array_ptr<const char> host,
                                                const long port,
                                                mm_array_ptr<const char> bearer,
@@ -64,10 +64,10 @@ CURLcode Curl_auth_create_oauth_bearer_message(const char *user,
 
   /* Generate the message */
   if(port == 0 || port == 80)
-    oauth = aprintf("n,a=%s,\1host=%s\1auth=Bearer %s\1\1", user, _GETCHARPTR(host),
+    oauth = aprintf("n,a=%s,\1host=%s\1auth=Bearer %s\1\1", _GETCHARPTR(user), _GETCHARPTR(host),
                     _GETCHARPTR(bearer));
   else
-    oauth = aprintf("n,a=%s,\1host=%s\1port=%ld\1auth=Bearer %s\1\1", user,
+    oauth = aprintf("n,a=%s,\1host=%s\1port=%ld\1auth=Bearer %s\1\1", _GETCHARPTR(user),
                     _GETCHARPTR(host), port, _GETCHARPTR(bearer));
   if(!oauth)
     return CURLE_OUT_OF_MEMORY;
@@ -90,12 +90,12 @@ CURLcode Curl_auth_create_oauth_bearer_message(const char *user,
  *
  * Returns CURLE_OK on success.
  */
-CURLcode Curl_auth_create_xoauth_bearer_message(const char *user,
+CURLcode Curl_auth_create_xoauth_bearer_message(mm_array_ptr<const char> user,
                                                mm_array_ptr<const char> bearer,
                                                struct bufref *out)
 {
   /* Generate the message */
-  char *xoauth = aprintf("user=%s\1auth=Bearer %s\1\1", user, _GETCHARPTR(bearer));
+  char *xoauth = aprintf("user=%s\1auth=Bearer %s\1\1", _GETCHARPTR(user), _GETCHARPTR(bearer));
   if(!xoauth)
     return CURLE_OUT_OF_MEMORY;
 

@@ -88,8 +88,8 @@ bool Curl_auth_is_digest_supported(void)
  */
 CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
                                              const struct bufref *chlg,
-                                             const char *userp,
-                                             const char *passwdp,
+                                             mm_array_ptr<const char> userp,
+                                             mm_array_ptr<const char> passwdp,
                                              const char *service,
                                              struct bufref *out)
 {
@@ -387,8 +387,8 @@ CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
  * Returns CURLE_OK on success.
  */
 CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
-                                              const char *userp,
-                                              const char *passwdp,
+                                              mm_array_ptr<const char> userp,
+                                              mm_array_ptr<const char> passwdp,
                                               const unsigned char *request,
                                               const unsigned char *uripath,
                                               struct digestdata *digest,
