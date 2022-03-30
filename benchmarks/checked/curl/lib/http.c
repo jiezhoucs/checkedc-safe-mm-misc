@@ -2324,7 +2324,7 @@ CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
 
     curl_mime_headers(http->sendit, data->set.headers, 0);
     // TODO
-    result = Curl_mime_prepare_headers(http->sendit, _GETCHARPTR(cthdr),
+    result = Curl_mime_prepare_headers(http->sendit, cthdr,
                                        NULL, MIMESTRATEGY_FORM);
     curl_mime_headers(http->sendit, NULL, 0);
     if(!result)

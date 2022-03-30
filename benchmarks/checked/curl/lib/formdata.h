@@ -32,7 +32,7 @@ struct FormInfo {
   size_t namelength;
   char *value;
   curl_off_t contentslength;
-  char *contenttype;
+  mm_array_ptr<char> contenttype;
   long flags;
   char *buffer;      /* pointer to existing buffer used for file upload */
   size_t bufferlength;

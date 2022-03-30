@@ -316,7 +316,7 @@ static CURLcode tool2curlparts(CURL *curl, mm_ptr<struct tool_mime> m,
     if(!ret && filename)
       ret = curl_mime_filename(part, _GETCHARPTR(filename));
     if(!ret)
-      ret = curl_mime_type(part, _GETCHARPTR(m->type));
+      ret = curl_mime_type(part, m->type);
     if(!ret)
       ret = curl_mime_headers(part, m->headers, 0);
     if(!ret)

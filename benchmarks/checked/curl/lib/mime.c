@@ -305,21 +305,21 @@ static char *escape_string(const char *src)
 }
 
 /* Check if header matches. */
-static char *match_header(struct curl_slist *hdr, const char *lbl, size_t len)
+static mm_array_ptr<char> match_header(struct curl_slist *hdr, const char *lbl, size_t len)
 {
-  char *value = NULL;
+  mm_array_ptr<char> value = NULL;
 
   if(mm_strncasecompare_0(hdr->data, lbl, len) && hdr->data[len] == ':')
-    for(value = _GETCHARPTR(hdr->data) + len + 1; *value == ' '; value++)
+    for(value = hdr->data + len + 1; *value == ' '; value++)
       ;
   return value;
 }
 
 /* Get a header from an slist. */
-static char *search_header(struct curl_slist *hdrlist, const char *hdr)
+static mm_array_ptr<char> search_header(struct curl_slist *hdrlist, const char *hdr)
 {
   size_t len = strlen(hdr);
-  char *value = NULL;
+  mm_array_ptr<char> value = NULL;
 
   for(; !value && hdrlist; hdrlist = hdrlist->next)
     value = match_header(hdrlist, hdr, len);
@@ -1201,7 +1201,7 @@ void Curl_mime_cleanpart(curl_mimepart *part)
   curl_slist_free_all(part->curlheaders);
   if(part->flags & MIME_USERHEADERS_OWNER)
     curl_slist_free_all(part->userheaders);
-  Curl_safefree(part->mimetype);
+  mm_Curl_safefree(char, part->mimetype);
   Curl_safefree(part->name);
   Curl_safefree(part->filename);
   Curl_mime_initpart(part, part->easy);
@@ -1482,16 +1482,16 @@ CURLcode curl_mime_filedata(curl_mimepart *part, const char *filename)
 }
 
 /* Set mime part type. */
-CURLcode curl_mime_type(curl_mimepart *part, const char *mimetype)
+CURLcode curl_mime_type(curl_mimepart *part, mm_array_ptr<const char> mimetype)
 {
   if(!part)
     return CURLE_BAD_FUNCTION_ARGUMENT;
 
-  Curl_safefree(part->mimetype);
+  mm_Curl_safefree(char, part->mimetype);
   part->mimetype = NULL;
 
   if(mimetype) {
-    part->mimetype = strdup(mimetype);
+    part->mimetype = mm_strdup(mimetype);
     if(!part->mimetype)
       return CURLE_OUT_OF_MEMORY;
   }
@@ -1743,7 +1743,7 @@ static CURLcode add_content_type(struct curl_slist **slp,
                               boundary? boundary: "");
 }
 
-const char *Curl_mime_contenttype(const char *filename)
+mm_array_ptr<const char> Curl_mime_contenttype(const char *filename)
 {
   /*
    * If no content type was specified, we scan through a few well-known
@@ -1751,7 +1751,7 @@ const char *Curl_mime_contenttype(const char *filename)
    */
   struct ContentType {
     const char *extension;
-    const char *type;
+    mm_array_ptr<const char> type;
   };
   static const struct ContentType ctts[] = {
     {".gif",  "image/gif"},
@@ -1799,13 +1799,13 @@ static bool content_type_match(const char *contenttype, const char *target)
 }
 
 CURLcode Curl_mime_prepare_headers(curl_mimepart *part,
-                                   const char *contenttype,
+                                   mm_array_ptr<const char> contenttype,
                                    const char *disposition,
                                    enum mimestrategy strategy)
 {
   curl_mime *mime = NULL;
   const char *boundary = NULL;
-  char *customct;
+  mm_array_ptr<char> customct = NULL;
   const char *cte = NULL;
   CURLcode ret = CURLE_OK;
 
@@ -1849,7 +1849,8 @@ CURLcode Curl_mime_prepare_headers(curl_mimepart *part,
       boundary = mime->boundary;
   }
   else if(contenttype && !customct &&
-          content_type_match(contenttype, "text/plain"))
+      // TODO
+          content_type_match(_GETCHARPTR(contenttype), "text/plain"))
     if(strategy == MIMESTRATEGY_MAIL || !part->filename)
       contenttype = NULL;
 
@@ -1857,7 +1858,7 @@ CURLcode Curl_mime_prepare_headers(curl_mimepart *part,
   if(!search_header(part->userheaders, "Content-Disposition")) {
     if(!disposition)
       if(part->filename || part->name ||
-        (contenttype && !strncasecompare_raw(contenttype, "multipart/", 10)))
+        (contenttype && !strncasecompare(contenttype, "multipart/", 10)))
           disposition = DISPOSITION_DEFAULT;
     if(disposition && curl_strequal(disposition, "attachment") &&
      !part->name && !part->filename)
@@ -1895,7 +1896,8 @@ CURLcode Curl_mime_prepare_headers(curl_mimepart *part,
 
   /* Issue Content-Type header. */
   if(contenttype) {
-    ret = add_content_type(&part->curlheaders, contenttype, boundary);
+    // TODO
+    ret = add_content_type(&part->curlheaders, _GETCHARPTR(contenttype), boundary);
     if(ret)
       return ret;
   }
@@ -1925,7 +1927,8 @@ CURLcode Curl_mime_prepare_headers(curl_mimepart *part,
     curl_mimepart *subpart;
 
     disposition = NULL;
-    if(content_type_match(contenttype, "multipart/form-data"))
+    // TODO
+    if(content_type_match(_GETCHARPTR(contenttype), "multipart/form-data"))
       disposition = "form-data";
     for(subpart = mime->firstpart; subpart; subpart = subpart->nextpart) {
       ret = Curl_mime_prepare_headers(subpart, NULL, disposition, strategy);

@@ -68,7 +68,7 @@ static struct curl_httppost *
 AddHttpPost(char *name, size_t namelength,
             char *value, curl_off_t contentslength,
             char *buffer, size_t bufferlength,
-            char *contenttype,
+            mm_array_ptr<char> contenttype,
             long flags,
             struct curl_slist *contentHeader,
             char *showfilename, char *userp,
@@ -124,7 +124,7 @@ AddHttpPost(char *name, size_t namelength,
  *
  ***************************************************************************/
 static struct FormInfo *AddFormInfo(char *value,
-                                    char *contenttype,
+                                    mm_array_ptr<char> contenttype,
                                     struct FormInfo *parent_form_info)
 {
   struct FormInfo *form_info;
@@ -206,7 +206,7 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
 {
   struct FormInfo *first_form, *current_form, *form = NULL;
   CURLFORMcode return_value = CURL_FORMADD_OK;
-  const char *prevtype = NULL;
+  mm_array_ptr<const char> prevtype = NULL;
   struct curl_httppost *post = NULL;
   CURLformoption option;
   struct curl_forms *forms = NULL;
@@ -446,13 +446,13 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
         if(current_form->contenttype) {
           if(current_form->flags & HTTPPOST_FILENAME) {
             if(contenttype) {
-              char *type = strdup(contenttype);
+              mm_array_ptr<char> type = mm_strdup_from_raw(contenttype);
               if(!type)
                 return_value = CURL_FORMADD_MEMORY;
               else {
                 form = AddFormInfo(NULL, type, current_form);
                 if(!form) {
-                  free(type);
+                  MM_FREE(char, type);
                   return_value = CURL_FORMADD_MEMORY;
                 }
                 else {
@@ -470,7 +470,7 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
         }
         else {
           if(contenttype) {
-            current_form->contenttype = strdup(contenttype);
+            current_form->contenttype = mm_strdup_from_raw(contenttype);
             if(!current_form->contenttype)
               return_value = CURL_FORMADD_MEMORY;
             else
@@ -532,7 +532,7 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
         ptr->value_alloc = FALSE;
       }
       if(ptr->contenttype_alloc) {
-        Curl_safefree(ptr->contenttype);
+        mm_Curl_safefree(char, ptr->contenttype);
         ptr->contenttype_alloc = FALSE;
       }
       if(ptr->showfilename_alloc) {
@@ -571,15 +571,14 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
          !form->contenttype) {
         char *f = (form->flags & HTTPPOST_BUFFER)?
           form->showfilename : form->value;
-        char const *type;
-        type = Curl_mime_contenttype(f);
+        mm_array_ptr<char const> type = Curl_mime_contenttype(f);
         if(!type)
           type = prevtype;
         if(!type)
           type = FILE_CONTENTTYPE_DEFAULT;
 
         /* our contenttype is missing */
-        form->contenttype = strdup(type);
+        form->contenttype = mm_strdup(type);
         if(!form->contenttype) {
           return_value = CURL_FORMADD_MEMORY;
           break;
@@ -661,7 +660,7 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
           ptr->value_alloc = FALSE;
         }
         if(ptr->contenttype_alloc) {
-          Curl_safefree(ptr->contenttype);
+          mm_Curl_safefree(char, ptr->contenttype);
           ptr->contenttype_alloc = FALSE;
         }
         if(ptr->showfilename_alloc) {
@@ -763,7 +762,7 @@ void curl_formfree(struct curl_httppost *form)
          (HTTPPOST_PTRCONTENTS|HTTPPOST_BUFFER|HTTPPOST_CALLBACK))
       )
       free(form->contents); /* free the contents */
-    free(form->contenttype); /* free the content type */
+    MM_FREE(char, form->contenttype); /* free the content type */
     free(form->showfilename); /* free the faked file name */
     free(form);       /* free the struct */
     form = next;

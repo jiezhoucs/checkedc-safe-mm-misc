@@ -119,7 +119,7 @@ struct curl_mimepart {
   FILE *fp;                        /* File pointer. */
   struct curl_slist *curlheaders;  /* Part headers. */
   struct curl_slist *userheaders;  /* Part headers. */
-  char *mimetype;                  /* Part mime type. */
+  mm_array_ptr<char> mimetype;                  /* Part mime type. */
   char *filename;                  /* Remote file name. */
   char *name;                      /* Data name. */
   curl_off_t datasize;             /* Expected data size. */
@@ -143,14 +143,14 @@ CURLcode Curl_mime_set_subparts(struct curl_mimepart *part,
                                 struct curl_mime *subparts,
                                 int take_ownership);
 CURLcode Curl_mime_prepare_headers(struct curl_mimepart *part,
-                                   const char *contenttype,
+                                   mm_array_ptr<const char> contenttype,
                                    const char *disposition,
                                    enum mimestrategy strategy);
 curl_off_t Curl_mime_size(struct curl_mimepart *part);
 size_t Curl_mime_read(char *buffer, size_t size, size_t nitems,
                       void *instream);
 CURLcode Curl_mime_rewind(struct curl_mimepart *part);
-const char *Curl_mime_contenttype(const char *filename);
+mm_array_ptr<const char> Curl_mime_contenttype(const char *filename);
 void Curl_mime_unpause(struct curl_mimepart *part);
 
 #else
