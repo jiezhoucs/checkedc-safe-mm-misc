@@ -101,11 +101,11 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   char *credential_scope = NULL;
   char *str_to_sign = NULL;
   const char *user = data->state.aptr.user ? data->state.aptr.user : "";
-  const char *passwd = data->state.aptr.passwd ? data->state.aptr.passwd : "";
+  const char *passwd = data->state.aptr.passwd ? _GETCHARPTR(data->state.aptr.passwd) : "";
   char *secret = NULL;
   unsigned char tmp_sign0[32] = {0};
   unsigned char tmp_sign1[32] = {0};
-  char *auth_headers = NULL;
+  mm_array_ptr<char> auth_headers = NULL;
 
   DEBUGASSERT(!proxy);
   (void)proxy;
@@ -354,7 +354,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
 
   sha256_to_hex(sha_hex, tmp_sign0, sizeof(sha_hex));
 
-  auth_headers = curl_maprintf("Authorization: %s4-HMAC-SHA256 "
+  auth_headers = mmize_str(curl_maprintf("Authorization: %s4-HMAC-SHA256 "
                                "Credential=%s/%s, "
                                "SignedHeaders=%s, "
                                "Signature=%s\r\n"
@@ -365,12 +365,12 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
                                signed_headers,
                                sha_hex,
                                _GETCHARPTR(provider1_mid),
-                               timestamp);
+                               timestamp));
   if(!auth_headers) {
     goto fail;
   }
 
-  Curl_safefree(data->state.aptr.userpwd);
+  mm_Curl_safefree(char, data->state.aptr.userpwd);
   data->state.aptr.userpwd = auth_headers;
   data->state.authhost.done = TRUE;
   ret = CURLE_OK;

@@ -258,8 +258,8 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   mm_array_ptr<const char> p_stream_uri = NULL;
   const char *p_transport = NULL;
   const char *p_uagent = NULL;
-  const char *p_proxyuserpwd = NULL;
-  const char *p_userpwd = NULL;
+  mm_array_ptr<const char> p_proxyuserpwd = NULL;
+  mm_array_ptr<const char> p_userpwd = NULL;
 
   *done = TRUE;
 
@@ -484,14 +484,14 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
                          p_range ? p_range : "",
                          p_referrer ? p_referrer : "",
                          p_uagent ? p_uagent : "",
-                         p_proxyuserpwd ? p_proxyuserpwd : "",
-                         p_userpwd ? p_userpwd : "");
+                         p_proxyuserpwd ? _GETCHARPTR(p_proxyuserpwd) : "",
+                         p_userpwd ? _GETCHARPTR(p_userpwd) : "");
 
   /*
    * Free userpwd now --- cannot reuse this for Negotiate and possibly NTLM
    * with basic and digest, it will be freed anyway by the next request
    */
-  Curl_safefree(data->state.aptr.userpwd);
+  mm_Curl_safefree(char, data->state.aptr.userpwd);
   data->state.aptr.userpwd = NULL;
 
   if(result)

@@ -545,7 +545,8 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
     newstate = SASL_LOGIN_PASSWD;
     break;
   case SASL_LOGIN_PASSWD:
-    result = Curl_auth_create_login_message(conn->passwd, &resp);
+    // TODO
+    result = Curl_auth_create_login_message(_GETCHARPTR(conn->passwd), &resp);
     break;
   case SASL_EXTERNAL:
     result = Curl_auth_create_external_message(conn->user, &resp);
@@ -563,14 +564,16 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
   case SASL_CRAMMD5:
     result = get_server_message(sasl, data, &serverdata);
     if(!result)
+      // TODO
       result = Curl_auth_create_cram_md5_message(&serverdata, conn->user,
-                                                 conn->passwd, &resp);
+                                                 _GETCHARPTR(conn->passwd), &resp);
     break;
   case SASL_DIGESTMD5:
     result = get_server_message(sasl, data, &serverdata);
     if(!result)
+      // TODO
       result = Curl_auth_create_digest_md5_message(data, &serverdata,
-                                                   conn->user, conn->passwd,
+                                                   conn->user, _GETCHARPTR(conn->passwd),
                                                    service, &resp);
     newstate = SASL_DIGESTMD5_RESP;
     break;
@@ -595,8 +598,9 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
       result = Curl_auth_decode_ntlm_type2_message(data, &serverdata,
                                                    &conn->ntlm);
     if(!result)
+      // TODO
       result = Curl_auth_create_ntlm_type3_message(data, conn->user,
-                                                   conn->passwd, &conn->ntlm,
+                                                   _GETCHARPTR(conn->passwd), &conn->ntlm,
                                                    &resp);
     break;
 #endif

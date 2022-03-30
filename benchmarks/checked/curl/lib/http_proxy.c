@@ -116,7 +116,7 @@ CURLcode Curl_proxy_connect(struct Curl_easy *data, int sockindex)
     result = Curl_proxyCONNECT(data, sockindex, hostname, remote_port);
     if(CURLE_OK != result)
       return result;
-    Curl_safefree(data->state.aptr.proxyuserpwd);
+    mm_Curl_safefree(char, data->state.aptr.proxyuserpwd);
 #else
     return CURLE_NOT_BUILT_IN;
 #endif
@@ -311,7 +311,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
                         httpv,
                         host?host:"",
                         data->state.aptr.proxyuserpwd?
-                        data->state.aptr.proxyuserpwd:"");
+                        _GETCHARPTR(data->state.aptr.proxyuserpwd):"");
 
         if(!result && !Curl_checkProxyheaders(data, conn, "User-Agent") &&
            data->set.str[STRING_USERAGENT])
@@ -477,7 +477,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
           return result;
 
         /* output debug if that is requested */
-        Curl_debug(data, CURLINFO_HEADER_IN, linep, perline);
+        mm_Curl_debug(data, CURLINFO_HEADER_IN, linep, perline);
 
         if(!data->set.suppress_connect_headers) {
           /* send the header to the callback */
@@ -684,7 +684,7 @@ static CURLcode CONNECT(struct Curl_easy *data,
   /* If a proxy-authorization header was used for the proxy, then we should
      make sure that it isn't accidentally used for the document request
      after we've connected. So let's free and clear it here. */
-  Curl_safefree(data->state.aptr.proxyuserpwd);
+  mm_Curl_safefree(char, data->state.aptr.proxyuserpwd);
   data->state.aptr.proxyuserpwd = NULL;
 
   data->state.authproxy.done = TRUE;

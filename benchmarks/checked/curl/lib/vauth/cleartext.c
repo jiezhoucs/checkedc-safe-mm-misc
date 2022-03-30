@@ -59,7 +59,7 @@
  */
 CURLcode Curl_auth_create_plain_message(const char *authzid,
                                         const char *authcid,
-                                        const char *passwd,
+                                        mm_array_ptr<const char> passwd,
                                         struct bufref *out)
 {
   char *plainauth;
@@ -70,7 +70,7 @@ CURLcode Curl_auth_create_plain_message(const char *authzid,
 
   zlen = (authzid == NULL ? 0 : strlen(authzid));
   clen = strlen(authcid);
-  plen = strlen(passwd);
+  plen = mm_strlen(passwd);
 
   /* Compute binary message length. Check for overflows. */
   if((zlen > SIZE_T_MAX/4) || (clen > SIZE_T_MAX/4) ||
@@ -88,7 +88,7 @@ CURLcode Curl_auth_create_plain_message(const char *authzid,
   plainauth[zlen] = '\0';
   memcpy(plainauth + zlen + 1, authcid, clen);
   plainauth[zlen + clen + 1] = '\0';
-  memcpy(plainauth + zlen + clen + 2, passwd, plen);
+  memcpy(plainauth + zlen + clen + 2, _GETCHARPTR(passwd), plen);
   plainauth[plainlen] = '\0';
   Curl_bufref_set(out, plainauth, plainlen, curl_free);
   return CURLE_OK;

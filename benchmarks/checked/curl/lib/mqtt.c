@@ -264,7 +264,7 @@ static CURLcode mqtt_connect(struct Curl_easy *data)
   const size_t ulen = strlen(username);
   /* extracting password from request */
   const char *passwd = data->state.aptr.passwd ?
-    data->state.aptr.passwd : "";
+    _GETCHARPTR(data->state.aptr.passwd) : "";
   const size_t plen = strlen(passwd);
 
   payloadlen = ulen + plen + MQTT_CLIENTID_LEN + 2;
@@ -337,7 +337,7 @@ end:
   if(packet)
     free(packet);
   Curl_safefree(data->state.aptr.user);
-  Curl_safefree(data->state.aptr.passwd);
+  mm_Curl_safefree(char, data->state.aptr.passwd);
   return result;
 }
 

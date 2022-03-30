@@ -80,11 +80,11 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
 
   /* Point to the address of the pointer that holds the string to send to the
      server, which is for a plain host or for a HTTP proxy */
-  char **allocuserpwd;
+  mm_array_ptr<char> *allocuserpwd;
 
   /* Point to the name and password for this */
   const char *userp;
-  const char *passwdp;
+  mm_array_ptr<const char> passwdp = NULL;
 
   /* Point to the correct struct with this */
   struct digestdata *digest;
@@ -109,7 +109,7 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
     authp = &data->state.authhost;
   }
 
-  Curl_safefree(*allocuserpwd);
+  mm_Curl_safefree(char, *allocuserpwd);
 
   /* not set means empty */
   if(!userp)
@@ -156,15 +156,16 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
   if(!path)
     return CURLE_OUT_OF_MEMORY;
 
-  result = Curl_auth_create_digest_http_message(data, userp, passwdp, request,
+  // TODO
+  result = Curl_auth_create_digest_http_message(data, userp, _GETCHARPTR(passwdp), request,
                                                 path, digest, &response, &len);
   free(path);
   if(result)
     return result;
 
-  *allocuserpwd = aprintf("%sAuthorization: Digest %s\r\n",
+  *allocuserpwd = mmize_str(aprintf("%sAuthorization: Digest %s\r\n",
                           proxy ? "Proxy-" : "",
-                          response);
+                          response));
   free(response);
   if(!*allocuserpwd)
     return CURLE_OUT_OF_MEMORY;

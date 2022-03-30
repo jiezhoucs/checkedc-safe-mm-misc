@@ -1524,14 +1524,14 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
     result = Curl_setstropt(&data->state.aptr.user,
                             _GETCHARPTR(data->set.str[STRING_USERNAME]));
   if(!result)
-    result = Curl_setstropt(&data->state.aptr.passwd,
-                            _GETCHARPTR(data->set.str[STRING_PASSWORD]));
+    result = mm_Curl_setstropt(&data->state.aptr.passwd,
+                            data->set.str[STRING_PASSWORD]);
   if(!result)
     result = Curl_setstropt(&data->state.aptr.proxyuser,
                             _GETCHARPTR(data->set.str[STRING_PROXYUSERNAME]));
   if(!result)
-    result = Curl_setstropt(&data->state.aptr.proxypasswd,
-                            _GETCHARPTR(data->set.str[STRING_PROXYPASSWORD]));
+    result = mm_Curl_setstropt(&data->state.aptr.proxypasswd,
+                            data->set.str[STRING_PROXYPASSWORD]);
 
   data->req.headerbytecount = 0;
   return result;

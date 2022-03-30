@@ -133,11 +133,11 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
 
   /* point to the address of the pointer that holds the string to send to the
      server, which is for a plain host or for a HTTP proxy */
-  char **allocuserpwd;
+  mm_array_ptr<char> *allocuserpwd;
 
   /* point to the username, password, service and host */
   const char *userp;
-  const char *passwdp;
+  mm_array_ptr<const char> passwdp = NULL;
   mm_array_ptr<const char> service = NULL;
   mm_array_ptr<const char> hostname = NULL;
 
@@ -211,10 +211,10 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
                                   (const char *) Curl_bufref_ptr(&ntlmmsg),
                                   Curl_bufref_len(&ntlmmsg), &base64, &len);
       if(!result) {
-        free(*allocuserpwd);
-        *allocuserpwd = aprintf("%sAuthorization: NTLM %s\r\n",
+        MM_FREE(char, *allocuserpwd);
+        *allocuserpwd = mmize_str(aprintf("%sAuthorization: NTLM %s\r\n",
                                 proxy ? "Proxy-" : "",
-                                base64);
+                                base64));
         free(base64);
         if(!*allocuserpwd)
           result = CURLE_OUT_OF_MEMORY;
@@ -224,17 +224,18 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
 
   case NTLMSTATE_TYPE2:
     /* We already received the type-2 message, create a type-3 message */
-    result = Curl_auth_create_ntlm_type3_message(data, userp, passwdp,
+    // TODO
+    result = Curl_auth_create_ntlm_type3_message(data, userp, _GETCHARPTR(passwdp),
                                                  ntlm, &ntlmmsg);
     if(!result && Curl_bufref_len(&ntlmmsg)) {
       result = Curl_base64_encode(data,
                                   (const char *) Curl_bufref_ptr(&ntlmmsg),
                                   Curl_bufref_len(&ntlmmsg), &base64, &len);
       if(!result) {
-        free(*allocuserpwd);
-        *allocuserpwd = aprintf("%sAuthorization: NTLM %s\r\n",
+        MM_FREE(char, *allocuserpwd);
+        *allocuserpwd = mmize_str(aprintf("%sAuthorization: NTLM %s\r\n",
                                 proxy ? "Proxy-" : "",
-                                base64);
+                                base64));
         free(base64);
         if(!*allocuserpwd)
           result = CURLE_OUT_OF_MEMORY;
@@ -252,7 +253,7 @@ CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy)
     *state = NTLMSTATE_LAST;
     /* FALLTHROUGH */
   case NTLMSTATE_LAST:
-    Curl_safefree(*allocuserpwd);
+    mm_Curl_safefree(char, *allocuserpwd);
     authp->done = TRUE;
     break;
   }

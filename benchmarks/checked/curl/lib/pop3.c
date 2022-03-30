@@ -448,7 +448,7 @@ static CURLcode pop3_perform_apop(struct Curl_easy *data,
                   curlx_uztoui(strlen(pop3c->apoptimestamp)));
 
   Curl_MD5_update(ctxt, (const unsigned char *) conn->passwd,
-                  curlx_uztoui(strlen(conn->passwd)));
+                  curlx_uztoui(mm_strlen(conn->passwd)));
 
   /* Finalise the digest */
   Curl_MD5_final(ctxt, digest);
@@ -864,7 +864,7 @@ static CURLcode pop3_state_user_resp(struct Curl_easy *data, int pop3code,
   else
     /* Send the PASS command */
     result = Curl_pp_sendf(data, &conn->proto.pop3c.pp, "PASS %s",
-                           conn->passwd ? conn->passwd : "");
+                           conn->passwd ? _GETCHARPTR(conn->passwd) : "");
   if(!result)
     state(data, POP3_PASS);
 

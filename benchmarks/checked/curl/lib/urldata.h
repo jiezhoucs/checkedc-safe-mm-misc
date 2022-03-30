@@ -864,7 +864,7 @@ struct proxy_info {
   long port;
   curl_proxytype proxytype; /* what kind of proxy that is in use */
   char *user;    /* proxy user name string, allocated */
-  char *passwd;  /* proxy password string, allocated */
+  mm_array_ptr<char> passwd;  /* proxy password string, allocated */
 };
 
 struct ldapconninfo;
@@ -979,7 +979,7 @@ struct connectdata {
   unsigned char ip_version; /* copied from the Curl_easy at creation time */
 
   char *user;    /* user name string, allocated */
-  char *passwd;  /* password string, allocated */
+  mm_array_ptr<char> passwd;  /* password string, allocated */
   char *options; /* options string, allocated */
   char *sasl_authzid;     /* authorisation identity string, allocated */
   unsigned char httpversion; /* the HTTP version*10 reported by the server */
@@ -1307,7 +1307,7 @@ struct urlpieces {
   mm_array_ptr<char> hostname;
   char *port;
   char *user;
-  char *password;
+  mm_array_ptr<char> password;
   char *options;
   mm_array_ptr<char> path;
   char *query;
@@ -1423,10 +1423,10 @@ struct UrlState {
   /* Dynamically allocated strings, MUST be freed before this struct is
      killed. */
   struct dynamically_allocated_data {
-    char *proxyuserpwd;
+    mm_array_ptr<char> proxyuserpwd;
     char *uagent;
     char *accept_encoding;
-    char *userpwd;
+    mm_array_ptr<char> userpwd;
     char *rangeline;
     char *ref;
     mm_array_ptr<char> host;
@@ -1436,9 +1436,9 @@ struct UrlState {
 
     /* transfer credentials */
     char *user;
-    char *passwd;
+    mm_array_ptr<char> passwd;
     char *proxyuser;
-    char *proxypasswd;
+    mm_array_ptr<char> proxypasswd;
   } aptr;
 
 #ifdef CURLDEBUG

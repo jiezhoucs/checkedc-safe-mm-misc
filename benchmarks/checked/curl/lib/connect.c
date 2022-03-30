@@ -797,7 +797,8 @@ static CURLcode connect_SOCKS(struct Curl_easy *data, int sockindex,
     switch(conn->socks_proxy.proxytype) {
     case CURLPROXY_SOCKS5:
     case CURLPROXY_SOCKS5_HOSTNAME:
-      pxresult = Curl_SOCKS5(conn->socks_proxy.user, conn->socks_proxy.passwd,
+      // TODO
+      pxresult = Curl_SOCKS5(conn->socks_proxy.user, _GETCHARPTR(conn->socks_proxy.passwd),
                              host, port, sockindex, data, done);
       break;
 

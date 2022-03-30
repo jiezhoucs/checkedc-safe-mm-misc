@@ -53,17 +53,17 @@ enum host_lookup_state {
 /*
  * Returns zero on success.
  */
-static int parsenetrc(const char *host,
+static int parsenetrc(mm_array_ptr<const char> host,
                       char **loginp,
-                      char **passwordp,
+                      mm_array_ptr<char> *passwordp,
                       bool *login_changed,
                       bool *password_changed,
-                      char *netrcfile)
+                      mm_array_ptr<char> netrcfile)
 {
   FILE *file;
   int retcode = NETRC_FILE_MISSING;
   char *login = *loginp;
-  char *password = *passwordp;
+  mm_array_ptr<char> password = *passwordp;
   bool specific_login = (login && *login != 0);
   bool login_alloc = FALSE;
   bool password_alloc = FALSE;
@@ -76,7 +76,7 @@ static int parsenetrc(const char *host,
 
   DEBUGASSERT(netrcfile);
 
-  file = fopen(netrcfile, FOPEN_READTEXT);
+  file = mm_fopen(netrcfile, FOPEN_READTEXT);
   if(file) {
     char *tok;
     char *tok_buf;
@@ -127,7 +127,7 @@ static int parsenetrc(const char *host,
           }
           break;
         case HOSTFOUND:
-          if(strcasecompare(host, tok)) {
+          if(mm_strcasecompare_0(host, tok)) {
             /* and yes, this is our host! */
             state = HOSTVALID;
             retcode = NETRC_SUCCESS; /* we did find our host */
@@ -158,12 +158,12 @@ static int parsenetrc(const char *host,
           }
           else if(state_password) {
             if((state_our_login || !specific_login)
-                && (!password || strcmp(password, tok))) {
+                && (!password || mm_strcmp(password, tok))) {
               if(password_alloc) {
-                free(password);
+                MM_FREE(char, password);
                 password_alloc = FALSE;
               }
-              password = strdup(tok);
+              password = mm_strdup_from_raw(tok);
               if(!password) {
                 retcode = NETRC_FAILED; /* allocation failed */
                 goto out;
@@ -201,7 +201,7 @@ static int parsenetrc(const char *host,
       }
       if(password_alloc) {
         if(*passwordp)
-          free(*passwordp);
+          MM_FREE(char, *passwordp);
         *passwordp = password;
         *password_changed = TRUE;
       }
@@ -210,7 +210,7 @@ static int parsenetrc(const char *host,
       if(login_alloc)
         free(login);
       if(password_alloc)
-        free(password);
+        MM_FREE(char, password);
     }
     fclose(file);
   }
@@ -224,15 +224,15 @@ static int parsenetrc(const char *host,
  * *loginp and *passwordp MUST be allocated if they aren't NULL when passed
  * in.
  */
-int Curl_parsenetrc(const char *host,
+int Curl_parsenetrc(mm_array_ptr<const char> host,
                     char **loginp,
-                    char **passwordp,
+                    mm_array_ptr<char> *passwordp,
                     bool *login_changed,
                     bool *password_changed,
-                    char *netrcfile)
+                    mm_array_ptr<char> netrcfile)
 {
   int retcode = 1;
-  char *filealloc = NULL;
+  mm_array_ptr<char> filealloc = NULL;
 
   if(!netrcfile) {
     char *home = NULL;
@@ -263,14 +263,14 @@ int Curl_parsenetrc(const char *host,
       return retcode; /* no home directory found (or possibly out of
                          memory) */
 
-    filealloc = curl_maprintf("%s%s.netrc", home, DIR_CHAR);
+    filealloc = mmize_str(curl_maprintf("%s%s.netrc", home, DIR_CHAR));
     if(!filealloc) {
       free(homea);
       return -1;
     }
     retcode = parsenetrc(host, loginp, passwordp, login_changed,
                          password_changed, filealloc);
-    free(filealloc);
+    MM_FREE(char, filealloc);
 #ifdef WIN32
     if(retcode == NETRC_FILE_MISSING) {
       /* fallback to the old-style "_netrc" file */

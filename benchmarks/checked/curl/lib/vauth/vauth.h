@@ -67,7 +67,7 @@ bool Curl_auth_user_contains_domain(const char *user);
 /* This is used to generate a PLAIN cleartext message */
 CURLcode Curl_auth_create_plain_message(const char *authzid,
                                         const char *authcid,
-                                        const char *passwd,
+                                        mm_array_ptr<const char> passwd,
                                         struct bufref *out);
 
 /* This is used to generate a LOGIN cleartext message */
@@ -141,7 +141,7 @@ bool Curl_auth_is_ntlm_supported(void);
 /* This is used to generate a base64 encoded NTLM type-1 message */
 CURLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
                                              const char *userp,
-                                             const char *passwdp,
+                                             mm_array_ptr<const char> passwdp,
                                              mm_array_ptr<const char> service,
                                              mm_array_ptr<const char> host,
                                              struct ntlmdata *ntlm,

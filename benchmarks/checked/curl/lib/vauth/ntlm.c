@@ -344,7 +344,7 @@ static void unicodecpy(unsigned char *dest, const char *src, size_t length)
  */
 CURLcode Curl_auth_create_ntlm_type1_message(struct Curl_easy *data,
                                              const char *userp,
-                                             const char *passwdp,
+                                             mm_array_ptr<const char> passwdp,
                                              mm_array_ptr<const char> service,
                                              mm_array_ptr<const char> hostname,
                                              struct ntlmdata *ntlm,

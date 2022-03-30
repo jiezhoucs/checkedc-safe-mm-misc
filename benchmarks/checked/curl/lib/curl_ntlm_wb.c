@@ -60,6 +60,8 @@
 #include "curl_memory.h"
 #include "memdebug.h"
 
+#include <safe_mm_checked.h>
+
 #if DEBUG_ME
 # define DEBUG_OUT(x) x
 #else
@@ -385,7 +387,7 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
 {
   /* point to the address of the pointer that holds the string to send to the
      server, which is for a plain host or for a HTTP proxy */
-  char **allocuserpwd;
+  mm_array_ptr<char> *allocuserpwd;
   /* point to the name and password for this */
   const char *userp;
   struct ntlmdata *ntlm;
@@ -445,11 +447,11 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
     if(res)
       return res;
 
-    free(*allocuserpwd);
-    *allocuserpwd = aprintf("%sAuthorization: NTLM %s\r\n",
+    MM_FREE(char, *allocuserpwd);
+    *allocuserpwd = mmize_str(aprintf("%sAuthorization: NTLM %s\r\n",
                             proxy ? "Proxy-" : "",
-                            ntlm->response);
-    DEBUG_OUT(fprintf(stderr, "**** Header %s\n ", *allocuserpwd));
+                            ntlm->response));
+    DEBUG_OUT(fprintf(stderr, "**** Header %s\n ", _GETCHARPTR(*allocuserpwd)));
     Curl_safefree(ntlm->response);
     if(!*allocuserpwd)
       return CURLE_OUT_OF_MEMORY;
@@ -464,11 +466,11 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
     if(res)
       return res;
 
-    free(*allocuserpwd);
-    *allocuserpwd = aprintf("%sAuthorization: NTLM %s\r\n",
+    MM_FREE(char, *allocuserpwd);
+    *allocuserpwd = mmize_str(aprintf("%sAuthorization: NTLM %s\r\n",
                             proxy ? "Proxy-" : "",
-                            ntlm->response);
-    DEBUG_OUT(fprintf(stderr, "**** %s\n ", *allocuserpwd));
+                            ntlm->response));
+    DEBUG_OUT(fprintf(stderr, "**** %s\n ", _GETCHARPTR(*allocuserpwd)));
     *state = NTLMSTATE_TYPE3; /* we sent a type-3 */
     authp->done = TRUE;
     Curl_http_auth_cleanup_ntlm_wb(conn);
@@ -482,7 +484,7 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
     *state = NTLMSTATE_LAST;
     /* FALLTHROUGH */
   case NTLMSTATE_LAST:
-    Curl_safefree(*allocuserpwd);
+    mm_Curl_safefree(char, *allocuserpwd);
     authp->done = TRUE;
     break;
   }

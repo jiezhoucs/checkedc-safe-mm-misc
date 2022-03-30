@@ -300,9 +300,9 @@ static CURLcode http_output_basic(struct Curl_easy *data, bool proxy)
 {
   size_t size = 0;
   char *authorization = NULL;
-  char **userp;
+  mm_array_ptr<char> *userp;
   const char *user;
-  const char *pwd;
+  mm_array_ptr<const char> pwd = NULL;
   CURLcode result;
   char *out;
 
@@ -323,7 +323,7 @@ static CURLcode http_output_basic(struct Curl_easy *data, bool proxy)
     pwd = data->state.aptr.passwd;
   }
 
-  out = aprintf("%s:%s", user, pwd ? pwd : "");
+  out = aprintf("%s:%s", user, pwd ? _GETCHARPTR(pwd) : "");
   if(!out)
     return CURLE_OUT_OF_MEMORY;
 
@@ -336,10 +336,10 @@ static CURLcode http_output_basic(struct Curl_easy *data, bool proxy)
     goto fail;
   }
 
-  free(*userp);
-  *userp = aprintf("%sAuthorization: Basic %s\r\n",
+  MM_FREE(char, *userp);
+  *userp = mmize_str(aprintf("%sAuthorization: Basic %s\r\n",
                    proxy ? "Proxy-" : "",
-                   authorization);
+                   authorization));
   free(authorization);
   if(!*userp) {
     result = CURLE_OUT_OF_MEMORY;
@@ -359,13 +359,13 @@ static CURLcode http_output_basic(struct Curl_easy *data, bool proxy)
  */
 static CURLcode http_output_bearer(struct Curl_easy *data)
 {
-  char **userp;
+  mm_array_ptr<char> *userp;
   CURLcode result = CURLE_OK;
 
   userp = &data->state.aptr.userpwd;
-  free(*userp);
-  *userp = aprintf("Authorization: Bearer %s\r\n",
-                   _GETCHARPTR(data->set.str[STRING_BEARER]));
+  MM_FREE(char, *userp);
+  *userp = mmize_str(aprintf("Authorization: Bearer %s\r\n",
+                   _GETCHARPTR(data->set.str[STRING_BEARER])));
 
   if(!*userp) {
     result = CURLE_OUT_OF_MEMORY;
@@ -3189,8 +3189,8 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
                   httpstring,
                   (data->state.aptr.host?_GETCHARPTR(data->state.aptr.host):""),
                   data->state.aptr.proxyuserpwd?
-                  data->state.aptr.proxyuserpwd:"",
-                  data->state.aptr.userpwd?data->state.aptr.userpwd:"",
+                  _GETCHARPTR(data->state.aptr.proxyuserpwd):"",
+                  data->state.aptr.userpwd?_GETCHARPTR(data->state.aptr.userpwd):"",
                   (data->state.use_range && data->state.aptr.rangeline)?
                   data->state.aptr.rangeline:"",
                   (data->set.str[STRING_USERAGENT] &&
@@ -3220,8 +3220,8 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
 
   /* clear userpwd and proxyuserpwd to avoid re-using old credentials
    * from re-used connections */
-  Curl_safefree(data->state.aptr.userpwd);
-  Curl_safefree(data->state.aptr.proxyuserpwd);
+  mm_Curl_safefree(char, data->state.aptr.userpwd);
+  mm_Curl_safefree(char, data->state.aptr.proxyuserpwd);
   free(altused);
 
   if(result) {

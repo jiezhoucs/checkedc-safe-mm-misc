@@ -459,10 +459,10 @@ static CURLcode smb_send_setup(struct Curl_easy *data)
   if(byte_count > sizeof(msg.bytes))
     return CURLE_FILESIZE_EXCEEDED;
 
-  Curl_ntlm_core_mk_lm_hash(data, conn->passwd, lm_hash);
+  Curl_ntlm_core_mk_lm_hash(data, _GETCHARPTR(conn->passwd), lm_hash);
   Curl_ntlm_core_lm_resp(lm_hash, smbc->challenge, lm);
 #ifdef USE_NTRESPONSES
-  Curl_ntlm_core_mk_nt_hash(data, conn->passwd, nt_hash);
+  Curl_ntlm_core_mk_nt_hash(data, _GETCHARPTR(conn->passwd), nt_hash);
   Curl_ntlm_core_lm_resp(nt_hash, smbc->challenge, nt);
 #else
   memset(nt, 0, sizeof(nt));

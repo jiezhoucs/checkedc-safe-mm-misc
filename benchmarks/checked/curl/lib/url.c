@@ -345,7 +345,7 @@ static void up_free(struct Curl_easy *data)
   mm_Curl_safefree(char, up->hostname);
   Curl_safefree(up->port);
   Curl_safefree(up->user);
-  Curl_safefree(up->password);
+  mm_Curl_safefree(char, up->password);
   Curl_safefree(up->options);
   MM_curl_free(char, up->path);
   Curl_safefree(up->query);
@@ -450,9 +450,9 @@ CURLcode Curl_close(struct Curl_easy **datap)
     Curl_share_unlock(data, CURL_LOCK_DATA_SHARE);
   }
 
-  Curl_safefree(data->state.aptr.proxyuserpwd);
+  mm_Curl_safefree(char, data->state.aptr.proxyuserpwd);
   Curl_safefree(data->state.aptr.uagent);
-  Curl_safefree(data->state.aptr.userpwd);
+  mm_Curl_safefree(char, data->state.aptr.userpwd);
   Curl_safefree(data->state.aptr.accept_encoding);
   Curl_safefree(data->state.aptr.te);
   Curl_safefree(data->state.aptr.rangeline);
@@ -461,9 +461,9 @@ CURLcode Curl_close(struct Curl_easy **datap)
   mm_Curl_safefree(char, data->state.aptr.cookiehost);
   Curl_safefree(data->state.aptr.rtsp_transport);
   Curl_safefree(data->state.aptr.user);
-  Curl_safefree(data->state.aptr.passwd);
+  mm_Curl_safefree(char, data->state.aptr.passwd);
   Curl_safefree(data->state.aptr.proxyuser);
-  Curl_safefree(data->state.aptr.proxypasswd);
+  mm_Curl_safefree(char, data->state.aptr.proxypasswd);
 
 #ifndef CURL_DISABLE_DOH
   if(data->req.doh) {
@@ -777,14 +777,14 @@ static void conn_free(struct connectdata *conn)
   Curl_free_idnconverted_hostname(&conn->socks_proxy.host);
   Curl_safefree(conn->http_proxy.user);
   Curl_safefree(conn->socks_proxy.user);
-  Curl_safefree(conn->http_proxy.passwd);
-  Curl_safefree(conn->socks_proxy.passwd);
+  mm_Curl_safefree(char, conn->http_proxy.passwd);
+  mm_Curl_safefree(char, conn->socks_proxy.passwd);
   MM_FREE(char, conn->http_proxy.host.rawalloc); /* http proxy name buffer */
   MM_FREE(char, conn->socks_proxy.host.rawalloc); /* socks proxy name buffer */
   Curl_free_primary_ssl_config(&conn->proxy_ssl_config);
 #endif
   Curl_safefree(conn->user);
-  Curl_safefree(conn->passwd);
+  mm_Curl_safefree(char, conn->passwd);
   Curl_safefree(conn->sasl_authzid);
   Curl_safefree(conn->options);
   Curl_dyn_free(&conn->trailer);
@@ -956,7 +956,7 @@ socks_proxy_info_matches(const struct proxy_info *data,
   /* curl_strequal does a case insentive comparison, so do not use it here! */
   if(data->passwd &&
      needle->passwd &&
-     strcmp(data->passwd, needle->passwd) != 0)
+     mm_strcmp(data->passwd, needle->passwd) != 0)
     return FALSE;
   return TRUE;
 }
@@ -1336,7 +1336,7 @@ ConnectionExists(struct Curl_easy *data,
         /* This protocol requires credentials per connection,
            so verify that we're using the same name and password as well */
         if(strcmp(needle->user, check->user) ||
-           strcmp(needle->passwd, check->passwd)) {
+           mm_strcmp(needle->passwd, check->passwd)) {
           /* one of them was different */
           continue;
         }
@@ -1409,7 +1409,7 @@ ConnectionExists(struct Curl_easy *data,
            partway through a handshake!) */
         if(wantNTLMhttp) {
           if(strcmp(needle->user, check->user) ||
-             strcmp(needle->passwd, check->passwd)) {
+             mm_strcmp(needle->passwd, check->passwd)) {
 
             /* we prefer a credential match, but this is at least a connection
                that can be reused and "upgraded" to NTLM */
@@ -1432,7 +1432,7 @@ ConnectionExists(struct Curl_easy *data,
             continue;
 
           if(strcmp(needle->http_proxy.user, check->http_proxy.user) ||
-             strcmp(needle->http_proxy.passwd, check->http_proxy.passwd))
+             mm_strcmp(needle->http_proxy.passwd, check->http_proxy.passwd))
             continue;
         }
         else if(check->proxy_ntlm_state != NTLMSTATE_NONE) {
@@ -2045,17 +2045,17 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
   }
 
   if(!data->state.aptr.passwd) {
-    uc = curl_url_get(uh, CURLUPART_PASSWORD, &data->state.up.password, 0);
+    uc = mm_curl_url_get(uh, CURLUPART_PASSWORD, &data->state.up.password, 0);
     if(!uc) {
-      char *decoded;
-      result = Curl_urldecode(NULL, data->state.up.password, 0, &decoded, NULL,
+      mm_array_ptr<char> decoded = NULL;
+      result = mm_Curl_urldecode(NULL, data->state.up.password, 0, &decoded, NULL,
                               conn->handler->flags&PROTOPT_USERPWDCTRL ?
                               REJECT_ZERO : REJECT_CTRL);
       if(result)
         return result;
       conn->passwd = decoded;
       conn->bits.user_passwd = TRUE;
-      result = Curl_setstropt(&data->state.aptr.passwd, decoded);
+      result = mm_Curl_setstropt(&data->state.aptr.passwd, decoded);
       if(result)
         return result;
     }
@@ -2385,7 +2385,7 @@ static CURLcode parse_proxy(struct Curl_easy *data,
   char *portptr = NULL;
   int port = -1;
   char *proxyuser = NULL;
-  char *proxypasswd = NULL;
+  mm_array_ptr<char> proxypasswd = NULL;
   mm_array_ptr<char> host = NULL;
   bool sockstype;
   CURLUcode uc;
@@ -2455,7 +2455,7 @@ static CURLcode parse_proxy(struct Curl_easy *data,
   uc = curl_url_get(uhp, CURLUPART_USER, &proxyuser, CURLU_URLDECODE);
   if(uc && (uc != CURLUE_NO_USER))
     goto error;
-  uc = curl_url_get(uhp, CURLUPART_PASSWORD, &proxypasswd, CURLU_URLDECODE);
+  uc = mm_curl_url_get(uhp, CURLUPART_PASSWORD, &proxypasswd, CURLU_URLDECODE);
   if(uc && (uc != CURLUE_NO_PASSWORD))
     goto error;
 
@@ -2466,16 +2466,16 @@ static CURLcode parse_proxy(struct Curl_easy *data,
     proxyuser = NULL;
     if(result)
       goto error;
-    Curl_safefree(proxyinfo->passwd);
+    mm_Curl_safefree(char, proxyinfo->passwd);
     if(!proxypasswd) {
-      proxypasswd = strdup("");
+      proxypasswd = mm_strdup_from_raw("");
       if(!proxypasswd) {
         result = CURLE_OUT_OF_MEMORY;
         goto error;
       }
     }
     proxyinfo->passwd = proxypasswd;
-    result = Curl_setstropt(&data->state.aptr.proxypasswd, proxypasswd);
+    result = mm_Curl_setstropt(&data->state.aptr.proxypasswd, proxypasswd);
     proxypasswd = NULL;
     if(result)
       goto error;
@@ -2527,7 +2527,7 @@ static CURLcode parse_proxy(struct Curl_easy *data,
 
   error:
   free(proxyuser);
-  free(proxypasswd);
+  MM_FREE(char, proxypasswd);
   free(scheme);
   curl_url_cleanup(uhp);
   return result;
@@ -2541,8 +2541,8 @@ static CURLcode parse_proxy_auth(struct Curl_easy *data,
 {
   const char *proxyuser = data->state.aptr.proxyuser ?
     data->state.aptr.proxyuser : "";
-  const char *proxypasswd = data->state.aptr.proxypasswd ?
-    data->state.aptr.proxypasswd : "";
+  mm_array_ptr<const char> proxypasswd = data->state.aptr.proxypasswd;
+  if (!proxypasswd) proxypasswd = "";
   CURLcode result = CURLE_OK;
 
   if(proxyuser) {
@@ -2553,10 +2553,10 @@ static CURLcode parse_proxy_auth(struct Curl_easy *data,
                               conn->http_proxy.user);
   }
   if(!result && proxypasswd) {
-    result = Curl_urldecode(data, proxypasswd, 0, &conn->http_proxy.passwd,
+    result = mm_Curl_urldecode(data, proxypasswd, 0, &conn->http_proxy.passwd,
                             NULL, REJECT_ZERO);
     if(!result)
-      result = Curl_setstropt(&data->state.aptr.proxypasswd,
+      result = mm_Curl_setstropt(&data->state.aptr.proxypasswd,
                               conn->http_proxy.passwd);
   }
   return result;
@@ -2703,7 +2703,7 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
         if(!conn->socks_proxy.user) {
           conn->socks_proxy.user = conn->http_proxy.user;
           conn->http_proxy.user = NULL;
-          Curl_safefree(conn->socks_proxy.passwd);
+          mm_Curl_safefree(char, conn->socks_proxy.passwd);
           conn->socks_proxy.passwd = conn->http_proxy.passwd;
           conn->http_proxy.passwd = NULL;
         }
@@ -2907,13 +2907,13 @@ static CURLcode override_login(struct Curl_easy *data,
 {
   CURLUcode uc;
   char **userp = &conn->user;
-  char **passwdp = &conn->passwd;
+  mm_array_ptr<char> *passwdp = &conn->passwd;
   char **optionsp = &conn->options;
 
 #ifndef CURL_DISABLE_NETRC
   if(data->set.use_netrc == CURL_NETRC_REQUIRED && conn->bits.user_passwd) {
     Curl_safefree(*userp);
-    Curl_safefree(*passwdp);
+    mm_Curl_safefree(char, *passwdp);
     conn->bits.user_passwd = FALSE; /* disable user+password */
   }
 #endif
@@ -2933,11 +2933,10 @@ static CURLcode override_login(struct Curl_easy *data,
     bool netrc_passwd_changed = FALSE;
     int ret;
 
-    // TODO
-    ret = Curl_parsenetrc(_GETCHARPTR(conn->host.name),
+    ret = Curl_parsenetrc(conn->host.name,
                           userp, passwdp,
                           &netrc_user_changed, &netrc_passwd_changed,
-                          _GETCHARPTR(data->set.str[STRING_NETRC_FILE]));
+                          data->set.str[STRING_NETRC_FILE]);
     if(ret > 0) {
       infof(data, "Couldn't find host %s in the %s file; using defaults",
             _GETCHARPTR(conn->host.name), _GETCHARPTR(data->set.str[STRING_NETRC_FILE]));
@@ -2974,17 +2973,18 @@ static CURLcode override_login(struct Curl_easy *data,
   }
 
   if(*passwdp) {
-    CURLcode result = Curl_setstropt(&data->state.aptr.passwd, *passwdp);
+    CURLcode result = mm_Curl_setstropt(&data->state.aptr.passwd, *passwdp);
     if(result)
       return result;
   }
   if(data->state.aptr.passwd) {
+    // TODO
     uc = curl_url_set(data->state.uh, CURLUPART_PASSWORD,
-                      data->state.aptr.passwd, CURLU_URLENCODE);
+                      _GETCHARPTR(data->state.aptr.passwd), CURLU_URLENCODE);
     if(uc)
       return Curl_uc_to_curlcode(uc);
     if(!*passwdp) {
-      *passwdp = strdup(data->state.aptr.passwd);
+      *passwdp = mm_strdup(data->state.aptr.passwd);
       if(!*passwdp)
         return CURLE_OUT_OF_MEMORY;
     }
@@ -3018,7 +3018,7 @@ static CURLcode set_login(struct connectdata *conn)
 
   /* Store the default password */
   if(!conn->passwd) {
-    conn->passwd = strdup(setpasswd);
+    conn->passwd = mm_strdup_from_raw(setpasswd);
     if(!conn->passwd)
       result = CURLE_OUT_OF_MEMORY;
   }
@@ -3487,7 +3487,7 @@ static void reuse_conn(struct Curl_easy *data,
   if(conn->bits.user_passwd) {
     /* use the new user name and password though */
     Curl_safefree(conn->user);
-    Curl_safefree(conn->passwd);
+    mm_Curl_safefree(char, conn->passwd);
     conn->user = old_conn->user;
     conn->passwd = old_conn->passwd;
     old_conn->user = NULL;
@@ -3500,8 +3500,8 @@ static void reuse_conn(struct Curl_easy *data,
     /* use the new proxy user name and proxy password though */
     Curl_safefree(conn->http_proxy.user);
     Curl_safefree(conn->socks_proxy.user);
-    Curl_safefree(conn->http_proxy.passwd);
-    Curl_safefree(conn->socks_proxy.passwd);
+    mm_Curl_safefree(char, conn->http_proxy.passwd);
+    mm_Curl_safefree(char, conn->socks_proxy.passwd);
     conn->http_proxy.user = old_conn->http_proxy.user;
     conn->socks_proxy.user = old_conn->socks_proxy.user;
     conn->http_proxy.passwd = old_conn->http_proxy.passwd;
@@ -3513,8 +3513,8 @@ static void reuse_conn(struct Curl_easy *data,
   }
   Curl_safefree(old_conn->http_proxy.user);
   Curl_safefree(old_conn->socks_proxy.user);
-  Curl_safefree(old_conn->http_proxy.passwd);
-  Curl_safefree(old_conn->socks_proxy.passwd);
+  mm_Curl_safefree(char, old_conn->http_proxy.passwd);
+  mm_Curl_safefree(char, old_conn->socks_proxy.passwd);
 #endif
 
   /* host can change, when doing keepalive with a proxy or if the case is
@@ -3545,7 +3545,7 @@ static void reuse_conn(struct Curl_easy *data,
   conn->bits.reuse = TRUE; /* yes, we're re-using here */
 
   Curl_safefree(old_conn->user);
-  Curl_safefree(old_conn->passwd);
+  mm_Curl_safefree(char, old_conn->passwd);
   Curl_safefree(old_conn->options);
   Curl_safefree(old_conn->localdev);
   Curl_llist_destroy(&old_conn->easyq, NULL);
