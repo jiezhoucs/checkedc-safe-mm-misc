@@ -1909,7 +1909,7 @@ static CURLcode imap_parse_url_options(struct connectdata *conn)
 {
   CURLcode result = CURLE_OK;
   struct imap_conn *imapc = &conn->proto.imapc;
-  const char *ptr = conn->options;
+  const char *ptr = _GETCHARPTR(conn->options);
 
   imapc->sasl.resetprefs = TRUE;
 

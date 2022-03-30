@@ -1653,7 +1653,7 @@ static CURLcode smtp_parse_url_options(struct connectdata *conn)
 {
   CURLcode result = CURLE_OK;
   struct smtp_conn *smtpc = &conn->proto.smtpc;
-  const char *ptr = conn->options;
+  const char *ptr = _GETCHARPTR(conn->options);
 
   smtpc->sasl.resetprefs = TRUE;
 

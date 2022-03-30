@@ -980,7 +980,7 @@ struct connectdata {
 
   mm_array_ptr<char> user;    /* user name string, allocated */
   mm_array_ptr<char> passwd;  /* password string, allocated */
-  char *options; /* options string, allocated */
+  mm_array_ptr<char> options; /* options string, allocated */
   mm_array_ptr<char> sasl_authzid;     /* authorisation identity string, allocated */
   unsigned char httpversion; /* the HTTP version*10 reported by the server */
   struct curltime now;     /* "current" time */
@@ -1308,7 +1308,7 @@ struct urlpieces {
   char *port;
   mm_array_ptr<char> user;
   mm_array_ptr<char> password;
-  char *options;
+  mm_array_ptr<char> options;
   mm_array_ptr<char> path;
   char *query;
 };

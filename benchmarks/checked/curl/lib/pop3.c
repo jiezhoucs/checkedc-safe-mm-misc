@@ -1341,7 +1341,7 @@ static CURLcode pop3_parse_url_options(struct connectdata *conn)
 {
   CURLcode result = CURLE_OK;
   struct pop3_conn *pop3c = &conn->proto.pop3c;
-  const char *ptr = conn->options;
+  const char *ptr = _GETCHARPTR(conn->options);
 
   pop3c->sasl.resetprefs = TRUE;
 

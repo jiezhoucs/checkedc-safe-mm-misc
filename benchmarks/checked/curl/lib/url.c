@@ -346,7 +346,7 @@ static void up_free(struct Curl_easy *data)
   Curl_safefree(up->port);
   mm_Curl_safefree(char, up->user);
   mm_Curl_safefree(char, up->password);
-  Curl_safefree(up->options);
+  mm_Curl_safefree(char, up->options);
   MM_curl_free(char, up->path);
   Curl_safefree(up->query);
   curl_url_cleanup(data->state.uh);
@@ -786,7 +786,7 @@ static void conn_free(struct connectdata *conn)
   mm_Curl_safefree(char, conn->user);
   mm_Curl_safefree(char, conn->passwd);
   mm_Curl_safefree(char, conn->sasl_authzid);
-  Curl_safefree(conn->options);
+  mm_Curl_safefree(char, conn->options);
   Curl_dyn_free(&conn->trailer);
   MM_FREE(char, conn->host.rawalloc); /* host name buffer */
   MM_FREE(char, conn->conn_to_host.rawalloc); /* host name buffer */
@@ -2075,10 +2075,10 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
       return Curl_uc_to_curlcode(uc);
   }
 
-  uc = curl_url_get(uh, CURLUPART_OPTIONS, &data->state.up.options,
+  uc = mm_curl_url_get(uh, CURLUPART_OPTIONS, &data->state.up.options,
                     CURLU_URLDECODE);
   if(!uc) {
-    conn->options = strdup(data->state.up.options);
+    conn->options = mm_strdup(data->state.up.options);
     if(!conn->options)
       return CURLE_OUT_OF_MEMORY;
   }
@@ -2623,7 +2623,6 @@ static CURLcode create_conn_helper_init_proxy(struct Curl_easy *data,
     }
   }
 
-  // TODO
   if(check_noproxy(conn->host.name, data->set.str[STRING_NOPROXY] ?
       data->set.str[STRING_NOPROXY] : no_proxy)) {
     mm_Curl_safefree(char, proxy);
@@ -2913,7 +2912,7 @@ static CURLcode override_login(struct Curl_easy *data,
   CURLUcode uc;
   mm_array_ptr<char> *userp = &conn->user;
   mm_array_ptr<char> *passwdp = &conn->passwd;
-  char **optionsp = &conn->options;
+  mm_array_ptr<char> *optionsp = &conn->options;
 
 #ifndef CURL_DISABLE_NETRC
   if(data->set.use_netrc == CURL_NETRC_REQUIRED && conn->bits.user_passwd) {
@@ -2924,9 +2923,9 @@ static CURLcode override_login(struct Curl_easy *data,
 #endif
 
   if(data->set.str[STRING_OPTIONS]) {
-    free(*optionsp);
+    MM_FREE(char, *optionsp);
     // TODO
-    *optionsp = strdup(_GETCHARPTR(data->set.str[STRING_OPTIONS]));
+    *optionsp = mm_strdup(data->set.str[STRING_OPTIONS]);
     if(!*optionsp)
       return CURLE_OUT_OF_MEMORY;
   }
@@ -3551,7 +3550,7 @@ static void reuse_conn(struct Curl_easy *data,
 
   mm_Curl_safefree(char, old_conn->user);
   mm_Curl_safefree(char, old_conn->passwd);
-  Curl_safefree(old_conn->options);
+  mm_Curl_safefree(char, old_conn->options);
   mm_Curl_safefree(char, old_conn->localdev);
   Curl_llist_destroy(&old_conn->easyq, NULL);
 
