@@ -2773,13 +2773,13 @@ out:
  * Returns CURLE_OK on success.
  */
 CURLcode Curl_parse_login_details(const char *login, const size_t len,
-                                  char **userp, char **passwdp,
-                                  char **optionsp)
+                                  mm_array_ptr<char> *userp, mm_array_ptr<char> *passwdp,
+                                  mm_array_ptr<char> *optionsp)
 {
   CURLcode result = CURLE_OK;
-  char *ubuf = NULL;
-  char *pbuf = NULL;
-  char *obuf = NULL;
+  mm_array_ptr<char> ubuf = NULL;
+  mm_array_ptr<char> pbuf = NULL;
+  mm_array_ptr<char> obuf = NULL;
   const char *psep = NULL;
   const char *osep = NULL;
   size_t ulen;
@@ -2823,26 +2823,26 @@ CURLcode Curl_parse_login_details(const char *login, const size_t len,
 
   /* Allocate the user portion buffer */
   if(userp && ulen) {
-    ubuf = malloc(ulen + 1);
+    ubuf = MM_ARRAY_ALLOC(char, ulen + 1);
     if(!ubuf)
       result = CURLE_OUT_OF_MEMORY;
   }
 
   /* Allocate the password portion buffer */
   if(!result && passwdp && plen) {
-    pbuf = malloc(plen + 1);
+    pbuf = MM_ARRAY_ALLOC(char, plen + 1);
     if(!pbuf) {
-      free(ubuf);
+      MM_FREE(char, ubuf);
       result = CURLE_OUT_OF_MEMORY;
     }
   }
 
   /* Allocate the options portion buffer */
   if(!result && optionsp && olen) {
-    obuf = malloc(olen + 1);
+    obuf = MM_ARRAY_ALLOC(char, olen + 1);
     if(!obuf) {
-      free(pbuf);
-      free(ubuf);
+      MM_FREE(char, pbuf);
+      MM_FREE(char, ubuf);
       result = CURLE_OUT_OF_MEMORY;
     }
   }
@@ -2850,25 +2850,25 @@ CURLcode Curl_parse_login_details(const char *login, const size_t len,
   if(!result) {
     /* Store the user portion if necessary */
     if(ubuf) {
-      memcpy(ubuf, login, ulen);
+      mm_memcpy(ubuf, login, ulen);
       ubuf[ulen] = '\0';
-      Curl_safefree(*userp);
+      mm_Curl_safefree(char, *userp);
       *userp = ubuf;
     }
 
     /* Store the password portion if necessary */
     if(pbuf) {
-      memcpy(pbuf, psep + 1, plen);
+      mm_memcpy(pbuf, psep + 1, plen);
       pbuf[plen] = '\0';
-      Curl_safefree(*passwdp);
+      mm_Curl_safefree(char, *passwdp);
       *passwdp = pbuf;
     }
 
     /* Store the options portion if necessary */
     if(obuf) {
-      memcpy(obuf, osep + 1, olen);
+      mm_memcpy(obuf, osep + 1, olen);
       obuf[olen] = '\0';
-      Curl_safefree(*optionsp);
+      mm_Curl_safefree(char, *optionsp);
       *optionsp = obuf;
     }
   }
@@ -3274,18 +3274,16 @@ static CURLcode parse_connect_to_slist(struct Curl_easy *data,
 #ifdef USE_NGHTTP2
     /* with h2 support, check that first */
     srcalpnid = ALPN_h2;
-    // TODO
     hit = Curl_altsvc_lookup(data->asi,
-                             srcalpnid, _GETCHARPTR(host), conn->remote_port, /* from */
+                             srcalpnid, host, conn->remote_port, /* from */
                              &as /* to */,
                              allowed_versions);
     if(!hit)
 #endif
     {
       srcalpnid = ALPN_h1;
-      // TODO
       hit = Curl_altsvc_lookup(data->asi,
-                               srcalpnid, _GETCHARPTR(host), conn->remote_port, /* from */
+                               srcalpnid, host, conn->remote_port, /* from */
                                &as /* to */,
                                allowed_versions);
     }
@@ -3788,7 +3786,7 @@ static CURLcode create_conn(struct Curl_easy *data,
      that will be freed as part of the Curl_easy struct, but all cloned
      copies will be separately allocated.
   */
-  // TODO
+  // TODO? ssl related
   data->set.ssl.primary.CApath = _GETCHARPTR(data->set.str[STRING_SSL_CAPATH]);
   data->set.ssl.primary.CAfile = _GETCHARPTR(data->set.str[STRING_SSL_CAFILE]);
   data->set.ssl.primary.issuercert = _GETCHARPTR(data->set.str[STRING_SSL_ISSUERCERT]);

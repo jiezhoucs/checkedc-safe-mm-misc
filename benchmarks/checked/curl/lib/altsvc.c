@@ -612,7 +612,7 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
  * Return TRUE on a match
  */
 bool Curl_altsvc_lookup(struct altsvcinfo *asi,
-                        enum alpnid srcalpnid, const char *srchost,
+                        enum alpnid srcalpnid, mm_array_ptr<const char> srchost,
                         int srcport,
                         struct altsvc **dstentry,
                         const int versions) /* one or more bits */
@@ -634,7 +634,7 @@ bool Curl_altsvc_lookup(struct altsvcinfo *asi,
       continue;
     }
     if((as->src.alpnid == srcalpnid) &&
-       mm_strcasecompare_0(as->src.host, srchost) &&
+       mm_strcasecompare(as->src.host, srchost) &&
        (as->src.port == srcport) &&
        (versions & as->dst.alpnid)) {
       /* match */

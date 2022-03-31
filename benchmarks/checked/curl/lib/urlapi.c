@@ -433,9 +433,9 @@ static CURLUcode parse_hostname_login(struct Curl_URL *u,
 {
   CURLUcode result = CURLUE_OK;
   CURLcode ccode;
-  char *userp = NULL;
-  char *passwdp = NULL;
-  char *optionsp = NULL;
+  mm_array_ptr<char> userp = NULL;
+  mm_array_ptr<char> passwdp = NULL;
+  mm_array_ptr<char> optionsp = NULL;
   const struct Curl_handler *h = NULL;
 
   /* At this point, we're hoping all the other special cases have
@@ -478,21 +478,21 @@ static CURLUcode parse_hostname_login(struct Curl_URL *u,
       goto out;
     }
 
-    u->user = userp;
+    u->user = _GETCHARPTR(userp);
   }
 
   if(passwdp)
-    u->password = passwdp;
+    u->password = _GETCHARPTR(passwdp);
 
   if(optionsp)
-    u->options = optionsp;
+    u->options = _GETCHARPTR(optionsp);
 
   return CURLUE_OK;
   out:
 
-  free(userp);
-  free(passwdp);
-  free(optionsp);
+  MM_FREE(char, userp);
+  MM_FREE(char, passwdp);
+  MM_FREE(char, optionsp);
 
   return result;
 }
@@ -1061,7 +1061,6 @@ static CURLUcode parseurl(const char *url, CURLU *u, unsigned int flags)
 
 static CURLUcode mm_parseurl(mm_array_ptr<const char> url, CURLU *u, unsigned int flags)
 {
-  // TODO
   CURLUcode result = seturl(_GETCHARPTR(url), u, flags);
   if(result) {
     free_urlhandle(u);
@@ -1907,7 +1906,6 @@ CURLUcode mm_curl_url_set(CURLU *u, CURLUPart what,
     char *redired_url;
     CURLU *handle2;
 
-    // TODO
     if(Curl_is_absolute_url(_GETCHARPTR(part), NULL, MAX_SCHEME_LEN + 1)) {
       handle2 = curl_url();
       if(!handle2)
@@ -1935,7 +1933,6 @@ CURLUcode mm_curl_url_set(CURLU *u, CURLUPart what,
     }
 
     /* apply the relative part to create a new URL */
-    // TODO
     redired_url = concat_url(oldurl, _GETCHARPTR(part));
     free(oldurl);
     if(!redired_url)

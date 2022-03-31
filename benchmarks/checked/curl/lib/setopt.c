@@ -146,13 +146,10 @@ static CURLcode setstropt_userpwd(char *option, mm_array_ptr<char> *userp,
   /* Parse the login details if specified. It not then we treat NULL as a hint
      to clear the existing data */
   if(option) {
-    char *tmp_user = NULL, *tmp_passwd = NULL;
     result = Curl_parse_login_details(option, strlen(option),
-                                      (userp ? &tmp_user : NULL),
-                                      (passwdp ? &tmp_passwd : NULL),
+                                      (userp ? &user : NULL),
+                                      (passwdp ? &passwd : NULL),
                                       NULL);
-    user = mmize_str(tmp_user);
-    passwd = mmize_str(tmp_passwd);
   }
 
   if(!result) {

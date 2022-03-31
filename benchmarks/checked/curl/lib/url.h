@@ -41,8 +41,8 @@ CURLcode Curl_setup_conn(struct Curl_easy *data,
                          bool *protocol_done);
 void Curl_free_request_state(struct Curl_easy *data);
 CURLcode Curl_parse_login_details(const char *login, const size_t len,
-                                  char **userptr, char **passwdptr,
-                                  char **optionsptr);
+                                  mm_array_ptr<char> *userptr, mm_array_ptr<char> *passwdptr,
+                                  mm_array_ptr<char> *optionsptr);
 
 const struct Curl_handler *Curl_builtin_scheme(const char *scheme);
 
