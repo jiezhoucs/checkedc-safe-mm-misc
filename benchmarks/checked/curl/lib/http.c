@@ -2176,7 +2176,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
 {
   CURLcode result = CURLE_OK;
   mm_array_ptr<const char> path = data->state.up.path;
-  const char *query = data->state.up.query;
+  mm_array_ptr<const char> query = data->state.up.query;
 
   if(data->set.str[STRING_TARGET]) {
     path = data->set.str[STRING_TARGET];
@@ -2211,7 +2211,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
       return CURLE_OUT_OF_MEMORY;
     }
 
-    if(strcasecompare("http", data->state.up.scheme)) {
+    if(mm_strcasecompare("http", data->state.up.scheme)) {
       /* when getting HTTP, we don't want the userinfo the URL */
       uc = curl_url_set(h, CURLUPART_USER, NULL, 0);
       if(uc) {
@@ -2242,7 +2242,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
     if(result)
       return (result);
 
-    if(strcasecompare("ftp", data->state.up.scheme)) {
+    if(mm_strcasecompare("ftp", data->state.up.scheme)) {
       if(data->set.proxy_transfer_mode) {
         /* when doing ftp, append ;type=<a|i> if not present */
         mm_array_ptr<char> type = mm_strstr(path, ";type=");
@@ -2275,7 +2275,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
     if(result)
       return result;
     if(query)
-      result = mm_Curl_dyn_addf(r, "?%s", query);
+      result = mm_Curl_dyn_addf(r, "?%s", _GETCHARPTR(query));
   }
 
   return result;
@@ -3091,7 +3091,8 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
   {
     mm_array_ptr<char> pq = NULL;
     if(data->state.up.query) {
-      pq = mmize_str(aprintf("%s?%s", _GETCHARPTR(data->state.up.path), data->state.up.query));
+      pq = mmize_str(aprintf("%s?%s", _GETCHARPTR(data->state.up.path),
+            _GETCHARPTR(data->state.up.query)));
       if(!pq)
         return CURLE_OUT_OF_MEMORY;
     }

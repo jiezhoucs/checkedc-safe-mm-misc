@@ -341,14 +341,14 @@ void Curl_freeset(struct Curl_easy *data)
 static void up_free(struct Curl_easy *data)
 {
   struct urlpieces *up = &data->state.up;
-  Curl_safefree(up->scheme);
+  mm_Curl_safefree(char, up->scheme);
   mm_Curl_safefree(char, up->hostname);
-  Curl_safefree(up->port);
+  mm_Curl_safefree(char, up->port);
   mm_Curl_safefree(char, up->user);
   mm_Curl_safefree(char, up->password);
   mm_Curl_safefree(char, up->options);
-  MM_curl_free(char, up->path);
-  Curl_safefree(up->query);
+  mm_Curl_safefree(char, up->path);
+  mm_Curl_safefree(char, up->query);
   curl_url_cleanup(data->state.uh);
   data->state.uh = NULL;
 }
@@ -1833,9 +1833,10 @@ const struct Curl_handler *Curl_builtin_scheme(const char *scheme)
 
 static CURLcode findprotocol(struct Curl_easy *data,
                              struct connectdata *conn,
-                             const char *protostr)
+                             mm_array_ptr<const char> protostr)
 {
-  const struct Curl_handler *p = Curl_builtin_scheme(protostr);
+    // TODO?
+  const struct Curl_handler *p = Curl_builtin_scheme(_GETCHARPTR(protostr));
 
   if(p && /* Protocol found in table. Check if allowed */
      (data->set.allowed_protocols & p->protocol)) {
@@ -1859,7 +1860,7 @@ static CURLcode findprotocol(struct Curl_easy *data,
      to anything since it is already assigned to a dummy-struct in the
      create_conn() function when the connectdata struct is allocated. */
   failf(data, "Protocol \"%s\" not supported or disabled in " LIBCURL_NAME,
-        protostr);
+        _GETCHARPTR(protostr));
 
   return CURLE_UNSUPPORTED_PROTOCOL;
 }
@@ -1989,21 +1990,21 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
     data->state.url_alloc = TRUE;
   }
 
-  uc = curl_url_get(uh, CURLUPART_SCHEME, &data->state.up.scheme, 0);
+  uc = mm_curl_url_get(uh, CURLUPART_SCHEME, &data->state.up.scheme, 0);
   if(uc)
     return Curl_uc_to_curlcode(uc);
 
   uc = mm_curl_url_get(uh, CURLUPART_HOST, &data->state.up.hostname, 0);
   if(uc) {
-    if(!strcasecompare("file", data->state.up.scheme))
+    if(!mm_strcasecompare("file", data->state.up.scheme))
       return CURLE_OUT_OF_MEMORY;
   }
 
 #ifndef CURL_DISABLE_HSTS
-  if(data->hsts && strcasecompare("http", data->state.up.scheme)) {
+  if(data->hsts && mm_strcasecompare("http", data->state.up.scheme)) {
     if(Curl_hsts(data->hsts, data->state.up.hostname, TRUE)) {
       char *url;
-      Curl_safefree(data->state.up.scheme);
+      mm_Curl_safefree(char, data->state.up.scheme);
       uc = curl_url_set(uh, CURLUPART_SCHEME, "https", 0);
       if(uc)
         return Curl_uc_to_curlcode(uc);
@@ -2013,7 +2014,7 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
       uc = curl_url_get(uh, CURLUPART_URL, &url, 0);
       if(uc)
         return Curl_uc_to_curlcode(uc);
-      uc = curl_url_get(uh, CURLUPART_SCHEME, &data->state.up.scheme, 0);
+      uc = mm_curl_url_get(uh, CURLUPART_SCHEME, &data->state.up.scheme, 0);
       if(uc) {
         free(url);
         return Curl_uc_to_curlcode(uc);
@@ -2089,20 +2090,20 @@ static CURLcode parseurlandfillconn(struct Curl_easy *data,
   if(uc)
     return Curl_uc_to_curlcode(uc);
 
-  uc = curl_url_get(uh, CURLUPART_PORT, &data->state.up.port,
+  uc = mm_curl_url_get(uh, CURLUPART_PORT, &data->state.up.port,
                     CURLU_DEFAULT_PORT);
   if(uc) {
-    if(!strcasecompare("file", data->state.up.scheme))
+    if(!mm_strcasecompare("file", data->state.up.scheme))
       return CURLE_OUT_OF_MEMORY;
   }
   else {
-    unsigned long port = strtoul(data->state.up.port, NULL, 10);
+    unsigned long port = mm_strtoul(data->state.up.port, NULL, 10);
     conn->port = conn->remote_port =
       (data->set.use_port && data->state.allow_port) ?
       (int)data->set.use_port : curlx_ultous(port);
   }
 
-  (void)curl_url_get(uh, CURLUPART_QUERY, &data->state.up.query, 0);
+  (void)mm_curl_url_get(uh, CURLUPART_QUERY, &data->state.up.query, 0);
 
   hostname = data->state.up.hostname;
   if(hostname && hostname[0] == '[') {
@@ -2399,7 +2400,7 @@ static CURLcode parse_proxy(struct Curl_easy *data,
   struct proxy_info *proxyinfo;
   CURLU *uhp = curl_url();
   CURLcode result = CURLE_OK;
-  char *scheme = NULL;
+  mm_array_ptr<char> scheme = NULL;
 
   /* When parsing the proxy, allowing non-supported schemes since we have
      these made up ones for proxies. Guess scheme for URLs without it. */
@@ -2407,24 +2408,24 @@ static CURLcode parse_proxy(struct Curl_easy *data,
                     CURLU_NON_SUPPORT_SCHEME|CURLU_GUESS_SCHEME);
   if(!uc) {
     /* parsed okay as a URL */
-    uc = curl_url_get(uhp, CURLUPART_SCHEME, &scheme, 0);
+    uc = mm_curl_url_get(uhp, CURLUPART_SCHEME, &scheme, 0);
     if(uc) {
       result = CURLE_OUT_OF_MEMORY;
       goto error;
     }
 
-    if(strcasecompare("https", scheme))
+    if(mm_strcasecompare("https", scheme))
       proxytype = CURLPROXY_HTTPS;
-    else if(strcasecompare("socks5h", scheme))
+    else if(mm_strcasecompare("socks5h", scheme))
       proxytype = CURLPROXY_SOCKS5_HOSTNAME;
-    else if(strcasecompare("socks5", scheme))
+    else if(mm_strcasecompare("socks5", scheme))
       proxytype = CURLPROXY_SOCKS5;
-    else if(strcasecompare("socks4a", scheme))
+    else if(mm_strcasecompare("socks4a", scheme))
       proxytype = CURLPROXY_SOCKS4A;
-    else if(strcasecompare("socks4", scheme) ||
-            strcasecompare("socks", scheme))
+    else if(mm_strcasecompare("socks4", scheme) ||
+            mm_strcasecompare("socks", scheme))
       proxytype = CURLPROXY_SOCKS4;
-    else if(strcasecompare("http", scheme))
+    else if(mm_strcasecompare("http", scheme))
       ; /* leave it as HTTP or HTTP/1.0 */
     else {
       /* Any other xxx:// reject! */
@@ -2535,7 +2536,7 @@ static CURLcode parse_proxy(struct Curl_easy *data,
   error:
   MM_FREE(char, proxyuser);
   MM_FREE(char, proxypasswd);
-  free(scheme);
+  MM_FREE(char, scheme);
   curl_url_cleanup(uhp);
   return result;
 }

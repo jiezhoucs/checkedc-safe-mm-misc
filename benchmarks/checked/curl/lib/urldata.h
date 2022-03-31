@@ -414,8 +414,8 @@ struct ntlmdata {
   /* used for communication with Samba's winbind daemon helper ntlm_auth */
   curl_socket_t ntlm_auth_hlpr_socket;
   pid_t ntlm_auth_hlpr_pid;
-  char *challenge; /* The received base64 encoded ntlm type-2 message */
-  char *response;  /* The generated base64 ntlm type-1/type-3 message */
+  mm_array_ptr<char> challenge; /* The received base64 encoded ntlm type-2 message */
+  mm_array_ptr<char> response;  /* The generated base64 ntlm type-1/type-3 message */
 #endif
 #endif
 };
@@ -1303,14 +1303,14 @@ struct time_node {
 
 /* individual pieces of the URL */
 struct urlpieces {
-  char *scheme;
+  mm_array_ptr<char> scheme;
   mm_array_ptr<char> hostname;
-  char *port;
+  mm_array_ptr<char> port;
   mm_array_ptr<char> user;
   mm_array_ptr<char> password;
   mm_array_ptr<char> options;
   mm_array_ptr<char> path;
-  char *query;
+  mm_array_ptr<char> query;
 };
 
 struct UrlState {

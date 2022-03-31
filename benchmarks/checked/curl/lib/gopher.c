@@ -128,11 +128,11 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)
   CURLcode result = CURLE_OK;
   struct connectdata *conn = data->conn;
   curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
-  char *gopherpath;
-  char *path = _GETCHARPTR(data->state.up.path);
-  char *query = data->state.up.query;
-  char *sel = NULL;
-  char *sel_org = NULL;
+  mm_array_ptr<char> gopherpath = NULL;
+  mm_array_ptr<char> path = data->state.up.path;
+  mm_array_ptr<char> query = data->state.up.query;
+  mm_array_ptr<char> sel = NULL;
+  mm_array_ptr<char> sel_org = NULL;
   timediff_t timeout_ms;
   ssize_t amount, k;
   size_t len;
@@ -144,29 +144,29 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)
   DEBUGASSERT(path);
 
   if(query)
-    gopherpath = aprintf("%s?%s", path, query);
+    gopherpath = mmize_str(aprintf("%s?%s", _GETCHARPTR(path), _GETCHARPTR(query)));
   else
-    gopherpath = strdup(path);
+    gopherpath = mm_strdup(path);
 
   if(!gopherpath)
     return CURLE_OUT_OF_MEMORY;
 
   /* Create selector. Degenerate cases: / and /1 => convert to "" */
-  if(strlen(gopherpath) <= 2) {
-    sel = (char *)"";
-    len = strlen(sel);
-    free(gopherpath);
+  if(mm_strlen(gopherpath) <= 2) {
+    sel = "";
+    len = mm_strlen(sel);
+    MM_FREE(char, gopherpath);
   }
   else {
-    char *newp;
+    mm_array_ptr<char> newp = NULL;
 
     /* Otherwise, drop / and the first character (i.e., item type) ... */
     newp = gopherpath;
     newp += 2;
 
     /* ... and finally unescape */
-    result = Curl_urldecode(data, newp, 0, &sel, &len, REJECT_ZERO);
-    free(gopherpath);
+    result = mm_Curl_urldecode(data, newp, 0, &sel, &len, REJECT_ZERO);
+    MM_FREE(char, gopherpath);
     if(result)
       return result;
     sel_org = sel;
@@ -177,12 +177,12 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)
   for(;;) {
     /* Break out of the loop if the selector is empty because OpenSSL and/or
        LibreSSL fail with errno 0 if this is the case. */
-    if(strlen(sel) < 1)
+    if(mm_strlen(sel) < 1)
       break;
 
-    result = Curl_write(data, sockfd, sel, k, &amount);
+    result = Curl_write(data, sockfd, _GETCHARPTR(sel), k, &amount);
     if(!result) { /* Which may not have written it all! */
-      result = Curl_client_write(data, CLIENTWRITE_HEADER, sel, amount);
+      result = Curl_client_write(data, CLIENTWRITE_HEADER, _GETCHARPTR(sel), amount);
       if(result)
         break;
 
@@ -219,7 +219,7 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)
     }
   }
 
-  free(sel_org);
+  MM_FREE(char, sel_org);
 
   if(!result)
     result = Curl_write(data, sockfd, "\r\n", 2, &amount);

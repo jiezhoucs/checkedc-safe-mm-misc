@@ -110,8 +110,8 @@ static void ntlm_wb_cleanup(struct ntlmdata *ntlm)
     ntlm->ntlm_auth_hlpr_pid = 0;
   }
 
-  Curl_safefree(ntlm->challenge);
-  Curl_safefree(ntlm->response);
+  mm_Curl_safefree(char, ntlm->challenge);
+  mm_Curl_safefree(char, ntlm->response);
 }
 
 static CURLcode ntlm_wb_init(struct Curl_easy *data, struct ntlmdata *ntlm,
@@ -261,16 +261,16 @@ done:
 #define MAX_NTLM_WB_RESPONSE 100000
 
 static CURLcode ntlm_wb_response(struct Curl_easy *data, struct ntlmdata *ntlm,
-                                 const char *input, curlntlm state)
+                                 mm_array_ptr<const char> input, curlntlm state)
 {
-  size_t len_in = strlen(input), len_out = 0;
+  size_t len_in = mm_strlen(input), len_out = 0;
   struct dynbuf b;
-  char *ptr = NULL;
+  mm_array_ptr<char> ptr = NULL;
   unsigned char *buf = (unsigned char *)data->state.buffer;
   Curl_dyn_init(&b, MAX_NTLM_WB_RESPONSE);
 
   while(len_in > 0) {
-    ssize_t written = swrite(ntlm->ntlm_auth_hlpr_socket, input, len_in);
+    ssize_t written = swrite(ntlm->ntlm_auth_hlpr_socket, _GETCHARPTR(input), len_in);
     if(written == -1) {
       /* Interrupted by a signal, retry it */
       if(errno == EINTR)
@@ -297,7 +297,7 @@ static CURLcode ntlm_wb_response(struct Curl_easy *data, struct ntlmdata *ntlm,
       goto done;
 
     len_out = Curl_dyn_len(&b);
-    ptr = _GETCHARPTR(Curl_dyn_ptr(&b));
+    ptr = Curl_dyn_ptr(&b);
     if(len_out && ptr[len_out - 1] == '\n') {
       ptr[len_out - 1] = '\0';
       break; /* done! */
@@ -321,7 +321,7 @@ static CURLcode ntlm_wb_response(struct Curl_easy *data, struct ntlmdata *ntlm,
      (ptr[0]!='A' || ptr[1]!='F' || ptr[2]!=' '))
     goto done;
 
-  ntlm->response = strdup(ptr + 3);
+  ntlm->response = mm_strdup(ptr + 3);
   Curl_dyn_free(&b);
   if(!ntlm->response)
     return CURLE_OUT_OF_MEMORY;
@@ -349,8 +349,7 @@ CURLcode Curl_input_ntlm_wb(struct Curl_easy *data,
     header++;
 
   if(*header) {
-    // TODO
-    ntlm->challenge = strdup(_GETCHARPTR(header));
+    ntlm->challenge = mm_strdup(header);
     if(!ntlm->challenge)
       return CURLE_OUT_OF_MEMORY;
 
@@ -450,26 +449,26 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
     MM_FREE(char, *allocuserpwd);
     *allocuserpwd = mmize_str(aprintf("%sAuthorization: NTLM %s\r\n",
                             proxy ? "Proxy-" : "",
-                            ntlm->response));
+                            _GETCHARPTR(ntlm->response)));
     DEBUG_OUT(fprintf(stderr, "**** Header %s\n ", _GETCHARPTR(*allocuserpwd)));
-    Curl_safefree(ntlm->response);
+    mm_Curl_safefree(char, ntlm->response);
     if(!*allocuserpwd)
       return CURLE_OUT_OF_MEMORY;
     break;
 
   case NTLMSTATE_TYPE2: {
-    char *input = aprintf("TT %s\n", ntlm->challenge);
+    mm_array_ptr<char> input = mmize_str(aprintf("TT %s\n", _GETCHARPTR(ntlm->challenge)));
     if(!input)
       return CURLE_OUT_OF_MEMORY;
     res = ntlm_wb_response(data, ntlm, input, *state);
-    free(input);
+    MM_FREE(char, input);
     if(res)
       return res;
 
     MM_FREE(char, *allocuserpwd);
     *allocuserpwd = mmize_str(aprintf("%sAuthorization: NTLM %s\r\n",
                             proxy ? "Proxy-" : "",
-                            ntlm->response));
+                            _GETCHARPTR(ntlm->response)));
     DEBUG_OUT(fprintf(stderr, "**** %s\n ", _GETCHARPTR(*allocuserpwd)));
     *state = NTLMSTATE_TYPE3; /* we sent a type-3 */
     authp->done = TRUE;
