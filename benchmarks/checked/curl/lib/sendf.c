@@ -271,7 +271,7 @@ void Curl_failf(struct Curl_easy *data, const char *fmt, ...)
     len = mvsnprintf(error, CURL_ERROR_SIZE, fmt, ap);
 
     if(data->set.errorbuffer && !data->state.errorbuf) {
-      strcpy(data->set.errorbuffer, error);
+      mm_strcpy(data->set.errorbuffer, error);
       data->state.errorbuf = TRUE; /* wrote error string */
     }
     error[len++] = '\n';

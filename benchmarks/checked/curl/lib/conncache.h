@@ -88,7 +88,7 @@ void Curl_conncache_destroy(struct conncache *connc);
 struct connectbundle *Curl_conncache_find_bundle(struct Curl_easy *data,
                                                  struct connectdata *conn,
                                                  struct conncache *connc,
-                                                 const char **hostp);
+                                                 mm_array_ptr<const char> *hostp);
 /* returns number of connections currently held in the connection cache */
 size_t Curl_conncache_size(struct Curl_easy *data);
 

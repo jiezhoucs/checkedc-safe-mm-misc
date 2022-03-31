@@ -120,7 +120,7 @@ bool Curl_ipvalid(struct Curl_easy *data, struct connectdata *conn);
  * of arguments
  */
 struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
-                                       const char *hostname,
+                                       mm_array_ptr<const char> hostname,
                                        int port,
                                        int *waitp);
 
@@ -139,7 +139,7 @@ void Curl_hostcache_prune(struct Curl_easy *data);
 int Curl_num_addresses(const struct Curl_addrinfo *addr);
 
 /* IPv4 threadsafe resolve function used for synch and asynch builds */
-struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname, int port);
+struct Curl_addrinfo *Curl_ipv4_resolve_r(mm_array_ptr<const char> hostname, int port);
 
 CURLcode Curl_once_resolved(struct Curl_easy *data, bool *protocol_connect);
 

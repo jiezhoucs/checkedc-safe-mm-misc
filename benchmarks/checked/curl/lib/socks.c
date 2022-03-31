@@ -185,7 +185,7 @@ int Curl_SOCKS_getsock(struct connectdata *conn, curl_socket_t *sock,
 *   Set protocol4a=true for  "SOCKS 4A (Simple Extension to SOCKS 4 Protocol)"
 *   Nonsupport "Identification Protocol (RFC1413)"
 */
-CURLproxycode Curl_SOCKS4(const char *proxy_user,
+CURLproxycode Curl_SOCKS4(mm_array_ptr<const char> proxy_user,
                           mm_array_ptr<const char> hostname,
                           int remote_port,
                           int sockindex,
@@ -323,13 +323,13 @@ CURLproxycode Curl_SOCKS4(const char *proxy_user,
      */
     socksreq[8] = 0; /* ensure empty userid is NUL-terminated */
     if(proxy_user) {
-      size_t plen = strlen(proxy_user);
+      size_t plen = mm_strlen(proxy_user);
       if(plen >= (size_t)data->set.buffer_size - 8) {
         failf(data, "Too long SOCKS proxy user name, can't use!");
         return CURLPX_LONG_USER;
       }
       /* copy the proxy name WITH trailing zero */
-      memcpy(socksreq + 8, proxy_user, plen + 1);
+      mm_memcpy(socksreq + 8, proxy_user, plen + 1);
     }
 
     /*
@@ -483,8 +483,8 @@ CURLproxycode Curl_SOCKS4(const char *proxy_user,
  * This function logs in to a SOCKS5 proxy and sends the specifics to the final
  * destination server.
  */
-CURLproxycode Curl_SOCKS5(const char *proxy_user,
-                          const char *proxy_password,
+CURLproxycode Curl_SOCKS5(mm_array_ptr<const char> proxy_user,
+                          mm_array_ptr<const char> proxy_password,
                           mm_array_ptr<const char> hostname,
                           int remote_port,
                           int sockindex,
@@ -666,8 +666,8 @@ CURLproxycode Curl_SOCKS5(const char *proxy_user,
     /* Needs user name and password */
     size_t proxy_user_len, proxy_password_len;
     if(proxy_user && proxy_password) {
-      proxy_user_len = strlen(proxy_user);
-      proxy_password_len = strlen(proxy_password);
+      proxy_user_len = mm_strlen(proxy_user);
+      proxy_password_len = mm_strlen(proxy_password);
     }
     else {
       proxy_user_len = 0;
@@ -690,7 +690,7 @@ CURLproxycode Curl_SOCKS5(const char *proxy_user,
         failf(data, "Excessive user name length for proxy auth");
         return CURLPX_LONG_USER;
       }
-      memcpy(socksreq + len, proxy_user, proxy_user_len);
+      mm_memcpy(socksreq + len, proxy_user, proxy_user_len);
     }
     len += proxy_user_len;
     socksreq[len++] = (unsigned char) proxy_password_len;
@@ -700,7 +700,7 @@ CURLproxycode Curl_SOCKS5(const char *proxy_user,
         failf(data, "Excessive password length for proxy auth");
         return CURLPX_LONG_PASSWD;
       }
-      memcpy(socksreq + len, proxy_password, proxy_password_len);
+      mm_memcpy(socksreq + len, proxy_password, proxy_password_len);
     }
     len += proxy_password_len;
     sxstate(data, CONNECT_AUTH_SEND);

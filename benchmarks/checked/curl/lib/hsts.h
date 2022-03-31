@@ -54,7 +54,7 @@ struct stsentry *Curl_hsts(struct hsts *h, mm_array_ptr<const char> hostname,
 CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
                         mm_array_ptr<const char> file);
 CURLcode Curl_hsts_loadfile(struct Curl_easy *data,
-                            struct hsts *h, const char *file);
+                            struct hsts *h, mm_array_ptr<const char> file);
 CURLcode Curl_hsts_loadcb(struct Curl_easy *data,
                           struct hsts *h);
 #else

@@ -674,15 +674,14 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
     /* First check if this is an IPv4 address string */
     if(Curl_inet_pton(AF_INET, _GETCHARPTR(hostname), &in) > 0)
       /* This is a dotted IP address 123.123.123.123-style */
-      // TODO?
-      addr = Curl_ip2addr(AF_INET, &in, _GETCHARPTR(hostname), port);
+      addr = Curl_ip2addr(AF_INET, &in, hostname, port);
 #ifdef ENABLE_IPV6
     if(!addr) {
       struct in6_addr in6;
       /* check if this is an IPv6 address string */
       if(Curl_inet_pton(AF_INET6, _GETCHARPTR(hostname), &in6) > 0)
         /* This is an IPv6 address literal */
-        addr = Curl_ip2addr(AF_INET6, &in6, _GETCHARPTR(hostname), port);
+        addr = Curl_ip2addr(AF_INET6, &in6, hostname, port);
     }
 #endif /* ENABLE_IPV6 */
 
@@ -719,8 +718,7 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
         /* If Curl_getaddrinfo() returns NULL, 'respwait' might be set to a
            non-zero value indicating that we need to wait for the response to
            the resolve call */
-        // TODO
-        addr = Curl_getaddrinfo(data, _GETCHARPTR(hostname), port, &respwait);
+        addr = Curl_getaddrinfo(data, hostname, port, &respwait);
       }
     }
     if(!addr) {

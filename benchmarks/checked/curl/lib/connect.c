@@ -797,15 +797,13 @@ static CURLcode connect_SOCKS(struct Curl_easy *data, int sockindex,
     switch(conn->socks_proxy.proxytype) {
     case CURLPROXY_SOCKS5:
     case CURLPROXY_SOCKS5_HOSTNAME:
-      // TODO
-      pxresult = Curl_SOCKS5(_GETCHARPTR(conn->socks_proxy.user), _GETCHARPTR(conn->socks_proxy.passwd),
+      pxresult = Curl_SOCKS5(conn->socks_proxy.user, conn->socks_proxy.passwd,
                              host, port, sockindex, data, done);
       break;
 
     case CURLPROXY_SOCKS4:
     case CURLPROXY_SOCKS4A:
-      // TODO
-      pxresult = Curl_SOCKS4(_GETCHARPTR(conn->socks_proxy.user), host, port, sockindex,
+      pxresult = Curl_SOCKS4(conn->socks_proxy.user, host, port, sockindex,
                              data, done);
       break;
 
@@ -1043,7 +1041,6 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
 
     failf(data, "Failed to connect to %s port %u after "
                 "%" CURL_FORMAT_TIMEDIFF_T " ms: %s",
-                // TODO
         _GETCHARPTR(hostname), conn->port,
         Curl_timediff(now, data->progress.t_startsingle),
         Curl_strerror(error, buffer, sizeof(buffer)));

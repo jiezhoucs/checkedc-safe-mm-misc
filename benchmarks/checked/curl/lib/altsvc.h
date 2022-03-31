@@ -57,7 +57,7 @@ struct altsvcinfo {
 
 const char *Curl_alpnid2str(enum alpnid id);
 struct altsvcinfo *Curl_altsvc_init(void);
-CURLcode Curl_altsvc_load(struct altsvcinfo *asi, const char *file);
+CURLcode Curl_altsvc_load(struct altsvcinfo *asi, mm_array_ptr<const char> file);
 CURLcode Curl_altsvc_save(struct Curl_easy *data,
                           struct altsvcinfo *asi, mm_array_ptr<const char> file);
 CURLcode Curl_altsvc_ctrl(struct altsvcinfo *asi, const long ctrl);

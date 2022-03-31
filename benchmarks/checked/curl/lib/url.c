@@ -1114,7 +1114,7 @@ ConnectionExists(struct Curl_easy *data,
   bool foundPendingCandidate = FALSE;
   bool canmultiplex = IsMultiplexingPossible(data, needle);
   struct connectbundle *bundle;
-  const char *hostbundle;
+  mm_array_ptr<const char> hostbundle = NULL;
 
 #ifdef USE_NTLM
   bool wantNTLMhttp = ((data->state.authhost.want &
@@ -1142,7 +1142,7 @@ ConnectionExists(struct Curl_easy *data,
     struct Curl_llist_element *curr;
 
     infof(data, "Found bundle for host %s: %p [%s]",
-          hostbundle, (void *)bundle, (bundle->multiuse == BUNDLE_MULTIPLEX ?
+          _GETCHARPTR(hostbundle), (void *)bundle, (bundle->multiuse == BUNDLE_MULTIPLEX ?
                                        "can multiplex" : "serially"));
 
     /* We can't multiplex if we don't know anything about the server */
@@ -3927,7 +3927,7 @@ static CURLcode create_conn(struct Curl_easy *data,
       connections_available = FALSE;
     else {
       /* this gets a lock on the conncache */
-      const char *bundlehost;
+      mm_array_ptr<const char> bundlehost = NULL;
       struct connectbundle *bundle =
         Curl_conncache_find_bundle(data, conn, data->state.conn_cache,
                                    &bundlehost);
@@ -3944,7 +3944,7 @@ static CURLcode create_conn(struct Curl_easy *data,
           (void)Curl_disconnect(data, conn_candidate, FALSE);
         else {
           infof(data, "No more connections allowed to host %s: %zu",
-                bundlehost, max_host_connections);
+                _GETCHARPTR(bundlehost), max_host_connections);
           connections_available = FALSE;
         }
       }

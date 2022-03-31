@@ -481,7 +481,7 @@ static CURLcode hsts_pull(struct Curl_easy *data, struct hsts *h)
  * handling to work completely. It will ignore individual syntactical errors
  * etc.
  */
-static CURLcode hsts_load(struct hsts *h, const char *file)
+static CURLcode hsts_load(struct hsts *h, mm_array_ptr<const char> file)
 {
   CURLcode result = CURLE_OK;
   char *line = NULL;
@@ -490,11 +490,11 @@ static CURLcode hsts_load(struct hsts *h, const char *file)
   /* we need a private copy of the file name so that the hsts cache file
      name survives an easy handle reset */
   MM_FREE(char, h->filename);
-  h->filename = mm_strdup_from_raw(file);
+  h->filename = mm_strdup(file);
   if(!h->filename)
     return CURLE_OUT_OF_MEMORY;
 
-  fp = fopen(file, FOPEN_READTEXT);
+  fp = mm_fopen(file, FOPEN_READTEXT);
   if(fp) {
     line = malloc(MAX_HSTS_LINE);
     if(!line)
@@ -524,7 +524,7 @@ static CURLcode hsts_load(struct hsts *h, const char *file)
  * Curl_hsts_loadfile() loads HSTS from file
  */
 CURLcode Curl_hsts_loadfile(struct Curl_easy *data,
-                            struct hsts *h, const char *file)
+                            struct hsts *h, mm_array_ptr<const char> file)
 {
   DEBUGASSERT(h);
   (void)data;

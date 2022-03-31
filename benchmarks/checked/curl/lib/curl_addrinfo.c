@@ -106,7 +106,7 @@ Curl_freeaddrinfo(struct Curl_addrinfo *cahead)
  */
 
 int
-Curl_getaddrinfo_ex(const char *nodename,
+Curl_getaddrinfo_ex(mm_array_ptr<const char> nodename,
                     const char *servname,
                     const struct addrinfo *hints,
                     struct Curl_addrinfo **result)
@@ -121,7 +121,7 @@ Curl_getaddrinfo_ex(const char *nodename,
 
   *result = NULL; /* assume failure */
 
-  error = getaddrinfo(nodename, servname, hints, &aihead);
+  error = getaddrinfo(_GETCHARPTR(nodename), servname, hints, &aihead);
   if(error)
     return error;
 
@@ -369,7 +369,7 @@ struct namebuff {
  */
 
 struct Curl_addrinfo *
-Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
+Curl_ip2addr(int af, const void *inaddr, mm_array_ptr<const char> hostname, int port)
 {
   struct Curl_addrinfo *ai;
 
@@ -380,50 +380,50 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
 #pragma message disable PTRMISMATCH
 #endif
 
-  struct hostent  *h;
-  struct namebuff *buf;
-  char  *addrentry;
-  char  *hoststr;
+  mm_ptr<struct hostent> h = NULL;
+  mm_ptr<struct namebuff> buf = NULL;
+  mm_array_ptr<char> addrentry = NULL;
+  mm_array_ptr<char> hoststr = NULL;
   size_t addrsize;
 
   DEBUGASSERT(inaddr && hostname);
 
-  buf = malloc(sizeof(struct namebuff));
+  buf = MM_ALLOC(struct namebuff);
   if(!buf)
     return NULL;
 
-  hoststr = strdup(hostname);
+  hoststr = mm_strdup(hostname);
   if(!hoststr) {
-    free(buf);
+    MM_FREE(struct namebuff, buf);
     return NULL;
   }
 
   switch(af) {
   case AF_INET:
     addrsize = sizeof(struct in_addr);
-    addrentry = (void *)&buf->addrentry.ina4;
-    memcpy(addrentry, inaddr, sizeof(struct in_addr));
+    addrentry = &buf->addrentry.ina4;
+    mm_memcpy(addrentry, inaddr, sizeof(struct in_addr));
     break;
 #ifdef ENABLE_IPV6
   case AF_INET6:
     addrsize = sizeof(struct in6_addr);
-    addrentry = (void *)&buf->addrentry.ina6;
-    memcpy(addrentry, inaddr, sizeof(struct in6_addr));
+    addrentry = &buf->addrentry.ina6;
+    mm_memcpy(addrentry, inaddr, sizeof(struct in6_addr));
     break;
 #endif
   default:
-    free(hoststr);
-    free(buf);
+    MM_FREE(char, hoststr);
+    MM_FREE(struct namebuff, buf);
     return NULL;
   }
 
   h = &buf->hostentry;
-  h->h_name = hoststr;
+  h->h_name = _GETCHARPTR(hoststr);
   h->h_aliases = NULL;
   h->h_addrtype = (short)af;
   h->h_length = (short)addrsize;
-  h->h_addr_list = &buf->h_addr_list[0];
-  h->h_addr_list[0] = addrentry;
+  h->h_addr_list = (char**)(buf->h_addr_list);
+  h->h_addr_list[0] = _GETCHARPTR(addrentry);
   h->h_addr_list[1] = NULL; /* terminate list of entries */
 
 #if defined(__VMS) && \
@@ -432,10 +432,10 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
 #pragma message enable PTRMISMATCH
 #endif
 
-  ai = Curl_he2ai(h, port);
+  ai = Curl_he2ai(_GETPTR(struct hostent, h), port);
 
-  free(hoststr);
-  free(buf);
+  MM_FREE(char, hoststr);
+  MM_FREE(struct namebuff, buf);
 
   return ai;
 }
@@ -444,16 +444,16 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
  * Given an IPv4 or IPv6 dotted string address, this converts it to a proper
  * allocated Curl_addrinfo struct and returns it.
  */
-struct Curl_addrinfo *Curl_str2addr(char *address, int port)
+struct Curl_addrinfo *Curl_str2addr(mm_array_ptr<char> address, int port)
 {
   struct in_addr in;
-  if(Curl_inet_pton(AF_INET, address, &in) > 0)
+  if(Curl_inet_pton(AF_INET, _GETCHARPTR(address), &in) > 0)
     /* This is a dotted IP address 123.123.123.123-style */
     return Curl_ip2addr(AF_INET, &in, address, port);
 #ifdef ENABLE_IPV6
   {
     struct in6_addr in6;
-    if(Curl_inet_pton(AF_INET6, address, &in6) > 0)
+    if(Curl_inet_pton(AF_INET6, _GETCHARPTR(address), &in6) > 0)
       /* This is a dotted IPv6 address ::1-style */
       return Curl_ip2addr(AF_INET6, &in6, address, port);
   }

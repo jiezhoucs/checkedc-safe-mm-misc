@@ -48,7 +48,7 @@ int Curl_SOCKS_getsock(struct connectdata *conn,
  * This function logs in to a SOCKS4(a) proxy and sends the specifics to the
  * final destination server.
  */
-CURLproxycode Curl_SOCKS4(const char *proxy_name,
+CURLproxycode Curl_SOCKS4(mm_array_ptr<const char> proxy_name,
                           mm_array_ptr<const char> hostname,
                           int remote_port,
                           int sockindex,
@@ -59,8 +59,8 @@ CURLproxycode Curl_SOCKS4(const char *proxy_name,
  * This function logs in to a SOCKS5 proxy and sends the specifics to the
  * final destination server.
  */
-CURLproxycode Curl_SOCKS5(const char *proxy_name,
-                          const char *proxy_password,
+CURLproxycode Curl_SOCKS5(mm_array_ptr<const char> proxy_name,
+                          mm_array_ptr<const char> proxy_password,
                           mm_array_ptr<const char> hostname,
                           int remote_port,
                           int sockindex,

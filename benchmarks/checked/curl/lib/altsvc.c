@@ -184,7 +184,7 @@ static CURLcode altsvc_add(struct altsvcinfo *asi, mm_array_ptr<char> line)
  * handling to work completely. It will ignore individual syntactical errors
  * etc.
  */
-static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
+static CURLcode altsvc_load(struct altsvcinfo *asi, mm_array_ptr<const char> file)
 {
   CURLcode result = CURLE_OK;
   mm_array_ptr<char> line = NULL;
@@ -193,16 +193,15 @@ static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
   /* we need a private copy of the file name so that the altsvc cache file
      name survives an easy handle reset */
   MM_FREE(char, asi->filename);
-  asi->filename = mm_strdup_from_raw(file);
+  asi->filename = mm_strdup(file);
   if(!asi->filename)
     return CURLE_OUT_OF_MEMORY;
 
-  fp = fopen(file, FOPEN_READTEXT);
+  fp = mm_fopen(file, FOPEN_READTEXT);
   if(fp) {
     line = MM_ARRAY_ALLOC(char, MAX_ALTSVC_LINE);
     if(!line)
       goto fail;
-    // TODO
     while(Curl_get_line(_GETCHARPTR(line), MAX_ALTSVC_LINE, fp)) {
       mm_array_ptr<char> lineptr = line;
       while(*lineptr && ISBLANK(*lineptr))
@@ -278,7 +277,7 @@ struct altsvcinfo *Curl_altsvc_init(void)
 /*
  * Curl_altsvc_load() loads alt-svc from file.
  */
-CURLcode Curl_altsvc_load(struct altsvcinfo *asi, const char *file)
+CURLcode Curl_altsvc_load(struct altsvcinfo *asi, mm_array_ptr<const char> file)
 {
   CURLcode result;
   DEBUGASSERT(asi);

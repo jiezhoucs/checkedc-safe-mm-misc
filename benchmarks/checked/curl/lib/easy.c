@@ -779,8 +779,7 @@ static CURLcode dupset(struct Curl_easy *dst, struct Curl_easy *src)
 
   /* duplicate all strings */
   for(i = (enum dupstring)0; i< STRING_LASTZEROTERMINATED; i++) {
-    // TODO
-    result = Curl_setstropt((char**)(&dst->set.str[i]), _GETCHARPTR(src->set.str[i]));
+    result = mm_Curl_setstropt(&dst->set.str[i], src->set.str[i]);
     if(result)
       return result;
   }
@@ -882,7 +881,6 @@ struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
   /* Reinitialize an SSL engine for the new handle
    * note: the engine name has already been copied by dupset */
   if(outcurl->set.str[STRING_SSL_ENGINE]) {
-    // TODO
     if(Curl_ssl_set_engine(outcurl, _GETCHARPTR(outcurl->set.str[STRING_SSL_ENGINE])))
       goto fail;
   }
@@ -902,9 +900,7 @@ struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
     if(!outcurl->hsts)
       goto fail;
     if(outcurl->set.str[STRING_HSTS])
-      (void)Curl_hsts_loadfile(outcurl,
-          // TODO
-                               outcurl->hsts, _GETCHARPTR(outcurl->set.str[STRING_HSTS]));
+      (void)Curl_hsts_loadfile(outcurl, outcurl->hsts, outcurl->set.str[STRING_HSTS]);
     (void)Curl_hsts_loadcb(outcurl, outcurl->hsts);
   }
 #endif
@@ -1067,7 +1063,6 @@ CURLcode curl_easy_pause(struct Curl_easy *data, int action)
            all buffers */
         if(!result)
           result = Curl_client_write(data, writebuf[i].type,
-              // TODO
                                      _GETCHARPTR(Curl_dyn_ptr(&writebuf[i].b)),
                                      Curl_dyn_len(&writebuf[i].b));
         Curl_dyn_free(&writebuf[i].b);

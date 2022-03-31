@@ -139,7 +139,7 @@ void Curl_conncache_destroy(struct conncache *connc)
 /* creates a key to find a bundle for this connection */
 static void hashkey(struct connectdata *conn, char *buf,
                     size_t len,  /* something like 128 is fine */
-                    const char **hostp)
+                    mm_array_ptr<const char> *hostp)
 {
   mm_array_ptr<const char> hostname = NULL;
   long port = conn->remote_port;
@@ -158,8 +158,7 @@ static void hashkey(struct connectdata *conn, char *buf,
 
   if(hostp)
     /* report back which name we used */
-    // TODO
-    *hostp = _GETCHARPTR(hostname);
+    *hostp = hostname;
 
   /* put the number first so that the hostname gets cut off if too long */
   msnprintf(buf, len, "%ld%s", port, _GETCHARPTR(hostname));
@@ -186,7 +185,7 @@ struct connectbundle *
 Curl_conncache_find_bundle(struct Curl_easy *data,
                            struct connectdata *conn,
                            struct conncache *connc,
-                           const char **hostp)
+                           mm_array_ptr<const char> *hostp)
 {
   struct connectbundle *bundle = NULL;
   CONNCACHE_LOCK(data);

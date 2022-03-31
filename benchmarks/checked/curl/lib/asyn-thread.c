@@ -160,7 +160,7 @@ struct thread_sync_data {
   curl_mutex_t *mtx;
   int done;
   int port;
-  char *hostname;        /* hostname to resolve, Curl_async.hostname
+  mm_array_ptr<char> hostname;        /* hostname to resolve, Curl_async.hostname
                             duplicate */
 #ifndef CURL_DISABLE_SOCKETPAIR
   struct Curl_easy *data;

@@ -89,7 +89,7 @@ bool Curl_ipvalid(struct Curl_easy *data, struct connectdata *conn)
  *
  */
 struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
-                                       const char *hostname,
+                                       mm_array_ptr<const char> hostname,
                                        int port,
                                        int *waitp)
 {

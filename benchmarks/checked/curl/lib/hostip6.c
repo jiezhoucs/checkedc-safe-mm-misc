@@ -99,7 +99,7 @@ static void dump_addrinfo(struct connectdata *conn,
  * Curl_freeaddrinfo(), nothing else.
  */
 struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
-                                       const char *hostname,
+                                       mm_array_ptr<const char> hostname,
                                        int port,
                                        int *waitp)
 {
@@ -129,8 +129,8 @@ struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
    * The AI_NUMERICHOST must not be set to get synthesized IPv6 address from
    * an IPv4 address on iOS and Mac OS X.
    */
-  if((1 == Curl_inet_pton(AF_INET, hostname, addrbuf)) ||
-     (1 == Curl_inet_pton(AF_INET6, hostname, addrbuf))) {
+  if((1 == Curl_inet_pton(AF_INET, _GETCHARPTR(hostname), addrbuf)) ||
+     (1 == Curl_inet_pton(AF_INET6, _GETCHARPTR(hostname), addrbuf))) {
     /* the given address is numerical only, prevent a reverse lookup */
     hints.ai_flags = AI_NUMERICHOST;
   }
@@ -143,7 +143,7 @@ struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
 
   error = Curl_getaddrinfo_ex(hostname, sbufptr, &hints, &res);
   if(error) {
-    infof(data, "getaddrinfo(3) failed for %s:%d", hostname, port);
+    infof(data, "getaddrinfo(3) failed for %s:%d", _GETCHARPTR(hostname), port);
     return NULL;
   }
 

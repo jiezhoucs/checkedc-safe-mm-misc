@@ -775,7 +775,6 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
         return CURLE_BAD_FUNCTION_ARGUMENT;
       /* append the cookie file name to the list of file names, and deal with
          them later */
-      // TODO
       cl = curl_slist_append(data->state.cookielist, _GETCHARPTR(argptr));
       if(!cl) {
         curl_slist_free_all(data->state.cookielist);
@@ -1196,7 +1195,6 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
      * Error buffer provided by the caller to get the human readable
      * error string in.
      */
-    // TODO
     data->set.errorbuffer = va_arg(param, char *);
     break;
   case CURLOPT_WRITEDATA:
@@ -3000,8 +2998,7 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
     if(result)
       return result;
     if(argptr)
-      // TODO
-      (void)Curl_hsts_loadfile(data, data->hsts, _GETCHARPTR(argptr));
+      (void)Curl_hsts_loadfile(data, data->hsts, argptr);
     break;
   case CURLOPT_HSTS_CTRL:
     arg = va_arg(param, long);
@@ -3028,8 +3025,7 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
     if(result)
       return result;
     if(argptr)
-      // TODO
-      (void)Curl_altsvc_load(data->asi, _GETCHARPTR(argptr));
+      (void)Curl_altsvc_load(data->asi, argptr);
     break;
   case CURLOPT_ALTSVC_CTRL:
     if(!data->asi) {
