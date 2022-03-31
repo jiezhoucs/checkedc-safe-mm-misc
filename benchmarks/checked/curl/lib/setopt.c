@@ -584,7 +584,8 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
      *
      */
     // Checked C: Better way to handle this?
-    argptr_raw = va_arg(param, char *);
+    argptr = va_arg(param, mm_array_ptr<char>);
+    argptr_raw = _GETCHARPTR(argptr);
     if(argptr_raw && !*argptr_raw) {
       argptr = Curl_all_content_encodings();
       if(!argptr)
@@ -595,7 +596,7 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
       }
     }
     else
-      result = Curl_setstropt((char **)&data->set.str[STRING_ENCODING], argptr_raw);
+      result = mm_Curl_setstropt(&data->set.str[STRING_ENCODING], argptr);
     break;
 
   case CURLOPT_TRANSFER_ENCODING:
@@ -1825,9 +1826,10 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
      * String that holds the SSL crypto engine.
      */
     /* Checked C */
-    argptr_raw = va_arg(param, char *);
+    argptr = va_arg(param, mm_array_ptr<char>);
+    argptr_raw = _GETCHARPTR(argptr);
     if(argptr_raw && argptr_raw[0]) {
-      result = Curl_setstropt((char **)&data->set.str[STRING_SSL_ENGINE], argptr_raw);
+      result = mm_Curl_setstropt(&data->set.str[STRING_SSL_ENGINE], argptr);
       if(!result) {
         result = Curl_ssl_set_engine(data, argptr_raw);
       }

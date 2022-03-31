@@ -72,7 +72,7 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
                             const unsigned char *uripath)
 {
   CURLcode result;
-  unsigned char *path = NULL;
+  mm_ptr<unsigned char> path = NULL;
   char *tmp = NULL;
   char *response;
   size_t len;
@@ -147,18 +147,18 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
     if(tmp) {
       size_t urilen = tmp - (char *)uripath;
       /* typecast is fine here since the value is always less than 32 bits */
-      path = (unsigned char *) aprintf("%.*s", (int)urilen, uripath);
+      path = (mm_array_ptr<unsigned char>)mmize_str(aprintf("%.*s", (int)urilen, uripath));
     }
   }
   if(!tmp)
-    path = (unsigned char *) strdup((char *) uripath);
+    path = (mm_array_ptr<unsigned char>)mm_strdup_from_raw((char *) uripath);
 
   if(!path)
     return CURLE_OUT_OF_MEMORY;
 
   result = Curl_auth_create_digest_http_message(data, userp, passwdp, request,
                                                 path, digest, &response, &len);
-  free(path);
+  MM_FREE(unsigned char, path);
   if(result)
     return result;
 

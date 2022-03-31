@@ -662,7 +662,7 @@ static CURLcode auth_create_digest_http_message(
                   mm_array_ptr<const char> userp,
                   mm_array_ptr<const char> passwdp,
                   const unsigned char *request,
-                  const unsigned char *uripath,
+                  mm_array_ptr<const unsigned char> uripath,
                   struct digestdata *digest,
                   char **outptr, size_t *outlen,
                   void (*convert_to_ascii)(unsigned char *, unsigned char *),
@@ -759,7 +759,7 @@ static CURLcode auth_create_digest_http_message(
     5.1.1 of RFC 2616)
   */
 
-  hashthis = aprintf("%s:%s", request, uripath);
+  hashthis = aprintf("%s:%s", request, _GETCHARPTR(uripath));
   if(!hashthis)
     return CURLE_OUT_OF_MEMORY;
 
@@ -831,7 +831,7 @@ static CURLcode auth_create_digest_http_message(
                        userp_quoted,
                        digest->realm,
                        digest->nonce,
-                       uripath,
+                       _GETCHARPTR(uripath),
                        digest->cnonce,
                        digest->nc,
                        digest->qop,
@@ -851,7 +851,7 @@ static CURLcode auth_create_digest_http_message(
                        userp_quoted,
                        digest->realm,
                        digest->nonce,
-                       uripath,
+                       _GETCHARPTR(uripath),
                        request_digest);
   }
   free(userp_quoted);
@@ -920,7 +920,7 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
                                               mm_array_ptr<const char> userp,
                                               mm_array_ptr<const char> passwdp,
                                               const unsigned char *request,
-                                              const unsigned char *uripath,
+                                              mm_array_ptr<const unsigned char> uripath,
                                               struct digestdata *digest,
                                               char **outptr, size_t *outlen)
 {

@@ -390,7 +390,7 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
                                               mm_array_ptr<const char> userp,
                                               mm_array_ptr<const char> passwdp,
                                               const unsigned char *request,
-                                              const unsigned char *uripath,
+                                              mm_array_ptr<const unsigned char> uripath,
                                               struct digestdata *digest,
                                               char **outptr, size_t *outlen)
 {
