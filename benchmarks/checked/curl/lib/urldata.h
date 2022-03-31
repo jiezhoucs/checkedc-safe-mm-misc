@@ -1424,15 +1424,15 @@ struct UrlState {
      killed. */
   struct dynamically_allocated_data {
     mm_array_ptr<char> proxyuserpwd;
-    char *uagent;
-    char *accept_encoding;
+    mm_array_ptr<char> uagent;
+    mm_array_ptr<char> accept_encoding;
     mm_array_ptr<char> userpwd;
-    char *rangeline;
-    char *ref;
+    mm_array_ptr<char> rangeline;
+    mm_array_ptr<char> ref;
     mm_array_ptr<char> host;
     mm_array_ptr<char> cookiehost;
-    char *rtsp_transport;
-    char *te; /* TE: request header */
+    mm_array_ptr<char> rtsp_transport;
+    mm_array_ptr<char> te; /* TE: request header */
 
     /* transfer credentials */
     mm_array_ptr<char> user;

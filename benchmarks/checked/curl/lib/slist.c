@@ -94,7 +94,6 @@ struct curl_slist *curl_slist_append(struct curl_slist *list,
   if(!dupdata)
     return NULL;
 
-  // TODO
   list = _GETPTR(struct curl_slist, Curl_slist_append_nodup(list, dupdata));
   if(!list)
     MM_FREE(char, dupdata);
@@ -113,7 +112,6 @@ struct curl_slist *Curl_slist_duplicate(struct curl_slist *inlist)
   struct curl_slist *tmp;
 
   while(inlist) {
-    // TODO
     tmp = _GETPTR(struct curl_slist, curl_slist_append(outlist, _GETCHARPTR(inlist->data)));
 
     if(!tmp) {

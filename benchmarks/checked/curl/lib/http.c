@@ -2069,7 +2069,7 @@ CURLcode Curl_http_useragent(struct Curl_easy *data)
      with the user-agent string specified, we erase the previously made string
      here. */
   if(Curl_checkheaders(data, "User-Agent")) {
-    free(data->state.aptr.uagent);
+    MM_FREE(char, data->state.aptr.uagent);
     data->state.aptr.uagent = NULL;
   }
   return CURLE_OK;
@@ -2282,7 +2282,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
 }
 
 CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
-                        Curl_HttpReq httpreq, const char **tep)
+                        Curl_HttpReq httpreq, mm_array_ptr<const char> *tep)
 {
   CURLcode result = CURLE_OK;
   mm_array_ptr<const char> ptr = NULL;
@@ -2771,24 +2771,24 @@ CURLcode Curl_http_range(struct Curl_easy *data,
     if(((httpreq == HTTPREQ_GET) || (httpreq == HTTPREQ_HEAD)) &&
        !Curl_checkheaders(data, "Range")) {
       /* if a line like this was already allocated, free the previous one */
-      free(data->state.aptr.rangeline);
-      data->state.aptr.rangeline = aprintf("Range: bytes=%s\r\n",
-                                           _GETCHARPTR(data->state.range));
+      MM_FREE(char, data->state.aptr.rangeline);
+      data->state.aptr.rangeline = mmize_str(aprintf("Range: bytes=%s\r\n",
+                                           _GETCHARPTR(data->state.range)));
     }
     else if((httpreq == HTTPREQ_POST || httpreq == HTTPREQ_PUT) &&
             !Curl_checkheaders(data, "Content-Range")) {
 
       /* if a line like this was already allocated, free the previous one */
-      free(data->state.aptr.rangeline);
+      MM_FREE(char, data->state.aptr.rangeline);
 
       if(data->set.set_resume_from < 0) {
         /* Upload resume was asked for, but we don't know the size of the
            remote part so we tell the server (and act accordingly) that we
            upload the whole file (again) */
         data->state.aptr.rangeline =
-          aprintf("Content-Range: bytes 0-%" CURL_FORMAT_CURL_OFF_T
+          mmize_str(aprintf("Content-Range: bytes 0-%" CURL_FORMAT_CURL_OFF_T
                   "/%" CURL_FORMAT_CURL_OFF_T "\r\n",
-                  data->state.infilesize - 1, data->state.infilesize);
+                  data->state.infilesize - 1, data->state.infilesize));
 
       }
       else if(data->state.resume_from) {
@@ -2796,17 +2796,17 @@ CURLcode Curl_http_range(struct Curl_easy *data,
         curl_off_t total_expected_size =
           data->state.resume_from + data->state.infilesize;
         data->state.aptr.rangeline =
-          aprintf("Content-Range: bytes %s%" CURL_FORMAT_CURL_OFF_T
+          mmize_str(aprintf("Content-Range: bytes %s%" CURL_FORMAT_CURL_OFF_T
                   "/%" CURL_FORMAT_CURL_OFF_T "\r\n",
                   _GETCHARPTR(data->state.range), total_expected_size-1,
-                  total_expected_size);
+                  total_expected_size));
       }
       else {
         /* Range was selected and then we just pass the incoming range and
            append total size */
         data->state.aptr.rangeline =
-          aprintf("Content-Range: bytes %s/%" CURL_FORMAT_CURL_OFF_T "\r\n",
-                  _GETCHARPTR(data->state.range), data->state.infilesize);
+          mmize_str(aprintf("Content-Range: bytes %s/%" CURL_FORMAT_CURL_OFF_T "\r\n",
+                  _GETCHARPTR(data->state.range), data->state.infilesize));
       }
       if(!data->state.aptr.rangeline)
         return CURLE_OUT_OF_MEMORY;
@@ -2985,7 +2985,7 @@ CURLcode Curl_transferencode(struct Curl_easy *data)
     mm_array_ptr<char> cptr = Curl_checkheaders(data, "Connection");
 #define TE_HEADER "TE: gzip\r\n"
 
-    Curl_safefree(data->state.aptr.te);
+    mm_Curl_safefree(char, data->state.aptr.te);
 
     if(cptr) {
       cptr = Curl_copy_header_value(cptr);
@@ -2994,9 +2994,9 @@ CURLcode Curl_transferencode(struct Curl_easy *data)
     }
 
     /* Create the (updated) Connection: header */
-    data->state.aptr.te = aprintf("Connection: %s%sTE\r\n" TE_HEADER,
+    data->state.aptr.te = mmize_str(aprintf("Connection: %s%sTE\r\n" TE_HEADER,
                                 _GETCHARPTR(cptr) ? _GETCHARPTR(cptr) : "",
-                                (_GETCHARPTR(cptr) && *cptr) ? ", ":"");
+                                (_GETCHARPTR(cptr) && *cptr) ? ", ":""));
 
     MM_FREE(char, cptr);
     if(!data->state.aptr.te)
@@ -3018,11 +3018,11 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
   CURLcode result = CURLE_OK;
   mm_ptr<struct HTTP> http = NULL;
   Curl_HttpReq httpreq;
-  const char *te = ""; /* transfer-encoding */
+  mm_array_ptr<const char> te = ""; /* transfer-encoding */
   mm_array_ptr<const char> request = NULL;
   const char *httpstring;
   struct dynbuf req;
-  char *altused = NULL;
+  mm_array_ptr<char> altused = NULL;
   const char *p_accept;      /* Accept: string */
 
   /* Always consider the DO phase done after this function call, even if there
@@ -3103,23 +3103,23 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
       return result;
   }
 
-  Curl_safefree(data->state.aptr.ref);
+  mm_Curl_safefree(char, data->state.aptr.ref);
   if(data->state.referer && !Curl_checkheaders(data, "Referer")) {
-    data->state.aptr.ref = aprintf("Referer: %s\r\n", data->state.referer);
+    data->state.aptr.ref = mmize_str(aprintf("Referer: %s\r\n", data->state.referer));
     if(!data->state.aptr.ref)
       return CURLE_OUT_OF_MEMORY;
   }
 
   if(!Curl_checkheaders(data, "Accept-Encoding") &&
      data->set.str[STRING_ENCODING]) {
-    Curl_safefree(data->state.aptr.accept_encoding);
+    mm_Curl_safefree(char, data->state.aptr.accept_encoding);
     data->state.aptr.accept_encoding =
-      aprintf("Accept-Encoding: %s\r\n", _GETCHARPTR(data->set.str[STRING_ENCODING]));
+      mmize_str(aprintf("Accept-Encoding: %s\r\n", _GETCHARPTR(data->set.str[STRING_ENCODING])));
     if(!data->state.aptr.accept_encoding)
       return CURLE_OUT_OF_MEMORY;
   }
   else
-    Curl_safefree(data->state.aptr.accept_encoding);
+    mm_Curl_safefree(char, data->state.aptr.accept_encoding);
 
 #ifdef HAVE_LIBZ
   /* we only consider transfer-encoding magic if libz support is built-in */
@@ -3163,8 +3163,8 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
 
 #ifndef CURL_DISABLE_ALTSVC
   if(conn->bits.altused && !Curl_checkheaders(data, "Alt-Used")) {
-    altused = aprintf("Alt-Used: %s:%d\r\n",
-                      _GETCHARPTR(conn->conn_to_host.name), conn->conn_to_port);
+    altused = mmize_str(aprintf("Alt-Used: %s:%d\r\n",
+                      _GETCHARPTR(conn->conn_to_host.name), conn->conn_to_port));
     if(!altused) {
       Curl_dyn_free(&req);
       return CURLE_OUT_OF_MEMORY;
@@ -3193,19 +3193,19 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
                   _GETCHARPTR(data->state.aptr.proxyuserpwd):"",
                   data->state.aptr.userpwd?_GETCHARPTR(data->state.aptr.userpwd):"",
                   (data->state.use_range && data->state.aptr.rangeline)?
-                  data->state.aptr.rangeline:"",
+                  _GETCHARPTR(data->state.aptr.rangeline):"",
                   (data->set.str[STRING_USERAGENT] &&
                    *data->set.str[STRING_USERAGENT] &&
                    data->state.aptr.uagent)?
-                  data->state.aptr.uagent:"",
+                  _GETCHARPTR(data->state.aptr.uagent):"",
                   p_accept?p_accept:"",
-                  data->state.aptr.te?data->state.aptr.te:"",
+                  data->state.aptr.te?_GETCHARPTR(data->state.aptr.te):"",
                   (data->set.str[STRING_ENCODING] &&
                    *data->set.str[STRING_ENCODING] &&
                    data->state.aptr.accept_encoding)?
-                  data->state.aptr.accept_encoding:"",
+                  _GETCHARPTR(data->state.aptr.accept_encoding):"",
                   (data->state.referer && data->state.aptr.ref)?
-                  data->state.aptr.ref:"" /* Referer: <data> */,
+                  _GETCHARPTR(data->state.aptr.ref):"" /* Referer: <data> */,
 #ifndef CURL_DISABLE_PROXY
                   (conn->bits.httpproxy &&
                    !conn->bits.tunnel_proxy &&
@@ -3215,15 +3215,15 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
 #else
                   "",
 #endif
-                  te,
-                  altused ? altused : ""
+                  _GETCHARPTR(te),
+                  altused ? _GETCHARPTR(altused) : ""
       );
 
   /* clear userpwd and proxyuserpwd to avoid re-using old credentials
    * from re-used connections */
   mm_Curl_safefree(char, data->state.aptr.userpwd);
   mm_Curl_safefree(char, data->state.aptr.proxyuserpwd);
-  free(altused);
+  MM_FREE(char, altused);
 
   if(result) {
     Curl_dyn_free(&req);

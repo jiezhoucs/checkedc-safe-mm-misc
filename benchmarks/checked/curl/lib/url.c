@@ -451,15 +451,15 @@ CURLcode Curl_close(struct Curl_easy **datap)
   }
 
   mm_Curl_safefree(char, data->state.aptr.proxyuserpwd);
-  Curl_safefree(data->state.aptr.uagent);
+  mm_Curl_safefree(char, data->state.aptr.uagent);
   mm_Curl_safefree(char, data->state.aptr.userpwd);
-  Curl_safefree(data->state.aptr.accept_encoding);
-  Curl_safefree(data->state.aptr.te);
-  Curl_safefree(data->state.aptr.rangeline);
-  Curl_safefree(data->state.aptr.ref);
+  mm_Curl_safefree(char, data->state.aptr.accept_encoding);
+  mm_Curl_safefree(char, data->state.aptr.te);
+  mm_Curl_safefree(char, data->state.aptr.rangeline);
+  mm_Curl_safefree(char, data->state.aptr.ref);
   mm_Curl_safefree(char, data->state.aptr.host);
   mm_Curl_safefree(char, data->state.aptr.cookiehost);
-  Curl_safefree(data->state.aptr.rtsp_transport);
+  mm_Curl_safefree(char, data->state.aptr.rtsp_transport);
   mm_Curl_safefree(char, data->state.aptr.user);
   mm_Curl_safefree(char, data->state.aptr.passwd);
   mm_Curl_safefree(char, data->state.aptr.proxyuser);
@@ -467,8 +467,8 @@ CURLcode Curl_close(struct Curl_easy **datap)
 
 #ifndef CURL_DISABLE_DOH
   if(data->req.doh) {
-    Curl_dyn_free(_GETDYNBUFPTR(&data->req.doh->probe[0].serverdoh));
-    Curl_dyn_free(_GETDYNBUFPTR(&data->req.doh->probe[1].serverdoh));
+    mm_Curl_dyn_free(&data->req.doh->probe[0].serverdoh);
+    mm_Curl_dyn_free(&data->req.doh->probe[1].serverdoh);
     curl_slist_free_all(data->req.doh->headers);
     mm_Curl_safefree(struct dohdata, data->req.doh);
   }

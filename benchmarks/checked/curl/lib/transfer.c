@@ -1513,9 +1513,9 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
    * protocol.
    */
   if(data->set.str[STRING_USERAGENT]) {
-    Curl_safefree(data->state.aptr.uagent);
+    mm_Curl_safefree(char, data->state.aptr.uagent);
     data->state.aptr.uagent =
-      aprintf("User-Agent: %s\r\n", _GETCHARPTR(data->set.str[STRING_USERAGENT]));
+      mmize_str(aprintf("User-Agent: %s\r\n", _GETCHARPTR(data->set.str[STRING_USERAGENT])));
     if(!data->state.aptr.uagent)
       return CURLE_OUT_OF_MEMORY;
   }

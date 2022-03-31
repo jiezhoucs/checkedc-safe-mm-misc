@@ -2039,7 +2039,6 @@ CURLUcode mm_curl_url_set(CURLU *u, CURLUPart what,
         /* Skip hostname check, it's allowed to be empty. */
       }
       else {
-        // TODO
         if(hostname_check(u, (char *)newp)) {
           MM_FREE(char, newp);
           return CURLUE_MALFORMED_INPUT;

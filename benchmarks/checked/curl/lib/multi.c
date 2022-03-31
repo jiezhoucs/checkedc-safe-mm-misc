@@ -1880,7 +1880,6 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
         data->state.async.done = TRUE;
 #endif
         result = CURLE_OK;
-        // TODO
         infof(data, "Hostname '%s' was found in DNS cache", _GETCHARPTR(hostname));
       }
 
