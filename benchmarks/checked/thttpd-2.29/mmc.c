@@ -213,7 +213,7 @@ mmc_map( char* filename, mm_ptr<struct stat> sbP, struct timeval* nowP )
 	    {
 	    syslog( LOG_ERR, "mmap - %m" );
 	    (void) close( fd );
-	    free( (void*) m );
+	    MM_FREE(Map, m);
 	    --alloc_count;
 	    return (void*) 0;
 	    }
@@ -232,7 +232,7 @@ mmc_map( char* filename, mm_ptr<struct stat> sbP, struct timeval* nowP )
 	    {
 	    syslog( LOG_ERR, "out of memory storing a file" );
 	    (void) close( fd );
-	    free( (void*) m );
+	    MM_FREE(Map, m);
 	    --alloc_count;
 	    return (void*) 0;
 	    }
@@ -240,7 +240,7 @@ mmc_map( char* filename, mm_ptr<struct stat> sbP, struct timeval* nowP )
 	    {
 	    syslog( LOG_ERR, "read - %m" );
 	    (void) close( fd );
-	    free( (void*) m );
+	    MM_FREE(Map, m);
 	    --alloc_count;
 	    return (void*) 0;
 	    }
@@ -252,7 +252,7 @@ mmc_map( char* filename, mm_ptr<struct stat> sbP, struct timeval* nowP )
     if ( add_hash( m ) < 0 )
 	{
 	syslog( LOG_ERR, "add_hash() failure" );
-	free( (void*) m );
+	MM_FREE(Map, m);
 	--alloc_count;
 	return (void*) 0;
 	}
@@ -341,7 +341,7 @@ mmc_cleanup( struct timeval* nowP )
 	m = free_maps;
 	free_maps = m->next;
 	--free_count;
-	free( (void*) m );
+	MM_FREE(Map, m);
 	--alloc_count;
 	}
     }
@@ -379,7 +379,7 @@ really_unmap( mm_ptr<mm_ptr<Map>> mm )
 	if ( munmap( m->addr, m->size ) < 0 )
 	    syslog( LOG_ERR, "munmap - %m" );
 #else /* HAVE_MMAP */
-	free( (void*) m->addr );
+	MM_FREE(char,  m->addr );
 #endif /* HAVE_MMAP */
 	}
     /* Update the total byte count. */
@@ -409,7 +409,7 @@ mmc_term( void )
 	m = free_maps;
 	free_maps = m->next;
 	--free_count;
-	free( (void*) m );
+	MM_FREE(Map, m);
 	--alloc_count;
 	}
     }
@@ -434,7 +434,7 @@ check_hash_size( void )
     else
 	{
 	/* No, got to expand. */
-	free( (void*) hash_table );
+	MM_FREE( mm_ptr<Map>, hash_table );
 	/* Double the hash size until it's big enough. */
 	do
 	    {

@@ -212,20 +212,20 @@ check_options( void )
 static void
 free_httpd_server( mm_ptr<httpd_server> hs ) {
     // All the to-be-freed objects except hs were allocated by strdup.
-    if ( hs->binding_hostname != (char*) 0 )
-	free( (void*) hs->binding_hostname );
-    if ( hs->cwd != (char*) 0 )
+    if ( hs->binding_hostname != NULL )
+	MM_FREE( char, hs->binding_hostname );
+    if ( hs->cwd != NULL)
 	free( (void*) hs->cwd );
-    if ( hs->cgi_pattern != (char*) 0 )
+    if ( hs->cgi_pattern != NULL)
 	free( (void*) hs->cgi_pattern );
-    if ( hs->charset != (char*) 0 )
+    if ( hs->charset != NULL)
 	free( (void*) hs->charset );
-    if ( hs->p3p != (char*) 0 )
+    if ( hs->p3p != NULL)
 	free( (void*) hs->p3p );
-    if ( hs->url_pattern != (char*) 0 )
+    if ( hs->url_pattern != NULL)
 	free( (void*) hs->url_pattern );
-    if ( hs->local_pattern != (char*) 0 )
-	free( (void*) hs->local_pattern );
+    if ( hs->local_pattern != NULL)
+	MM_FREE(char, hs->local_pattern );
     mm_free<httpd_server>(hs);
     }
 
@@ -252,11 +252,11 @@ httpd_initialize(
 	return NULL;
 	}
 
-    if ( hostname != (char*) 0 )
+    if ( hostname != NULL)
 	{
         // Should we do something about strdup?
-	hs->binding_hostname = strdup( hostname );
-	if ( hs->binding_hostname == (char*) 0 )
+	hs->binding_hostname = mm_strdup_from_raw( hostname );
+	if ( hs->binding_hostname == NULL )
 	    {
 	    syslog( LOG_CRIT, "out of memory copying hostname" );
 	    return NULL;
@@ -265,15 +265,15 @@ httpd_initialize(
 	}
     else
 	{
-	hs->binding_hostname = (char*) 0;
-	hs->server_hostname = (char*) 0;
+	hs->binding_hostname = NULL;
+	hs->server_hostname = NULL;
 	if ( gethostname( ghnbuf, sizeof(ghnbuf) ) < 0 )
 	    ghnbuf[0] = '\0';
 #ifdef SERVER_NAME_LIST
 	if ( ghnbuf[0] != '\0' )
 	    hs->server_hostname = hostname_map( ghnbuf );
 #endif /* SERVER_NAME_LIST */
-	if ( hs->server_hostname == (char*) 0 )
+	if ( hs->server_hostname == NULL )
 	    {
 #ifdef SERVER_NAME
 	    hs->server_hostname = SERVER_NAME;
@@ -285,7 +285,7 @@ httpd_initialize(
 	}
 
     hs->port = port;
-    if ( cgi_pattern == (char*) 0 )
+    if ( cgi_pattern == NULL)
 	hs->cgi_pattern = (char*) 0;
     else
 	{
@@ -293,13 +293,13 @@ httpd_initialize(
 	if ( cgi_pattern[0] == '/' )
 	    ++cgi_pattern;
 	hs->cgi_pattern = strdup( cgi_pattern );
-	if ( hs->cgi_pattern == (char*) 0 )
+	if ( hs->cgi_pattern == NULL)
 	    {
 	    syslog( LOG_CRIT, "out of memory copying cgi_pattern" );
 	    return NULL;
 	    }
 	/* Nuke any leading slashes in the cgi pattern. */
-	while ( ( cp = strstr( hs->cgi_pattern, "|/" ) ) != (char*) 0 )
+	while ( ( cp = strstr( hs->cgi_pattern, "|/" ) ) != NULL)
 	    (void) ol_strcpy( cp + 1, cp + 2 );
 	}
     hs->cgi_limit = cgi_limit;
@@ -308,28 +308,28 @@ httpd_initialize(
     hs->p3p = strdup( p3p );
     hs->max_age = max_age;
     hs->cwd = strdup( cwd );
-    if ( hs->cwd == (char*) 0 )
+    if ( hs->cwd == NULL)
 	{
 	syslog( LOG_CRIT, "out of memory copying cwd" );
 	return NULL;
 	}
-    if ( url_pattern == (char*) 0 )
+    if ( url_pattern == NULL)
 	hs->url_pattern = (char*) 0;
     else
 	{
 	hs->url_pattern = strdup( url_pattern );
-	if ( hs->url_pattern == (char*) 0 )
+	if ( hs->url_pattern == NULL)
 	    {
 	    syslog( LOG_CRIT, "out of memory copying url_pattern" );
 	    return NULL;
 	    }
 	}
-    if ( local_pattern == (char*) 0 )
-	hs->local_pattern = (char*) 0;
+    if ( local_pattern == NULL)
+	hs->local_pattern = NULL;
     else
 	{
-	hs->local_pattern = strdup( local_pattern );
-	if ( hs->local_pattern == (char*) 0 )
+	hs->local_pattern = mm_strdup_from_raw( local_pattern );
+	if ( hs->local_pattern == NULL)
 	    {
 	    syslog( LOG_CRIT, "out of memory copying local_pattern" );
 	    return NULL;
@@ -365,7 +365,7 @@ httpd_initialize(
     init_mime();
 
     /* Done initializing. */
-    if ( hs->binding_hostname == (char*) 0 )
+    if ( hs->binding_hostname == NULL )
 	syslog(
 	    LOG_NOTICE, "%.80s starting on port %d", SERVER_SOFTWARE,
 	    (int) hs->port );
@@ -735,7 +735,7 @@ httpd_realloc_str( char** strP, size_t* maxsizeP, size_t size )
 	}
     else
 	return;
-    if ( *strP == (char*) 0 )
+    if ( *strP == NULL)
 	{
 	syslog(
 	    LOG_ERR, "out of memory reallocating a string to %ld bytes",
@@ -1106,7 +1106,7 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
     authinfo[l] = '\0';
     /* Split into user and password. */
     authpass = strchr( authinfo, ':' );
-    if ( authpass == (char*) 0 )
+    if ( authpass == NULL)
 	{
 	/* No colon?  Bogus auth info. */
 	send_authenticate( hc, dirname );
@@ -1115,7 +1115,7 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
     *authpass++ = '\0';
     /* If there are more fields, cut them off. */
     colon = strchr( authpass, ':' );
-    if ( colon != (char*) 0 )
+    if ( colon != NULL)
 	*colon = '\0';
 
     /* See if we have a cached entry and can use it. */
@@ -1156,7 +1156,7 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
 	}
 
     /* Read it. */
-    while ( fgets( line, sizeof(line), fp ) != (char*) 0 )
+    while ( fgets( line, sizeof(line), fp ) != NULL)
 	{
 	/* Nuke newline. */
 	l = strlen( line );
@@ -1164,7 +1164,7 @@ auth_check2( mm_ptr<httpd_conn> hc, char* dirname  )
 	    line[l - 1] = '\0';
 	/* Split into user and encrypted password. */
 	cryp = strchr( line, ':' );
-	if ( cryp == (char*) 0 )
+	if ( cryp == NULL)
 	    continue;
 	*cryp++ = '\0';
 	/* Is this the right user? */
@@ -1221,7 +1221,7 @@ send_dirredirect( mm_ptr<httpd_conn> hc )
     if ( hc->query[0] != '\0')
 	{
 	char* cp = strchr(_GETARRAYPTR(char, hc->encodedurl), '?' );
-	if ( cp != (char*) 0 )	/* should always find it */
+	if ( cp != NULL)	/* should always find it */
 	    *cp = '\0';
 	mm_httpd_realloc_str(
 	    &location, &maxlocation,
@@ -1302,7 +1302,7 @@ strencode( char* to, int tosize, char* from )
 
     for ( tolen = 0; *from != '\0' && tolen + 4 < tosize; ++from )
 	{
-	if ( isalnum(*from) || strchr( "/_.-~", *from ) != (char*) 0 )
+	if ( isalnum(*from) || strchr( "/_.-~", *from ) != NULL)
 	    {
 	    *to = *from;
 	    ++to;
@@ -1359,7 +1359,7 @@ tilde_map_2( httpd_conn* hc )
     mm_httpd_realloc_str( &temp, &maxtemp, strlen( hc->expnfilename ) - 1 );
     (void) strcpy( _GETARRAYPTR(char, temp), &hc->expnfilename[1] );
     cp = strchr( _GETARRAYPTR(char, temp), '/' );
-    if ( cp != (char*) 0 )
+    if ( cp != NULL)
 	*cp++ = '\0';
     else
 	cp = "";
@@ -1483,7 +1483,7 @@ vhost_map( mm_ptr<httpd_conn> hc )
 
 
 /* Expands all symlinks in the given filename, eliding ..'s and leading /'s.
-** Returns the expanded path (pointer to static string), or (char*) 0 on
+** Returns the expanded path (pointer to static string), or NULLon
 ** errors.  Also returns, in the string pointed to by restP, any trailing
 ** parts of the path that don't exist.
 **
@@ -1567,7 +1567,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 
 	/* Grab one component from r and transfer it to checked. */
 	cp1 = strchr(_GETARRAYPTR(char, r), '/' );
-	if ( cp1 != (char*) 0 )
+	if ( cp1 != NULL)
 	    {
 	    i = cp1 - (char *)_GETARRAYPTR(char, r);
 	    if ( i == 0 )
@@ -1583,7 +1583,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 		if ( checkedlen != 0 )
 		    {
 		    cp2 = strrchr( _GETARRAYPTR(char, checked), '/' );
-		    if ( cp2 == (char*) 0 )
+		    if ( cp2 == NULL)
 			checkedlen = 0;
 		    else if ( cp2 == _GETARRAYPTR(char, checked))
 			checkedlen = 1;
@@ -1612,7 +1612,7 @@ expand_symlinks(char *path, mm_ptr<mm_array_ptr<char>> restP, int no_symlink_che
 		if ( checkedlen != 0 )
 		    {
 		    cp2 = strrchr( _GETARRAYPTR(char, checked), '/' );
-		    if ( cp2 == (char*) 0 )
+		    if ( cp2 == NULL)
 			checkedlen = 0;
 		    else if ( cp2 == (char *)_GETARRAYPTR(char, checked))
 			checkedlen = 1;
@@ -2011,7 +2011,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
     *url++ = '\0';
     url += strspn(_GETARRAYPTR(char, url), " \t\012\015" );
     protocol = strpbrk(_GETARRAYPTR(char, url), " \t\012\015" );
-    if ( protocol == (char*) 0 )
+    if ( protocol == NULL)
 	{
 	protocol = "HTTP/0.9";
 	hc->mime_flag = 0;
@@ -2023,7 +2023,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 	if ( *protocol != '\0' )
 	    {
 	    eol = strpbrk( protocol, " \t\012\015" );
-	    if ( eol != (char*) 0 )
+	    if ( eol != NULL)
 		*eol = '\0';
 	    if ( strcasecmp( protocol, "HTTP/1.0" ) != 0 )
 		hc->one_one = 1;
@@ -2048,7 +2048,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 	    return -1;
 	    }
 	*url = '\0';
-	if ( strchr( _GETARRAYPTR(char, reqhost), '/' ) != (char*) 0 || reqhost[0] == '.' )
+	if ( strchr( _GETARRAYPTR(char, reqhost), '/' ) != NULL|| reqhost[0] == '.' )
 	    {
 	    httpd_send_err( hc, 400, httpd_err400title, "", httpd_err400form, "" );
 	    return -1;
@@ -2152,7 +2152,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
         cp = _create_mm_array_ptr<char>(hc->hdrhost, raw_cp);
 		if ( cp != NULL )
 		    *cp = '\0';
-		if ( strchr(_GETARRAYPTR(char, hc->hdrhost), '/' ) != (char*) 0 || hc->hdrhost[0] == '.' )
+		if ( strchr(_GETARRAYPTR(char, hc->hdrhost), '/' ) != NULL|| hc->hdrhost[0] == '.' )
 		    {
 		    httpd_send_err( hc, 400, httpd_err400title, "", httpd_err400form, "" );
 		    return -1;
@@ -2223,7 +2223,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 	    else if ( strncasecmp(_GETARRAYPTR(char, buf), "Range:", 6 ) == 0 )
 		{
 		/* Only support %d- and %d-%d, not %d-%d,%d-%d or -%d. */
-		if ( strchr(_GETARRAYPTR(char, buf), ',' ) == (char*) 0 )
+		if ( strchr(_GETARRAYPTR(char, buf), ',' ) == NULL)
 		    {
 		    char* cp_dash;
 		    raw_cp = strpbrk(_GETARRAYPTR(char, buf), "=" );
@@ -2231,7 +2231,7 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 		    if ( cp != NULL )
 			{
 			cp_dash = strchr(_GETARRAYPTR(char, cp + 1), '-' );
-			if ( cp_dash != (char*) 0 && cp_dash != _GETARRAYPTR(char, cp + 1))
+			if ( cp_dash != NULL&& cp_dash != _GETARRAYPTR(char, cp + 1))
 			    {
 			    *cp_dash = '\0';
 			    hc->got_range = 1;
@@ -2469,7 +2469,7 @@ de_dotdot( mm_array_ptr<char> mm_file )
     char *file = _GETARRAYPTR(char, mm_file);
 
     /* Collapse any multiple / sequences. */
-    while ( ( cp = strstr( file, "//") ) != (char*) 0 )
+    while ( ( cp = strstr( file, "//") ) != NULL)
 	{
 	for ( cp2 = cp + 2; *cp2 == '/'; ++cp2 )
 	    continue;
@@ -2479,7 +2479,7 @@ de_dotdot( mm_array_ptr<char> mm_file )
     /* Remove leading ./ and any /./ sequences. */
     while ( strncmp( file, "./", 2 ) == 0 )
 	(void) ol_strcpy( file, file + 2 );
-    while ( ( cp = strstr( file, "/./") ) != (char*) 0 )
+    while ( ( cp = strstr( file, "/./") ) != NULL)
 	(void) ol_strcpy( cp, cp + 2 );
 
     /* Alternate between removing leading ../ and removing xxx/../ */
@@ -2488,7 +2488,7 @@ de_dotdot( mm_array_ptr<char> mm_file )
 	while ( strncmp( file, "../", 3 ) == 0 )
 	    (void) ol_strcpy( file, file + 3 );
 	cp = strstr( file, "/../" );
-	if ( cp == (char*) 0 )
+	if ( cp == NULL)
 	    break;
 	for ( cp2 = cp - 1; cp2 >= file && *cp2 != '/'; --cp2 )
 	    continue;
@@ -2513,7 +2513,7 @@ httpd_close_conn( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     {
     make_log_entry( hc, nowP );
 
-    if ( hc->file_address != (char*) 0 )
+    if ( hc->file_address != NULL)
 	{
 	mmc_unmap( hc->file_address, &(hc->sb), nowP );
 	hc->file_address = (char*) 0;
@@ -2878,7 +2878,7 @@ mode  links    bytes  last-changed  name\n\
 			names = RENEW( names, char, maxnames * ( MAXPATHLEN + 1 ) );
 			nameptrs = RENEW( nameptrs, char*, maxnames );
 			}
-		    if ( names == (char*) 0 || nameptrs == (char**) 0 )
+		    if ( names == NULL|| nameptrs == (char**) 0 )
 			{
 			syslog( LOG_ERR, "out of memory reallocating directory names" );
 			exit( 1 );
@@ -3061,7 +3061,7 @@ build_env( char* fmt, char* arg )
 	mm_httpd_realloc_str( &buf, &maxbuf, size );
     (void) my_snprintf(_GETARRAYPTR(char, buf), maxbuf, fmt, arg );
     cp = strdup( _GETARRAYPTR(char, buf ));
-    if ( cp == (char*) 0 )
+    if ( cp == NULL)
 	{
 	syslog( LOG_ERR, "out of memory copying environment variable" );
 	exit( 1 );
@@ -3071,18 +3071,18 @@ build_env( char* fmt, char* arg )
 
 
 #ifdef SERVER_NAME_LIST
-static char*
+static mm_array_ptr<char>
 hostname_map( char* hostname )
     {
     int len, n;
-    static char* list[] = { SERVER_NAME_LIST };
+    static mm_array_ptr<char> list[] = { SERVER_NAME_LIST };
 
     len = strlen( hostname );
     for ( n = sizeof(list) / sizeof(*list) - 1; n >= 0; --n )
 	if ( strncasecmp( hostname, list[n], len ) == 0 )
 	    if ( list[n][len] == '/' )  /* check in case of a substring match */
 		return &list[n][len + 1];
-    return (char*) 0;
+    return NULL;
     }
 #endif /* SERVER_NAME_LIST */
 
@@ -3096,7 +3096,7 @@ make_envp( mm_ptr<httpd_conn> hc )
     {
     static char* envp[50];
     int envn;
-    char *cp;   /* no need to refactor cp */
+    mm_array_ptr<char> cp = NULL;   /* no need to refactor cp */
     char buf[256];
 
     envn = 0;
@@ -3106,15 +3106,16 @@ make_envp( mm_ptr<httpd_conn> hc )
 #endif /* CGI_LD_LIBRARY_PATH */
     envp[envn++] = build_env( "SERVER_SOFTWARE=%s", SERVER_SOFTWARE );
     if ( hc->hs->vhost && hc->hostname != NULL && hc->hostname[0] != '\0' )
-	cp = _GETARRAYPTR(char, hc->hostname);
+	cp = hc->hostname;
     else if ( hc->hdrhost != NULL && hc->hdrhost[0] != '\0' )
-	cp = _GETARRAYPTR(char, hc->hdrhost);
+	cp = hc->hdrhost;
     else if ( hc->reqhost != NULL && hc->reqhost[0] != '\0' )
-	cp = _GETARRAYPTR(char, hc->reqhost);
+	cp = hc->reqhost;
     else
 	cp = hc->hs->server_hostname;
-    if ( cp != (char*) 0 )
-	envp[envn++] = build_env( "SERVER_NAME=%s", cp );
+    if ( cp != NULL )
+        // TODO
+	envp[envn++] = build_env( "SERVER_NAME=%s", _GETCHARPTR(cp) );
     envp[envn++] = "GATEWAY_INTERFACE=CGI/1.1";
     envp[envn++] = build_env("SERVER_PROTOCOL=%s", hc->protocol);
     (void) my_snprintf( buf, sizeof(buf), "%d", (int) hc->hs->port );
@@ -3130,7 +3131,7 @@ make_envp( mm_ptr<httpd_conn> hc )
     // DISCUSS: No need to make cp2 an mmsafeptr as it is only passed to
     // my_snprintf which is basically a wrapper of two library functions.
 	cp2 = NEW( char, l );
-	if ( cp2 != (char*) 0 )
+	if ( cp2 != NULL)
 	    {
 	    (void) my_snprintf( cp2, l, "%s%s", hc->hs->cwd, _GETARRAYPTR(char, hc->pathinfo));
 	    envp[envn++] = build_env( "PATH_TRANSLATED=%s", cp2 );
@@ -3173,7 +3174,7 @@ make_envp( mm_ptr<httpd_conn> hc )
     if ( hc->authorization[0] != '\0' )
 	envp[envn++] = build_env( "AUTH_TYPE=%s", "Basic" );
 	/* We only support Basic auth at the moment. */
-    if ( getenv( "TZ" ) != (char*) 0 )
+    if ( getenv( "TZ" ) != NULL)
 	envp[envn++] = build_env( "TZ=%s", getenv( "TZ" ) );
     envp[envn++] = build_env( "CGI_PATTERN=%s", hc->hs->cgi_pattern );
 
@@ -3214,7 +3215,7 @@ make_argp( mm_ptr<httpd_conn> hc )
     ** character to determine if the command line is to be used, if it finds
     ** one, the command line is not to be used."
     */
-    if ( strchr( _GETARRAYPTR(char, hc->query), '=' ) == (char*) 0 )
+    if ( strchr( _GETARRAYPTR(char, hc->query), '=' ) == NULL)
 	{
 	for ( cp1 = cp2 = hc->query; *cp2 != '\0'; ++cp2 )
 	    {
@@ -3344,8 +3345,8 @@ cgi_interpose_output( mm_ptr<httpd_conn> hc, int rfd )
 	(void) memmove( _GETPTR(char, &(headers[headers_len])), buf, r );
 	headers_len += r;
 	headers[headers_len] = '\0';
-	if ( ( br = strstr(_GETARRAYPTR(char, headers), "\015\012\015\012" ) ) != (char*) 0 ||
-	     ( br = strstr(_GETARRAYPTR(char, headers), "\012\012" ) ) != (char*) 0 )
+	if ( ( br = strstr(_GETARRAYPTR(char, headers), "\015\012\015\012" ) ) != NULL||
+	     ( br = strstr(_GETARRAYPTR(char, headers), "\012\012" ) ) != NULL)
 	    break;
 	}
 
@@ -3364,11 +3365,11 @@ cgi_interpose_output( mm_ptr<httpd_conn> hc, int rfd )
 	cp += strcspn( cp, " \t" );
 	status = atoi( cp );
 	}
-    if ( ( cp = strstr( _GETARRAYPTR(char, headers), "Location:" ) ) != (char*) 0 &&
+    if ( ( cp = strstr( _GETARRAYPTR(char, headers), "Location:" ) ) != NULL&&
 	 cp < br &&
 	 ( cp == _GETARRAYPTR(char, headers) || *(cp-1) == '\012' ) )
 	status = 302;
-    if ( ( cp = strstr( _GETARRAYPTR(char, headers), "Status:" ) ) != (char*) 0 &&
+    if ( ( cp = strstr( _GETARRAYPTR(char, headers), "Status:" ) ) != NULL&&
 	 cp < br &&
 	 ( cp == _GETARRAYPTR(char, headers) || *(cp-1) == '\012' ) )
 	{
@@ -3587,12 +3588,12 @@ cgi_child( mm_ptr<httpd_conn> hc )
     ** spec, but it's what other HTTP servers do.
     */
     directory = strdup( _GETARRAYPTR(char, hc->expnfilename));
-    if ( directory == (char*) 0 )
+    if ( directory == NULL)
 	binary = _GETARRAYPTR(char, hc->expnfilename);      /* ignore errors */
     else
 	{
 	binary = strrchr( directory, '/' );
-	if ( binary == (char*) 0 )
+	if ( binary == NULL)
 	    binary = _GETARRAYPTR(char, hc->expnfilename);
 	else
 	    {
@@ -3791,7 +3792,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	*/
 	cp = _GETARRAYPTR(char, expand_symlinks( _GETARRAYPTR(char, indexname),
                 &pi, hc->hs->no_symlink_check, hc->tildemapped));
-	if ( cp == (char*) 0 || pi[0] != '\0' )
+	if ( cp == NULL|| pi[0] != '\0' )
 	    {
 	    httpd_send_err( hc, 500, err500title, "", err500form, hc->encodedurl );
 	    return -1;
@@ -3820,7 +3821,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     mm_httpd_realloc_str( &dirname, &maxdirname, expnlen );
     (void) strcpy( _GETARRAYPTR(char, dirname), _GETARRAYPTR(char, hc->expnfilename));
     cp = strrchr( _GETARRAYPTR(char, dirname), '/' );
-    if ( cp == (char*) 0 )
+    if ( cp == NULL)
 	(void) strcpy( _GETARRAYPTR(char, dirname), "." );
     else
 	*cp = '\0';
@@ -3864,7 +3865,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	return -1;
 
     /* Is it world-executable and in the CGI area? */
-    if ( hc->hs->cgi_pattern != (char*) 0 &&
+    if ( hc->hs->cgi_pattern != NULL&&
 	 ( hc->sb.st_mode & S_IXOTH ) &&
 	 match( hc->hs->cgi_pattern, _GETARRAYPTR(char, hc->expnfilename)) )
 	return cgi( hc );
@@ -3926,7 +3927,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     else
 	{
 	hc->file_address = mmc_map( _GETARRAYPTR(char, hc->expnfilename), &(hc->sb), nowP);
-	if ( hc->file_address == (char*) 0 )
+	if ( hc->file_address == NULL)
 	    {
 	    httpd_send_err( hc, 500, err500title, "", err500form, hc->encodedurl );
 	    return -1;
@@ -3981,7 +3982,7 @@ make_log_entry( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     if ( hc->hs->vhost && ! hc->tildemapped )
 	(void) my_snprintf(url, sizeof(url),
 	    "/%.100s%.200s",
-	    hc->hostname == NULL ? hc->hs->server_hostname : _GETARRAYPTR(char, hc->hostname),
+	    hc->hostname == NULL ? _GETCHARPTR(hc->hs->server_hostname) : _GETARRAYPTR(char, hc->hostname),
 	    _GETARRAYPTR(char, hc->encodedurl));
     else
 	(void) my_snprintf( url, sizeof(url),
@@ -4054,10 +4055,10 @@ static int
 check_referrer( mm_ptr<httpd_conn> hc )
     {
     int r;
-    char* cp;   /* No need to refactor cp */
+    mm_array_ptr<char> cp = NULL;   /* No need to refactor cp */
 
     /* Are we doing referrer checking at all? */
-    if ( hc->hs->url_pattern == (char*) 0 )
+    if ( hc->hs->url_pattern == NULL)
 	return 1;
 
     r = really_check_referrer( hc );
@@ -4065,14 +4066,14 @@ check_referrer( mm_ptr<httpd_conn> hc )
     if ( ! r )
 	{
 	if ( hc->hs->vhost && hc->hostname != NULL )
-	    cp = _GETARRAYPTR(char, hc->hostname);
+	    cp = hc->hostname;
 	else
 	    cp = hc->hs->server_hostname;
-	if ( cp == (char*) 0 )
+	if ( cp == NULL )
 	    cp = "";
 	syslog(
 	    LOG_INFO, "%.80s non-local referrer \"%.80s%.80s\" \"%.80s\"",
-	    _GETARRAYPTR(char, mm_httpd_ntoa( &hc->client_addr )), cp,
+	    _GETARRAYPTR(char, mm_httpd_ntoa( &hc->client_addr )), _GETCHARPTR(cp),
         _GETARRAYPTR(char, hc->encodedurl), _GETARRAYPTR(char, hc->referrer));
 	httpd_send_err(
 	    hc, 403, err403title, "",
@@ -4093,13 +4094,13 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
     char* cp3;
     static  mm_array_ptr<char> refhost = NULL;
     static  size_t refhost_size = 0;
-    char *lp;
+    mm_array_ptr<char> lp = NULL;
 
     hs = hc->hs;
 
     /* Check for an empty referrer. */
     if ( hc->referrer == NULL || hc->referrer[0] == '\0' ||
-	 ( cp1 = strstr( _GETARRAYPTR(char, hc->referrer), "//" ) ) == (char*) 0 )
+	 ( cp1 = strstr( _GETARRAYPTR(char, hc->referrer), "//" ) ) == NULL)
 	{
 	/* Disallow if we require a referrer and the url matches. */
 	if ( hs->no_empty_referrers && match( hs->url_pattern, _GETARRAYPTR(char, hc->origfilename)) )
@@ -4121,7 +4122,7 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
     *cp3 = '\0';
 
     /* Local pattern? */
-    if ( hs->local_pattern != (char*) 0 )
+    if ( hs->local_pattern != NULL)
 	lp = hs->local_pattern;
     else
 	{
@@ -4130,15 +4131,15 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
 	    {
 	    /* Not vhosting, use the server name. */
 	    lp = hs->server_hostname;
-	    if ( lp == (char*) 0 )
+	    if ( lp == NULL)
 		/* Couldn't figure out local hostname - give up. */
 		return 1;
 	    }
 	else
 	    {
 	    /* We are vhosting, use the hostname on this connection. */
-	    lp = _GETARRAYPTR(char, hc->hostname);
-	    if ( lp == (char*) 0 )
+	    lp = hc->hostname;
+	    if ( lp == NULL)
 		/* Oops, no hostname.  Maybe it's an old browser that
 		** doesn't send a Host: header.  We could figure out
 		** the default hostname for this IP address, but it's
@@ -4151,7 +4152,7 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
     /* If the referrer host doesn't match the local host pattern, and
     ** the filename does match the url pattern, it's an illegal reference.
     */
-    if ( ! match( lp, _GETARRAYPTR(char, refhost)) &&
+    if ( ! match( _GETCHARPTR(lp), _GETARRAYPTR(char, refhost)) &&
             match( hs->url_pattern, _GETARRAYPTR(char, hc->origfilename)) )
 	return 0;
     /* Otherwise ok. */

@@ -321,7 +321,7 @@ tmr_cleanup( void )
 	t = free_timers;
 	free_timers = t->next;
 	--free_count;
-	free( (void*) t );
+	MM_FREE(Timer, t);
 	--alloc_count;
 	}
     }

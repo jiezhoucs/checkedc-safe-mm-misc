@@ -76,8 +76,8 @@ typedef union {
 
 /* A server. */
 typedef struct {
-    char* binding_hostname;  // no need to be mmsafe ptr
-    char* server_hostname;   // no need to be mmsafe ptr
+    mm_array_ptr<char> binding_hostname;  // no need to be mmsafe ptr
+    mm_array_ptr<char> server_hostname;   // no need to be mmsafe ptr
     unsigned short port;
     char* cgi_pattern;
     int cgi_limit, cgi_count;
@@ -92,7 +92,7 @@ typedef struct {
     int vhost;
     int global_passwd;
     char* url_pattern;
-    char* local_pattern;
+    mm_array_ptr<char> local_pattern;
     int no_empty_referrers;
     } httpd_server;
 
