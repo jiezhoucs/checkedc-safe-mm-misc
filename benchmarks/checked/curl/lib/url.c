@@ -316,7 +316,7 @@ void Curl_freeset(struct Curl_easy *data)
   enum dupblob j;
 
   for(i = (enum dupstring)0; i < STRING_LAST; i++) {
-    MM_curl_free(char, data->set.str[i]);
+    mm_Curl_safefree(char, data->set.str[i]);
   }
 
   for(j = (enum dupblob)0; j < BLOB_LAST; j++) {
@@ -408,7 +408,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
 
   /* Close down all open SSL info and sessions */
   Curl_ssl_close_all(data);
-  MM_curl_free(char, data->state.first_host);
+  mm_Curl_safefree(char, data->state.first_host);
   mm_Curl_safefree(char, data->state.scratch);
   Curl_ssl_free_certinfo(data);
 
@@ -425,7 +425,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
   up_free(data);
   mm_Curl_safefree(char, data->state.buffer);
   Curl_dyn_free(&data->state.headerb);
-  MM_curl_free(char, data->state.ulbuf);
+  mm_Curl_safefree(char, data->state.ulbuf);
   Curl_flush_cookies(data, TRUE);
   Curl_altsvc_save(data, data->asi, data->set.str[STRING_ALTSVC]);
   Curl_altsvc_cleanup(&data->asi);
@@ -434,7 +434,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_CRYPTO_AUTH)
   Curl_http_auth_cleanup_digest(data);
 #endif
-  MM_curl_free(char, data->info.contenttype);
+  mm_Curl_safefree(char, data->info.contenttype);
   Curl_safefree(data->info.wouldredirect);
 
   /* this destroys the channel and we cannot use it anymore after this */
@@ -743,7 +743,7 @@ static void conn_shutdown(struct Curl_easy *data, struct connectdata *conn)
     /* If this was closed with a CONNECT in progress, cleanup this temporary
        struct arrangement */
     data->req.p.http = NULL;
-    MM_curl_free(struct HTTP, conn->connect_state->prot_save);
+    mm_Curl_safefree(struct HTTP, conn->connect_state->prot_save);
   }
 #endif
 

@@ -477,7 +477,7 @@ GetFileAndPassword(mm_array_ptr<char> nextarg, mm_ptr<mm_array_ptr<char>> file,
   mm_array_ptr<char> certname = NULL;
   mm_array_ptr<char> passphrase = NULL;
   parse_cert_parameter(nextarg, &certname, &passphrase);
-  MM_curl_free(char, *file);
+  mm_Curl_safefree(char, *file);
   *file = certname;
   if(passphrase) {
     mm_Curl_safefree(char, *password);

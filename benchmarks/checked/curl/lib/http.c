@@ -623,7 +623,7 @@ CURLcode Curl_http_auth_act(struct Curl_easy *data)
     /* In case this is GSS auth, the newurl field is already allocated so
        we must make sure to free it before allocating a new one. As figured
        out in bug #2284386 */
-    MM_curl_free(char, data->req.newurl);
+    mm_Curl_safefree(char, data->req.newurl);
     data->req.newurl = mm_strdup_from_raw(data->state.url); /* clone URL */
     if(!data->req.newurl)
       return CURLE_OUT_OF_MEMORY;
@@ -3444,7 +3444,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
       /* ignore empty data */
       MM_FREE(char, contenttype);
     else {
-      MM_curl_free(char, data->info.contenttype);
+      mm_Curl_safefree(char, data->info.contenttype);
       data->info.contenttype = contenttype;
     }
   }

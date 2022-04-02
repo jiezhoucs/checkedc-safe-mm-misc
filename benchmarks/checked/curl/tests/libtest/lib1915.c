@@ -55,7 +55,7 @@ static CURLSTScode hstsread(CURL *easy, struct curl_hstsentry *e,
   expire = preload_hosts[s->index++].exp;
 
   if(host && (strlen(host) < e->namelen)) {
-    strcpy(e->name, host);
+    strcpy(_GETCHARPTR(e->name), host);
     e->includeSubDomains = FALSE;
     strcpy(e->expire, expire);
     fprintf(stderr, "add '%s'\n", host);
@@ -81,7 +81,7 @@ static CURLSTScode hstswrite(CURL *easy, struct curl_hstsentry *e,
 {
   (void)easy;
   (void)userp;
-  printf("[%zu/%zu] %s %s\n", i->index, i->total, e->name, e->expire);
+  printf("[%zu/%zu] %s %s\n", i->index, i->total, _GETCHARPTR(e->name), e->expire);
   return CURLSTS_OK;
 }
 

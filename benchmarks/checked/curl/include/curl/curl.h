@@ -2502,7 +2502,7 @@ CURL_EXTERN void curl_formfree(struct curl_httppost *form);
  * Returns a malloc()'ed string that MUST be curl_free()ed after usage is
  * complete. DEPRECATED - see lib/README.curlx
  */
-CURL_EXTERN char *curl_getenv(const char *variable);
+CURL_EXTERN mm_array_ptr<char> curl_getenv(const char *variable);
 
 /*
  * NAME curl_version()

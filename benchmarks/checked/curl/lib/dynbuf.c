@@ -55,7 +55,7 @@ void Curl_dyn_init(struct dynbuf *s, size_t toobig)
 void Curl_dyn_free(struct dynbuf *s)
 {
   DEBUGASSERT(s);
-  MM_curl_free(char, s->bufr);
+  mm_Curl_safefree(char, s->bufr);
   s->leng = s->allc = 0;
 }
 
@@ -97,7 +97,7 @@ static CURLcode dyn_nappend(struct dynbuf *s,
        include that as well when it uses this code */
     mm_array_ptr<char> p = mm_array_realloc<char>(s->bufr, a);
     if(!p) {
-      MM_curl_free(char, s->bufr);
+      mm_Curl_safefree(char, s->bufr);
       s->leng = s->allc = 0;
       return CURLE_OUT_OF_MEMORY;
     }

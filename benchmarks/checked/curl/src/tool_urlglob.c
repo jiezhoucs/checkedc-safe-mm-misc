@@ -462,7 +462,7 @@ CURLcode glob_url(mm_ptr<mm_ptr<struct URLGlob>> glob, mm_array_ptr<char> url,
 
   glob_expand = MM_SINGLE_CALLOC(struct URLGlob);
   if(!glob_expand) {
-    MM_curl_free(char, glob_buffer);
+    mm_Curl_safefree(char, glob_buffer);
     return CURLE_OUT_OF_MEMORY;
   }
   glob_expand->urllen = mm_strlen(url);
@@ -516,8 +516,8 @@ void glob_cleanup(mm_ptr<struct URLGlob> glob)
       mm_Curl_safefree(mm_array_ptr<char>, glob->pattern[i].content.Set.elements);
     }
   }
-  MM_curl_free(char, glob->glob_buffer);
-  MM_curl_free(struct URLGlob, glob);
+  mm_Curl_safefree(char, glob->glob_buffer);
+  mm_Curl_safefree(struct URLGlob, glob);
 }
 
 CURLcode glob_next_url(mm_ptr<mm_array_ptr<char>> globbed, mm_ptr<struct URLGlob> glob)

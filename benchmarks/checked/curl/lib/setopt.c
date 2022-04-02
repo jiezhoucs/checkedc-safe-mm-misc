@@ -84,7 +84,7 @@ CURLcode mm_Curl_setstropt(mm_array_ptr<char> *charp, mm_array_ptr<const char> s
   /* Release the previous storage at `charp' and replace by a dynamic storage
      copy of `s'. Return CURLE_OK or CURLE_OUT_OF_MEMORY. */
 
-  MM_curl_free(char, *charp);
+  mm_Curl_safefree(char, *charp);
 
   if(s) {
     mm_array_ptr<char> str = mm_strdup(s);
@@ -162,13 +162,13 @@ static CURLcode setstropt_userpwd(char *option, mm_array_ptr<char> *userp,
           result = CURLE_OUT_OF_MEMORY;
       }
 
-      MM_curl_free(char, *userp);
+      mm_Curl_safefree(char, *userp);
       *userp = user;
     }
 
     /* Store the password part of option if required */
     if(passwdp) {
-      MM_curl_free(char, *passwdp);
+      mm_Curl_safefree(char, *passwdp);
       *passwdp = passwd;
     }
   }
@@ -2232,7 +2232,7 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
       arg = UPLOADBUFFER_MIN;
 
     data->set.upload_buffer_size = (unsigned int)arg;
-    MM_curl_free(char, data->state.ulbuf); /* force a realloc next opportunity */
+    mm_Curl_safefree(char, data->state.ulbuf); /* force a realloc next opportunity */
     break;
 
   case CURLOPT_NOSIGNAL:

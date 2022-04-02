@@ -572,8 +572,8 @@ static CURLcode multi_done(struct Curl_easy *data,
   Curl_resolver_kill(data);
 
   /* Cleanup possible redirect junk */
-  MM_curl_free(char, data->req.newurl);
-  MM_curl_free(char, data->req.location);
+  mm_Curl_safefree(char, data->req.newurl);
+  mm_Curl_safefree(char, data->req.location);
 
   switch(status) {
   case CURLE_ABORTED_BY_CALLBACK:
@@ -622,7 +622,7 @@ static CURLcode multi_done(struct Curl_easy *data,
     conn->dns_entry = NULL;
   }
   Curl_hostcache_prune(data);
-  MM_curl_free(char, data->state.ulbuf);
+  mm_Curl_safefree(char, data->state.ulbuf);
 
   /* if the transfer was completed in a paused state there can be buffered
      data left to free */
