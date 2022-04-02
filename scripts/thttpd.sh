@@ -8,8 +8,8 @@ EVAL_DIR=`realpath ../eval`
 DATA_DIR=$EVAL_DIR/data/thttpd
 BUILD_DIR=$EVAL_DIR/../../benchmark-build/thttpd
 
-REQUESTS=10000
-CONS=8
+REQUESTS=100000
+CONS=1
 HOST=http://127.0.0.1
 PORT=8080
 FILES=$HOST:$PORT/files
