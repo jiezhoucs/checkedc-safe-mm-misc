@@ -14,6 +14,9 @@
 #define mm_memcmp(s1,s2,n) memcmp(_GETCHARPTR(s1),_GETCHARPTR(s2),n)
 #define mm_memset(s,c,n) memset(_GETCHARPTR(s),c,n)
 #define mm_strcspn(s,r) strcspn(_GETCHARPTR(s),_GETCHARPTR(r))
+#define mm_strspn(s,a) strspn(_GETCHARPTR(s),a)
+#define mm_strcasecmp(s1,s2) strcasecmp(_GETCHARPTR(s1),_GETCHARPTR(s2))
+#define mm_strncasecmp(s1,s2,n) strncasecmp(_GETCHARPTR(s1),_GETCHARPTR(s2),n)
 /* file utilities */
 #define mm_fopen(p,m) fopen(_GETCHARPTR(p),m)
 #define mm_open(p,f) open(_GETCHARPTR(p),f)
@@ -35,6 +38,8 @@ mm_array_ptr<char> mm_memrchr(mm_array_ptr<const char> s, int c, size_t n);
 void mm_qsort(mm_array_ptr<mm_ptr<void>> base, size_t nmemb, size_t size,
     int (*compar)(const void *, const void *));
 
+mm_array_ptr<char> mm_strpbrk(mm_array_ptr<const char> p, const char *accept);
+mm_array_ptr<char> mm_strstr(mm_array_ptr<const char> p, const char *needle);
 unsigned long int mm_strtoul(mm_array_ptr<const char> nptr, mm_array_ptr<char> *endptr, int base);
 long int mm_strtol(mm_array_ptr<const char> nptr, mm_array_ptr<char> *endptr, int base);
 double mm_strtod(mm_array_ptr<const char> nptr, mm_array_ptr<char> *endptr);

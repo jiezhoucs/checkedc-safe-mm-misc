@@ -110,7 +110,7 @@ typedef struct {
     off_t bytes_sent;
     mm_array_ptr<char> encodedurl;
     mm_array_ptr<char> decodedurl;
-    char *protocol;
+    mm_array_ptr<char> protocol;
     mm_array_ptr<char> origfilename;
     mm_array_ptr<char> expnfilename;
     mm_array_ptr<char> encodings;
@@ -139,7 +139,7 @@ typedef struct {
     size_t responselen;
     time_t if_modified_since, range_if;
     size_t contentlength;
-    char *type;		/* not malloc()ed */
+    char *type;		/* Only point to global. */
     mm_array_ptr<char> hostname;
     int mime_flag;
     int one_one;	/* HTTP/1.1 or better */
@@ -150,7 +150,7 @@ typedef struct {
     int should_linger;
     struct stat sb;
     int conn_fd;
-    char* file_address;
+    char* file_address;  /* mmap related */
 } httpd_conn;
 
 /* Methods. */

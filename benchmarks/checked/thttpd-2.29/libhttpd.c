@@ -659,7 +659,7 @@ send_mime( mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char> en
 	    fixed_type, sizeof(fixed_type), type, _GETCHARPTR(hc->hs->charset) );
 	(void) my_snprintf( (char *)buf, sizeof(buf),
 	    "%.20s %d %s\015\012Server: %s\015\012Content-Type: %s\015\012Date: %s\015\012Last-Modified: %s\015\012Accept-Ranges: bytes\015\012Connection: close\015\012",
-	    hc->protocol, status, title, EXPOSED_SERVER_SOFTWARE, fixed_type,
+	    _GETCHARPTR(hc->protocol), status, title, EXPOSED_SERVER_SOFTWARE, fixed_type,
 	    nowbuf, modbuf );
 	add_response( hc, buf );
 	s100 = status / 100;
@@ -1993,9 +1993,9 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
     mm_ptr<char> buf = NULL;
     mm_array_ptr<char> method_str = NULL;
     mm_array_ptr<char> url = NULL;
-    char* protocol;
+    mm_array_ptr<char> protocol = NULL;
     mm_array_ptr<char> reqhost = NULL;
-    char* eol;
+    mm_array_ptr<char> eol = NULL;
     mm_array_ptr<char> cp = NULL;
      mm_array_ptr<char> pi = NULL;
 
@@ -2009,8 +2009,8 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
 	return -1;
 	}
     *url++ = '\0';
-    url += strspn(_GETARRAYPTR(char, url), " \t\012\015" );
-    protocol = strpbrk(_GETARRAYPTR(char, url), " \t\012\015" );
+    url += mm_strspn(url, " \t\012\015" );
+    protocol = mm_strpbrk(url, " \t\012\015" );
     if ( protocol == NULL)
 	{
 	protocol = "HTTP/0.9";
@@ -2019,20 +2019,20 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
     else
 	{
 	*protocol++ = '\0';
-	protocol += strspn( protocol, " \t\012\015" );
+	protocol += mm_strspn( protocol, " \t\012\015" );
 	if ( *protocol != '\0' )
 	    {
-	    eol = strpbrk( protocol, " \t\012\015" );
+	    eol = mm_strpbrk( protocol, " \t\012\015" );
 	    if ( eol != NULL)
 		*eol = '\0';
-	    if ( strcasecmp( protocol, "HTTP/1.0" ) != 0 )
+	    if ( mm_strcasecmp( protocol, "HTTP/1.0" ) != 0 )
 		hc->one_one = 1;
 	    }
 	}
     hc->protocol = protocol;
 
     /* Check for HTTP/1.1 absolute URL. */
-    if ( strncasecmp( _GETARRAYPTR(char, url), "http://", 7 ) == 0 )
+    if ( mm_strncasecmp( url, "http://", 7 ) == 0 )
 	{
 	if ( ! hc->one_one )
 	    {
@@ -3116,7 +3116,7 @@ make_envp( mm_ptr<httpd_conn> hc )
         // TODO
 	envp[envn++] = build_env( "SERVER_NAME=%s", _GETCHARPTR(cp) );
     envp[envn++] = "GATEWAY_INTERFACE=CGI/1.1";
-    envp[envn++] = build_env("SERVER_PROTOCOL=%s", hc->protocol);
+    envp[envn++] = build_env("SERVER_PROTOCOL=%s", _GETCHARPTR(hc->protocol));
     (void) my_snprintf( buf, sizeof(buf), "%d", (int) hc->hs->port );
     envp[envn++] = build_env( "SERVER_PORT=%s", buf );
     envp[envn++] = build_env(
@@ -4034,7 +4034,7 @@ make_log_entry( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	(void) fprintf( hc->hs->logfp,
 	    "%.80s - %.80s [%s] \"%.80s %.300s %.80s\" %d %s \"%.200s\" \"%.200s\"\n",
         _GETARRAYPTR(char, mm_httpd_ntoa( &hc->client_addr )), _GETARRAYPTR(char, ru), date,
-	    _GETARRAYPTR(char, httpd_method_str( hc->method )), url, hc->protocol,
+	    _GETARRAYPTR(char, httpd_method_str( hc->method )), url, _GETCHARPTR(hc->protocol),
 	    hc->status, bytes, _GETARRAYPTR(char, hc->referrer), _GETARRAYPTR(char, hc->useragent));
 #ifdef FLUSH_LOG_EVERY_TIME
 	(void) fflush( hc->hs->logfp );
@@ -4044,7 +4044,7 @@ make_log_entry( mm_ptr<httpd_conn> hc, struct timeval* nowP )
 	syslog( LOG_INFO,
 	    "%.80s - %.80s \"%.80s %.200s %.80s\" %d %s \"%.200s\" \"%.200s\"",
 	    _GETARRAYPTR(char, mm_httpd_ntoa( &hc->client_addr )), _GETARRAYPTR(char, ru),
-	    _GETARRAYPTR(char, httpd_method_str( hc->method )), url, hc->protocol,
+	    _GETARRAYPTR(char, httpd_method_str( hc->method )), url, _GETCHARPTR(hc->protocol),
 	    hc->status, bytes, _GETARRAYPTR(char, hc->referrer), _GETARRAYPTR(char, hc->useragent));
     }
 
