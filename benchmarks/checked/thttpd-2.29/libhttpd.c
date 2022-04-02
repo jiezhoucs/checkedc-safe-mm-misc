@@ -164,11 +164,11 @@ static void cgi_kill( ClientData client_data, struct timeval* nowP );
 #ifdef GENERATE_INDEXES
 static int ls( mm_ptr<httpd_conn> hc );
 #endif /* GENERATE_INDEXES */
-static char* build_env( char* fmt, char* arg );
+static mm_array_ptr<char> build_env( char* fmt, mm_array_ptr<char> arg );
 #ifdef SERVER_NAME_LIST
 static char* hostname_map( char* hostname );
 #endif /* SERVER_NAME_LIST */
-static char** make_envp( mm_ptr<httpd_conn> hc );
+static mm_array_ptr<mm_array_ptr<char>> make_envp( mm_ptr<httpd_conn> hc );
 static mm_array_ptr<mm_array_ptr<char>> make_argp( mm_ptr<httpd_conn> hc );
 static void cgi_interpose_input( mm_ptr<httpd_conn> hc, int wfd );
 static void post_post_garbage_hack( mm_ptr<httpd_conn> hc );
@@ -3047,19 +3047,19 @@ mode  links    bytes  last-changed  name\n\
 
 
 /* No need to refactor build_env */
-static char*
-build_env( char* fmt, char* arg )
+static mm_array_ptr<char>
+build_env( char* fmt, mm_array_ptr<char> arg )
     {
-    char* cp;
+    mm_array_ptr<char> cp = NULL;
     size_t size;
     static  mm_array_ptr<char> buf = NULL;
     static  size_t maxbuf = 0;
 
-    size = strlen( fmt ) + strlen( arg );
+    size = strlen( fmt ) + mm_strlen( arg );
     if ( size > maxbuf )
 	mm_httpd_realloc_str( &buf, &maxbuf, size );
-    (void) my_snprintf(_GETARRAYPTR(char, buf), maxbuf, fmt, arg );
-    cp = strdup( _GETARRAYPTR(char, buf ));
+    (void) my_snprintf(_GETARRAYPTR(char, buf), maxbuf, fmt, _GETCHARPTR(arg) );
+    cp = mm_strdup( buf);
     if ( cp == NULL)
 	{
 	syslog( LOG_ERR, "out of memory copying environment variable" );
@@ -3090,12 +3090,12 @@ hostname_map( char* hostname )
 ** letting malicious clients overrun a buffer.  We don't have
 ** to worry about freeing stuff since we're a sub-process.
 */
-static char**
+static mm_array_ptr<mm_array_ptr<char>>
 make_envp( mm_ptr<httpd_conn> hc )
     {
-    static char* envp[50];
+    static mm_array_ptr<char> envp[50];
     int envn;
-    mm_array_ptr<char> cp = NULL;   /* no need to refactor cp */
+    mm_array_ptr<char> cp = NULL;
     char buf[256];
 
     envn = 0;
@@ -3113,55 +3113,52 @@ make_envp( mm_ptr<httpd_conn> hc )
     else
 	cp = hc->hs->server_hostname;
     if ( cp != NULL )
-        // TODO
-	envp[envn++] = build_env( "SERVER_NAME=%s", _GETCHARPTR(cp) );
+	envp[envn++] = build_env( "SERVER_NAME=%s", cp );
     envp[envn++] = "GATEWAY_INTERFACE=CGI/1.1";
-    envp[envn++] = build_env("SERVER_PROTOCOL=%s", _GETCHARPTR(hc->protocol));
+    envp[envn++] = build_env("SERVER_PROTOCOL=%s", hc->protocol);
     (void) my_snprintf( buf, sizeof(buf), "%d", (int) hc->hs->port );
     envp[envn++] = build_env( "SERVER_PORT=%s", buf );
     envp[envn++] = build_env(
-	"REQUEST_METHOD=%s", _GETARRAYPTR(char, httpd_method_str( hc->method )));
+	"REQUEST_METHOD=%s", httpd_method_str( hc->method ));
     if ( hc->pathinfo[0] != '\0' )
 	{
-	char* cp2;
+	mm_array_ptr<char> cp2 = NULL;
 	size_t l;
-	envp[envn++] = build_env( "PATH_INFO=/%s", _GETARRAYPTR(char, hc->pathinfo));
+	envp[envn++] = build_env( "PATH_INFO=/%s", hc->pathinfo);
 	l = mm_strlen( hc->hs->cwd ) + mm_strlen(hc->pathinfo) + 1;
-    // DISCUSS: No need to make cp2 an mmsafeptr as it is only passed to
-    // my_snprintf which is basically a wrapper of two library functions.
-	cp2 = NEW( char, l );
+	cp2 = MM_ARRAY_NEW( char, l );
 	if ( cp2 != NULL)
 	    {
-	    (void) my_snprintf( cp2, l, "%s%s", _GETCHARPTR(hc->hs->cwd), _GETARRAYPTR(char, hc->pathinfo));
+	    (void) my_snprintf( _GETCHARPTR(cp2), l, "%s%s", _GETCHARPTR(hc->hs->cwd),
+                _GETARRAYPTR(char, hc->pathinfo));
 	    envp[envn++] = build_env( "PATH_TRANSLATED=%s", cp2 );
 	    }
 	}
-    envp[envn++] = build_env(
-	"SCRIPT_NAME=/%s", strcmp(_GETARRAYPTR(char, hc->origfilename), "." ) == 0 ?
-	"" : _GETARRAYPTR(char, hc->origfilename));
+    envp[envn++] = mm_strcmp(hc->origfilename, "." ) == 0 ? build_env("SCRIPT_NAME=/%s",  "") :
+        build_env("SCRIPT_NAME=/%s", hc->origfilename);
     if ( hc->query[0] != '\0')
-	envp[envn++] = build_env( "QUERY_STRING=%s", _GETARRAYPTR(char, hc->query));
+	envp[envn++] = build_env( "QUERY_STRING=%s", hc->query);
     envp[envn++] = build_env(
-	"REMOTE_ADDR=%s", _GETARRAYPTR(char, mm_httpd_ntoa(&hc->client_addr)));
+	"REMOTE_ADDR=%s", mm_httpd_ntoa(&hc->client_addr));
     if ( hc->referrer[0] != '\0' )
 	{
-	envp[envn++] = build_env( "HTTP_REFERER=%s", _GETARRAYPTR(char, hc->referrer));
-	envp[envn++] = build_env( "HTTP_REFERRER=%s", _GETARRAYPTR(char, hc->referrer));
+	envp[envn++] = build_env( "HTTP_REFERER=%s", hc->referrer);
+	envp[envn++] = build_env( "HTTP_REFERRER=%s", hc->referrer);
 	}
     if ( hc->useragent[0] != '\0' )
-	envp[envn++] = build_env( "HTTP_USER_AGENT=%s", _GETARRAYPTR(char, hc->useragent));
+	envp[envn++] = build_env( "HTTP_USER_AGENT=%s", hc->useragent);
     if ( hc->accept[0] != '\0' )
-	envp[envn++] = build_env( "HTTP_ACCEPT=%s", _GETARRAYPTR(char, hc->accept));
+	envp[envn++] = build_env( "HTTP_ACCEPT=%s", hc->accept);
     if ( hc->accepte[0] != '\0' )
-	envp[envn++] = build_env( "HTTP_ACCEPT_ENCODING=%s", _GETARRAYPTR(char, hc->accepte));
+	envp[envn++] = build_env( "HTTP_ACCEPT_ENCODING=%s", hc->accepte);
     if ( hc->acceptl[0] != '\0' )
-	envp[envn++] = build_env( "HTTP_ACCEPT_LANGUAGE=%s", _GETARRAYPTR(char, hc->acceptl));
+	envp[envn++] = build_env( "HTTP_ACCEPT_LANGUAGE=%s", hc->acceptl);
     if ( hc->cookie[0] != '\0' )
-	envp[envn++] = build_env( "HTTP_COOKIE=%s", _GETARRAYPTR(char, hc->cookie));
+	envp[envn++] = build_env( "HTTP_COOKIE=%s", hc->cookie);
     if ( hc->contenttype[0] != '\0' )
-	envp[envn++] = build_env( "CONTENT_TYPE=%s", _GETARRAYPTR(char, hc->contenttype));
+	envp[envn++] = build_env( "CONTENT_TYPE=%s", hc->contenttype);
     if ( hc->hdrhost[0] != '\0' )
-	envp[envn++] = build_env( "HTTP_HOST=%s", _GETARRAYPTR(char, hc->hdrhost));
+	envp[envn++] = build_env( "HTTP_HOST=%s", hc->hdrhost);
     if ( hc->contentlength != -1 )
 	{
 	(void) my_snprintf(
@@ -3169,15 +3166,15 @@ make_envp( mm_ptr<httpd_conn> hc )
 	envp[envn++] = build_env( "CONTENT_LENGTH=%s", buf);
 	}
     if ( hc->remoteuser[0] != '\0' )
-	envp[envn++] = build_env( "REMOTE_USER=%s", _GETARRAYPTR(char, hc->remoteuser));
+	envp[envn++] = build_env( "REMOTE_USER=%s", hc->remoteuser);
     if ( hc->authorization[0] != '\0' )
 	envp[envn++] = build_env( "AUTH_TYPE=%s", "Basic" );
 	/* We only support Basic auth at the moment. */
     if ( getenv( "TZ" ) != NULL)
-	envp[envn++] = build_env( "TZ=%s", getenv( "TZ" ) );
-    envp[envn++] = build_env( "CGI_PATTERN=%s", _GETCHARPTR(hc->hs->cgi_pattern));
+	envp[envn++] = build_env( "TZ=%s", mm_strdup_from_raw(getenv( "TZ" )) );
+    envp[envn++] = build_env( "CGI_PATTERN=%s", hc->hs->cgi_pattern);
 
-    envp[envn] = (char*) 0;
+    envp[envn] = NULL;
     return envp;
     }
 
@@ -3426,7 +3423,7 @@ cgi_child( mm_ptr<httpd_conn> hc )
     {
     int r;
     mm_array_ptr<mm_array_ptr<char>> argp = NULL;
-    char** envp;
+    mm_array_ptr<mm_array_ptr<char>> envp = NULL;
     char* binary;
     char* directory;
 
@@ -3609,7 +3606,8 @@ cgi_child( mm_ptr<httpd_conn> hc )
 #endif /* HAVE_SIGSET */
 
     /* Run the program. */
-    (void) execve( binary, (char *const *)_marshal_shared_array_ptr<char>(argp), envp );
+    (void) execve( binary, (char *const *)_marshal_shared_array_ptr<char>(argp),
+            (char *const*)_marshal_shared_array_ptr<char>(envp));
 
     /* Something went wrong. */
     syslog( LOG_ERR, "execve %.80s - %m", _GETARRAYPTR(char, hc->expnfilename));
