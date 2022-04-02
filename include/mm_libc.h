@@ -24,6 +24,7 @@
 
 mm_array_ptr<char> mm_strchr(mm_array_ptr<const char> p, int c);
 mm_array_ptr<char> mm_strrchr(mm_array_ptr<const char> p, int c);
+mm_array_ptr<char> mm_strstr(mm_array_ptr<const char> p, const char *needle);
 mm_array_ptr<char> mm_strtok(mm_array_ptr<char> str, const char *delim,
                              mm_array_ptr<char> ostr);
 mm_array_ptr<char> mm_strtok_r(mm_array_ptr<char> str, const char *delim,

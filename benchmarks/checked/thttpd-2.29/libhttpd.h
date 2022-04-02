@@ -79,19 +79,19 @@ typedef struct {
     mm_array_ptr<char> binding_hostname;  // no need to be mmsafe ptr
     mm_array_ptr<char> server_hostname;   // no need to be mmsafe ptr
     unsigned short port;
-    char* cgi_pattern;
+    mm_array_ptr<char> cgi_pattern;
     int cgi_limit, cgi_count;
-    char* charset;
-    char* p3p;
+    mm_array_ptr<char> charset;
+    mm_array_ptr<char> p3p;
     int max_age;
-    char* cwd;
+    mm_array_ptr<char> cwd;
     int listen4_fd, listen6_fd;
     int no_log;
     FILE* logfp;
     int no_symlink_check;
     int vhost;
     int global_passwd;
-    char* url_pattern;
+    mm_array_ptr<char> url_pattern;
     mm_array_ptr<char> local_pattern;
     int no_empty_referrers;
     } httpd_server;

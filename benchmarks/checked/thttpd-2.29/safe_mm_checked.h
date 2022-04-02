@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "stdchecked.h"
+#include <mm_libc.h>
 
 /* Extract the raw pointer from a checked pointer. */
 #define _GETPTR(T, p) ((T *)(p))

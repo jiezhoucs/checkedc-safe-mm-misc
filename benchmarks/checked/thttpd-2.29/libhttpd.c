@@ -215,15 +215,15 @@ free_httpd_server( mm_ptr<httpd_server> hs ) {
     if ( hs->binding_hostname != NULL )
 	MM_FREE( char, hs->binding_hostname );
     if ( hs->cwd != NULL)
-	free( (void*) hs->cwd );
+	MM_FREE(char, hs->cwd );
     if ( hs->cgi_pattern != NULL)
-	free( (void*) hs->cgi_pattern );
+	MM_FREE( char, hs->cgi_pattern );
     if ( hs->charset != NULL)
-	free( (void*) hs->charset );
+	MM_FREE(char, hs->charset );
     if ( hs->p3p != NULL)
-	free( (void*) hs->p3p );
+	MM_FREE(char, hs->p3p );
     if ( hs->url_pattern != NULL)
-	free( (void*) hs->url_pattern );
+	MM_FREE( char, hs->url_pattern );
     if ( hs->local_pattern != NULL)
 	MM_FREE(char, hs->local_pattern );
     mm_free<httpd_server>(hs);
@@ -240,7 +240,7 @@ httpd_initialize(
     {
     mm_ptr<httpd_server> hs = NULL;
     static char ghnbuf[256];
-    char* cp;
+    mm_array_ptr<char> cp = NULL;
 
     check_options();
 
@@ -286,38 +286,38 @@ httpd_initialize(
 
     hs->port = port;
     if ( cgi_pattern == NULL)
-	hs->cgi_pattern = (char*) 0;
+	hs->cgi_pattern = NULL;
     else
 	{
 	/* Nuke any leading slashes. */
 	if ( cgi_pattern[0] == '/' )
 	    ++cgi_pattern;
-	hs->cgi_pattern = strdup( cgi_pattern );
+	hs->cgi_pattern = mm_strdup_from_raw( cgi_pattern );
 	if ( hs->cgi_pattern == NULL)
 	    {
 	    syslog( LOG_CRIT, "out of memory copying cgi_pattern" );
 	    return NULL;
 	    }
 	/* Nuke any leading slashes in the cgi pattern. */
-	while ( ( cp = strstr( hs->cgi_pattern, "|/" ) ) != NULL)
-	    (void) ol_strcpy( cp + 1, cp + 2 );
+	while ( ( cp = mm_strstr( hs->cgi_pattern, "|/" ) ) != NULL)
+	    (void) ol_strcpy( _GETCHARPTR(cp) + 1, _GETCHARPTR(cp) + 2 );
 	}
     hs->cgi_limit = cgi_limit;
     hs->cgi_count = 0;
-    hs->charset = strdup( charset );
-    hs->p3p = strdup( p3p );
+    hs->charset = mm_strdup_from_raw( charset );
+    hs->p3p = mm_strdup_from_raw( p3p );
     hs->max_age = max_age;
-    hs->cwd = strdup( cwd );
+    hs->cwd = mm_strdup_from_raw( cwd );
     if ( hs->cwd == NULL)
 	{
 	syslog( LOG_CRIT, "out of memory copying cwd" );
 	return NULL;
 	}
     if ( url_pattern == NULL)
-	hs->url_pattern = (char*) 0;
+	hs->url_pattern = NULL;
     else
 	{
-	hs->url_pattern = strdup( url_pattern );
+	hs->url_pattern = mm_strdup_from_raw( url_pattern );
 	if ( hs->url_pattern == NULL)
 	    {
 	    syslog( LOG_CRIT, "out of memory copying url_pattern" );
@@ -656,7 +656,7 @@ send_mime( mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char> en
 	(void) strftime( nowbuf, sizeof(nowbuf), rfc1123fmt, gmtime( &now ) );
 	(void) strftime( modbuf, sizeof(modbuf), rfc1123fmt, gmtime( &mod ) );
 	(void) my_snprintf(
-	    fixed_type, sizeof(fixed_type), type, hc->hs->charset );
+	    fixed_type, sizeof(fixed_type), type, _GETCHARPTR(hc->hs->charset) );
 	(void) my_snprintf( (char *)buf, sizeof(buf),
 	    "%.20s %d %s\015\012Server: %s\015\012Content-Type: %s\015\012Date: %s\015\012Last-Modified: %s\015\012Accept-Ranges: bytes\015\012Connection: close\015\012",
 	    hc->protocol, status, title, EXPOSED_SERVER_SOFTWARE, fixed_type,
@@ -693,7 +693,7 @@ send_mime( mm_ptr<httpd_conn> hc, int status, char* title, mm_array_ptr<char> en
 	    }
 	if ( hc->hs->p3p[0] != '\0' )
 	    {
-	    (void) my_snprintf( (char *)buf, sizeof(buf), "P3P: %s\015\012", hc->hs->p3p );
+	    (void) my_snprintf( (char *)buf, sizeof(buf), "P3P: %s\015\012", _GETCHARPTR(hc->hs->p3p));
 	    add_response( hc, buf );
 	    }
 	if ( hc->hs->max_age >= 0 )
@@ -2401,12 +2401,11 @@ httpd_parse_request( mm_ptr<httpd_conn> hc )
     */
     if ( hc->expnfilename[0] == '/' )
 	{
-	if ( strncmp(
-		 _GETARRAYPTR(char, hc->expnfilename), hc->hs->cwd, strlen( hc->hs->cwd ) ) == 0 )
+	if ( mm_strncmp( hc->expnfilename, hc->hs->cwd, mm_strlen( hc->hs->cwd ) ) == 0 )
 	    {
 	    /* Elide the current directory. */
 	    (void) ol_strcpy(
-		_GETARRAYPTR(char, hc->expnfilename), _GETPTR(char, &hc->expnfilename[strlen( hc->hs->cwd )]));
+		_GETARRAYPTR(char, hc->expnfilename), _GETPTR(char, &hc->expnfilename[mm_strlen( hc->hs->cwd )]));
 	    }
 #ifdef TILDE_MAP_2
 	else if ( hc->altdir[0] != '\0' &&
@@ -3127,13 +3126,13 @@ make_envp( mm_ptr<httpd_conn> hc )
 	char* cp2;
 	size_t l;
 	envp[envn++] = build_env( "PATH_INFO=/%s", _GETARRAYPTR(char, hc->pathinfo));
-	l = strlen( hc->hs->cwd ) + strlen( _GETARRAYPTR(char, hc->pathinfo)) + 1;
+	l = mm_strlen( hc->hs->cwd ) + mm_strlen(hc->pathinfo) + 1;
     // DISCUSS: No need to make cp2 an mmsafeptr as it is only passed to
     // my_snprintf which is basically a wrapper of two library functions.
 	cp2 = NEW( char, l );
 	if ( cp2 != NULL)
 	    {
-	    (void) my_snprintf( cp2, l, "%s%s", hc->hs->cwd, _GETARRAYPTR(char, hc->pathinfo));
+	    (void) my_snprintf( cp2, l, "%s%s", _GETCHARPTR(hc->hs->cwd), _GETARRAYPTR(char, hc->pathinfo));
 	    envp[envn++] = build_env( "PATH_TRANSLATED=%s", cp2 );
 	    }
 	}
@@ -3176,7 +3175,7 @@ make_envp( mm_ptr<httpd_conn> hc )
 	/* We only support Basic auth at the moment. */
     if ( getenv( "TZ" ) != NULL)
 	envp[envn++] = build_env( "TZ=%s", getenv( "TZ" ) );
-    envp[envn++] = build_env( "CGI_PATTERN=%s", hc->hs->cgi_pattern );
+    envp[envn++] = build_env( "CGI_PATTERN=%s", _GETCHARPTR(hc->hs->cgi_pattern));
 
     envp[envn] = (char*) 0;
     return envp;
@@ -3867,7 +3866,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     /* Is it world-executable and in the CGI area? */
     if ( hc->hs->cgi_pattern != NULL&&
 	 ( hc->sb.st_mode & S_IXOTH ) &&
-	 match( hc->hs->cgi_pattern, _GETARRAYPTR(char, hc->expnfilename)) )
+	 match( _GETCHARPTR(hc->hs->cgi_pattern), _GETARRAYPTR(char, hc->expnfilename)) )
 	return cgi( hc );
 
     /* It's not CGI.  If it's executable or there's pathinfo, someone's
@@ -4103,7 +4102,7 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
 	 ( cp1 = strstr( _GETARRAYPTR(char, hc->referrer), "//" ) ) == NULL)
 	{
 	/* Disallow if we require a referrer and the url matches. */
-	if ( hs->no_empty_referrers && match( hs->url_pattern, _GETARRAYPTR(char, hc->origfilename)) )
+	if ( hs->no_empty_referrers && match( _GETCHARPTR(hs->url_pattern), _GETARRAYPTR(char, hc->origfilename)) )
 	    return 0;
 	/* Otherwise ok. */
 	return 1;
@@ -4153,7 +4152,7 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
     ** the filename does match the url pattern, it's an illegal reference.
     */
     if ( ! match( _GETCHARPTR(lp), _GETARRAYPTR(char, refhost)) &&
-            match( hs->url_pattern, _GETARRAYPTR(char, hc->origfilename)) )
+            match( _GETCHARPTR(hs->url_pattern), _GETARRAYPTR(char, hc->origfilename)) )
 	return 0;
     /* Otherwise ok. */
     return 1;
