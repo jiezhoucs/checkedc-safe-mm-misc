@@ -278,14 +278,11 @@ fdwatch_logstats( long secs )
 
 #ifdef HAVE_KQUEUE
 
-// There is no need to use mmsafe pointers for kqevents, kqrevents, and kqrfdidx
-// because these three pointer never escape from this source file and they
-// are never freed.
 static int maxkqevents;
-static struct kevent* kqevents;
+static mm_array_ptr<struct kevent> kqevents = NULL;
 static int nkqevents;
-static struct kevent* kqrevents;
-static int* kqrfdidx;
+static mm_array_ptr<struct kevent> kqrevents = NULL;
+static mm_array_ptr<int> kqrfdidx = NULL;
 static int kq;
 
 
@@ -296,14 +293,13 @@ kqueue_init( int nf )
     if ( kq == -1 )
 	return -1;
     maxkqevents = nf * 2;
-    kqevents = (struct kevent*) malloc( sizeof(struct kevent) * maxkqevents );
-    kqrevents = (struct kevent*) malloc( sizeof(struct kevent) * nf );
-    kqrfdidx = (int*) malloc( sizeof(int) * nf );
-    if ( kqevents == (struct kevent*) 0 || kqrevents == (struct kevent*) 0 ||
-	 kqrfdidx == (int*) 0 )
+    kqevents = MM_ARRAY_ALLOC(struct kevent,  maxkqevents);
+    kqrevents = MM_ARRAY_ALLOC(struct kevent, nf);
+    kqrfdidx = MM_ARRAY_ALLOC(int, nf);
+    if ( kqevents == NULL || kqrevents == NULL || kqrfdidx == NULL )
 	return -1;
-    (void) memset( kqevents, 0, sizeof(struct kevent) * maxkqevents );
-    (void) memset( kqrfdidx, 0, sizeof(int) * nf );
+    (void) mm_memset( kqevents, 0, sizeof(struct kevent) * maxkqevents );
+    (void) mm_memset( kqrfdidx, 0, sizeof(int) * nf );
     return 0;
     }
 
@@ -383,7 +379,7 @@ kqueue_check_fd( int fd )
 	syslog( LOG_ERR, "bad ridx (%d) in kqueue_check_fd!", ridx );
 	return 0;
 	}
-    if ( ridx >= nreturned ) 
+    if ( ridx >= nreturned )
 	return 0;
     if ( kqrevents[ridx].ident != fd )
 	return 0;
@@ -415,10 +411,10 @@ kqueue_get_fd( int ridx )
 # ifdef HAVE_DEVPOLL
 
 static int maxdpevents;
-static struct pollfd* dpevents;
+static mm_array_ptr<struct pollfd> dpevents = NULL;
 static int ndpevents;
-static struct pollfd* dprevents;
-static int* dp_rfdidx;
+static mm_array_ptr<struct pollfd> dprevents = NULL;
+static mm_array_ptr<int> dp_rfdidx = NULL;
 static int dp;
 
 
@@ -430,13 +426,12 @@ devpoll_init( int nf )
 	return -1;
     (void) fcntl( dp, F_SETFD, 1 );
     maxdpevents = nf * 2;
-    dpevents = (struct pollfd*) malloc( sizeof(struct pollfd) * maxdpevents );
-    dprevents = (struct pollfd*) malloc( sizeof(struct pollfd) * nf );
-    dp_rfdidx = (int*) malloc( sizeof(int) * nf );
-    if ( dpevents == (struct pollfd*) 0 || dprevents == (struct pollfd*) 0 ||
-	 dp_rfdidx == (int*) 0 )
+    dpevents = MM_ARRAY_ALLOC( struct pollfd, maxdpevents );
+    dprevents = MM_ARRAY_ALLOC(struct pollfd,  nf );
+    dp_rfdidx = MM_ARRAY_ALLOC( int, nf );
+    if ( dpevents == NULL || dprevents == NULL || dp_rfdidx == NULL )
 	return -1;
-    (void) memset( dp_rfdidx, 0, sizeof(int) * nf );
+    (void) mm_memset( dp_rfdidx, 0, sizeof(int) * nf );
     return 0;
     }
 
@@ -542,10 +537,10 @@ devpoll_get_fd( int ridx )
 
 #  ifdef HAVE_POLL
 
-static struct pollfd* pollfds;
+static mm_array_ptr<struct pollfd> pollfds = NULL;
 static int npoll_fds;
-static int* poll_fdidx;
-static int* poll_rfdidx;
+static mm_array_ptr<int> poll_fdidx = NULL;
+static mm_array_ptr<int> poll_rfdidx = NULL;
 
 
 static int
@@ -553,11 +548,10 @@ poll_init( int nf )
     {
     int i;
 
-    pollfds = (struct pollfd*) malloc( sizeof(struct pollfd) * nf );
-    poll_fdidx = (int*) malloc( sizeof(int) * nf );
-    poll_rfdidx = (int*) malloc( sizeof(int) * nf );
-    if ( pollfds == (struct pollfd*) 0 || poll_fdidx == (int*) 0 ||
-	 poll_rfdidx == (int*) 0 )
+    pollfds = MM_ARRAY_ALLOC(struct pollfd, nf );
+    poll_fdidx = MM_ARRAY_ALLOC( int, nf );
+    poll_rfdidx = MM_ARRAY_ALLOC( int, nf );
+    if ( pollfds == NULL || poll_fdidx == NULL || poll_rfdidx == NULL )
 	return -1;
     for ( i = 0; i < nf; ++i )
 	pollfds[i].fd = poll_fdidx[i] = -1;
@@ -608,7 +602,7 @@ poll_watch( long timeout_msecs )
     {
     int r, ridx, i;
 
-    r = poll( pollfds, npoll_fds, (int) timeout_msecs );
+    r = poll( _GETPTR(struct pollfd, pollfds), npoll_fds, (int) timeout_msecs );
     if ( r <= 0 )
 	return r;
 
@@ -667,9 +661,9 @@ static fd_set master_rfdset;
 static fd_set master_wfdset;
 static fd_set working_rfdset;
 static fd_set working_wfdset;
-static int* select_fds;
-static int* select_fdidx;
-static int* select_rfdidx;
+static mm_array_ptr<int> select_fds = NULL;
+static mm_array_ptr<int> select_fdidx = NULL;
+static mm_array_ptr<int> select_rfdidx = NULL;
 static int nselect_fds;
 static int maxfd;
 static int maxfd_changed;
@@ -682,11 +676,11 @@ select_init( int nf )
 
     FD_ZERO( &master_rfdset );
     FD_ZERO( &master_wfdset );
-    select_fds = (int*) malloc( sizeof(int) * nf );
-    select_fdidx = (int*) malloc( sizeof(int) * nf );
-    select_rfdidx = (int*) malloc( sizeof(int) * nf );
-    if ( select_fds == (int*) 0 || select_fdidx == (int*) 0 ||
-	 select_rfdidx == (int*) 0 )
+    select_fds = MM_ARRAY_ALLOC( int, nf );
+    select_fdidx = MM_ARRAY_ALLOC(int, nf );
+    select_rfdidx = MM_ARRAY_ALLOC( int, nf );
+    if ( select_fds == NULL || select_fdidx == NULL ||
+	 select_rfdidx == NULL )
 	return -1;
     nselect_fds = 0;
     maxfd = -1;
