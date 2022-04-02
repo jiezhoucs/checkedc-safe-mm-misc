@@ -53,7 +53,7 @@ DEFS =		 -DHAVE__PROGNAME=1 -DHAVE_FCNTL_H=1 -DHAVE_GRP_H=1 -DHAVE_MEMORY_H=1 -D
 INCLS =		-I. -I../../../include
 CFLAGS = -g $(CCOPT) $(DEFS) $(INCLS)
 LDFLAGS = -L../../../lib -L../../../lib
-LIBS =		-lcrypt  -lsafemm
+LIBS =		-lcrypt  -lsafemm -lstdc++ -lporting
 NETLIBS =	
 INSTALL =	/usr/bin/install -c
 
