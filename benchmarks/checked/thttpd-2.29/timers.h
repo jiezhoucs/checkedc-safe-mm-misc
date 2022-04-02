@@ -61,8 +61,8 @@ typedef struct TimerStruct {
     long msecs;
     int periodic;
     struct timeval time;
-    struct TimerStruct* prev;
-    struct TimerStruct* next;
+    mm_ptr<struct TimerStruct> prev;
+    mm_ptr<struct TimerStruct> next;
     int hash;
     } Timer;
 
@@ -70,7 +70,7 @@ typedef struct TimerStruct {
 void tmr_init( void );
 
 /* Set up a timer, either periodic or one-shot. Returns (Timer*) 0 on errors. */
-Timer* tmr_create(
+mm_ptr<Timer> tmr_create(
     struct timeval* nowP, TimerProc* timer_proc, ClientData client_data,
     long msecs, int periodic );
 
@@ -92,12 +92,12 @@ long tmr_mstimeout( struct timeval* nowP );
 void tmr_run( struct timeval* nowP );
 
 /* Reset the clock on a timer, to current time plus the original timeout. */
-void tmr_reset( struct timeval* nowP, Timer* timer );
+void tmr_reset( struct timeval* nowP, mm_ptr<Timer> timer );
 
 /* Deschedule a timer.  Note that non-periodic timers are automatically
 ** descheduled when they run, so you don't have to call this on them.
 */
-void tmr_cancel( Timer* timer );
+void tmr_cancel( mm_ptr<Timer> timer );
 
 /* Clean up the timers package, freeing any unused storage. */
 void tmr_cleanup( void );

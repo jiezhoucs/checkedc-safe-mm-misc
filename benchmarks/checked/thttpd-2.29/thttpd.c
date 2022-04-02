@@ -112,8 +112,8 @@ typedef struct {
     int numtnums;
     long max_limit, min_limit;
     time_t started_at, active_at;
-    Timer* wakeup_timer;
-    Timer* linger_timer;
+    mm_ptr<Timer> wakeup_timer;
+    mm_ptr<Timer> linger_timer;
     long wouldblock_delay;
     off_t bytes;
     off_t end_byte_index;
@@ -648,13 +648,13 @@ main( int argc, char** argv )
 	exit( 1 );
 
     /* Set up the occasional timer. */
-    if ( tmr_create( (struct timeval*) 0, occasional, JunkClientData, OCCASIONAL_TIME * 1000L, 1 ) == (Timer*) 0 )
+    if ( tmr_create( (struct timeval*) 0, occasional, JunkClientData, OCCASIONAL_TIME * 1000L, 1 ) == NULL )
 	{
 	syslog( LOG_CRIT, "tmr_create(occasional) failed" );
 	exit( 1 );
 	}
     /* Set up the idle timer. */
-    if ( tmr_create( (struct timeval*) 0, idle, JunkClientData, 5 * 1000L, 1 ) == (Timer*) 0 )
+    if ( tmr_create( (struct timeval*) 0, idle, JunkClientData, 5 * 1000L, 1 ) == NULL )
 	{
 	syslog( LOG_CRIT, "tmr_create(idle) failed" );
 	exit( 1 );
@@ -662,7 +662,7 @@ main( int argc, char** argv )
     if ( numthrottles > 0 )
 	{
 	/* Set up the throttles timer. */
-	if ( tmr_create( (struct timeval*) 0, update_throttles, JunkClientData, THROTTLE_TIME * 1000L, 1 ) == (Timer*) 0 )
+	if ( tmr_create( (struct timeval*) 0, update_throttles, JunkClientData, THROTTLE_TIME * 1000L, 1 ) == NULL )
 	    {
 	    syslog( LOG_CRIT, "tmr_create(update_throttles) failed" );
 	    exit( 1 );
@@ -670,7 +670,7 @@ main( int argc, char** argv )
 	}
 #ifdef STATS_TIME
     /* Set up the stats timer. */
-    if ( tmr_create( (struct timeval*) 0, show_stats, JunkClientData, STATS_TIME * 1000L, 1 ) == (Timer*) 0 )
+    if ( tmr_create( (struct timeval*) 0, show_stats, JunkClientData, STATS_TIME * 1000L, 1 ) == NULL )
 	{
 	syslog( LOG_CRIT, "tmr_create(show_stats) failed" );
 	exit( 1 );
@@ -1753,11 +1753,11 @@ handle_send(mm_ptr<connecttab> c, struct timeval* tvP )
 	c->conn_state = CNST_PAUSING;
 	fdwatch_del_fd( hc->conn_fd );
 	client_data.p = (mm_ptr<void>)c;
-	if ( c->wakeup_timer != (Timer*) 0 )
+	if ( c->wakeup_timer != NULL )
 	    syslog( LOG_ERR, "replacing non-null wakeup_timer!" );
 	c->wakeup_timer = tmr_create(
 	    tvP, wakeup_connection, client_data, c->wouldblock_delay, 0 );
-	if ( c->wakeup_timer == (Timer*) 0 )
+	if ( c->wakeup_timer == NULL )
 	    {
 	    syslog( LOG_CRIT, "tmr_create(wakeup_connection) failed" );
 	    exit( 1 );
@@ -1838,12 +1838,12 @@ handle_send(mm_ptr<connecttab> c, struct timeval* tvP )
 	    */
 	    coast = c->hc->bytes_sent / c->max_limit - elapsed;
 	    client_data.p = (mm_ptr<void>)c;
-	    if ( c->wakeup_timer != (Timer*) 0 )
+	    if ( c->wakeup_timer != NULL )
 		syslog( LOG_ERR, "replacing non-null wakeup_timer!" );
 	    c->wakeup_timer = tmr_create(
 		tvP, wakeup_connection, client_data,
 		coast > 0 ? ( coast * 1000L ) : 500L, 0 );
-	    if ( c->wakeup_timer == (Timer*) 0 )
+	    if ( c->wakeup_timer == NULL )
 		{
 		syslog( LOG_CRIT, "tmr_create(wakeup_connection) failed" );
 		exit( 1 );
@@ -1988,7 +1988,7 @@ clear_connection(mm_ptr<connecttab> c, struct timeval* tvP )
     {
     ClientData client_data;
 
-    if ( c->wakeup_timer != (Timer*) 0 )
+    if ( c->wakeup_timer != NULL )
 	{
 	tmr_cancel( c->wakeup_timer );
 	c->wakeup_timer = 0;
@@ -2009,7 +2009,7 @@ clear_connection(mm_ptr<connecttab> c, struct timeval* tvP )
 	{
 	/* If we were already lingering, shut down for real. */
 	tmr_cancel( c->linger_timer );
-	c->linger_timer = (Timer*) 0;
+	c->linger_timer = NULL;
 	c->hc->should_linger = 0;
 	}
     if ( c->hc->should_linger )
@@ -2020,11 +2020,11 @@ clear_connection(mm_ptr<connecttab> c, struct timeval* tvP )
 	shutdown( c->hc->conn_fd, SHUT_WR );
 	fdwatch_add_fd( c->hc->conn_fd, (mm_ptr<void>)c, FDW_READ );
 	client_data.p = (mm_ptr<void>)c;
-	if ( c->linger_timer != (Timer*) 0 )
+	if ( c->linger_timer != NULL )
 	    syslog( LOG_ERR, "replacing non-null linger_timer!" );
 	c->linger_timer = tmr_create(
 	    tvP, linger_clear_connection, client_data, LINGER_TIME, 0 );
-	if ( c->linger_timer == (Timer*) 0 )
+	if ( c->linger_timer == NULL )
 	    {
 	    syslog( LOG_CRIT, "tmr_create(linger_clear_connection) failed" );
 	    exit( 1 );
@@ -2043,7 +2043,7 @@ really_clear_connection(mm_ptr<connecttab> c, struct timeval* tvP )
 	fdwatch_del_fd( c->hc->conn_fd );
     httpd_close_conn(c->hc, tvP );
     clear_throttles( c, tvP );
-    if ( c->linger_timer != (Timer*) 0 )
+    if ( c->linger_timer != NULL )
 	{
 	tmr_cancel( c->linger_timer );
 	c->linger_timer = 0;

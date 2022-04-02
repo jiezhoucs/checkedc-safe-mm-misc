@@ -2722,7 +2722,7 @@ cgi_kill( ClientData client_data, struct timeval* nowP )
 	{
 	syslog( LOG_WARNING, "killed CGI process %d", pid );
 	/* In case this isn't enough, schedule an uncatchable kill. */
-	if ( tmr_create( nowP, cgi_kill2, client_data, 5 * 1000L, 0 ) == (Timer*) 0 )
+	if ( tmr_create( nowP, cgi_kill2, client_data, 5 * 1000L, 0 ) == NULL )
 	    {
 	    syslog( LOG_CRIT, "tmr_create(cgi_kill2) failed" );
 	    exit( 1 );
@@ -3023,7 +3023,7 @@ mode  links    bytes  last-changed  name\n\
 #ifdef CGI_TIMELIMIT
 	/* Schedule a kill for the child process, in case it runs too long */
 	client_data.i = r;
-	if ( tmr_create( (struct timeval*) 0, cgi_kill, client_data, CGI_TIMELIMIT * 1000L, 0 ) == (Timer*) 0 )
+	if ( tmr_create( (struct timeval*) 0, cgi_kill, client_data, CGI_TIMELIMIT * 1000L, 0 ) == NULL )
 	    {
 	    syslog( LOG_CRIT, "tmr_create(cgi_kill ls) failed" );
 	    exit( 1 );
@@ -3655,7 +3655,7 @@ cgi( mm_ptr<httpd_conn> hc )
 #ifdef CGI_TIMELIMIT
     /* Schedule a kill for the child process, in case it runs too long */
     client_data.i = r;
-    if ( tmr_create( (struct timeval*) 0, cgi_kill, client_data, CGI_TIMELIMIT * 1000L, 0 ) == (Timer*) 0 )
+    if ( tmr_create( (struct timeval*) 0, cgi_kill, client_data, CGI_TIMELIMIT * 1000L, 0 ) == NULL )
 	{
 	syslog( LOG_CRIT, "tmr_create(cgi_kill child) failed" );
 	exit( 1 );
