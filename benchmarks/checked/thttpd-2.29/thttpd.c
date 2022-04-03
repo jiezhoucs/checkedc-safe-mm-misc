@@ -1592,7 +1592,7 @@ handle_read(mm_ptr<connecttab> c, struct timeval* tvP )
 	    finish_connection(c, tvP );
 	    return;
 	    }
-	mm_httpd_realloc_str(
+	httpd_realloc_str(
 	    &hc->read_buf, &hc->read_size, hc->read_size + 1000 );
 	}
 

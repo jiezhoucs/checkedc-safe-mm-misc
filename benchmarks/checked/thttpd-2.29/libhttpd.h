@@ -274,8 +274,7 @@ extern char* httpd_err503form;
 mm_array_ptr<char> httpd_method_str( int method );
 
 /* Reallocate a string. */
-void httpd_realloc_str( char** strP, size_t* maxsizeP, size_t size );
-void mm_httpd_realloc_str(mm_ptr<mm_array_ptr<char>> strP, mm_ptr<size_t> maxsizeP, size_t size);
+void httpd_realloc_str(mm_ptr<mm_array_ptr<char>> strP, mm_ptr<size_t> maxsizeP, size_t size);
 
 /* Format a network socket to a string representation. */
 mm_array_ptr<char> mm_httpd_ntoa( mm_ptr<httpd_sockaddr> saP );
