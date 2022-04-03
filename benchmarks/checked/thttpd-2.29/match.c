@@ -32,20 +32,20 @@
 
 #include "match.h"
 
-static int match_one( const char* pattern, int patternlen, const char* string );
+static int match_one( mm_array_ptr<const char> pattern, int patternlen, mm_array_ptr<const char> string );
 
 /* No need to refactor these few function as they only pass the pointer
  * arguments to libc string processing functions. */
 int
-match( const char* pattern, const char* string )
+match( mm_array_ptr<const char> pattern, mm_array_ptr<const char> string )
     {
-    const char* or;
+    mm_array_ptr<const char> or = NULL;
 
     for (;;)
 	{
-	or = strchr( pattern, '|' );
-	if ( or == (char*) 0 )
-	    return match_one( pattern, strlen( pattern ), string );
+	or = mm_strchr( pattern, '|' );
+	if ( or == NULL )
+	    return match_one( pattern, mm_strlen( pattern ), string );
 	if ( match_one( pattern, or - pattern, string ) )
 	    return 1;
 	pattern = or + 1;
@@ -54,9 +54,9 @@ match( const char* pattern, const char* string )
 
 
 static int
-match_one( const char* pattern, int patternlen, const char* string )
+match_one( mm_array_ptr<const char> pattern, int patternlen, mm_array_ptr<const char> string )
     {
-    const char* p;
+    mm_array_ptr<const char> p = NULL;
 
     for ( p = pattern; p - pattern < patternlen; ++p, ++string )
 	{
@@ -70,11 +70,11 @@ match_one( const char* pattern, int patternlen, const char* string )
 		{
 		/* Double-wildcard matches anything. */
 		++p;
-		i = strlen( string );
+		i = mm_strlen( string );
 		}
 	    else
 		/* Single-wildcard matches anything but slash. */
-		i = strcspn( string, "/" );
+		i = mm_strcspn( string, "/" );
 	    pl = patternlen - ( p - pattern );
 	    for ( ; i >= 0; --i )
 		if ( match_one( p, pl, &(string[i]) ) )

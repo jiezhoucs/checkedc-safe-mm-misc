@@ -774,7 +774,7 @@ send_response(mm_ptr<httpd_conn> hc, int status, char* title,
     defang( arg, defanged_arg, sizeof(defanged_arg) );
     (void) my_snprintf((char *)buf, sizeof(buf), form, defanged_arg );
     add_response( hc, buf );
-    if ( match( "**MSIE**", _GETARRAYPTR(char, hc->useragent)) )
+    if ( match( "**MSIE**", hc->useragent) )
 	{
 	int n;
 	add_response( hc, "<!--\n");
@@ -3396,8 +3396,8 @@ cgi_child( mm_ptr<httpd_conn> hc )
     int r;
     mm_array_ptr<mm_array_ptr<char>> argp = NULL;
     mm_array_ptr<mm_array_ptr<char>> envp = NULL;
-    char* binary;
-    char* directory;
+    mm_array_ptr<char> binary = NULL;
+    mm_array_ptr<char> directory = NULL;
 
     /* Unset close-on-exec flag for this socket.  This actually shouldn't
     ** be necessary, according to POSIX a dup()'d file descriptor does
@@ -3555,18 +3555,18 @@ cgi_child( mm_ptr<httpd_conn> hc )
     ** to the program's own directory.  This isn't in the CGI 1.1
     ** spec, but it's what other HTTP servers do.
     */
-    directory = strdup( _GETARRAYPTR(char, hc->expnfilename));
+    directory = mm_strdup( hc->expnfilename);
     if ( directory == NULL)
-	binary = _GETARRAYPTR(char, hc->expnfilename);      /* ignore errors */
+	binary = hc->expnfilename;      /* ignore errors */
     else
 	{
-	binary = strrchr( directory, '/' );
+	binary = mm_strrchr( directory, '/' );
 	if ( binary == NULL)
-	    binary = _GETARRAYPTR(char, hc->expnfilename);
+	    binary = hc->expnfilename;
 	else
 	    {
 	    *binary++ = '\0';
-	    (void) chdir( directory );  /* ignore errors */
+	    (void) chdir( _GETCHARPTR(directory) );  /* ignore errors */
 	    }
 	}
 
@@ -3578,7 +3578,7 @@ cgi_child( mm_ptr<httpd_conn> hc )
 #endif /* HAVE_SIGSET */
 
     /* Run the program. */
-    (void) execve( binary, (char *const *)_marshal_shared_array_ptr<char>(argp),
+    (void) execve( _GETCHARPTR(binary), (char *const *)_marshal_shared_array_ptr<char>(argp),
             (char *const*)_marshal_shared_array_ptr<char>(envp));
 
     /* Something went wrong. */
@@ -3836,7 +3836,7 @@ really_start_request( mm_ptr<httpd_conn> hc, struct timeval* nowP )
     /* Is it world-executable and in the CGI area? */
     if ( hc->hs->cgi_pattern != NULL&&
 	 ( hc->sb.st_mode & S_IXOTH ) &&
-	 match( _GETCHARPTR(hc->hs->cgi_pattern), _GETARRAYPTR(char, hc->expnfilename)) )
+	 match( hc->hs->cgi_pattern, hc->expnfilename) )
 	return cgi( hc );
 
     /* It's not CGI.  If it's executable or there's pathinfo, someone's
@@ -4072,7 +4072,7 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
 	 ( cp1 = strstr( _GETARRAYPTR(char, hc->referrer), "//" ) ) == NULL)
 	{
 	/* Disallow if we require a referrer and the url matches. */
-	if ( hs->no_empty_referrers && match( _GETCHARPTR(hs->url_pattern), _GETARRAYPTR(char, hc->origfilename)) )
+	if ( hs->no_empty_referrers && match( hs->url_pattern, hc->origfilename) )
 	    return 0;
 	/* Otherwise ok. */
 	return 1;
@@ -4121,8 +4121,8 @@ really_check_referrer( mm_ptr<httpd_conn> hc )
     /* If the referrer host doesn't match the local host pattern, and
     ** the filename does match the url pattern, it's an illegal reference.
     */
-    if ( ! match( _GETCHARPTR(lp), _GETARRAYPTR(char, refhost)) &&
-            match( _GETCHARPTR(hs->url_pattern), _GETARRAYPTR(char, hc->origfilename)) )
+    if ( ! match( lp, refhost) &&
+            match( hs->url_pattern, hc->origfilename) )
 	return 0;
     /* Otherwise ok. */
     return 1;

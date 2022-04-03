@@ -73,8 +73,8 @@ typedef long long int64_t;
 static char* argv0;
 static int debug;
 static unsigned short port;
-static char* dir;
-static char* data_dir;
+static char *dir;
+static char *data_dir;
 static int do_chroot, no_log, no_symlink_check, do_vhost, do_global_passwd;
 static char* cgi_pattern;
 static int cgi_limit;
@@ -92,7 +92,7 @@ static int max_age;
 
 
 typedef struct {
-    char* pattern;
+    mm_array_ptr<char> pattern;
     long max_limit, min_limit;
     long rate;
     off_t bytes_since_avg;
@@ -148,7 +148,8 @@ static void usage( void );
 static void read_config( char* filename );
 static void value_required( char* name, char* value );
 static void no_value_required( char* name, char* value );
-static char* e_strdup( char* oldstr );
+static char *e_strdup( char* oldstr );
+static mm_array_ptr<char> mm_e_strdup( char* oldstr );
 static void lookup_hostname( httpd_sockaddr* sa4P, size_t sa4_len, int* gotv4P, httpd_sockaddr* sa6P, size_t sa6_len, int* gotv6P );
 static void read_throttlefile( char* tf );
 static void shut_down( void );
@@ -338,7 +339,7 @@ re_open_logfile( void )
 	return;
 
     /* Re-open the log file. */
-    if ( logfile != (char*) 0 && strcmp( logfile, "-" ) != 0 )
+    if ( logfile != NULL && strcmp( logfile, "-" ) != 0 )
 	{
 	syslog( LOG_NOTICE, "re-opening logfile" );
 	logfp = fopen( logfile, "a" );
@@ -373,7 +374,7 @@ main( int argc, char** argv )
     argv0 = argv[0];
 
     cp = strrchr( argv0, '/' );
-    if ( cp != (char*) 0 )
+    if ( cp != NULL )
 	++cp;
     else
 	cp = argv0;
@@ -398,7 +399,7 @@ main( int argc, char** argv )
     numthrottles = 0;
     maxthrottles = 0;
     throttles = NULL;
-    if ( throttlefile != (char*) 0 )
+    if ( throttlefile != NULL )
 	read_throttlefile( throttlefile );
 
     /* If we're root and we're going to become another user, get the uid/gid
@@ -418,7 +419,7 @@ main( int argc, char** argv )
 	}
 
     /* Log file. */
-    if ( logfile != (char*) 0 )
+    if ( logfile != NULL )
 	{
 	if ( strcmp( logfile, "/dev/null" ) == 0 )
 	    {
@@ -459,9 +460,9 @@ main( int argc, char** argv )
 	logfp = (FILE*) 0;
 
     /* Switch directories if requested. */
-    if ( dir != (char*) 0 )
+    if ( dir != NULL )
 	{
-	if ( chdir( dir ) < 0 )
+	if ( mm_chdir( dir ) < 0 )
 	    {
 	    syslog( LOG_CRIT, "chdir - %m" );
 	    perror( "chdir" );
@@ -532,7 +533,7 @@ main( int argc, char** argv )
 #endif /* HAVE_SETSID */
 	}
 
-    if ( pidfile != (char*) 0 )
+    if ( pidfile != NULL )
 	{
 	/* Write the PID file. */
 	FILE* pidfp = fopen( pidfile, "w" );
@@ -570,7 +571,7 @@ main( int argc, char** argv )
 	** that the logfile pathname still works from inside the chroot
 	** tree.
 	*/
-	if ( logfile != (char*) 0 && strcmp( logfile, "-" ) != 0 )
+	if ( logfile != NULL && strcmp( logfile, "-" ) != 0 )
 	    {
 	    if ( strncmp( logfile, cwd, strlen( cwd ) ) == 0 )
 		{
@@ -597,9 +598,9 @@ main( int argc, char** argv )
 	}
 
     /* Switch directories again if requested. */
-    if ( data_dir != (char*) 0 )
+    if ( data_dir != NULL )
 	{
-	if ( chdir( data_dir ) < 0 )
+	if ( mm_chdir( data_dir ) < 0 )
 	    {
 	    syslog( LOG_CRIT, "data_dir chdir - %m" );
 	    perror( "data_dir chdir" );
@@ -843,8 +844,8 @@ parse_args( int argc, char** argv )
 
     debug = 0;
     port = DEFAULT_PORT;
-    dir = (char*) 0;
-    data_dir = (char*) 0;
+    dir = NULL;
+    data_dir = NULL;
 #ifdef ALWAYS_CHROOT
     do_chroot = 1;
 #else /* ALWAYS_CHROOT */
@@ -865,20 +866,20 @@ parse_args( int argc, char** argv )
 #ifdef CGI_PATTERN
     cgi_pattern = CGI_PATTERN;
 #else /* CGI_PATTERN */
-    cgi_pattern = (char*) 0;
+    cgi_pattern = NULL;
 #endif /* CGI_PATTERN */
 #ifdef CGI_LIMIT
     cgi_limit = CGI_LIMIT;
 #else /* CGI_LIMIT */
     cgi_limit = 0;
 #endif /* CGI_LIMIT */
-    url_pattern = (char*) 0;
+    url_pattern = NULL;
     no_empty_referrers = 0;
-    local_pattern = (char*) 0;
-    throttlefile = (char*) 0;
-    hostname = (char*) 0;
-    logfile = (char*) 0;
-    pidfile = (char*) 0;
+    local_pattern = NULL;
+    throttlefile = NULL;
+    hostname = NULL;
+    logfile = NULL;
+    pidfile = NULL;
     user = DEFAULT_USER;
     charset = DEFAULT_CHARSET;
     p3p = "";
@@ -1016,10 +1017,10 @@ read_config( char* filename )
 	exit( 1 );
 	}
 
-    while ( fgets( line, sizeof(line), fp ) != (char*) 0 )
+    while ( fgets( line, sizeof(line), fp ) != NULL )
 	{
 	/* Trim comments. */
-	if ( ( cp = strchr( line, '#' ) ) != (char*) 0 )
+	if ( ( cp = strchr( line, '#' ) ) != NULL )
 	    *cp = '\0';
 
 	/* Skip leading whitespace. */
@@ -1037,7 +1038,7 @@ read_config( char* filename )
 	    /* Split into name and value. */
 	    name = cp;
 	    value = strchr( name, '=' );
-	    if ( value != (char*) 0 )
+	    if ( value != NULL )
 		*value++ = '\0';
 	    /* Interpret. */
 	    if ( strcasecmp( name, "debug" ) == 0 )
@@ -1188,7 +1189,7 @@ read_config( char* filename )
 static void
 value_required( char* name, char* value )
     {
-    if ( value == (char*) 0 )
+    if ( value == NULL )
 	{
 	(void) fprintf(
 	    stderr, "%s: value required for %s option\n", argv0, name );
@@ -1200,7 +1201,7 @@ value_required( char* name, char* value )
 static void
 no_value_required( char* name, char* value )
     {
-    if ( value != (char*) 0 )
+    if ( value != NULL )
 	{
 	(void) fprintf(
 	    stderr, "%s: no value required for %s option\n",
@@ -1213,10 +1214,10 @@ no_value_required( char* name, char* value )
 static char*
 e_strdup( char* oldstr )
     {
-    char* newstr;
+    char *newstr = NULL;
 
     newstr = strdup( oldstr );
-    if ( newstr == (char*) 0 )
+    if ( newstr == NULL )
 	{
 	syslog( LOG_CRIT, "out of memory copying a string" );
 	(void) fprintf( stderr, "%s: out of memory copying a string\n", argv0 );
@@ -1224,6 +1225,22 @@ e_strdup( char* oldstr )
 	}
     return newstr;
     }
+
+static mm_array_ptr<char>
+mm_e_strdup( char* oldstr )
+    {
+    mm_array_ptr<char> newstr = NULL;
+
+    newstr = mm_strdup_from_raw( oldstr );
+    if ( newstr == NULL )
+	{
+	syslog( LOG_CRIT, "out of memory copying a string" );
+	(void) fprintf( stderr, "%s: out of memory copying a string\n", argv0 );
+	exit( 1 );
+	}
+    return newstr;
+    }
+
 
 
 static void
@@ -1317,7 +1334,7 @@ lookup_hostname( httpd_sockaddr* sa4P, size_t sa4_len, int* gotv4P, httpd_sockad
 
     (void) memset( sa4P, 0, sa4_len );
     sa4P->sa.sa_family = AF_INET;
-    if ( hostname == (char*) 0 )
+    if ( hostname == NULL )
 	sa4P->sa_in.sin_addr.s_addr = htonl( INADDR_ANY );
     else
 	{
@@ -1381,11 +1398,11 @@ read_throttlefile( char* tf )
 
     (void) gettimeofday( &tv, (struct timezone*) 0 );
 
-    while ( fgets( buf, sizeof(buf), fp ) != (char*) 0 )
+    while ( fgets( buf, sizeof(buf), fp ) != NULL )
 	{
 	/* Nuke comments. */
 	cp = strchr( buf, '#' );
-	if ( cp != (char*) 0 )
+	if ( cp != NULL )
 	    *cp = '\0';
 
 	/* Nuke trailing whitespace. */
@@ -1417,7 +1434,7 @@ read_throttlefile( char* tf )
 	/* Nuke any leading slashes in pattern. */
 	if ( pattern[0] == '/' )
 	    (void) ol_strcpy( pattern, &pattern[1] );
-	while ( ( cp = strstr( pattern, "|/" ) ) != (char*) 0 )
+	while ( ( cp = strstr( pattern, "|/" ) ) != NULL )
 	    (void) ol_strcpy( cp + 1, cp + 2 );
 
 	/* Check for room in throttles. */
@@ -1444,7 +1461,7 @@ read_throttlefile( char* tf )
 	    }
 
 	/* Add to table. */
-	throttles[numthrottles].pattern = e_strdup( pattern );
+	throttles[numthrottles].pattern = mm_e_strdup( pattern );
 	throttles[numthrottles].max_limit = max_limit;
 	throttles[numthrottles].min_limit = min_limit;
 	throttles[numthrottles].rate = 0;
@@ -1668,7 +1685,7 @@ handle_read(mm_ptr<connecttab> c, struct timeval* tvP )
 	c->end_byte_index = hc->bytes_to_send;
 
     /* Check if it's already handled. */
-    if ( hc->file_address == (char*) 0 )
+    if ( hc->file_address == NULL )
 	{
 	/* No file address means someone else is handling it. */
 	int tind;
@@ -1880,7 +1897,7 @@ check_throttles(mm_ptr<connecttab> c ) {
     c->max_limit = c->min_limit = THROTTLE_NOLIMIT;
     for ( tnum = 0; tnum < numthrottles && c->numtnums < MAXTHROTTLENUMS;
 	  ++tnum )
-	if ( match( throttles[tnum].pattern, _GETARRAYPTR(char, c->hc->expnfilename)))
+	if ( match( throttles[tnum].pattern, c->hc->expnfilename))
 	    {
 	    /* If we're way over the limit, don't even start. */
 	    if ( throttles[tnum].rate > throttles[tnum].max_limit * 2 )
@@ -1939,13 +1956,19 @@ update_throttles( ClientData client_data, struct timeval* nowP )
 	if ( throttles[tnum].rate > throttles[tnum].max_limit && throttles[tnum].num_sending != 0 )
 	    {
 	    if ( throttles[tnum].rate > throttles[tnum].max_limit * 2 )
-		syslog( LOG_NOTICE, "throttle #%d '%.80s' rate %ld greatly exceeding limit %ld; %d sending", tnum, throttles[tnum].pattern, throttles[tnum].rate, throttles[tnum].max_limit, throttles[tnum].num_sending );
+		syslog( LOG_NOTICE, "throttle #%d '%.80s' rate %ld greatly exceeding limit %ld; %d sending",
+                tnum, _GETCHARPTR(throttles[tnum].pattern), throttles[tnum].rate,
+                throttles[tnum].max_limit, throttles[tnum].num_sending );
 	    else
-		syslog( LOG_INFO, "throttle #%d '%.80s' rate %ld exceeding limit %ld; %d sending", tnum, throttles[tnum].pattern, throttles[tnum].rate, throttles[tnum].max_limit, throttles[tnum].num_sending );
+		syslog( LOG_INFO, "throttle #%d '%.80s' rate %ld exceeding limit %ld; %d sending",
+                tnum, _GETCHARPTR(throttles[tnum].pattern), throttles[tnum].rate,
+                throttles[tnum].max_limit, throttles[tnum].num_sending );
 	    }
 	if ( throttles[tnum].rate < throttles[tnum].min_limit && throttles[tnum].num_sending != 0 )
 	    {
-	    syslog( LOG_NOTICE, "throttle #%d '%.80s' rate %ld lower than minimum %ld; %d sending", tnum, throttles[tnum].pattern, throttles[tnum].rate, throttles[tnum].min_limit, throttles[tnum].num_sending );
+	    syslog( LOG_NOTICE, "throttle #%d '%.80s' rate %ld lower than minimum %ld; %d sending",
+                tnum, _GETCHARPTR(throttles[tnum].pattern), throttles[tnum].rate,
+                throttles[tnum].min_limit, throttles[tnum].num_sending );
 	    }
 	}
 

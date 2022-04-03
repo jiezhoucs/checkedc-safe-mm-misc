@@ -73,7 +73,7 @@ Something unusual went wrong during a server-side-includes request:\n\
 
 
 static void
-not_found( char* filename )
+not_found( mm_array_ptr<char> filename )
     {
     char* title = "404 Not Found";
 
@@ -82,7 +82,7 @@ not_found( char* filename )
 <BODY><H2>%s</H2>\n\
 The requested server-side-includes filename, %s,\n\
 does not seem to exist.\n\
-</BODY></HTML>\n", title, title, filename );
+</BODY></HTML>\n", title, title, _GETCHARPTR(filename) );
     }
 
 
@@ -211,38 +211,38 @@ get_filename( char* vfilename, char* filename, char* directive, char* tag, char*
 
 
 static int
-check_filename( char* filename )
+check_filename( mm_array_ptr<char> filename )
     {
     static int inited = 0;
-    static char* cgi_pattern;
+    static mm_array_ptr<char> cgi_pattern = NULL;
     int fnl;
-    char* cp;
-    char* dirname;
-    char* authname;
+    mm_array_ptr<char> cp = NULL;
+    mm_array_ptr<char> dirname = NULL;
+    mm_array_ptr<char> authname = NULL;
     struct stat sb2;
     int r;
 
     if ( ! inited )
 	{
 	/* Get the cgi pattern. */
-	cgi_pattern = getenv( "CGI_PATTERN" );
+	cgi_pattern = mm_strdup_from_raw(getenv( "CGI_PATTERN" ));
 #ifdef CGI_PATTERN
-	if ( cgi_pattern == (char*) 0 )
+	if ( cgi_pattern == NULL )
 	    cgi_pattern = CGI_PATTERN;
 #endif /* CGI_PATTERN */
 	inited = 1;
 	}
 
     /* ../ is not permitted. */
-    if ( strstr( filename, "../" ) != (char*) 0 )
+    if ( mm_strstr( filename, "../" ) != NULL )
 	return 0;
 
 #ifdef AUTH_FILE
     /* Ensure that we are not reading a basic auth password file. */
-    fnl = strlen(filename);
-    if ( strcmp( filename, AUTH_FILE ) == 0 ||
+    fnl = mm_strlen(filename);
+    if ( mm_strcmp( filename, AUTH_FILE ) == 0 ||
 	 ( fnl >= sizeof(AUTH_FILE) &&
-	   strcmp( &filename[fnl - sizeof(AUTH_FILE) + 1], AUTH_FILE ) == 0 &&
+	   mm_strcmp( &filename[fnl - sizeof(AUTH_FILE) + 1], AUTH_FILE ) == 0 &&
 	   filename[fnl - sizeof(AUTH_FILE)] == '/' ) )
 	return 0;
 
@@ -251,27 +251,27 @@ check_filename( char* filename )
     ** authorization header, for security reasons.  So instead we just
     ** prohibit access to all auth-protected files.
     */
-    dirname = strdup( filename );
-    if ( dirname == (char*) 0 )
+    dirname = mm_strdup( filename );
+    if ( dirname == NULL )
 	return 0;	/* out of memory */
-    cp = strrchr( dirname, '/' );
-    if ( cp == (char*) 0 )
-	(void) strcpy( dirname, "." );
+    cp = mm_strrchr( dirname, '/' );
+    if ( cp == NULL )
+	(void) mm_strcpy( dirname, "." );
     else
 	*cp = '\0';
-    authname = malloc( strlen( dirname ) + 1 + sizeof(AUTH_FILE) );
-    if ( authname == (char*) 0 )
+    authname = MM_ARRAY_ALLOC(char,  mm_strlen( dirname ) + 1 + sizeof(AUTH_FILE) );
+    if ( authname == NULL )
 	return 0;	/* out of memory */
-    (void) sprintf( authname, "%s/%s", dirname, AUTH_FILE );
-    r = stat( authname, &sb2 );
-    free( dirname );
-    free( authname );
+    (void) sprintf( _GETCHARPTR(authname), "%s/%s", _GETCHARPTR(dirname), AUTH_FILE );
+    r = mm_stat( authname, &sb2 );
+    MM_FREE(char,  dirname );
+    MM_FREE(char, authname );
     if ( r == 0 )
 	return 0;
 #endif /* AUTH_FILE */
 
     /* Ensure that we are not reading a CGI file. */
-    if ( cgi_pattern != (char*) 0 && match( cgi_pattern, filename ) )
+    if ( cgi_pattern != NULL && match( cgi_pattern, filename ) )
 	return 0;
 
     return 1;
@@ -701,7 +701,7 @@ main( int argc, char** argv )
     {
     char* script_name;
     char* path_info;
-    char* path_translated;
+    mm_array_ptr<char> path_translated = NULL;
     FILE* fp;
 
     argv0 = argv[0];
@@ -734,8 +734,8 @@ main( int argc, char** argv )
     (void) sprintf( url, "%s%s", script_name, path_info );
 
     /* Get the name of the file to parse. */
-    path_translated = getenv( "PATH_TRANSLATED" );
-    if ( path_translated == (char*) 0 )
+    path_translated = mm_strdup_from_raw(getenv( "PATH_TRANSLATED" ));
+    if ( path_translated == NULL )
 	{
 	internal_error( "Couldn't get PATH_TRANSLATED environment variable." );
 	exit( 1 );
@@ -743,12 +743,13 @@ main( int argc, char** argv )
 
     if ( ! check_filename( path_translated ) )
 	{
-	not_permitted( "initial", "PATH_TRANSLATED", path_translated );
+        // TODO
+	not_permitted( "initial", "PATH_TRANSLATED", _GETCHARPTR(path_translated) );
 	exit( 1 );
 	}
 
     /* Open it. */
-    fp = fopen( path_translated, "r" );
+    fp = mm_fopen( path_translated, "r" );
     if ( fp == (FILE*) 0 )
 	{
 	not_found( path_translated );
@@ -756,7 +757,8 @@ main( int argc, char** argv )
 	}
 
     /* Read and handle the file. */
-    read_file( path_info, path_translated, fp );
+    // TODO
+    read_file( path_info, _GETCHARPTR(path_translated), fp );
 
     (void) fclose( fp );
     exit( 0 );

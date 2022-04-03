@@ -28,9 +28,11 @@
 #ifndef _MATCH_H_
 #define _MATCH_H_
 
+#include <safe_mm_checked.h>
+
 /* Simple shell-style filename pattern matcher.  Only does ? * and **, and
 ** multiple patterns separated by |.  Returns 1 or 0.
 */
-int match( const char* pattern, const char* string );
+int match( mm_array_ptr<const char> pattern, mm_array_ptr<const char> string );
 
 #endif /* _MATCH_H_ */
