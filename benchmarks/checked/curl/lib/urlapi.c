@@ -52,19 +52,19 @@
 
 /* Internal representation of CURLU. Point to URL-encoded strings. */
 struct Curl_URL {
-  char *scheme;
-  char *user;
-  char *password;
-  char *options; /* IMAP only? */
-  char *host;
-  char *zoneid; /* for numerical IPv6 addresses */
-  char *port;
-  char *path;
-  char *query;
-  char *fragment;
+  mm_array_ptr<char> scheme;
+  mm_array_ptr<char> user;
+  mm_array_ptr<char> password;
+  mm_array_ptr<char> options; /* IMAP only? */
+  mm_array_ptr<char> host;
+  mm_array_ptr<char> zoneid; /* for numerical IPv6 addresses */
+  mm_array_ptr<char> port;
+  mm_array_ptr<char> path;
+  mm_array_ptr<char> query;
+  mm_array_ptr<char> fragment;
 
-  char *scratch; /* temporary scratch area */
-  char *temppath; /* temporary path pointer */
+  mm_array_ptr<char> scratch; /* temporary scratch area */
+  mm_array_ptr<char> temppath; /* temporary path pointer */
   long portnum; /* the numerical version */
 };
 
@@ -72,18 +72,18 @@ struct Curl_URL {
 
 static void free_urlhandle(struct Curl_URL *u)
 {
-  free(u->scheme);
-  free(u->user);
-  free(u->password);
-  free(u->options);
-  free(u->host);
-  free(u->zoneid);
-  free(u->port);
-  free(u->path);
-  free(u->query);
-  free(u->fragment);
-  free(u->scratch);
-  free(u->temppath);
+  MM_FREE(char, u->scheme);
+  MM_FREE(char, u->user);
+  MM_FREE(char, u->password);
+  MM_FREE(char, u->options);
+  MM_FREE(char, u->host);
+  MM_FREE(char, u->zoneid);
+  MM_FREE(char, u->port);
+  MM_FREE(char, u->path);
+  MM_FREE(char, u->query);
+  MM_FREE(char, u->fragment);
+  MM_FREE(char, u->scratch);
+  MM_FREE(char, u->temppath);
 }
 
 /* move the full contents of one handle onto another and
@@ -428,7 +428,7 @@ static char *concat_url(const char *base, const char *relurl)
  *
  */
 static CURLUcode parse_hostname_login(struct Curl_URL *u,
-                                      char **hostname,
+                                      mm_array_ptr<char> *hostname,
                                       unsigned int flags)
 {
   CURLUcode result = CURLUE_OK;
@@ -445,8 +445,8 @@ static CURLUcode parse_hostname_login(struct Curl_URL *u,
    * We need somewhere to put the embedded details, so do that first.
    */
 
-  char *ptr = strchr(*hostname, '@');
-  char *login = *hostname;
+  mm_array_ptr<char> ptr = mm_strchr(*hostname, '@');
+  mm_array_ptr<char> login = *hostname;
 
   if(!ptr)
     goto out;
@@ -458,11 +458,12 @@ static CURLUcode parse_hostname_login(struct Curl_URL *u,
 
   /* if this is a known scheme, get some details */
   if(u->scheme)
-    h = Curl_builtin_scheme(u->scheme);
+    h = mm_Curl_builtin_scheme(u->scheme);
 
   /* We could use the login information in the URL so extract it. Only parse
      options if the handler says we should. Note that 'h' might be NULL! */
-  ccode = Curl_parse_login_details(login, ptr - login - 1,
+  // TODO?
+  ccode = Curl_parse_login_details(_GETCHARPTR(login), ptr - login - 1,
                                    &userp, &passwdp,
                                    (h && (h->flags & PROTOPT_URLOPTIONS)) ?
                                    &optionsp:NULL);
@@ -478,14 +479,14 @@ static CURLUcode parse_hostname_login(struct Curl_URL *u,
       goto out;
     }
 
-    u->user = _GETCHARPTR(userp);
+    u->user = userp;
   }
 
   if(passwdp)
-    u->password = _GETCHARPTR(passwdp);
+    u->password = passwdp;
 
   if(optionsp)
-    u->options = _GETCHARPTR(optionsp);
+    u->options = optionsp;
 
   return CURLUE_OK;
   out:
@@ -571,7 +572,7 @@ UNITTEST CURLUcode Curl_parse_port(struct Curl_URL *u, char *hostname,
     /* generate a new port number string to get rid of leading zeroes etc */
     msnprintf(portbuf, sizeof(portbuf), "%ld", port);
     u->portnum = port;
-    u->port = strdup(portbuf);
+    u->port = mm_strdup_from_raw(portbuf);
     if(!u->port)
       return CURLUE_OUT_OF_MEMORY;
   }
@@ -637,7 +638,7 @@ static CURLUcode hostname_check(struct Curl_URL *u, char *hostname)
         if(!i || (']' != *h))
           return CURLUE_MALFORMED_INPUT;
         zoneid[i] = 0;
-        u->zoneid = strdup(zoneid);
+        u->zoneid = mm_strdup(zoneid);
         if(!u->zoneid)
           return CURLUE_OUT_OF_MEMORY;
         hostname[len] = ']'; /* insert end bracket */
@@ -758,15 +759,15 @@ static bool ipv4_normalize(const char *hostname, char *outp, size_t olen)
 
 static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
 {
-  char *path;
+  mm_array_ptr<char> path = NULL;
   bool path_alloced = FALSE;
-  char *hostname;
-  char *query = NULL;
-  char *fragment = NULL;
+  mm_array_ptr<char> hostname = NULL;
+  mm_array_ptr<char> query = NULL;
+  mm_array_ptr<char> fragment = NULL;
   CURLUcode result;
   bool url_has_scheme = FALSE;
   char schemebuf[MAX_SCHEME_LEN + 1];
-  const char *schemep = NULL;
+  mm_array_ptr<const char> schemep = NULL;
   size_t schemelen = 0;
   size_t urllen;
 
@@ -781,7 +782,7 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
     /* excessive input length */
     return CURLUE_MALFORMED_INPUT;
 
-  path = u->scratch = malloc(urllen * 2 + 2);
+  path = u->scratch = MM_ARRAY_ALLOC(char, urllen * 2 + 2);
   if(!path)
     return CURLUE_OUT_OF_MEMORY;
 
@@ -796,10 +797,10 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
   /* handle the file: scheme */
   if(url_has_scheme && strcasecompare(schemebuf, "file")) {
     /* path has been allocated large enough to hold this */
-    strcpy(path, &url[5]);
+    mm_strcpy(path, &url[5]);
 
     hostname = NULL; /* no host for file: URLs */
-    u->scheme = strdup("file");
+    u->scheme = mm_strdup_from_raw("file");
     if(!u->scheme)
       return CURLUE_OUT_OF_MEMORY;
 
@@ -811,7 +812,7 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
      */
     if(path[0] == '/' && path[1] == '/') {
       /* swallow the two slashes */
-      char *ptr = &path[2];
+      mm_array_ptr<char> ptr = &path[2];
 
       /*
        * According to RFC 8089, a file: URL can be reliably dereferenced if:
@@ -832,8 +833,8 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
       if(ptr[0] != '/' && !STARTS_WITH_URL_DRIVE_PREFIX(ptr)) {
         /* the URL includes a host name, it must match "localhost" or
            "127.0.0.1" to be valid */
-        if(!checkprefix_raw("localhost/", ptr) &&
-           !checkprefix_raw("127.0.0.1/", ptr)) {
+        if(!checkprefix("localhost/", ptr) &&
+           !checkprefix("127.0.0.1/", ptr)) {
           /* Invalid file://hostname/, expected localhost or 127.0.0.1 or
              none */
           return CURLUE_MALFORMED_INPUT;
@@ -880,11 +881,11 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
         return CURLUE_MALFORMED_INPUT;
 
       schemep = schemebuf;
-      if(!Curl_builtin_scheme(schemep) &&
+      if(!mm_Curl_builtin_scheme(schemep) &&
          !(flags & CURLU_NON_SUPPORT_SCHEME))
         return CURLUE_UNSUPPORTED_SCHEME;
 
-      if(junkscan(schemep, flags))
+      if(junkscan(_GETCHARPTR(schemep), flags))
         return CURLUE_MALFORMED_INPUT;
     }
     else {
@@ -907,7 +908,7 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
 
     len = p - hostp;
     if(len) {
-      memcpy(hostname, hostp, len);
+      mm_memcpy(hostname, hostp, len);
       hostname[len] = 0;
     }
     else {
@@ -916,44 +917,46 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
     }
 
     len = strlen(p);
-    memcpy(path, p, len);
+    mm_memcpy(path, p, len);
     path[len] = 0;
 
     if(schemep) {
-      u->scheme = strdup(schemep);
+      u->scheme = mm_strdup(schemep);
       if(!u->scheme)
         return CURLUE_OUT_OF_MEMORY;
     }
   }
 
-  if(junkscan(path, flags))
+  // TODO
+  if(junkscan(_GETCHARPTR(path), flags))
     return CURLUE_MALFORMED_INPUT;
 
   if((flags & CURLU_URLENCODE) && path[0]) {
     /* worst case output length is 3x the original! */
-    char *newp = malloc(strlen(path) * 3);
+    mm_array_ptr<char> newp = MM_ARRAY_ALLOC(char, mm_strlen(path) * 3);
     if(!newp)
       return CURLUE_OUT_OF_MEMORY;
     path_alloced = TRUE;
-    strcpy_url(newp, path, TRUE); /* consider it relative */
+    // TODO
+    strcpy_url(_GETCHARPTR(newp), _GETCHARPTR(path), TRUE); /* consider it relative */
     u->temppath = path = newp;
   }
 
-  fragment = strchr(path, '#');
+  fragment = mm_strchr(path, '#');
   if(fragment) {
     *fragment++ = 0;
     if(fragment[0]) {
-      u->fragment = strdup(fragment);
+      u->fragment = mm_strdup(fragment);
       if(!u->fragment)
         return CURLUE_OUT_OF_MEMORY;
     }
   }
 
-  query = strchr(path, '?');
+  query = mm_strchr(path, '?');
   if(query) {
     *query++ = 0;
     /* done even if the query part is a blank string */
-    u->query = strdup(query);
+    u->query = mm_strdup(query);
     if(!u->query)
       return CURLUE_OUT_OF_MEMORY;
   }
@@ -964,22 +967,22 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
   else {
     if(!(flags & CURLU_PATH_AS_IS)) {
       /* remove ../ and ./ sequences according to RFC3986 */
-      char *newp = Curl_dedotdotify(path);
+      mm_array_ptr<char> newp = Curl_dedotdotify(path);
       if(!newp)
         return CURLUE_OUT_OF_MEMORY;
 
-      if(strcmp(newp, path)) {
+      if(mm_strcmp(newp, path)) {
         /* if we got a new version */
         if(path_alloced)
-          Curl_safefree(u->temppath);
+          mm_Curl_safefree(char, u->temppath);
         u->temppath = path = newp;
         path_alloced = TRUE;
       }
       else
-        free(newp);
+        MM_FREE(char, newp);
     }
 
-    u->path = path_alloced?path:strdup(path);
+    u->path = path_alloced?path:mm_strdup(path);
     if(!u->path)
       return CURLUE_OUT_OF_MEMORY;
     u->temppath = NULL; /* used now */
@@ -990,58 +993,60 @@ static CURLUcode seturl(const char *url, CURLU *u, unsigned int flags)
     /*
      * Parse the login details and strip them out of the host name.
      */
-    if(junkscan(hostname, flags))
+    if(junkscan(_GETCHARPTR(hostname), flags))
       return CURLUE_MALFORMED_INPUT;
 
     result = parse_hostname_login(u, &hostname, flags);
     if(result)
       return result;
 
-    result = Curl_parse_port(u, hostname, url_has_scheme);
+    // TODO?
+    result = Curl_parse_port(u, _GETCHARPTR(hostname), url_has_scheme);
     if(result)
       return result;
 
-    if(0 == strlen(hostname) && (flags & CURLU_NO_AUTHORITY)) {
+    if(0 == mm_strlen(hostname) && (flags & CURLU_NO_AUTHORITY)) {
       /* Skip hostname check, it's allowed to be empty. */
     }
     else {
-      result = hostname_check(u, hostname);
+      result = hostname_check(u, _GETCHARPTR(hostname));
       if(result)
         return result;
     }
 
-    if(ipv4_normalize(hostname, normalized_ipv4, sizeof(normalized_ipv4)))
-      u->host = strdup(normalized_ipv4);
+    // TOD?
+    if(ipv4_normalize(_GETCHARPTR(hostname), normalized_ipv4, sizeof(normalized_ipv4)))
+      u->host = mm_strdup_from_raw(normalized_ipv4);
     else
-      u->host = strdup(hostname);
+      u->host = mm_strdup(hostname);
     if(!u->host)
       return CURLUE_OUT_OF_MEMORY;
 
     if((flags & CURLU_GUESS_SCHEME) && !schemep) {
       /* legacy curl-style guess based on host name */
-      if(checkprefix_raw("ftp.", hostname))
+      if(checkprefix("ftp.", hostname))
         schemep = "ftp";
-      else if(checkprefix_raw("dict.", hostname))
+      else if(checkprefix("dict.", hostname))
         schemep = "dict";
-      else if(checkprefix_raw("ldap.", hostname))
+      else if(checkprefix("ldap.", hostname))
         schemep = "ldap";
-      else if(checkprefix_raw("imap.", hostname))
+      else if(checkprefix("imap.", hostname))
         schemep = "imap";
-      else if(checkprefix_raw("smtp.", hostname))
+      else if(checkprefix("smtp.", hostname))
         schemep = "smtp";
-      else if(checkprefix_raw("pop3.", hostname))
+      else if(checkprefix("pop3.", hostname))
         schemep = "pop3";
       else
         schemep = "http";
 
-      u->scheme = strdup(schemep);
+      u->scheme = mm_strdup(schemep);
       if(!u->scheme)
         return CURLUE_OUT_OF_MEMORY;
     }
   }
 
-  Curl_safefree(u->scratch);
-  Curl_safefree(u->temppath);
+  mm_Curl_safefree(char, u->scratch);
+  mm_Curl_safefree(char, u->temppath);
 
   return CURLUE_OK;
 }
@@ -1088,7 +1093,7 @@ void curl_url_cleanup(CURLU *u)
 #define DUP(dest, src, name)                    \
   do {                                          \
     if(src->name) {                             \
-      dest->name = strdup(src->name);           \
+      dest->name = mm_strdup(src->name);           \
       if(!dest->name)                           \
         goto fail;                              \
     }                                           \
@@ -1118,7 +1123,7 @@ CURLU *curl_url_dup(CURLU *in)
 CURLUcode curl_url_get(CURLU *u, CURLUPart what,
                        char **part, unsigned int flags)
 {
-  char *ptr;
+  mm_array_ptr<char> ptr = NULL;
   CURLUcode ifmissing = CURLUE_UNKNOWN_PART;
   char portbuf[7];
   bool urldecode = (flags & CURLU_URLDECODE)?1:0;
@@ -1163,7 +1168,7 @@ CURLUcode curl_url_get(CURLU *u, CURLUPart what,
       /* there's no stored port number, but asked to deliver
          a default one for the scheme */
       const struct Curl_handler *h =
-        Curl_builtin_scheme(u->scheme);
+        mm_Curl_builtin_scheme(u->scheme);
       if(h) {
         msnprintf(portbuf, sizeof(portbuf), "%u", h->defport);
         ptr = portbuf;
@@ -1173,7 +1178,7 @@ CURLUcode curl_url_get(CURLU *u, CURLUPart what,
       /* there is a stored port number, but ask to inhibit if
          it matches the default one for the scheme */
       const struct Curl_handler *h =
-        Curl_builtin_scheme(u->scheme);
+        mm_Curl_builtin_scheme(u->scheme);
       if(h && (h->defport == u->portnum) &&
          (flags & CURLU_NO_DEFAULT_PORT))
         ptr = NULL;
@@ -1182,7 +1187,7 @@ CURLUcode curl_url_get(CURLU *u, CURLUPart what,
   case CURLUPART_PATH:
     ptr = u->path;
     if(!ptr) {
-      ptr = u->path = strdup("/");
+      ptr = u->path = mm_strdup_from_raw("/");
       if(!u->path)
         return CURLUE_OUT_OF_MEMORY;
     }
@@ -1197,16 +1202,16 @@ CURLUcode curl_url_get(CURLU *u, CURLUPart what,
     ifmissing = CURLUE_NO_FRAGMENT;
     break;
   case CURLUPART_URL: {
-    char *url;
-    char *scheme;
-    char *options = u->options;
-    char *port = u->port;
-    char *allochost = NULL;
-    if(u->scheme && strcasecompare("file", u->scheme)) {
+    char *url = NULL;
+    mm_array_ptr<char> scheme = NULL;
+    mm_array_ptr<char> options = u->options;
+    mm_array_ptr<char> port = u->port;
+    mm_array_ptr<char> allochost = NULL;
+    if(u->scheme && mm_strcasecompare("file", u->scheme)) {
       url = aprintf("file://%s%s%s",
-                    u->path,
+                    _GETCHARPTR(u->path),
                     u->fragment? "#": "",
-                    u->fragment? u->fragment : "");
+                    u->fragment? _GETCHARPTR(u->fragment) : "");
     }
     else if(!u->host)
       return CURLUE_NO_HOST;
@@ -1215,11 +1220,11 @@ CURLUcode curl_url_get(CURLU *u, CURLUPart what,
       if(u->scheme)
         scheme = u->scheme;
       else if(flags & CURLU_DEFAULT_SCHEME)
-        scheme = (char *) DEFAULT_SCHEME;
+        scheme =  DEFAULT_SCHEME;
       else
         return CURLUE_NO_SCHEME;
 
-      h = Curl_builtin_scheme(scheme);
+      h = mm_Curl_builtin_scheme(scheme);
       if(!port && (flags & CURLU_DEFAULT_PORT)) {
         /* there's no stored port number, but asked to deliver
            a default one for the scheme */
@@ -1241,34 +1246,34 @@ CURLUcode curl_url_get(CURLU *u, CURLUPart what,
 
       if((u->host[0] == '[') && u->zoneid) {
         /* make it '[ host %25 zoneid ]' */
-        size_t hostlen = strlen(u->host);
-        size_t alen = hostlen + 3 + strlen(u->zoneid) + 1;
-        allochost = malloc(alen);
+        size_t hostlen = mm_strlen(u->host);
+        size_t alen = hostlen + 3 + mm_strlen(u->zoneid) + 1;
+        allochost = MM_ARRAY_ALLOC(char, alen);
         if(!allochost)
           return CURLUE_OUT_OF_MEMORY;
-        memcpy(allochost, u->host, hostlen - 1);
-        msnprintf(&allochost[hostlen - 1], alen - hostlen + 1,
-                  "%%25%s]", u->zoneid);
+        mm_memcpy(allochost, u->host, hostlen - 1);
+        msnprintf(_GETCHARPTR(&allochost[hostlen - 1]), alen - hostlen + 1,
+                  "%%25%s]", _GETCHARPTR(u->zoneid));
       }
 
       url = aprintf("%s://%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
-                    scheme,
-                    u->user ? u->user : "",
+                    _GETCHARPTR(scheme),
+                    u->user ? _GETCHARPTR(u->user) : "",
                     u->password ? ":": "",
-                    u->password ? u->password : "",
+                    u->password ? _GETCHARPTR(u->password) : "",
                     options ? ";" : "",
-                    options ? options : "",
+                    options ? _GETCHARPTR(options) : "",
                     (u->user || u->password || options) ? "@": "",
-                    allochost ? allochost : u->host,
+                    allochost ? _GETCHARPTR(allochost) : _GETCHARPTR(u->host),
                     port ? ":": "",
-                    port ? port : "",
+                    port ? _GETCHARPTR(port) : "",
                     (u->path && (u->path[0] != '/')) ? "/": "",
-                    u->path ? u->path : "/",
+                    u->path ? _GETCHARPTR(u->path) : "/",
                     (u->query && u->query[0]) ? "?": "",
-                    (u->query && u->query[0]) ? u->query : "",
+                    (u->query && u->query[0]) ? _GETCHARPTR(u->query) : "",
                     u->fragment? "#": "",
-                    u->fragment? u->fragment : "");
-      free(allochost);
+                    u->fragment? _GETCHARPTR(u->fragment) : "");
+      MM_FREE(char, allochost);
     }
     if(!url)
       return CURLUE_OUT_OF_MEMORY;
@@ -1280,7 +1285,7 @@ CURLUcode curl_url_get(CURLU *u, CURLUPart what,
     break;
   }
   if(ptr) {
-    *part = strdup(ptr);
+    *part = strdup(_GETCHARPTR(ptr));
     if(!*part)
       return CURLUE_OUT_OF_MEMORY;
     if(plusdecode) {
@@ -1314,7 +1319,7 @@ CURLUcode curl_url_get(CURLU *u, CURLUPart what,
 CURLUcode mm_curl_url_get(CURLU *u, CURLUPart what,
                        mm_array_ptr<char> *part, unsigned int flags)
 {
-  char *ptr;
+  mm_array_ptr<char> ptr = NULL;
   CURLUcode ifmissing = CURLUE_UNKNOWN_PART;
   char portbuf[7];
   bool urldecode = (flags & CURLU_URLDECODE)?1:0;
@@ -1359,7 +1364,7 @@ CURLUcode mm_curl_url_get(CURLU *u, CURLUPart what,
       /* there's no stored port number, but asked to deliver
          a default one for the scheme */
       const struct Curl_handler *h =
-        Curl_builtin_scheme(u->scheme);
+        mm_Curl_builtin_scheme(u->scheme);
       if(h) {
         msnprintf(portbuf, sizeof(portbuf), "%u", h->defport);
         ptr = portbuf;
@@ -1369,7 +1374,7 @@ CURLUcode mm_curl_url_get(CURLU *u, CURLUPart what,
       /* there is a stored port number, but ask to inhibit if
          it matches the default one for the scheme */
       const struct Curl_handler *h =
-        Curl_builtin_scheme(u->scheme);
+        mm_Curl_builtin_scheme(u->scheme);
       if(h && (h->defport == u->portnum) &&
          (flags & CURLU_NO_DEFAULT_PORT))
         ptr = NULL;
@@ -1378,7 +1383,7 @@ CURLUcode mm_curl_url_get(CURLU *u, CURLUPart what,
   case CURLUPART_PATH:
     ptr = u->path;
     if(!ptr) {
-      ptr = u->path = strdup("/");
+      ptr = u->path = mm_strdup_from_raw("/");
       if(!u->path)
         return CURLUE_OUT_OF_MEMORY;
     }
@@ -1394,15 +1399,15 @@ CURLUcode mm_curl_url_get(CURLU *u, CURLUPart what,
     break;
   case CURLUPART_URL: {
     mm_array_ptr<char> url = NULL;
-    char *scheme;
-    char *options = u->options;
-    char *port = u->port;
-    char *allochost = NULL;
-    if(u->scheme && strcasecompare("file", u->scheme)) {
+    mm_array_ptr<char> scheme = NULL;
+    mm_array_ptr<char> options = u->options;
+    mm_array_ptr<char> port = u->port;
+    mm_array_ptr<char> allochost = NULL;
+    if(u->scheme && mm_strcasecompare("file", u->scheme)) {
       url = mmize_str(aprintf("file://%s%s%s",
-                    u->path,
+                    _GETCHARPTR(u->path),
                     u->fragment? "#": "",
-                    u->fragment? u->fragment : ""));
+                    u->fragment? _GETCHARPTR(u->fragment) : ""));
     }
     else if(!u->host)
       return CURLUE_NO_HOST;
@@ -1411,11 +1416,11 @@ CURLUcode mm_curl_url_get(CURLU *u, CURLUPart what,
       if(u->scheme)
         scheme = u->scheme;
       else if(flags & CURLU_DEFAULT_SCHEME)
-        scheme = (char *) DEFAULT_SCHEME;
+        scheme =  DEFAULT_SCHEME;
       else
         return CURLUE_NO_SCHEME;
 
-      h = Curl_builtin_scheme(scheme);
+      h = mm_Curl_builtin_scheme(scheme);
       if(!port && (flags & CURLU_DEFAULT_PORT)) {
         /* there's no stored port number, but asked to deliver
            a default one for the scheme */
@@ -1437,34 +1442,34 @@ CURLUcode mm_curl_url_get(CURLU *u, CURLUPart what,
 
       if((u->host[0] == '[') && u->zoneid) {
         /* make it '[ host %25 zoneid ]' */
-        size_t hostlen = strlen(u->host);
-        size_t alen = hostlen + 3 + strlen(u->zoneid) + 1;
-        allochost = malloc(alen);
+        size_t hostlen = mm_strlen(u->host);
+        size_t alen = hostlen + 3 + mm_strlen(u->zoneid) + 1;
+        allochost = MM_ARRAY_ALLOC(char, alen);
         if(!allochost)
           return CURLUE_OUT_OF_MEMORY;
-        memcpy(allochost, u->host, hostlen - 1);
-        msnprintf(&allochost[hostlen - 1], alen - hostlen + 1,
-                  "%%25%s]", u->zoneid);
+        mm_memcpy(allochost, u->host, hostlen - 1);
+        msnprintf(_GETCHARPTR(&allochost[hostlen - 1]), alen - hostlen + 1,
+                  "%%25%s]", _GETCHARPTR(u->zoneid));
       }
 
       url = mmize_str(aprintf("%s://%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
-                    scheme,
-                    u->user ? u->user : "",
+                    _GETCHARPTR(scheme),
+                    u->user ? _GETCHARPTR(u->user) : "",
                     u->password ? ":": "",
-                    u->password ? u->password : "",
+                    u->password ? _GETCHARPTR(u->password) : "",
                     options ? ";" : "",
-                    options ? options : "",
+                    options ? _GETCHARPTR(options) : "",
                     (u->user || u->password || options) ? "@": "",
-                    allochost ? allochost : u->host,
+                    allochost ? _GETCHARPTR(allochost) : _GETCHARPTR(u->host),
                     port ? ":": "",
-                    port ? port : "",
+                    port ? _GETCHARPTR(port) : "",
                     (u->path && (u->path[0] != '/')) ? "/": "",
-                    u->path ? u->path : "/",
+                    u->path ? _GETCHARPTR(u->path) : "/",
                     (u->query && u->query[0]) ? "?": "",
-                    (u->query && u->query[0]) ? u->query : "",
+                    (u->query && u->query[0]) ? _GETCHARPTR(u->query) : "",
                     u->fragment? "#": "",
-                    u->fragment? u->fragment : ""));
-      free(allochost);
+                    u->fragment? _GETCHARPTR(u->fragment) : ""));
+      MM_FREE(char, allochost);
     }
     if(!url)
       return CURLUE_OUT_OF_MEMORY;
@@ -1476,7 +1481,7 @@ CURLUcode mm_curl_url_get(CURLU *u, CURLUPart what,
     break;
   }
   if(ptr) {
-    *part = mm_strdup_from_raw(ptr);
+    *part = mm_strdup(ptr);
     if(!*part)
       return CURLUE_OUT_OF_MEMORY;
     if(plusdecode) {
@@ -1511,7 +1516,7 @@ CURLUcode mm_curl_url_get(CURLU *u, CURLUPart what,
 CURLUcode curl_url_set(CURLU *u, CURLUPart what,
                        const char *part, unsigned int flags)
 {
-  char **storep = NULL;
+  mm_array_ptr<char> *storep = NULL;
   long port = 0;
   bool urlencode = (flags & CURLU_URLENCODE)? 1 : 0;
   bool plusencode = FALSE;
@@ -1561,7 +1566,7 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
       return CURLUE_UNKNOWN_PART;
     }
     if(storep && *storep) {
-      Curl_safefree(*storep);
+      mm_Curl_safefree(char, *storep);
     }
     return CURLUE_OK;
   }
@@ -1589,7 +1594,7 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
     break;
   case CURLUPART_HOST:
     storep = &u->host;
-    Curl_safefree(u->zoneid);
+    mm_Curl_safefree(char, u->zoneid);
     break;
   case CURLUPART_ZONEID:
     storep = &u->zoneid;
@@ -1683,7 +1688,7 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
   }
   DEBUGASSERT(storep);
   {
-    const char *newp = part;
+    mm_array_ptr<const char> newp = mm_strdup_from_raw(part);
     size_t nalloc = strlen(part);
 
     if(nalloc > CURL_MAX_INPUT_LENGTH)
@@ -1692,8 +1697,8 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
 
     if(urlencode) {
       const unsigned char *i;
-      char *o;
-      char *enc = malloc(nalloc * 3 + 1); /* for worst case! */
+      mm_array_ptr<char> o = NULL;
+      mm_array_ptr<char> enc = MM_ARRAY_ALLOC(char, nalloc * 3 + 1); /* for worst case! */
       if(!enc)
         return CURLUE_OUT_OF_MEMORY;
       for(i = (const unsigned char *)part, o = enc; *i; i++) {
@@ -1711,7 +1716,7 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
           o++;
         }
         else {
-          msnprintf(o, 4, "%%%02x", *i);
+          msnprintf(_GETCHARPTR(o), 4, "%%%02x", *i);
           o += 3;
         }
       }
@@ -1719,11 +1724,10 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
       newp = enc;
     }
     else {
-      char *p;
-      newp = strdup(part);
+      mm_array_ptr<char> p = NULL;
       if(!newp)
         return CURLUE_OUT_OF_MEMORY;
-      p = (char *)newp;
+      p = (mm_array_ptr<char>)newp;
       while(*p) {
         /* make sure percent encoded are lower case */
         if((*p == '%') && ISXDIGIT(p[1]) && ISXDIGIT(p[2]) &&
@@ -1740,40 +1744,40 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
     if(appendquery) {
       /* Append the string onto the old query. Add a '&' separator if none is
          present at the end of the exsting query already */
-      size_t querylen = u->query ? strlen(u->query) : 0;
+      size_t querylen = u->query ? mm_strlen(u->query) : 0;
       bool addamperand = querylen && (u->query[querylen -1] != '&');
       if(querylen) {
-        size_t newplen = strlen(newp);
-        char *p = malloc(querylen + addamperand + newplen + 1);
+        size_t newplen = mm_strlen(newp);
+        mm_array_ptr<char> p = MM_ARRAY_ALLOC(char, querylen + addamperand + newplen + 1);
         if(!p) {
-          free((char *)newp);
+          MM_FREE(char, newp);
           return CURLUE_OUT_OF_MEMORY;
         }
-        strcpy(p, u->query); /* original query */
+        mm_strcpy(p, u->query); /* original query */
         if(addamperand)
           p[querylen] = '&'; /* ampersand */
-        strcpy(&p[querylen + addamperand], newp); /* new suffix */
-        free((char *)newp);
-        free(*storep);
+        mm_strcpy(&p[querylen + addamperand], newp); /* new suffix */
+        MM_FREE(char, newp);
+        MM_FREE(char, *storep);
         *storep = p;
         return CURLUE_OK;
       }
     }
 
     if(what == CURLUPART_HOST) {
-      if(0 == strlen(newp) && (flags & CURLU_NO_AUTHORITY)) {
+      if(0 == mm_strlen(newp) && (flags & CURLU_NO_AUTHORITY)) {
         /* Skip hostname check, it's allowed to be empty. */
       }
       else {
         if(hostname_check(u, (char *)newp)) {
-          free((char *)newp);
+          MM_FREE(char, newp);
           return CURLUE_MALFORMED_INPUT;
         }
       }
     }
 
-    free(*storep);
-    *storep = (char *)newp;
+    MM_FREE(char, *storep);
+    *storep = (mm_array_ptr<char>)newp;
   }
   /* set after the string, to make it not assigned if the allocation above
      fails */
@@ -1785,7 +1789,7 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
 CURLUcode mm_curl_url_set(CURLU *u, CURLUPart what,
                        mm_array_ptr<const char> part, unsigned int flags)
 {
-  char **storep = NULL;
+  mm_array_ptr<char> *storep = NULL;
   long port = 0;
   bool urlencode = (flags & CURLU_URLENCODE)? 1 : 0;
   bool plusencode = FALSE;
@@ -1835,7 +1839,7 @@ CURLUcode mm_curl_url_set(CURLU *u, CURLUPart what,
       return CURLUE_UNKNOWN_PART;
     }
     if(storep && *storep) {
-      Curl_safefree(*storep);
+      mm_Curl_safefree(char, *storep);
     }
     return CURLUE_OK;
   }
@@ -1863,7 +1867,7 @@ CURLUcode mm_curl_url_set(CURLU *u, CURLUPart what,
     break;
   case CURLUPART_HOST:
     storep = &u->host;
-    Curl_safefree(u->zoneid);
+    mm_Curl_safefree(char, u->zoneid);
     break;
   case CURLUPART_ZONEID:
     storep = &u->zoneid;
@@ -2014,21 +2018,21 @@ CURLUcode mm_curl_url_set(CURLU *u, CURLUPart what,
     if(appendquery) {
       /* Append the string onto the old query. Add a '&' separator if none is
          present at the end of the exsting query already */
-      size_t querylen = u->query ? strlen(u->query) : 0;
+      size_t querylen = u->query ? mm_strlen(u->query) : 0;
       bool addamperand = querylen && (u->query[querylen -1] != '&');
       if(querylen) {
         size_t newplen = mm_strlen(newp);
-        char *p = malloc(querylen + addamperand + newplen + 1);
+        mm_array_ptr<char> p = MM_ARRAY_ALLOC(char, querylen + addamperand + newplen + 1);
         if(!p) {
           MM_FREE(char, newp);
           return CURLUE_OUT_OF_MEMORY;
         }
-        strcpy(p, u->query); /* original query */
+        mm_strcpy(p, u->query); /* original query */
         if(addamperand)
           p[querylen] = '&'; /* ampersand */
         mm_strcpy(&p[querylen + addamperand], newp); /* new suffix */
         MM_FREE(char, newp);
-        free(*storep);
+        MM_FREE(char, *storep);
         *storep = p;
         return CURLUE_OK;
       }
@@ -2046,8 +2050,8 @@ CURLUcode mm_curl_url_set(CURLU *u, CURLUPart what,
       }
     }
 
-    free(*storep);
-    *storep = (char *)newp;
+    MM_FREE(char, *storep);
+    *storep = (mm_array_ptr<char>)newp;
   }
   /* set after the string, to make it not assigned if the allocation above
      fails */

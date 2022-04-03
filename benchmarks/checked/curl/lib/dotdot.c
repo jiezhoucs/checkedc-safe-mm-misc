@@ -50,24 +50,24 @@
  *
  * an allocated dedotdotified output string
  */
-char *Curl_dedotdotify(const char *input)
+mm_array_ptr<char> Curl_dedotdotify(mm_array_ptr<const char> input)
 {
-  size_t inlen = strlen(input);
-  char *clone;
+  size_t inlen = mm_strlen(input);
+  mm_array_ptr<char> clone = NULL;
   size_t clen = inlen; /* the length of the cloned input */
-  char *out = malloc(inlen + 1);
-  char *outptr;
-  char *orgclone;
-  char *queryp;
+  mm_array_ptr<char> out = MM_ARRAY_ALLOC(char, inlen + 1);
+  mm_array_ptr<char> outptr = NULL;
+  mm_array_ptr<char> orgclone = NULL;
+  mm_array_ptr<char> queryp = NULL;
   if(!out)
     return NULL; /* out of memory */
 
   *out = 0; /* null-terminates, for inputs like "./" */
 
   /* get a cloned copy of the input */
-  clone = strdup(input);
+  clone = mm_strdup(input);
   if(!clone) {
-    free(out);
+    MM_FREE(char, out);
     return NULL;
   }
   orgclone = clone;
@@ -75,7 +75,7 @@ char *Curl_dedotdotify(const char *input)
 
   if(!*clone) {
     /* zero length string, return that */
-    free(out);
+    MM_FREE(char, out);
     return clone;
   }
 
@@ -84,7 +84,7 @@ char *Curl_dedotdotify(const char *input)
    * dotdot-operation and then append it again at the end to the output
    * string.
    */
-  queryp = strchr(clone, '?');
+  queryp = mm_strchr(clone, '?');
   if(queryp)
     *queryp = 0;
 
@@ -93,11 +93,11 @@ char *Curl_dedotdotify(const char *input)
     /*  A.  If the input buffer begins with a prefix of "../" or "./", then
         remove that prefix from the input buffer; otherwise, */
 
-    if(!strncmp("./", clone, 2)) {
+    if(!mm_strncmp("./", clone, 2)) {
       clone += 2;
       clen -= 2;
     }
-    else if(!strncmp("../", clone, 3)) {
+    else if(!mm_strncmp("../", clone, 3)) {
       clone += 3;
       clen -= 3;
     }
@@ -105,11 +105,11 @@ char *Curl_dedotdotify(const char *input)
     /*  B.  if the input buffer begins with a prefix of "/./" or "/.", where
         "."  is a complete path segment, then replace that prefix with "/" in
         the input buffer; otherwise, */
-    else if(!strncmp("/./", clone, 3)) {
+    else if(!mm_strncmp("/./", clone, 3)) {
       clone += 2;
       clen -= 2;
     }
-    else if(!strcmp("/.", clone)) {
+    else if(!mm_strcmp("/.", clone)) {
       clone[1]='/';
       clone++;
       clen -= 1;
@@ -120,7 +120,7 @@ char *Curl_dedotdotify(const char *input)
         the input buffer and remove the last segment and its preceding "/" (if
         any) from the output buffer; otherwise, */
 
-    else if(!strncmp("/../", clone, 4)) {
+    else if(!mm_strncmp("/../", clone, 4)) {
       clone += 3;
       clen -= 3;
       /* remove the last segment from the output buffer */
@@ -131,7 +131,7 @@ char *Curl_dedotdotify(const char *input)
       }
       *outptr = 0; /* null-terminate where it stops */
     }
-    else if(!strcmp("/..", clone)) {
+    else if(!mm_strcmp("/..", clone)) {
       clone[2]='/';
       clone += 2;
       clen -= 2;
@@ -147,7 +147,7 @@ char *Curl_dedotdotify(const char *input)
     /*  D.  if the input buffer consists only of "." or "..", then remove
         that from the input buffer; otherwise, */
 
-    else if(!strcmp(".", clone) || !strcmp("..", clone)) {
+    else if(!mm_strcmp(".", clone) || !mm_strcmp("..", clone)) {
       *clone = 0;
       *out = 0;
     }
@@ -173,10 +173,10 @@ char *Curl_dedotdotify(const char *input)
        may now have been altered so we copy from the original input string
        from the correct index. */
     size_t oindex = queryp - orgclone;
-    qlen = strlen(&input[oindex]);
-    memcpy(outptr, &input[oindex], qlen + 1); /* include the end zero byte */
+    qlen = mm_strlen(&input[oindex]);
+    mm_memcpy(outptr, &input[oindex], qlen + 1); /* include the end zero byte */
   }
 
-  free(orgclone);
+  MM_FREE(char, orgclone);
   return out;
 }
