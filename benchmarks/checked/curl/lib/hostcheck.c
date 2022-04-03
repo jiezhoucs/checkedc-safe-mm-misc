@@ -83,7 +83,7 @@ static int mm_hostmatch(mm_array_ptr<char> hostname, mm_array_ptr<char> pattern)
       CURL_HOST_MATCH : CURL_HOST_NOMATCH;
 
   /* detect IP address as hostname and fail the match if so */
-  if(Curl_host_is_ipnum(_GETCHARPTR(hostname)))
+  if(mm_Curl_host_is_ipnum(hostname))
     return CURL_HOST_NOMATCH;
 
   /* We require at least 2 dots in pattern to avoid too wide wildcard

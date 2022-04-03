@@ -72,6 +72,7 @@ struct Curl_dns_entry {
 };
 
 bool Curl_host_is_ipnum(const char *hostname);
+bool mm_Curl_host_is_ipnum(mm_array_ptr<const char> hostname);
 
 /*
  * Curl_resolv() returns an entry with the info for the specified host

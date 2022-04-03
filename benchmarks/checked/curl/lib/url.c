@@ -1364,7 +1364,7 @@ ConnectionExists(struct Curl_easy *data,
             needle->conn_to_host.name, check->conn_to_host.name)) &&
            (!needle->bits.conn_to_port ||
              needle->conn_to_port == check->conn_to_port) &&
-           strcasecompare(_GETCHARPTR(needle->host.name), _GETCHARPTR(check->host.name)) &&
+           mm_strcasecompare(needle->host.name, check->host.name) &&
            needle->remote_port == check->remote_port) {
           /* The schemes match or the protocol family is the same and the
              previous connection was TLS upgraded, and the hostname and host
@@ -1578,7 +1578,7 @@ static void strip_trailing_dot(struct hostname *host)
   size_t len;
   if(!host || !host->name)
     return;
-  len = strlen(_GETCHARPTR(host->name));
+  len = mm_strlen(host->name);
   if(len && (host->name[len-1] == '.'))
     host->name[len-1] = 0;
 }
@@ -1830,13 +1830,26 @@ const struct Curl_handler *Curl_builtin_scheme(const char *scheme)
   return NULL; /* not found */
 }
 
+/* returns the handler if the given scheme is built-in */
+const struct Curl_handler *mm_Curl_builtin_scheme(mm_array_ptr<const char> scheme)
+{
+  const struct Curl_handler * const *pp;
+  const struct Curl_handler *p;
+  /* Scan protocol handler table and match against 'scheme'. The handler may
+     be changed later when the protocol specific setup function is called. */
+  for(pp = protocols; (p = *pp) != NULL; pp++)
+    if(mm_strcasecompare_1(p->scheme, scheme))
+      /* Protocol found in table. Check if allowed */
+      return p;
+  return NULL; /* not found */
+}
+
 
 static CURLcode findprotocol(struct Curl_easy *data,
                              struct connectdata *conn,
                              mm_array_ptr<const char> protostr)
 {
-    // TODO?
-  const struct Curl_handler *p = Curl_builtin_scheme(_GETCHARPTR(protostr));
+  const struct Curl_handler *p = mm_Curl_builtin_scheme(protostr);
 
   if(p && /* Protocol found in table. Check if allowed */
      (data->set.allowed_protocols & p->protocol)) {

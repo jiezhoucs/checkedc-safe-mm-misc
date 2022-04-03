@@ -277,7 +277,7 @@ static size_t cookiehash(mm_array_ptr<const char> const domain)
   mm_array_ptr<const char> top = NULL;
   size_t len;
 
-  if(!domain || Curl_host_is_ipnum(_GETCHARPTR(domain)))
+  if(!domain || mm_Curl_host_is_ipnum(domain))
     return 0;
 
   top = get_top_domain(domain, &len);
@@ -643,7 +643,7 @@ Curl_cookie_add(struct Curl_easy *data,
             domain = ":";
 #endif
 
-          is_ip = Curl_host_is_ipnum(domain ? _GETCHARPTR(domain) : _GETCHARPTR(whatptr));
+          is_ip = mm_Curl_host_is_ipnum(domain ? domain : whatptr);
 
           if(!domain
              || (is_ip && !mm_strcmp(whatptr, domain))
@@ -1367,7 +1367,7 @@ mm_ptr<struct Cookie> Curl_cookie_getlist(mm_ptr<struct CookieInfo> c,
   remove_expired(c);
 
   /* check if host is an IP(v4|v6) address */
-  is_ip = Curl_host_is_ipnum(_GETCHARPTR(host));
+  is_ip = mm_Curl_host_is_ipnum(host);
 
   co = c->cookies[myhash];
 
