@@ -142,7 +142,7 @@ static void send_dirredirect( mm_ptr<httpd_conn> hc );
 static int hexit( char c );
 static void strdecode( mm_array_ptr<char> to, mm_array_ptr<char> from );
 #ifdef GENERATE_INDEXES
-static void strencode( char* to, int tosize, char* from );
+static void strencode( mm_array_ptr<char> to, int tosize, mm_array_ptr<char> from );
 #endif /* GENERATE_INDEXES */
 #ifdef TILDE_MAP_1
 static int tilde_map_1( httpd_conn* hc );
@@ -1296,7 +1296,7 @@ strdecode( mm_array_ptr<char> to, mm_array_ptr<char> from )
 #ifdef GENERATE_INDEXES
 /* Copies and encodes a string. */
 static void
-strencode( char* to, int tosize, char* from )
+strencode( mm_array_ptr<char> to, int tosize, mm_array_ptr<char> from )
     {
     int tolen;
 
@@ -1310,7 +1310,7 @@ strencode( char* to, int tosize, char* from )
 	    }
 	else
 	    {
-	    (void) sprintf( to, "%%%02x", (int) *from & 0xff );
+	    (void) sprintf( _GETCHARPTR(to), "%%%02x", (int) *from & 0xff );
 	    to += 3;
 	    tolen += 3;
 	    }
@@ -2753,13 +2753,13 @@ ls( mm_ptr<httpd_conn> hc )
     int nnames;
     // DISCUSS: no need to make names and namesptr mmsafe as they're static
     // and they never escape.
-    static char* names;  // TODO: mmsafe
+    static char* names;  // TODO?
     static char** nameptrs;
-    static char* name;   // TODO: mmsafe
+    static mm_array_ptr<char> name = NULL;
     static size_t maxname = 0;
-    static char* rname;  // TODO: mmsafe
+    static mm_array_ptr<char> rname = NULL;
     static size_t maxrname = 0;
-    static char* encrname;  // TODO: mmsafe
+    static mm_array_ptr<char> encrname = NULL;
     static size_t maxencrname = 0;
     FILE* fp;
     int i, r;
@@ -2898,34 +2898,34 @@ mode  links    bytes  last-changed  name\n\
 	    /* Generate output. */
 	    for ( i = 0; i < nnames; ++i )
 		{
-		httpd_realloc_str(
+		mm_httpd_realloc_str(
 		    &name, &maxname,
-		    strlen(_GETARRAYPTR(char, hc->expnfilename)) + 1 + strlen( nameptrs[i] ) );
-		httpd_realloc_str(
+		    mm_strlen(hc->expnfilename) + 1 + strlen( nameptrs[i] ) );
+		mm_httpd_realloc_str(
 		    &rname, &maxrname,
-		    strlen(_GETARRAYPTR(char, hc->origfilename)) + 1 + strlen( nameptrs[i] ) );
+		    mm_strlen(hc->origfilename) + 1 + strlen( nameptrs[i] ) );
 		if ( hc->expnfilename[0] == '\0' ||
-		     strcmp( _GETARRAYPTR(char, hc->expnfilename), "." ) == 0 )
+		     mm_strcmp(hc->expnfilename, "." ) == 0 )
 		    {
-		    (void) strcpy( name, nameptrs[i] );
-		    (void) strcpy( rname, nameptrs[i] );
+		    (void) mm_strcpy( name, nameptrs[i] );
+		    (void) mm_strcpy( rname, nameptrs[i] );
 		    }
 		else
 		    {
-		    (void) my_snprintf( name, maxname,
+		    (void) my_snprintf( _GETCHARPTR(name), maxname,
 			"%s/%s", _GETARRAYPTR(char, hc->expnfilename), nameptrs[i] );
-		    if ( strcmp(_GETARRAYPTR(char, hc->origfilename), "." ) == 0 )
-			(void) my_snprintf( rname, maxrname,
+		    if ( mm_strcmp(hc->origfilename, "." ) == 0 )
+			(void) my_snprintf( _GETCHARPTR(rname), maxrname,
 			    "%s", nameptrs[i] );
 		    else
-			(void) my_snprintf( rname, maxrname,
+			(void) my_snprintf( _GETCHARPTR(rname), maxrname,
 			    "%s%s", _GETARRAYPTR(char, hc->origfilename), nameptrs[i] );
 		    }
-		httpd_realloc_str(
-		    &encrname, &maxencrname, 3 * strlen( rname ) + 1 );
+		mm_httpd_realloc_str(
+		    &encrname, &maxencrname, 3 * mm_strlen( rname ) + 1 );
 		strencode( encrname, maxencrname, rname );
 
-		if ( stat( name, &sb ) < 0 || lstat( name, &lsb ) < 0 )
+		if ( mm_stat( name, &sb ) < 0 || lstat( _GETCHARPTR(name), &lsb ) < 0 )
 		    continue;
 
 		linkprefix = "";
@@ -2940,7 +2940,7 @@ mode  links    bytes  last-changed  name\n\
 		    case S_IFREG:  modestr[0] = '-'; break;
 		    case S_IFSOCK: modestr[0] = 's'; break;
 		    case S_IFLNK:  modestr[0] = 'l';
-		    linklen = readlink( name, lnk, sizeof(lnk) - 1 );
+		    linklen = readlink( _GETCHARPTR(name), lnk, sizeof(lnk) - 1 );
 		    if ( linklen != -1 )
 			{
 			lnk[linklen] = '\0';
@@ -3006,7 +3006,7 @@ mode  links    bytes  last-changed  name\n\
 		(void)  fprintf( fp,
 		   "%s %3ld  %10lld  %s  <a href=\"/%.500s%s\">%.80s</a>%s%s%s\n",
 		    modestr, (long) lsb.st_nlink, (long long) lsb.st_size,
-		    timestr, encrname, S_ISDIR(sb.st_mode) ? "/" : "",
+		    timestr, _GETCHARPTR(encrname), S_ISDIR(sb.st_mode) ? "/" : "",
 		    nameptrs[i], linkprefix, lnk, fileclass );
 		}
 
