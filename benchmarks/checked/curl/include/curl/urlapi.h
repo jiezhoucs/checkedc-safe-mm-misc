@@ -119,9 +119,9 @@ CURL_EXTERN CURLUcode mm_curl_url_get(CURLU *handle, CURLUPart what,
  */
 CURL_EXTERN CURLUcode curl_url_set(CURLU *handle, CURLUPart what,
                                    const char *part, unsigned int flags);
-
 CURL_EXTERN CURLUcode mm_curl_url_set(CURLU *handle, CURLUPart what,
                                    mm_array_ptr<const char> part, unsigned int flags);
+
 
 #ifdef __cplusplus
 } /* end of extern "C" */

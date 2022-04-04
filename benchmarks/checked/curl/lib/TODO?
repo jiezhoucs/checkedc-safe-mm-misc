@@ -1,0 +1,69 @@
+
+- Curl_dyn_free
+- Curl_dyn_add
+- Curl_dyn_init
+- Curl_dyn_reset
+
+## Port?
+- msnprintf(), the first arg
+- curlx_getenv // defined in
+- Curl_base64_decode // used by some security code
+- Curl_base64url_encode
+- Curl_bufref_set // mainly used in vauth/*
+- Curl_getdate_capped // used by ftp and libssh(2).c
+- Curl_get_line // ftp.c, libssh(2)
+- Curl_persistconninfo // used by vquic/quiche.c
+
+## Will not port
+### Shared utilities
+- curlx_strtoofft // Used by imap and ftp
+~~- curl_url_set  // defined in urlapi.h~~
+- seturl // curl_url_set related
+- Curl_is_absolute_url // same as ^
+- concat_url // ^
+- Curl_is_absolute_url  // defined in urapi-int.h
+- Curl_client_write // Used by many protocols
+- Curl_convert_from_network // called by Curl_client_write with ptr arg
+- curl_slist_append // defined in curl.h, used by tests; used by telnet;
+- curl_mime_data // defined in curl.h and used by tests
+- curl_mime_filedata // defined in curl.h and used by tests
+- curl_mime_file_name // ^
+- curl_easy_escape // ^
+- setfiletime // no def; passed to Win API
+- Curl_mime_initpart // accepts &Curl_easy.set.mimepart
+- curl_read_callback // used by multiple protocols
+- http2_recv // called by Curl_read
+- Curl_resolv // used by ftp
+- Curl_HMAC_init // call fn ptr
+- Curl_idnconvert_hostname // used by smtp
+- Curl_read  // Used by telnet, smb, mqtt
+- Curl_write  // used by smb, krb5, mqtt, smtp, etc.
+- curl_slist_append // used by telnet and openssl.c
+- Curl_inet_pton
+
+- easysrc_add // It only strips off the metadata and passes the raw ptr to another fn
+- c_escape // arg from variadic args (options) passed to it
+- convert_to_network // no deref but only passing to iconv
+- hostname_check // called by curl_url_set
+
+### allocator calls
+- url.c:allocate_conn // have to change llist.c:Curl_llist_element.ptr
+- url.c: resolve_server // transitively passed to Curl_resolv
+
+### struct fields
+- SingleRequst.upload_fromhere  // Used by smtp, tftp, smb
+- data->state.url  // variadic related
+
+## mm_ version of fn
+- curl_url_get
+- curl_url_set
+- Curl_setstropt
+- Curl_parsenetrc
+- Curl_debug
+
+## Windows specific
+vauth/digest_sspi.c
+
+
+## SSl
+- Curl_ssl_set_engine

@@ -84,7 +84,7 @@ CURLcode mm_Curl_setstropt(mm_array_ptr<char> *charp, mm_array_ptr<const char> s
   /* Release the previous storage at `charp' and replace by a dynamic storage
      copy of `s'. Return CURLE_OK or CURLE_OUT_OF_MEMORY. */
 
-  mm_Curl_safefree(char, *charp);
+  MM_curl_free(char, *charp);
 
   if(s) {
     mm_array_ptr<char> str = mm_strdup(s);
@@ -136,7 +136,7 @@ CURLcode Curl_setblobopt(struct curl_blob **blobp,
   return CURLE_OK;
 }
 
-static CURLcode setstropt_userpwd(mm_array_ptr<char> option, mm_array_ptr<char> *userp,
+static CURLcode setstropt_userpwd(char *option, mm_array_ptr<char> *userp,
                                                 mm_array_ptr<char> *passwdp)
 {
   CURLcode result = CURLE_OK;
@@ -146,7 +146,7 @@ static CURLcode setstropt_userpwd(mm_array_ptr<char> option, mm_array_ptr<char> 
   /* Parse the login details if specified. It not then we treat NULL as a hint
      to clear the existing data */
   if(option) {
-    result = Curl_parse_login_details(_GETCHARPTR(option), mm_strlen(option),
+    result = Curl_parse_login_details(option, strlen(option),
                                       (userp ? &user : NULL),
                                       (passwdp ? &passwd : NULL),
                                       NULL);
@@ -162,13 +162,13 @@ static CURLcode setstropt_userpwd(mm_array_ptr<char> option, mm_array_ptr<char> 
           result = CURLE_OUT_OF_MEMORY;
       }
 
-      mm_Curl_safefree(char, *userp);
+      MM_curl_free(char, *userp);
       *userp = user;
     }
 
     /* Store the password part of option if required */
     if(passwdp) {
-      mm_Curl_safefree(char, *passwdp);
+      MM_curl_free(char, *passwdp);
       *passwdp = passwd;
     }
   }
@@ -1454,7 +1454,7 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
     /*
      * user:password to use in the operation
      */
-    result = setstropt_userpwd(va_arg(param, mm_array_ptr<char>),
+    result = setstropt_userpwd(va_arg(param, char *),
                                &data->set.str[STRING_USERNAME],
                                &data->set.str[STRING_PASSWORD]);
     break;
@@ -1560,7 +1560,7 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
     /*
      * user:password needed to use the proxy
      */
-    result = setstropt_userpwd(va_arg(param, mm_array_ptr<char>),
+    result = setstropt_userpwd(va_arg(param, char *),
                                &data->set.str[STRING_PROXYUSERNAME],
                                &data->set.str[STRING_PROXYPASSWORD]);
     break;
@@ -2232,7 +2232,7 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
       arg = UPLOADBUFFER_MIN;
 
     data->set.upload_buffer_size = (unsigned int)arg;
-    mm_Curl_safefree(char, data->state.ulbuf); /* force a realloc next opportunity */
+    MM_curl_free(char, data->state.ulbuf); /* force a realloc next opportunity */
     break;
 
   case CURLOPT_NOSIGNAL:

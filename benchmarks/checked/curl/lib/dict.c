@@ -96,20 +96,20 @@ const struct Curl_handler Curl_handler_dict = {
   PROTOPT_NONE | PROTOPT_NOURLQUERY     /* flags */
 };
 
-static mm_array_ptr<char> unescape_word(struct Curl_easy *data, mm_array_ptr<const char> inputbuff)
+static char *unescape_word(struct Curl_easy *data, const char *inputbuff)
 {
-  mm_array_ptr<char> newp = NULL;
-  mm_array_ptr<char> dictp = NULL;
+  char *newp = NULL;
+  char *dictp;
   size_t len;
 
-  CURLcode result = mm_Curl_urldecode(data, inputbuff, 0, &newp, &len,
+  CURLcode result = Curl_urldecode(data, inputbuff, 0, &newp, &len,
                                    REJECT_NADA);
   if(!newp || result)
     return NULL;
 
-  dictp = MM_ARRAY_ALLOC(char, len*2 + 1); /* add one for terminating zero */
+  dictp = malloc(len*2 + 1); /* add one for terminating zero */
   if(dictp) {
-    mm_array_ptr<char> ptr = NULL;
+    char *ptr;
     char ch;
     int olen = 0;
     /* According to RFC2229 section 2.2, these letters need to be escaped with
@@ -125,7 +125,7 @@ static mm_array_ptr<char> unescape_word(struct Curl_easy *data, mm_array_ptr<con
     }
     dictp[olen] = 0;
   }
-  MM_FREE(char, newp);
+  free(newp);
   return dictp;
 }
 
@@ -176,7 +176,7 @@ static CURLcode sendf(curl_socket_t sockfd, struct Curl_easy *data,
 static CURLcode dict_do(struct Curl_easy *data, bool *done)
 {
   mm_array_ptr<char> word = NULL;
-  mm_array_ptr<char> eword = NULL;
+  char *eword;
   mm_array_ptr<char> ppath = NULL;
   mm_array_ptr<char> database = NULL;
   mm_array_ptr<char> strategy = NULL;
@@ -226,7 +226,8 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
       strategy = ".";
     }
 
-    eword = unescape_word(data, word);
+    // TODO
+    eword = unescape_word(data, _GETCHARPTR(word));
     if(!eword)
       return CURLE_OUT_OF_MEMORY;
 
@@ -239,9 +240,9 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
                    "QUIT\r\n",
                    _GETCHARPTR(database),
                    _GETCHARPTR(strategy),
-                   _GETCHARPTR(eword));
+                   eword);
 
-    MM_FREE(char, eword);
+    free(eword);
 
     if(result) {
       failf(data, "Failed sending DICT request");
@@ -274,7 +275,8 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
       database = "!";
     }
 
-    eword = unescape_word(data, word);
+    // TODO
+    eword = unescape_word(data, _GETCHARPTR(word));
     if(!eword)
       return CURLE_OUT_OF_MEMORY;
 
@@ -285,9 +287,9 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
                    "%s\r\n"  /* word */
                    "QUIT\r\n",
                    _GETCHARPTR(database),
-                   _GETCHARPTR(eword));
+                   eword);
 
-    MM_FREE(char, eword);
+    free(eword);
 
     if(result) {
       failf(data, "Failed sending DICT request");

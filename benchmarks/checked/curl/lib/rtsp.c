@@ -250,14 +250,14 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   curl_off_t putsize = 0; /* for ANNOUNCE and SET_PARAMETER */
 
   mm_array_ptr<const char> p_request = NULL;
-  mm_array_ptr<const char> p_session_id = NULL;
-  mm_array_ptr<const char> p_accept = NULL;
-  mm_array_ptr<const char> p_accept_encoding = NULL;
-  mm_array_ptr<const char> p_range = NULL;
-  mm_array_ptr<const char> p_referrer = NULL;
+  const char *p_session_id = NULL;
+  const char *p_accept = NULL;
+  const char *p_accept_encoding = NULL;
+  const char *p_range = NULL;
+  const char *p_referrer = NULL;
   mm_array_ptr<const char> p_stream_uri = NULL;
-  mm_array_ptr<const char> p_transport = NULL;
-  mm_array_ptr<const char> p_uagent = NULL;
+  const char *p_transport = NULL;
+  const char *p_uagent = NULL;
   mm_array_ptr<const char> p_proxyuserpwd = NULL;
   mm_array_ptr<const char> p_userpwd = NULL;
 
@@ -324,7 +324,8 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
     return result;
   }
 
-  p_session_id = data->set.str[STRING_RTSP_SESSION_ID];
+  // TODO?
+  p_session_id = _GETCHARPTR(data->set.str[STRING_RTSP_SESSION_ID]);
   if(!p_session_id &&
      (rtspreq & ~(RTSPREQ_OPTIONS | RTSPREQ_DESCRIBE | RTSPREQ_SETUP))) {
     failf(data, "Refusing to issue an RTSP request [%s] without a session ID.",
@@ -341,15 +342,16 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   }
 
   /* Transport Header for SETUP requests */
-  p_transport = Curl_checkheaders(data, "Transport");
+  // TODO
+  p_transport = _GETCHARPTR(Curl_checkheaders(data, "Transport"));
   if(rtspreq == RTSPREQ_SETUP && !p_transport) {
     /* New Transport: setting? */
     if(data->set.str[STRING_RTSP_TRANSPORT]) {
-      mm_Curl_safefree(char, data->state.aptr.rtsp_transport);
+      Curl_safefree(data->state.aptr.rtsp_transport);
 
       data->state.aptr.rtsp_transport =
-        mmize_str(aprintf("Transport: %s\r\n",
-                _GETCHARPTR(data->set.str[STRING_RTSP_TRANSPORT])));
+        aprintf("Transport: %s\r\n",
+                _GETCHARPTR(data->set.str[STRING_RTSP_TRANSPORT]));
       if(!data->state.aptr.rtsp_transport)
         return CURLE_OUT_OF_MEMORY;
     }
@@ -365,15 +367,15 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   /* Accept Headers for DESCRIBE requests */
   if(rtspreq == RTSPREQ_DESCRIBE) {
     /* Accept Header */
-    if (Curl_checkheaders(data, "Accept")) p_accept = NULL;
-    else p_accept = "Accept: application/sdp\r\n";
+    p_accept = Curl_checkheaders(data, "Accept")?
+      NULL:"Accept: application/sdp\r\n";
 
     /* Accept-Encoding header */
     if(!Curl_checkheaders(data, "Accept-Encoding") &&
        data->set.str[STRING_ENCODING]) {
-      mm_Curl_safefree(char, data->state.aptr.accept_encoding);
+      Curl_safefree(data->state.aptr.accept_encoding);
       data->state.aptr.accept_encoding =
-        mmize_str(aprintf("Accept-Encoding: %s\r\n", _GETCHARPTR(data->set.str[STRING_ENCODING])));
+        aprintf("Accept-Encoding: %s\r\n", _GETCHARPTR(data->set.str[STRING_ENCODING]));
 
       if(!data->state.aptr.accept_encoding)
         return CURLE_OUT_OF_MEMORY;
@@ -392,7 +394,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   }
   else if(!Curl_checkheaders(data, "User-Agent") &&
           data->set.str[STRING_USERAGENT]) {
-    p_uagent = data->state.aptr.uagent;
+    p_uagent = _GETCHARPTR(data->state.aptr.uagent);
   }
 
   /* setup the authentication headers */
@@ -405,9 +407,9 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
   p_userpwd = data->state.aptr.userpwd;
 
   /* Referrer */
-  mm_Curl_safefree(char, data->state.aptr.ref);
+  Curl_safefree(data->state.aptr.ref);
   if(data->state.referer && !Curl_checkheaders(data, "Referer"))
-    data->state.aptr.ref = mmize_str(aprintf("Referer: %s\r\n", data->state.referer));
+    data->state.aptr.ref = aprintf("Referer: %s\r\n", data->state.referer);
   else
     data->state.aptr.ref = NULL;
 
@@ -424,8 +426,8 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
 
     /* Check to see if there is a range set in the custom headers */
     if(!Curl_checkheaders(data, "Range") && data->state.range) {
-      mm_Curl_safefree(char, data->state.aptr.rangeline);
-      data->state.aptr.rangeline = mmize_str(aprintf("Range: %s\r\n", _GETCHARPTR(data->state.range)));
+      Curl_safefree(data->state.aptr.rangeline);
+      data->state.aptr.rangeline = aprintf("Range: %s\r\n", _GETCHARPTR(data->state.range));
       p_range = data->state.aptr.rangeline;
     }
   }
@@ -458,7 +460,7 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
    * to make comparison easier
    */
   if(p_session_id) {
-    result = Curl_dyn_addf(&req_buffer, "Session: %s\r\n", _GETCHARPTR(p_session_id));
+    result = Curl_dyn_addf(&req_buffer, "Session: %s\r\n", p_session_id);
     if(result)
       return result;
   }
@@ -476,12 +478,12 @@ static CURLcode rtsp_do(struct Curl_easy *data, bool *done)
                          "%s" /* proxyuserpwd */
                          "%s" /* userpwd */
                          ,
-                         p_transport ? _GETCHARPTR(p_transport) : "",
-                         p_accept ? _GETCHARPTR(p_accept) : "",
-                         p_accept_encoding ? _GETCHARPTR(p_accept_encoding) : "",
-                         p_range ? _GETCHARPTR(p_range) : "",
-                         p_referrer ? _GETCHARPTR(p_referrer) : "",
-                         p_uagent ? _GETCHARPTR(p_uagent) : "",
+                         p_transport ? p_transport : "",
+                         p_accept ? p_accept : "",
+                         p_accept_encoding ? p_accept_encoding : "",
+                         p_range ? p_range : "",
+                         p_referrer ? p_referrer : "",
+                         p_uagent ? p_uagent : "",
                          p_proxyuserpwd ? _GETCHARPTR(p_proxyuserpwd) : "",
                          p_userpwd ? _GETCHARPTR(p_userpwd) : "");
 

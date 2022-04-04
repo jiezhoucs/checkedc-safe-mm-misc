@@ -316,7 +316,7 @@ void Curl_freeset(struct Curl_easy *data)
   enum dupblob j;
 
   for(i = (enum dupstring)0; i < STRING_LAST; i++) {
-    mm_Curl_safefree(char, data->set.str[i]);
+    MM_curl_free(char, data->set.str[i]);
   }
 
   for(j = (enum dupblob)0; j < BLOB_LAST; j++) {
@@ -408,7 +408,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
 
   /* Close down all open SSL info and sessions */
   Curl_ssl_close_all(data);
-  mm_Curl_safefree(char, data->state.first_host);
+  MM_curl_free(char, data->state.first_host);
   mm_Curl_safefree(char, data->state.scratch);
   Curl_ssl_free_certinfo(data);
 
@@ -425,7 +425,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
   up_free(data);
   mm_Curl_safefree(char, data->state.buffer);
   Curl_dyn_free(&data->state.headerb);
-  mm_Curl_safefree(char, data->state.ulbuf);
+  MM_curl_free(char, data->state.ulbuf);
   Curl_flush_cookies(data, TRUE);
   Curl_altsvc_save(data, data->asi, data->set.str[STRING_ALTSVC]);
   Curl_altsvc_cleanup(&data->asi);
@@ -434,7 +434,7 @@ CURLcode Curl_close(struct Curl_easy **datap)
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_CRYPTO_AUTH)
   Curl_http_auth_cleanup_digest(data);
 #endif
-  mm_Curl_safefree(char, data->info.contenttype);
+  MM_curl_free(char, data->info.contenttype);
   Curl_safefree(data->info.wouldredirect);
 
   /* this destroys the channel and we cannot use it anymore after this */
@@ -453,13 +453,13 @@ CURLcode Curl_close(struct Curl_easy **datap)
   mm_Curl_safefree(char, data->state.aptr.proxyuserpwd);
   mm_Curl_safefree(char, data->state.aptr.uagent);
   mm_Curl_safefree(char, data->state.aptr.userpwd);
-  mm_Curl_safefree(char, data->state.aptr.accept_encoding);
-  mm_Curl_safefree(char, data->state.aptr.te);
-  mm_Curl_safefree(char, data->state.aptr.rangeline);
-  mm_Curl_safefree(char, data->state.aptr.ref);
+  Curl_safefree(data->state.aptr.accept_encoding);
+  Curl_safefree(data->state.aptr.te);
+  Curl_safefree(data->state.aptr.rangeline);
+  Curl_safefree(data->state.aptr.ref);
   mm_Curl_safefree(char, data->state.aptr.host);
   mm_Curl_safefree(char, data->state.aptr.cookiehost);
-  mm_Curl_safefree(char, data->state.aptr.rtsp_transport);
+  Curl_safefree(data->state.aptr.rtsp_transport);
   mm_Curl_safefree(char, data->state.aptr.user);
   mm_Curl_safefree(char, data->state.aptr.passwd);
   mm_Curl_safefree(char, data->state.aptr.proxyuser);
@@ -467,8 +467,8 @@ CURLcode Curl_close(struct Curl_easy **datap)
 
 #ifndef CURL_DISABLE_DOH
   if(data->req.doh) {
-    mm_Curl_dyn_free(&data->req.doh->probe[0].serverdoh);
-    mm_Curl_dyn_free(&data->req.doh->probe[1].serverdoh);
+    Curl_dyn_free(_GETDYNBUFPTR(&data->req.doh->probe[0].serverdoh));
+    Curl_dyn_free(_GETDYNBUFPTR(&data->req.doh->probe[1].serverdoh));
     curl_slist_free_all(data->req.doh->headers);
     mm_Curl_safefree(struct dohdata, data->req.doh);
   }
@@ -743,7 +743,7 @@ static void conn_shutdown(struct Curl_easy *data, struct connectdata *conn)
     /* If this was closed with a CONNECT in progress, cleanup this temporary
        struct arrangement */
     data->req.p.http = NULL;
-    mm_Curl_safefree(struct HTTP, conn->connect_state->prot_save);
+    MM_curl_free(struct HTTP, conn->connect_state->prot_save);
   }
 #endif
 
@@ -1364,7 +1364,7 @@ ConnectionExists(struct Curl_easy *data,
             needle->conn_to_host.name, check->conn_to_host.name)) &&
            (!needle->bits.conn_to_port ||
              needle->conn_to_port == check->conn_to_port) &&
-           mm_strcasecompare(needle->host.name, check->host.name) &&
+           strcasecompare(_GETCHARPTR(needle->host.name), _GETCHARPTR(check->host.name)) &&
            needle->remote_port == check->remote_port) {
           /* The schemes match or the protocol family is the same and the
              previous connection was TLS upgraded, and the hostname and host
@@ -1578,7 +1578,7 @@ static void strip_trailing_dot(struct hostname *host)
   size_t len;
   if(!host || !host->name)
     return;
-  len = mm_strlen(host->name);
+  len = strlen(_GETCHARPTR(host->name));
   if(len && (host->name[len-1] == '.'))
     host->name[len-1] = 0;
 }
@@ -1830,26 +1830,13 @@ const struct Curl_handler *Curl_builtin_scheme(const char *scheme)
   return NULL; /* not found */
 }
 
-/* returns the handler if the given scheme is built-in */
-const struct Curl_handler *mm_Curl_builtin_scheme(mm_array_ptr<const char> scheme)
-{
-  const struct Curl_handler * const *pp;
-  const struct Curl_handler *p;
-  /* Scan protocol handler table and match against 'scheme'. The handler may
-     be changed later when the protocol specific setup function is called. */
-  for(pp = protocols; (p = *pp) != NULL; pp++)
-    if(mm_strcasecompare_1(p->scheme, scheme))
-      /* Protocol found in table. Check if allowed */
-      return p;
-  return NULL; /* not found */
-}
-
 
 static CURLcode findprotocol(struct Curl_easy *data,
                              struct connectdata *conn,
                              mm_array_ptr<const char> protostr)
 {
-  const struct Curl_handler *p = mm_Curl_builtin_scheme(protostr);
+    // TODO?
+  const struct Curl_handler *p = Curl_builtin_scheme(_GETCHARPTR(protostr));
 
   if(p && /* Protocol found in table. Check if allowed */
      (data->set.allowed_protocols & p->protocol)) {

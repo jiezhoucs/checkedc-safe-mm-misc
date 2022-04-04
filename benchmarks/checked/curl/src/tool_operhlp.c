@@ -45,7 +45,7 @@ void clean_getout(mm_ptr<struct OperationConfig> config)
       mm_Curl_safefree(char, node->url);
       mm_Curl_safefree(char, node->outfile);
       mm_Curl_safefree(char, node->infile);
-      mm_Curl_safefree(struct getout, node);
+      MM_curl_free(struct getout, node);
       node = next;
     }
     config->url_list = NULL;

@@ -1856,7 +1856,7 @@ CURLcode Curl_retry_request(struct Curl_easy *data, mm_array_ptr<char> *url)
       if(data->req.writebytecount) {
         CURLcode result = Curl_readrewind(data);
         if(result) {
-          mm_Curl_safefree(char, *url);
+          MM_curl_free(char, *url);
           return result;
         }
       }

@@ -29,7 +29,7 @@ void mm_Curl_dyn_init(mm_ptr<struct dynbuf> s, size_t toobig)
 void mm_Curl_dyn_free(mm_ptr<struct dynbuf> s)
 {
   DEBUGASSERT(s);
-  mm_Curl_safefree(char, s->bufr);
+  MM_curl_free(char, s->bufr);
   s->leng = s->allc = 0;
 }
 

@@ -572,8 +572,8 @@ static CURLcode multi_done(struct Curl_easy *data,
   Curl_resolver_kill(data);
 
   /* Cleanup possible redirect junk */
-  mm_Curl_safefree(char, data->req.newurl);
-  mm_Curl_safefree(char, data->req.location);
+  MM_curl_free(char, data->req.newurl);
+  MM_curl_free(char, data->req.location);
 
   switch(status) {
   case CURLE_ABORTED_BY_CALLBACK:
@@ -622,7 +622,7 @@ static CURLcode multi_done(struct Curl_easy *data,
     conn->dns_entry = NULL;
   }
   Curl_hostcache_prune(data);
-  mm_Curl_safefree(char, data->state.ulbuf);
+  MM_curl_free(char, data->state.ulbuf);
 
   /* if the transfer was completed in a paused state there can be buffered
      data left to free */
@@ -1880,6 +1880,7 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
         data->state.async.done = TRUE;
 #endif
         result = CURLE_OK;
+        // TODO
         infof(data, "Hostname '%s' was found in DNS cache", _GETCHARPTR(hostname));
       }
 

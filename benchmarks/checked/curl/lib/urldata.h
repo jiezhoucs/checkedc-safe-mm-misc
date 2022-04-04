@@ -1425,14 +1425,14 @@ struct UrlState {
   struct dynamically_allocated_data {
     mm_array_ptr<char> proxyuserpwd;
     mm_array_ptr<char> uagent;
-    mm_array_ptr<char> accept_encoding;
+    char *accept_encoding;
     mm_array_ptr<char> userpwd;
-    mm_array_ptr<char> rangeline;
-    mm_array_ptr<char> ref;
+    char *rangeline;
+    char *ref;
     mm_array_ptr<char> host;
     mm_array_ptr<char> cookiehost;
-    mm_array_ptr<char> rtsp_transport;
-    mm_array_ptr<char> te; /* TE: request header */
+    char *rtsp_transport;
+    char *te; /* TE: request header */
 
     /* transfer credentials */
     mm_array_ptr<char> user;

@@ -100,7 +100,7 @@ CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
 CURLcode Curl_transferencode(struct Curl_easy *data);
 CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
                         Curl_HttpReq httpreq,
-                        mm_array_ptr<const char> *teep);
+                        const char **teep);
 CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
                             mm_ptr<struct dynbuf> r, Curl_HttpReq httpreq);
 bool Curl_use_http_1_1plus(const struct Curl_easy *data,

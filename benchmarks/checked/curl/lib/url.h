@@ -45,7 +45,6 @@ CURLcode Curl_parse_login_details(const char *login, const size_t len,
                                   mm_array_ptr<char> *optionsptr);
 
 const struct Curl_handler *Curl_builtin_scheme(const char *scheme);
-const struct Curl_handler *mm_Curl_builtin_scheme(mm_array_ptr<const char> scheme);
 
 bool Curl_is_ASCII_name(const char *hostname);
 CURLcode Curl_idnconvert_hostname(struct Curl_easy *data,

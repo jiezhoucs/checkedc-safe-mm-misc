@@ -21,5 +21,5 @@
  * KIND, either express or implied.
  *
  ***************************************************************************/
-mm_array_ptr<char> Curl_dedotdotify(mm_array_ptr<const char> input);
+char *Curl_dedotdotify(const char *input);
 #endif /* HEADER_CURL_DOTDOT_H */

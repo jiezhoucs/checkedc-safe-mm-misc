@@ -581,22 +581,6 @@ bool Curl_host_is_ipnum(const char *hostname)
   return FALSE;
 }
 
-bool mm_Curl_host_is_ipnum(mm_array_ptr<const char> hostname)
-{
-  struct in_addr in;
-#ifdef ENABLE_IPV6
-  struct in6_addr in6;
-#endif
-  if(Curl_inet_pton(AF_INET, _GETCHARPTR(hostname), &in) > 0
-#ifdef ENABLE_IPV6
-     || Curl_inet_pton(AF_INET6, _GETCHARPTR(hostname), &in6) > 0
-#endif
-    )
-    return TRUE;
-  return FALSE;
-}
-
-
 /*
  * Curl_resolv() is the main name resolve function within libcurl. It resolves
  * a name and returns a pointer to the entry in the 'entry' argument (if one
