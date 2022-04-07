@@ -1,0 +1,2350 @@
+********* System characteristics ******** 
+* curl 7.79.1-DEV (x86_64-pc-linux-gnu) 
+* libcurl/7.79.1-DEV OpenSSL/1.1.1f zlib/1.2.11 libidn2/2.2.0 nghttp2/1.40.0
+* Features: alt-svc HSTS HTTP2 HTTPS-proxy IPv6 Largefile libz NTLM NTLM_WB SSL TLS-SRP UnixSockets
+* Disabled: 
+* Host: Ubuntu20
+* System: Linux Ubuntu20 5.11.0-38-generic #42~20.04.1-Ubuntu SMP Tue Sep 28 20:41:07 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
+* OS: linux
+* Servers: HTTP-IPv6 HTTP-unix FTP-IPv6 
+* Env: 
+* Seed: 213885
+***************************************** 
+test 0001...[HTTP GET]
+--pd---e--- OK (1   out of 1416, remaining: 23:58, took 1.017s, duration: 00:01)
+test 0002...[HTTP GET with user and password]
+--pd---e--- OK (2   out of 1416, remaining: 12:41, took 0.060s, duration: 00:01)
+test 0003...[HTTP POST with auth and contents but with content-length set to 0]
+--pd---e--- OK (3   out of 1416, remaining: 08:31, took 0.008s, duration: 00:01)
+test 0004...[Replaced internal and added custom HTTP headers]
+--pd---e--- OK (4   out of 1416, remaining: 07:03, took 0.114s, duration: 00:01)
+test 0005...[HTTP over proxy]
+--pd---e--- OK (5   out of 1416, remaining: 06:00, took 0.075s, duration: 00:01)
+test 0006...[HTTP with simple cookie send]
+--pd---e--- OK (6   out of 1416, remaining: 05:17, took 0.075s, duration: 00:01)
+test 0007...[HTTP with cookie parser and header recording]
+--pd--oe--- OK (7   out of 1416, remaining: 04:47, took 0.077s, duration: 00:01)
+test 0008...[HTTP with cookie parsing from header file]
+--pd---e--- OK (8   out of 1416, remaining: 04:26, took 0.087s, duration: 00:01)
+test 0009...[HTTP RFC1867-type formposting]
+--pd---e--- OK (9   out of 1416, remaining: 04:09, took 0.078s, duration: 00:01)
+test 0010...[simple HTTP PUT from file]
+--pd---e--- OK (10  out of 1416, remaining: 06:16, took 1.079s, duration: 00:02)
+test 0011...[simple HTTP Location: following]
+--pd---e--- OK (11  out of 1416, remaining: 05:56, took 0.114s, duration: 00:02)
+test 0012...[HTTP range support]
+--pd---e--- OK (12  out of 1416, remaining: 05:28, took 0.018s, duration: 00:02)
+test 0013...[HTTP custom request 'DELETE']
+--pd---e--- OK (13  out of 1416, remaining: 05:03, took 0.005s, duration: 00:02)
+test 0014...[HTTP HEAD with Connection: close]
+--pd---e--- OK (14  out of 1416, remaining: 04:42, took 0.005s, duration: 00:02)
+test 0015...[--write-out test]
+s-p----e--- OK (15  out of 1416, remaining: 04:23, took 0.006s, duration: 00:02)
+test 0016...[HTTP with proxy authorization]
+--pd---e--- OK (16  out of 1416, remaining: 04:07, took 0.006s, duration: 00:02)
+test 0017...[HTTP with config file on stdin]
+--pd---e--- OK (17  out of 1416, remaining: 03:53, took 0.006s, duration: 00:02)
+test 0018...[multiple requests using {} in URL]
+s-p----e--- OK (18  out of 1416, remaining: 03:41, took 0.008s, duration: 00:02)
+test 0019...[attempt connect to non-listening socket]
+-------e--- OK (19  out of 1416, remaining: 03:29, took 0.005s, duration: 00:02)
+test 0020...[attempt connect to non-existing host name]
+-------e--- OK (20  out of 1416, remaining: 03:19, took 0.007s, duration: 00:02)
+test 0021...[use curl with multiple request methods]
+-------e--- OK (21  out of 1416, remaining: 03:10, took 0.005s, duration: 00:02)
+test 0022...[get HTTP with URL > 10000 bytes]
+--pd---e--- OK (22  out of 1416, remaining: 03:01, took 0.006s, duration: 00:02)
+test 0023...[unsupported protocol:// URL]
+-------e--- OK (23  out of 1416, remaining: 02:54, took 0.005s, duration: 00:02)
+test 0024...[HTTP GET fail silently on HTTP error return]
+--p---oe--- OK (24  out of 1416, remaining: 02:47, took 0.005s, duration: 00:02)
+test 0025...[looping HTTP Location: following with --max-redirs]
+--pd---e--- OK (25  out of 1416, remaining: 02:40, took 0.010s, duration: 00:02)
+test 0026...[specify more -o than URLs]
+--pd---e--- OK (26  out of 1416, remaining: 02:37, took 0.058s, duration: 00:02)
+test 0027...[Get same cookie page several times]
+--pd---e--- OK (27  out of 1416, remaining: 02:40, took 0.178s, duration: 00:03)
+test 0028...[HTTP Location: following with extra spaces in header]
+--pd---e--- OK (28  out of 1416, remaining: 02:41, took 0.130s, duration: 00:03)
+test 0029...[HTTP with 2 secs timeout]
+Warning: server logs lock timeout (2 seconds) expired
+--pd---e--- OK (29  out of 1416, remaining: 05:48, took 4.036s, duration: 00:07)
+test 0030...[HTTP with no data in server reply]
+--p----e--- OK (30  out of 1416, remaining: 10:19, took 6.110s, duration: 00:13)
+test 0031...[HTTP with weirdly formatted cookies and cookiejar storage]
+--pd--oe--- OK (31  out of 1416, remaining: 09:59, took 0.012s, duration: 00:13)
+test 0032...[HTTP with -d and -G]
+--pd---e--- OK (32  out of 1416, remaining: 09:40, took 0.006s, duration: 00:13)
+test 0033...[HTTP PUT with resume]
+--pd---e--- OK (33  out of 1416, remaining: 10:07, took 1.064s, duration: 00:14)
+test 0034...[HTTP GET with chunked Transfer-Encoding]
+--pd---e--- OK (34  out of 1416, remaining: 09:49, took 0.007s, duration: 00:14)
+test 0035...[HTTP POST binary data with embedded NUL]
+--pd---e--- OK (35  out of 1416, remaining: 09:34, took 0.060s, duration: 00:14)
+test 0036...[HTTP GET with bad chunked Transfer-Encoding]
+--pd---e--- OK (36  out of 1416, remaining: 09:18, took 0.020s, duration: 00:14)
+test 0037...[HTTP GET with nothing returned from server]
+--p----e--- OK (37  out of 1416, remaining: 09:05, took 0.058s, duration: 00:14)
+test 0038...[HTTP resume request without server supporting it]
+--p---oe--- OK (38  out of 1416, remaining: 08:51, took 0.018s, duration: 00:14)
+test 0039...[HTTP RFC1867-type formposting with filename= and type=]
+--pd---e--- OK (39  out of 1416, remaining: 08:37, took 0.007s, duration: 00:14)
+test 0040...[HTTP redirect with whitespace after ? (and conversion)]
+--pd---e--- OK (40  out of 1416, remaining: 08:28, took 0.113s, duration: 00:14)
+test 0041...[HTTP formpost with missing file]
+-------e--- OK (41  out of 1416, remaining: 08:16, took 0.019s, duration: 00:14)
+test 0042...[HTTP redirect with whitespace in path (and conversion)]
+--pd---e--- OK (42  out of 1416, remaining: 08:08, took 0.130s, duration: 00:14)
+test 0043...[HTTP Location: following over HTTP proxy]
+--pd---e--- OK (43  out of 1416, remaining: 07:59, took 0.081s, duration: 00:15)
+test 0044...[HTTP RFC1867-type formposting without Expect: header]
+--pd---e--- OK (44  out of 1416, remaining: 07:50, took 0.079s, duration: 00:15)
+test 0045...[simple HTTP Location: without protocol in initial URL]
+--pd---e--- OK (45  out of 1416, remaining: 07:43, took 0.131s, duration: 00:15)
+test 0046...[HTTP with bad domain name, get cookies and store in cookie jar]
+--pd--oe--- OK (46  out of 1416, remaining: 07:34, took 0.034s, duration: 00:15)
+test 0047...[simple HTTP 1.0 GET]
+--pd---e--- OK (47  out of 1416, remaining: 07:26, took 0.074s, duration: 00:15)
+test 0048...[HTTP with -d and -G and -I]
+--pd---e--- OK (48  out of 1416, remaining: 07:17, took 0.027s, duration: 00:15)
+test 0049...[HTTP follow redirect with ../]
+--pd---e--- OK (49  out of 1416, remaining: 07:11, took 0.127s, duration: 00:15)
+test 0050...[HTTP follow redirect with ../../]
+--pd---e--- OK (50  out of 1416, remaining: 07:06, took 0.130s, duration: 00:15)
+test 0051...[HTTP follow redirect with excessive ../]
+--pd---e--- OK (51  out of 1416, remaining: 07:01, took 0.131s, duration: 00:15)
+test 0052...[HTTP follow redirect with ./-prefix]
+--pd---e--- OK (52  out of 1416, remaining: 06:56, took 0.131s, duration: 00:15)
+test 0053...[HTTP, junk session cookies]
+--pd---e--- OK (53  out of 1416, remaining: 06:48, took 0.025s, duration: 00:15)
+test 0054...[HTTP with blank Location:]
+--pd---e--- OK (54  out of 1416, remaining: 06:42, took 0.074s, duration: 00:15)
+test 0055...[HTTP follow redirect with single slash in path]
+--pd---e--- OK (55  out of 1416, remaining: 06:38, took 0.130s, duration: 00:16)
+test 0056...[HTTP POST with *HUGE* request and chunked transfer-encoding]
+--pd---e--- OK (56  out of 1416, remaining: 06:33, took 0.089s, duration: 00:16)
+test 0057...[HTTP content-type with spaces in]
+s-p----e--- OK (57  out of 1416, remaining: 06:27, took 0.075s, duration: 00:16)
+test 0058...[HTTP PUT from file with weird letters]
+--pd---e--- OK (58  out of 1416, remaining: 06:46, took 1.079s, duration: 00:17)
+test 0059...[HTTP URL with slash but with "parameter"]
+--pd---e--- OK (59  out of 1416, remaining: 06:40, took 0.061s, duration: 00:17)
+test 0060...[HTTP PUT from stdin with wrong content-length]
+--pd---e--- OK (60  out of 1416, remaining: 06:57, took 1.076s, duration: 00:18)
+test 0061...[HTTP with various cookies and custom Host:]
+--pd--oe--- OK (61  out of 1416, remaining: 06:50, took 0.008s, duration: 00:18)
+test 0062...[HTTP, send cookies when using custom Host:]
+--pd---e--- OK (62  out of 1416, remaining: 06:46, took 0.115s, duration: 00:18)
+test 0063...[HTTP with proxy authorization set in environment]
+--pd---e--- OK (63  out of 1416, remaining: 06:41, took 0.070s, duration: 00:18)
+test 0064...[HTTP with Digest authorization]
+--pd---e--- OK (64  out of 1416, remaining: 06:37, took 0.132s, duration: 00:18)
+test 0065...[HTTP with Digest authorization with bad password]
+--pd---e--- OK (65  out of 1416, remaining: 06:31, took 0.031s, duration: 00:18)
+test 0066...[HTTP GET without headers in the response]
+--pd---e--- OK (66  out of 1416, remaining: 06:27, took 0.074s, duration: 00:18)
+test 0067 SKIPPED: curl lacks debug support
+test 0068 SKIPPED: curl lacks debug support
+test 0069 SKIPPED: curl lacks debug support
+test 0070...[HTTP with Digest *OR* NTLM authorization]
+--pd---e--- OK (70  out of 1416, remaining: 06:04, took 0.020s, duration: 00:18)
+test 0071...[HTTP and -F upload in config file]
+--pd---e--- OK (71  out of 1416, remaining: 06:00, took 0.066s, duration: 00:19)
+test 0072...[HTTP with Digest *OR* Basic authorization]
+--pd---e--- OK (72  out of 1416, remaining: 05:55, took 0.023s, duration: 00:19)
+test 0073...[HTTP, receive cookies when using custom Host:, domain using only two dots]
+--pd--oe--- OK (73  out of 1416, remaining: 05:51, took 0.057s, duration: 00:19)
+test 0074...[HTTP, urlglob {}-retrieval and -o #[num] usage]
+--p---oe--- OK (74  out of 1416, remaining: 05:48, took 0.078s, duration: 00:19)
+test 0075...[HTTP, urlglob retrieval with bad range]
+s------e--- OK (75  out of 1416, remaining: 05:43, took 0.016s, duration: 00:19)
+test 0076...[HTTP, -O with no file name part in the URL]
+-------e--- OK (76  out of 1416, remaining: 05:38, took 0.004s, duration: 00:19)
+test 0077...[HTTP with -z "older date"]
+--pd---e--- OK (77  out of 1416, remaining: 05:34, took 0.006s, duration: 00:19)
+test 0078...[HTTP with -z "newer date"]
+--pd---e--- OK (78  out of 1416, remaining: 05:29, took 0.006s, duration: 00:19)
+test 0079...[FTP over HTTP proxy]
+--pd---e--- OK (79  out of 1416, remaining: 05:26, took 0.058s, duration: 00:19)
+test 0080...[HTTP 1.0 CONNECT with proxytunnel and proxy+host Basic authentication]
+--pd-P-e--- OK (80  out of 1416, remaining: 05:48, took 1.578s, duration: 00:20)
+test 0082...[HTTP with proxy requiring NTLM, but we send Basic]
+--pd---e--- OK (82  out of 1416, remaining: 05:39, took 0.006s, duration: 00:20)
+test 0083...[HTTP over proxy-tunnel with site authentication]
+--pd-P-e--- OK (83  out of 1416, remaining: 05:51, took 0.997s, duration: 00:21)
+test 0084...[HTTP over proxy with site authentication]
+--pd---e--- OK (84  out of 1416, remaining: 05:47, took 0.059s, duration: 00:21)
+test 0085...[HTTP over proxy with site and proxy authentication]
+--pd---e--- OK (85  out of 1416, remaining: 05:44, took 0.067s, duration: 00:21)
+test 0086...[HTTP, urlglob []-retrieval and -o #[num] usage]
+--p---oe--- OK (86  out of 1416, remaining: 05:43, took 0.189s, duration: 00:22)
+test 0087...[urlglob with out of range -o #[num] usage]
+------oe--- OK (87  out of 1416, remaining: 05:39, took 0.029s, duration: 00:22)
+test 0088...[HTTP PUT with Digest authorization]
+--pd---e--- OK (88  out of 1416, remaining: 05:51, took 1.087s, duration: 00:23)
+test 0092...[HTTP resume transfer with the whole file already downloaded]
+--pd---e--- OK (92  out of 1416, remaining: 05:35, took 0.006s, duration: 00:23)
+test 0093...[HTTP GET with failed proxy auth]
+--pd---e--- OK (93  out of 1416, remaining: 05:32, took 0.059s, duration: 00:23)
+test 0094...[HTTPS GET with failed proxy auth (CONNECT 1.0)]
+--p----e--- OK (94  out of 1416, remaining: 05:29, took 0.070s, duration: 00:23)
+test 0095...[HTTP over proxytunnel using POST]
+--pd-P-e--- OK (95  out of 1416, remaining: 05:34, took 0.583s, duration: 00:24)
+test 0096 SKIPPED: curl lacks TrackMemory support
+test 0097...[HTTP POST with custom content-type]
+--pd---e--- OK (97  out of 1416, remaining: 05:26, took 0.006s, duration: 00:24)
+test 0098...[HTTP PUT from stdin with set size, disabling chunked transfer-encoding]
+--pd---e--- OK (98  out of 1416, remaining: 05:36, took 1.014s, duration: 00:25)
+test 0099...[HTTP GET with large-file resume point and failed resume]
+--pd---e--- OK (99  out of 1416, remaining: 05:33, took 0.008s, duration: 00:25)
+test 0100...[FTP dir list PASV]
+--pd---e--- OK (100 out of 1416, remaining: 05:43, took 1.027s, duration: 00:26)
+test 0101...[FTP dir list, PORT with specified IP]
+--pd---e--- OK (101 out of 1416, remaining: 05:39, took 0.014s, duration: 00:26)
+test 0102...[FTP RETR PASV]
+--pd---e--- OK (102 out of 1416, remaining: 05:36, took 0.020s, duration: 00:26)
+test 0103...[FTP RETR PORT with CWD]
+--pd---e--- OK (103 out of 1416, remaining: 05:33, took 0.025s, duration: 00:26)
+test 0104...[FTP --head to get file size only]
+--p----e--- OK (104 out of 1416, remaining: 05:30, took 0.019s, duration: 00:26)
+test 0105...[FTP user+password in URL and ASCII transfer]
+--pd---e--- OK (105 out of 1416, remaining: 05:26, took 0.024s, duration: 00:26)
+test 0106...[FTP GET with type=A style ASCII URL using %20 codes]
+--pd---e--- OK (106 out of 1416, remaining: 05:23, took 0.025s, duration: 00:26)
+test 0107...[FTP PASV upload file]
+--p-u--e--- OK (107 out of 1416, remaining: 05:21, took 0.024s, duration: 00:26)
+test 0108...[FTP PORT upload with CWD]
+--p-u--e--- OK (108 out of 1416, remaining: 05:18, took 0.025s, duration: 00:26)
+test 0109...[FTP PASV upload append]
+--p-u--e--- OK (109 out of 1416, remaining: 05:15, took 0.024s, duration: 00:26)
+test 0110...[FTP download resume with set limit]
+--pd---e--- OK (110 out of 1416, remaining: 05:12, took 0.025s, duration: 00:26)
+test 0111...[FTP download resume beyond file size]
+--p----e--- OK (111 out of 1416, remaining: 05:09, took 0.022s, duration: 00:26)
+test 0112...[FTP PASV upload resume]
+--p-u--e--- OK (112 out of 1416, remaining: 05:06, took 0.024s, duration: 00:26)
+test 0113...[FTP download, failed login: USER not valid]
+--p----e--- OK (113 out of 1416, remaining: 05:04, took 0.014s, duration: 00:26)
+test 0114...[FTP download, failed login: PASS not valid]
+--p----e--- OK (114 out of 1416, remaining: 05:01, took 0.015s, duration: 00:26)
+test 0115...[FTP download, failed PASV]
+--p----e--- OK (115 out of 1416, remaining: 04:58, took 0.017s, duration: 00:26)
+test 0116...[FTP download, failed PORT]
+--p----e--- OK (116 out of 1416, remaining: 04:56, took 0.020s, duration: 00:26)
+test 0117...[FTP download, failed TYPE]
+--p----e--- OK (117 out of 1416, remaining: 04:53, took 0.022s, duration: 00:26)
+test 0118...[FTP download, failed RETR]
+--p----e--- OK (118 out of 1416, remaining: 04:51, took 0.024s, duration: 00:26)
+test 0119...[FTP download, failed RETR with PORT]
+--p----e--- OK (119 out of 1416, remaining: 04:48, took 0.023s, duration: 00:26)
+test 0120...[ftp download with post-quote delete operation]
+--pd---e--- OK (120 out of 1416, remaining: 04:46, took 0.026s, duration: 00:26)
+test 0121...[ftp download with post- and pre-transfer delete operations]
+--pd---e--- OK (121 out of 1416, remaining: 04:44, took 0.026s, duration: 00:26)
+test 0122...[FTP download resume with whole file already downloaded]
+--p----e--- OK (122 out of 1416, remaining: 04:41, took 0.023s, duration: 00:26)
+test 0123...[FTP upload resume with whole file already downloaded]
+--p----e--- OK (123 out of 1416, remaining: 04:39, took 0.021s, duration: 00:26)
+test 0124...[FTP download, failed PWD]
+--pd---e--- OK (124 out of 1416, remaining: 04:37, took 0.024s, duration: 00:26)
+test 0125...[FTP download, failed CWD]
+--p----e--- OK (125 out of 1416, remaining: 04:35, took 0.017s, duration: 00:26)
+test 0126...[FTP download with multiple replies at once in RETR]
+--pd---e--- OK (126 out of 1416, remaining: 04:33, took 0.073s, duration: 00:26)
+test 0127...[FTP --disable-epsv]
+--pd---e--- OK (127 out of 1416, remaining: 04:31, took 0.079s, duration: 00:26)
+test 0128...[FTP upload with --crlf]
+--p-u--e--- OK (128 out of 1416, remaining: 04:29, took 0.034s, duration: 00:26)
+test 0129...[HTTP/1.2 is rejected]
+--p----e--- OK (129 out of 1416, remaining: 04:27, took 0.021s, duration: 00:26)
+test 0130...[FTP (optional .netrc; no user/pass) dir list PASV]
+--pd---e--- OK (130 out of 1416, remaining: 04:25, took 0.035s, duration: 00:26)
+test 0131...[FTP (optional .netrc; user/no pass) dir list PASV]
+--pd---e--- OK (131 out of 1416, remaining: 04:24, took 0.032s, duration: 00:26)
+test 0132...[FTP (optional .netrc; user/passwd supplied) dir list PASV]
+--pd---e--- OK (132 out of 1416, remaining: 04:22, took 0.032s, duration: 00:26)
+test 0133...[FTP (compulsory .netrc; ignored user/passwd) dir list PASV]
+--pd---e--- OK (133 out of 1416, remaining: 04:20, took 0.075s, duration: 00:27)
+test 0134...[FTP (optional .netrc; programmatic user/passwd) dir list PASV]
+--pd---e--- OK (134 out of 1416, remaining: 04:18, took 0.035s, duration: 00:27)
+test 0135...[FTP retrieve a byte-range]
+--pd---e--- OK (135 out of 1416, remaining: 04:17, took 0.034s, duration: 00:27)
+test 0136...[FTP with user and no password]
+--pd---e--- OK (136 out of 1416, remaining: 04:15, took 0.032s, duration: 00:27)
+test 0137...[FTP download without size in RETR string]
+--pd---e--- OK (137 out of 1416, remaining: 04:13, took 0.077s, duration: 00:27)
+test 0138...[FTP download without size in RETR string and no SIZE command]
+--pd---e--- OK (138 out of 1416, remaining: 04:12, took 0.079s, duration: 00:27)
+test 0139...[FTP download a newer file with -z]
+--pd---e--- OK (139 out of 1416, remaining: 04:11, took 0.079s, duration: 00:27)
+test 0140...[FTP download file with -z, expected to not transfer]
+--p----e--- OK (140 out of 1416, remaining: 04:09, took 0.026s, duration: 00:27)
+test 0141...[FTP download info with -I]
+s-p----e--- OK (141 out of 1416, remaining: 04:07, took 0.027s, duration: 00:27)
+test 0142...[FTP URL with 150 dir levels]
+--pd---e--- OK (142 out of 1416, remaining: 04:07, took 0.134s, duration: 00:27)
+test 0143...[FTP URL with type=a]
+--pd---e--- OK (143 out of 1416, remaining: 04:05, took 0.079s, duration: 00:27)
+test 0144...[FTP NLST dir list without contents, using PORT]
+--p----e--- OK (144 out of 1416, remaining: 04:04, took 0.033s, duration: 00:27)
+test 0145...[FTP NLST dir list with weird reply code, using PORT]
+--p----e--- OK (145 out of 1416, remaining: 04:02, took 0.031s, duration: 00:27)
+test 0146...[persistent FTP with different paths]
+--pd---e--- OK (146 out of 1416, remaining: 04:02, took 0.135s, duration: 00:27)
+test 0147...[FTP with --ftp-create-dirs (failing CWD)]
+--pd---e--- OK (147 out of 1416, remaining: 04:00, took 0.083s, duration: 00:27)
+test 0148...[FTP with --ftp-create-dirs (failing MKD)]
+--p----e--- OK (148 out of 1416, remaining: 03:59, took 0.029s, duration: 00:27)
+test 0149...[FTP with multiple uploads]
+--p---oe--- OK (149 out of 1416, remaining: 03:58, took 0.130s, duration: 00:28)
+test 0151...[HTTP GET with an error code that might trick authentication]
+--pd---e--- OK (151 out of 1416, remaining: 03:55, took 0.074s, duration: 00:28)
+test 0152...[HTTP GET with an error code that might trick authentication and --fail]
+--p----e--- OK (152 out of 1416, remaining: 03:54, took 0.075s, duration: 00:28)
+test 0153...[HTTP with Digest authorization with stale=true]
+s-p----e--- OK (153 out of 1416, remaining: 03:54, took 0.147s, duration: 00:28)
+test 0154...[HTTP PUT with --anyauth authorization (picking Digest)]
+--pd---e--- OK (154 out of 1416, remaining: 04:01, took 1.084s, duration: 00:29)
+test 0156...[HTTP PUT with --anyauth (when the server requires none)]
+--pd---e--- OK (156 out of 1416, remaining: 04:06, took 1.064s, duration: 00:30)
+test 0157...[HTTP GET with --anyauth (when the server requires none)]
+--pd---e--- OK (157 out of 1416, remaining: 04:05, took 0.061s, duration: 00:30)
+test 0158...[HTTP multipart formpost with only a 100 reply]
+--pd---e--- OK (158 out of 1416, remaining: 04:04, took 0.072s, duration: 00:30)
+test 0160...[HTTP with delayed close, conn reuse, connection reset and retry]
+s-p----e--- OK (160 out of 1416, remaining: 04:17, took 2.135s, duration: 00:32)
+test 0161...[FTP RETR PASV]
+--pd---e--- OK (161 out of 1416, remaining: 04:15, took 0.010s, duration: 00:32)
+test 0162...[HTTP GET asking for --proxy-ntlm when some other authentication is required]
+--p----e--- OK (162 out of 1416, remaining: 04:14, took 0.059s, duration: 00:32)
+test 0163...[HTTP multipart formpost with contents from a file]
+--pd---e--- OK (163 out of 1416, remaining: 04:13, took 0.074s, duration: 00:32)
+test 0164...[HTTP range with multiple ranges]
+--pd---e--- OK (164 out of 1416, remaining: 04:12, took 0.064s, duration: 00:33)
+test 0165 SKIPPED: curl lacks idn support
+test 0166...[HTTP formpost a file with spaces in name]
+--pd---e--- OK (166 out of 1416, remaining: 04:09, took 0.077s, duration: 00:33)
+test 0167...[HTTP with proxy-requiring-Basic to site-requiring-Digest]
+--pd---e--- OK (167 out of 1416, remaining: 04:08, took 0.132s, duration: 00:33)
+test 0168...[HTTP with proxy-requiring-Digest to site-requiring-Digest]
+--pd---e--- OK (168 out of 1416, remaining: 04:08, took 0.185s, duration: 00:33)
+test 0170...[HTTP POST with --proxy-ntlm and no SSL with no response]
+--p----e--- OK (170 out of 1416, remaining: 04:05, took 0.076s, duration: 00:33)
+test 0171...[HTTP, get cookie with dot prefixed full domain]
+--pd--oe--- OK (171 out of 1416, remaining: 04:04, took 0.027s, duration: 00:33)
+test 0172...[HTTP with cookies file and custom added cookie]
+--pd---e--- OK (172 out of 1416, remaining: 04:02, took 0.025s, duration: 00:33)
+test 0173...[HTTP RFC1867-formpost a file from stdin with "faked" filename]
+--pd---e--- OK (173 out of 1416, remaining: 04:01, took 0.077s, duration: 00:33)
+test 0174...[HTTP POST --anyauth to server not requiring any auth at all]
+--pd---e--- OK (174 out of 1416, remaining: 04:00, took 0.075s, duration: 00:33)
+test 0175...[HTTP POST --digest to server not requiring any auth at all]
+--pd---e--- OK (175 out of 1416, remaining: 04:00, took 0.132s, duration: 00:33)
+test 0176...[HTTP POST --ntlm to server not requiring any auth at all]
+--pd---e--- OK (176 out of 1416, remaining: 03:59, took 0.133s, duration: 00:33)
+test 0177...[HTTP POST --digest to server doing a 302-location response]
+--pd---e--- OK (177 out of 1416, remaining: 03:58, took 0.076s, duration: 00:34)
+test 0178...[HTTP response with negative Content-Length]
+--pd---e--- OK (178 out of 1416, remaining: 03:57, took 0.077s, duration: 00:34)
+test 0179...[HTTP using proxy and cookies with path checks]
+--pd---e--- OK (179 out of 1416, remaining: 03:56, took 0.026s, duration: 00:34)
+test 0180...[HTTP 1.0 PUT]
+--pd---e--- OK (180 out of 1416, remaining: 03:55, took 0.072s, duration: 00:34)
+test 0181...[HTTP 1.0 POST]
+--pd---e--- OK (181 out of 1416, remaining: 03:54, took 0.075s, duration: 00:34)
+test 0182...[FTP download an empty file]
+--pd---e--- OK (182 out of 1416, remaining: 03:52, took 0.038s, duration: 00:34)
+test 0183...[HTTP GET two URLs over a single proxy with persistent connection]
+--pd---e--- OK (183 out of 1416, remaining: 03:51, took 0.019s, duration: 00:34)
+test 0184...[HTTP replace Host: when following Location: to new host]
+--pd---e--- OK (184 out of 1416, remaining: 03:50, took 0.007s, duration: 00:34)
+test 0185...[HTTP replace Host: when following Location: on the same host]
+--pd---e--- OK (185 out of 1416, remaining: 03:48, took 0.007s, duration: 00:34)
+test 0186...[HTTP RFC1867-type formposting with types on text fields]
+--pd---e--- OK (186 out of 1416, remaining: 03:47, took 0.058s, duration: 00:34)
+test 0187...[HTTP redirect with bad host name separation and slash in parameters]
+--pd---e--- OK (187 out of 1416, remaining: 03:46, took 0.079s, duration: 00:34)
+test 0188...[HTTP GET with resume and redirect]
+--pd---e--- OK (188 out of 1416, remaining: 03:45, took 0.030s, duration: 00:34)
+test 0189...[HTTP GET with resume and redirect (to a page that doesn't resume)]
+--pd---e--- OK (189 out of 1416, remaining: 03:44, took 0.029s, duration: 00:34)
+test 0190...[FTP download with strict timeout and slow CWD]
+--p----e--- OK (190 out of 1416, remaining: 04:35, took 8.062s, duration: 00:42)
+test 0191...[FTP URL with ?-letters in username and password ]
+--pd---e--- OK (191 out of 1416, remaining: 04:40, took 1.028s, duration: 00:43)
+test 0192...[HTTP GET -w num_connects with one simple connect]
+s-p----e--- OK (192 out of 1416, remaining: 04:38, took 0.008s, duration: 00:43)
+test 0193...[HTTP GET -w num_connects with redirected fetch (2 connects)]
+s-p----e--- OK (193 out of 1416, remaining: 04:37, took 0.066s, duration: 00:43)
+test 0194...[HTTP resume transfer with the whole file already downloaded and --fail]
+--pd---e--- OK (194 out of 1416, remaining: 04:35, took 0.060s, duration: 00:43)
+test 0195...[FTP response 530 after PASS, temporarily not allowed access]
+--p----e--- OK (195 out of 1416, remaining: 04:34, took 0.017s, duration: 00:43)
+test 0196...[FTP transient error, retry request once]
+--p----e--- OK (196 out of 1416, remaining: 04:39, took 1.015s, duration: 00:44)
+test 0197...[HTTP GET --retry on 503 error with output to stdout]
+s-p----e--- OK (197 out of 1416, remaining: 04:43, took 1.016s, duration: 00:45)
+test 0198...[HTTP GET --retry on 503 error with output to file]
+--pd---e--- OK (198 out of 1416, remaining: 04:48, took 1.014s, duration: 00:46)
+test 0199...[HTTP with -d, -G and {}]
+--pd---e--- OK (199 out of 1416, remaining: 04:46, took 0.008s, duration: 00:46)
+test 0200...[basic file:// file]
+---d---e--- OK (200 out of 1416, remaining: 04:45, took 0.006s, duration: 00:46)
+test 0201...[missing file:// file]
+-------e--- OK (201 out of 1416, remaining: 04:43, took 0.005s, duration: 00:46)
+test 0202...[two file:// URLs to stdout]
+s------e--- OK (202 out of 1416, remaining: 04:41, took 0.007s, duration: 00:46)
+test 0203...[file:/path URL with a single slash]
+---d---e--- OK (203 out of 1416, remaining: 04:40, took 0.008s, duration: 00:46)
+test 0204...["upload" with file://]
+------oe--- OK (204 out of 1416, remaining: 04:38, took 0.007s, duration: 00:46)
+test 0205...["upload" with file://]
+-------e--- OK (205 out of 1416, remaining: 04:37, took 0.007s, duration: 00:46)
+test 0206...[HTTP proxy CONNECT auth Digest]
+--pd---e--- OK (206 out of 1416, remaining: 04:35, took 0.012s, duration: 00:46)
+test 0207...[HTTP GET with chunked Transfer-Encoding closed prematurely]
+--pd---e--- OK (207 out of 1416, remaining: 04:34, took 0.064s, duration: 00:46)
+test 0208...[HTTP PUT to a FTP URL with username+password - over HTTP proxy]
+--pd---e--- OK (208 out of 1416, remaining: 04:39, took 1.082s, duration: 00:48)
+test 0210...[Get two FTP files from the same remote dir: no second CWD]
+--pd---e--- OK (210 out of 1416, remaining: 04:36, took 0.014s, duration: 00:48)
+test 0211...[Get two FTP files with no remote EPSV support]
+--pd---e--- OK (211 out of 1416, remaining: 04:34, took 0.016s, duration: 00:48)
+test 0212...[Get two FTP files with no remote EPRT support]
+--pd---e--- OK (212 out of 1416, remaining: 04:33, took 0.016s, duration: 00:48)
+test 0214...[HTTP URL with escaped { and }]
+--pd---e--- OK (214 out of 1416, remaining: 04:30, took 0.007s, duration: 00:48)
+test 0215...[Get two FTP dir listings from the same remote dir: no second CWD]
+--pd---e--- OK (215 out of 1416, remaining: 04:29, took 0.016s, duration: 00:48)
+test 0216...[FTP upload two files to the same dir]
+--p----e--- OK (216 out of 1416, remaining: 04:27, took 0.015s, duration: 00:48)
+test 0217...[HTTP proxy CONNECT to proxy returning 405]
+s-p----e--- OK (217 out of 1416, remaining: 04:26, took 0.060s, duration: 00:48)
+test 0218...[HTTP PUT from a file but enforce chunked transfer-encoding]
+--pd---e--- OK (218 out of 1416, remaining: 04:30, took 1.027s, duration: 00:49)
+test 0219...[try using proxy with unsupported scheme]
+-------e--- OK (219 out of 1416, remaining: 04:29, took 0.006s, duration: 00:49)
+test 0220...[HTTP GET gzip compressed content]
+--pd---e--- OK (220 out of 1416, remaining: 04:27, took 0.007s, duration: 00:49)
+test 0221...[HTTP GET gzip compressed content with broken gzip header]
+--pd---e--- OK (221 out of 1416, remaining: 04:26, took 0.008s, duration: 00:49)
+test 0222...[HTTP GET deflate compressed content]
+--pd---e--- OK (222 out of 1416, remaining: 04:25, took 0.013s, duration: 00:49)
+test 0223...[HTTP GET deflate compressed content with broken deflate header]
+--pd---e--- OK (223 out of 1416, remaining: 04:23, took 0.009s, duration: 00:49)
+test 0224...[HTTP GET gzip compressed content with huge comment and extra field]
+--pd---e--- OK (224 out of 1416, remaining: 04:22, took 0.009s, duration: 00:49)
+test 0225...[FTP %0a-code in URL's name part]
+-------e--- OK (225 out of 1416, remaining: 04:21, took 0.005s, duration: 00:49)
+test 0226...[FTP %0d-code in URL's CWD part]
+-------e--- OK (226 out of 1416, remaining: 04:19, took 0.007s, duration: 00:49)
+test 0227...[FTP with quote ops]
+--pd---e--- OK (227 out of 1416, remaining: 04:18, took 0.013s, duration: 00:49)
+test 0228...[FTP RETR with ACCT]
+--pd---e--- OK (228 out of 1416, remaining: 04:17, took 0.012s, duration: 00:49)
+test 0229...[FTP RETR with bad ACCT]
+--p----e--- OK (229 out of 1416, remaining: 04:15, took 0.008s, duration: 00:49)
+test 0230...[HTTP GET multiply compressed content]
+--pd---e--- OK (230 out of 1416, remaining: 04:14, took 0.013s, duration: 00:49)
+test 0231...[file:// with resume]
+---d---e--- OK (231 out of 1416, remaining: 04:13, took 0.006s, duration: 00:49)
+test 0232...[HTTP GET deflate raw-compressed content]
+--pd---e--- OK (232 out of 1416, remaining: 04:12, took 0.013s, duration: 00:49)
+test 0233...[HTTP, proxy, site+proxy auth and Location: to new host]
+--pd---e--- OK (233 out of 1416, remaining: 04:11, took 0.114s, duration: 00:49)
+test 0234...[HTTP, proxy, site+proxy auth and Location: to new host using location-trusted]
+--pd---e--- OK (234 out of 1416, remaining: 04:10, took 0.130s, duration: 00:49)
+test 0235...[FTP resumed upload but no file present remotely]
+--p-u--e--- OK (235 out of 1416, remaining: 04:09, took 0.081s, duration: 00:49)
+test 0236...[FTP resume upload but denied access to remote file]
+--p----e--- OK (236 out of 1416, remaining: 04:08, took 0.022s, duration: 00:49)
+test 0237...[FTP getting bad host in 227-response to PASV]
+--p----e--- OK (237 out of 1416, remaining: 04:07, took 0.007s, duration: 00:49)
+test 0238...[FTP getting bad port in response to EPSV]
+--p----e--- OK (238 out of 1416, remaining: 04:06, took 0.007s, duration: 00:49)
+test 0240...[HTTP-IPv6 GET]
+--pd---e--- OK (240 out of 1416, remaining: 04:08, took 1.017s, duration: 00:50)
+test 0241...[HTTP-IPv6 GET (using ip6-localhost)]
+--pd---e--- OK (241 out of 1416, remaining: 04:07, took 0.008s, duration: 00:50)
+test 0242...[HTTP-IPv6 GET with username+password in URL]
+--pd---e--- OK (242 out of 1416, remaining: 04:06, took 0.008s, duration: 00:50)
+test 0244...[FTP dir listing with nocwd and URL encoded path]
+--pd---e--- OK (244 out of 1416, remaining: 04:04, took 0.014s, duration: 00:50)
+test 0245...[HTTP POST --digest]
+--pd---e--- OK (245 out of 1416, remaining: 04:02, took 0.011s, duration: 00:50)
+test 0246...[HTTP POST --digest with server doing a 100 before 401 response]
+--pd---e--- OK (246 out of 1416, remaining: 04:01, took 0.011s, duration: 00:50)
+test 0247...[FTP upload time condition evaluates TRUE => skip upload]
+--p----e--- OK (247 out of 1416, remaining: 04:00, took 0.010s, duration: 00:50)
+test 0248...[FTP upload time condition evaluates FALSE => upload anyway]
+--p-u--e--- OK (248 out of 1416, remaining: 03:59, took 0.014s, duration: 00:50)
+test 0249...[HTTP 304 response with "illegal" Content-Length: header]
+--pd---e--- OK (249 out of 1416, remaining: 03:58, took 0.061s, duration: 00:50)
+test 0250...[FTP dir list PASV with slow response]
+--pd---e--- OK (250 out of 1416, remaining: 04:46, took 10.606s, duration: 01:01)
+test 0251...[FTP dir list, PORT with specified IP and slow response]
+--pd---e--- OK (251 out of 1416, remaining: 05:35, took 10.717s, duration: 01:12)
+test 0252...[FTP IPv6 dir list PASV]
+--pd---e--- OK (252 out of 1416, remaining: 05:38, took 1.027s, duration: 01:13)
+test 0253...[FTP IPv6 dir list with EPRT]
+--pd---e--- OK (253 out of 1416, remaining: 05:36, took 0.014s, duration: 01:13)
+test 0254...[FTP IPv6 dir list PASV and --disable-epsv]
+--pd---e--- OK (254 out of 1416, remaining: 05:35, took 0.012s, duration: 01:13)
+test 0255...[FTP IPv6 dir list with EPRT and --disable-eprt]
+--pd---e--- OK (255 out of 1416, remaining: 05:33, took 0.010s, duration: 01:13)
+test 0256...[HTTP resume request over proxy with auth without server supporting it]
+--p---oe--- OK (256 out of 1416, remaining: 05:32, took 0.007s, duration: 01:13)
+test 0257...[HTTP Location: following with --netrc-optional]
+--pd---e--- OK (257 out of 1416, remaining: 05:31, took 0.165s, duration: 01:13)
+test 0258...[HTTP POST multipart without Expect: header using proxy anyauth (Digest)]
+--pd---e--- OK (258 out of 1416, remaining: 05:30, took 0.083s, duration: 01:13)
+test 0259...[HTTP POST multipart with Expect: header using proxy anyauth (Digest)]
+--pd---e--- OK (259 out of 1416, remaining: 05:37, took 2.041s, duration: 01:15)
+test 0260...[HTTP GET URL without slash but with questionmark]
+--pd---e--- OK (260 out of 1416, remaining: 05:36, took 0.006s, duration: 01:15)
+test 0261...[FTP RETR with 226 response code to TYPE]
+--pd---e--- OK (261 out of 1416, remaining: 05:34, took 0.011s, duration: 01:15)
+test 0262...[HTTP GET with binary zeroes in header]
+--pd---e--- OK (262 out of 1416, remaining: 05:33, took 0.008s, duration: 01:15)
+test 0263...[HTTP-IPv6 GET with proxy specified using IPv6-numerical address]
+--pd---e--- OK (263 out of 1416, remaining: 05:31, took 0.007s, duration: 01:15)
+test 0264...[HTTP with proxy string including http:// and user+password]
+--pd---e--- OK (264 out of 1416, remaining: 05:30, took 0.059s, duration: 01:15)
+test 0266...[HTTP GET with chunked Transfer-Encoding and chunked trailer]
+--pd--oe--- OK (266 out of 1416, remaining: 05:27, took 0.017s, duration: 01:15)
+test 0268...[HTTP POST a non-existing file]
+--pd---e--- OK (268 out of 1416, remaining: 05:24, took 0.006s, duration: 01:15)
+test 0269...[HTTP --ignore-content-length]
+--pd---e--- OK (269 out of 1416, remaining: 05:23, took 0.057s, duration: 01:15)
+test 0270...[FTP RETR PASV --ftp-skip-pasv-ip]
+--pd---e--- OK (270 out of 1416, remaining: 05:21, took 0.032s, duration: 01:15)
+test 0271...[TFTP retrieve]
+--pd---e--- OK (271 out of 1416, remaining: 05:24, took 1.019s, duration: 01:16)
+test 0272...[FTP timed conditioned get file with identical time stamp ]
+--p----e--- OK (272 out of 1416, remaining: 05:23, took 0.007s, duration: 01:16)
+test 0273...[HTTP with two Digest authorization headers]
+--pd---e--- OK (273 out of 1416, remaining: 05:22, took 0.115s, duration: 01:16)
+test 0274...[HTTP Location: following with --max-redirs 0]
+--pd---e--- OK (274 out of 1416, remaining: 05:20, took 0.059s, duration: 01:17)
+test 0275...[HTTP CONNECT with proxytunnel getting two URLs from the same host]
+--pd-P-e--- OK (275 out of 1416, remaining: 05:21, took 0.538s, duration: 01:17)
+test 0276...[HTTP Location: following with multiple question marks in URLs]
+--pd---e--- OK (276 out of 1416, remaining: 05:20, took 0.112s, duration: 01:17)
+test 0277...[HTTP RFC1867-type formposting with custom Content-Type]
+--pd---e--- OK (277 out of 1416, remaining: 05:19, took 0.073s, duration: 01:17)
+test 0278...[HTTP with proxy string including http:// and user+empty password]
+--pd---e--- OK (278 out of 1416, remaining: 05:18, took 0.070s, duration: 01:17)
+test 0279...[HTTP with proxy string including http:// and user only]
+--pd---e--- OK (279 out of 1416, remaining: 05:17, took 0.076s, duration: 01:17)
+test 0280...[FTP --ftp-alternative-to-user on USER failure]
+--pd---e--- OK (280 out of 1416, remaining: 05:16, took 0.085s, duration: 01:17)
+test 0281...[HTTP PUT from file with 100 + 401 responses and -f without auth given]
+--pd---e--- OK (281 out of 1416, remaining: 05:19, took 1.027s, duration: 01:19)
+test 0282...[HTTP GET with no response body or headers]
+--pd---e--- OK (282 out of 1416, remaining: 05:18, took 0.100s, duration: 01:19)
+test 0283...[TFTP retrieve on invalid file]
+--p----e--- OK (283 out of 1416, remaining: 05:16, took 0.017s, duration: 01:19)
+test 0284...[TFTP retrieve of boundary case 512 byte file]
+--pd---e--- OK (284 out of 1416, remaining: 05:15, took 0.006s, duration: 01:19)
+test 0285...[TFTP send]
+Warning: server logs lock timeout (2 seconds) expired
+--p-u--e--- OK (285 out of 1416, remaining: 05:22, took 2.021s, duration: 01:21)
+test 0286...[TFTP send of boundary case 512 byte file]
+Warning: server logs lock timeout (2 seconds) expired
+--p-u--e--- OK (286 out of 1416, remaining: 05:40, took 5.006s, duration: 01:26)
+test 0287...[HTTP proxy CONNECT with custom User-Agent header]
+s-p----e--- OK (287 out of 1416, remaining: 05:39, took 0.059s, duration: 01:26)
+test 0288...[file:// with (unsupported) proxy, authentication and range]
+---d---e--- OK (288 out of 1416, remaining: 05:37, took 0.018s, duration: 01:26)
+test 0289...[FTP resume upload but denied access to local file]
+-------e--- OK (289 out of 1416, remaining: 05:36, took 0.004s, duration: 01:26)
+test 0290...[FTP download maximum filesize exceeded]
+--p----e--- OK (290 out of 1416, remaining: 05:34, took 0.009s, duration: 01:26)
+test 0291...[FTP download maximum filesize not exceeded]
+--pd---e--- OK (291 out of 1416, remaining: 05:33, took 0.010s, duration: 01:26)
+test 0292...[HTTP GET with maximum filesize not exceeded]
+--pd---e--- OK (292 out of 1416, remaining: 05:32, took 0.006s, duration: 01:26)
+test 0293...[HTTP GET with maximum filesize exceeded]
+--p----e--- OK (293 out of 1416, remaining: 05:30, took 0.006s, duration: 01:26)
+test 0294...[FTP --ftp-account on ACCT request]
+--pd---e--- OK (294 out of 1416, remaining: 05:29, took 0.010s, duration: 01:26)
+test 0295...[FTP ACCT request without --ftp-account]
+--p----e--- OK (295 out of 1416, remaining: 05:27, took 0.006s, duration: 01:26)
+test 0296...[FTP CWD with --ftp-method multicwd]
+--pd---e--- OK (296 out of 1416, remaining: 05:26, took 0.010s, duration: 01:26)
+test 0297...[FTP CWD with --ftp-method singlecwd]
+--pd---e--- OK (297 out of 1416, remaining: 05:25, took 0.009s, duration: 01:26)
+test 0298...[FTP CWD with --ftp-method nocwd]
+--pd---e--- OK (298 out of 1416, remaining: 05:23, took 0.009s, duration: 01:26)
+test 0299...[FTP over HTTP proxy with user:pass not in url]
+--pd---e--- OK (299 out of 1416, remaining: 05:22, took 0.059s, duration: 01:26)
+test 0300 SKIPPED: no stunnel
+test 0301 SKIPPED: no stunnel
+test 0302 SKIPPED: no stunnel
+test 0314 SKIPPED: curl lacks brotli support
+test 0315 SKIPPED: curl lacks brotli support
+test 0316 SKIPPED: curl lacks brotli support
+test 0317...[HTTP with custom Authorization: and redirect to new host]
+--pd---e--- OK (317 out of 1416, remaining: 05:00, took 0.113s, duration: 01:26)
+test 0318...[HTTP with custom Authorization: and redirect to new host]
+--pd---e--- OK (318 out of 1416, remaining: 04:59, took 0.129s, duration: 01:26)
+test 0319...[HTTP GET gzip transfer-encoded data in raw mode]
+--pd---e--- OK (319 out of 1416, remaining: 04:58, took 0.074s, duration: 01:26)
+test 0320 SKIPPED: no gnutls-serv
+test 0321 SKIPPED: no gnutls-serv
+test 0322 SKIPPED: no gnutls-serv
+test 0326...[HTTP GET chunked data in raw mode]
+--pd---e--- OK (325 out of 1416, remaining: 04:51, took 0.018s, duration: 01:26)
+test 0327...[HTTP with cookiejar without cookies left]
+--pd--oe--- OK (326 out of 1416, remaining: 04:50, took 0.122s, duration: 01:26)
+test 0328...[HTTP with "Content-Encoding: none]
+--pd---e--- OK (327 out of 1416, remaining: 04:49, took 0.026s, duration: 01:26)
+test 0329...[HTTP cookie with Max-Age=0]
+--pd---e--- OK (328 out of 1416, remaining: 04:48, took 0.031s, duration: 01:26)
+test 0330...[HTTP with custom Cookie: and redirect to new host]
+--pd---e--- OK (329 out of 1416, remaining: 04:47, took 0.131s, duration: 01:27)
+test 0331...[HTTP with cookie using host name 'moo']
+--pd---e--- OK (330 out of 1416, remaining: 04:46, took 0.081s, duration: 01:27)
+test 0332...[TFTP retrieve with blksize 400]
+--pd---e--- OK (331 out of 1416, remaining: 04:52, took 1.961s, duration: 01:29)
+test 0333...[Try a non-boolean command line option with --no-]
+-------e--- OK (332 out of 1416, remaining: 04:51, took 0.006s, duration: 01:29)
+test 0334...[HTTP 204 No content with chunked header]
+--pd---e--- OK (333 out of 1416, remaining: 04:49, took 0.006s, duration: 01:29)
+test 0335...[HTTP with proxy Digest and site Digest with creds in URLs]
+--pd---e--- OK (334 out of 1416, remaining: 04:49, took 0.167s, duration: 01:29)
+test 0336...[FTP range download when SIZE doesn't work]
+--pd---e--- OK (335 out of 1416, remaining: 04:48, took 0.023s, duration: 01:29)
+test 0337...[FTP range download with SIZE returning extra crap]
+--pd---e--- OK (336 out of 1416, remaining: 04:47, took 0.011s, duration: 01:29)
+test 0338...[ANYAUTH connection reuse of non-authed connection]
+--pd---e--- OK (337 out of 1416, remaining: 04:46, took 0.008s, duration: 01:29)
+test 0339...[Check if --etag-save saved correct etag to a file]
+--p---oe--- OK (338 out of 1416, remaining: 04:45, took 0.007s, duration: 01:29)
+test 0340...[FTP using %00 in path with singlecwd]
+--p----e--- OK (339 out of 1416, remaining: 04:43, took 0.007s, duration: 01:29)
+test 0341...[Try to open a non existing file with --etag-compare should return an error]
+-------e--- OK (340 out of 1416, remaining: 04:42, took 0.006s, duration: 01:29)
+test 0342...[Check if --etag-compare set correct etag in header]
+--pd---e--- OK (341 out of 1416, remaining: 04:41, took 0.007s, duration: 01:29)
+test 0343...[Both --etag-compare and --etag-save to save new Etag]
+--pd--oe--- OK (342 out of 1416, remaining: 04:40, took 0.007s, duration: 01:29)
+test 0344...[Both --etag-compare and -save store new Etag using non-existing file]
+--pd--oe--- OK (343 out of 1416, remaining: 04:39, took 0.007s, duration: 01:29)
+test 0345...[Both --etag-compare and -save store new Etag using one pre-existing file]
+--pd--oe--- OK (344 out of 1416, remaining: 04:38, took 0.007s, duration: 01:29)
+test 0346...[HTTP GET over proxy with credentials using blank passwords]
+--pd---e--- OK (345 out of 1416, remaining: 04:37, took 0.007s, duration: 01:29)
+test 0347...[--etag-save with blank incoming header]
+--p---oe--- OK (346 out of 1416, remaining: 04:36, took 0.007s, duration: 01:29)
+test 0348...[FTP upload file with 552 disk full response]
+--p-u--e--- OK (347 out of 1416, remaining: 04:35, took 0.011s, duration: 01:29)
+test 0349...[HTTP GET --fail-with-body on HTTP error return]
+--pd---e--- OK (348 out of 1416, remaining: 04:34, took 0.060s, duration: 01:29)
+test 0350...[FTP root dir list multicwd]
+--pd---e--- OK (349 out of 1416, remaining: 04:33, took 0.041s, duration: 01:29)
+test 0351...[FTP root dir list nocwd]
+--pd---e--- OK (350 out of 1416, remaining: 04:32, took 0.037s, duration: 01:29)
+test 0352...[FTP root dir list singlecwd]
+--pd---e--- OK (351 out of 1416, remaining: 04:32, took 0.080s, duration: 01:29)
+test 0353...[FTP home dir list singlecwd]
+--pd---e--- OK (352 out of 1416, remaining: 04:31, took 0.040s, duration: 01:29)
+test 0354...[FTP without password]
+--pd---e--- OK (353 out of 1416, remaining: 04:30, took 0.039s, duration: 01:29)
+test 0355...[load Alt-Svc from file and use]
+--pd---e--- OK (354 out of 1416, remaining: 04:29, took 0.023s, duration: 01:29)
+test 0357...[HTTP PUT with Expect: 100-continue and 417 response]
+--pd---e--- OK (356 out of 1416, remaining: 04:27, took 0.024s, duration: 01:29)
+test 0360...[Error on both --fail-with-body and --fail]
+-------e--- OK (359 out of 1416, remaining: 04:24, took 0.010s, duration: 01:29)
+test 0361...[HTTP GET --fail-with-body on HTTP error return - twice]
+--pd---e--- OK (360 out of 1416, remaining: 04:23, took 0.120s, duration: 01:29)
+test 0362...[FTP resume upload file with nothing to start from]
+--p-u--e--- OK (361 out of 1416, remaining: 04:22, took 0.040s, duration: 01:29)
+test 0365...[HTTP/1.1 with chunked AND Content-Length headers]
+--pd---e--- OK (364 out of 1416, remaining: 04:20, took 0.025s, duration: 01:30)
+test 0366...[HTTP --retry-max-time with too long Retry-After]
+--pd---e--- OK (365 out of 1416, remaining: 04:19, took 0.022s, duration: 01:30)
+test 0392...[HTTP secure cookies over localhost]
+--pd---e--- OK (366 out of 1416, remaining: 04:18, took 0.036s, duration: 01:30)
+test 0393...[HTTP max-filesize and out-of-range Content-Length]
+--p----e--- OK (367 out of 1416, remaining: 04:17, took 0.069s, duration: 01:30)
+test 0394...[HTTP with rubbish in Content-Length]
+--p----e--- OK (368 out of 1416, remaining: 04:16, took 0.074s, duration: 01:30)
+test 0395...[HTTP and out-of-range Content-Length]
+--p----e--- OK (369 out of 1416, remaining: 04:16, took 0.076s, duration: 01:30)
+test 0396 SKIPPED: curl lacks zstd support
+test 0397 SKIPPED: curl lacks zstd support
+test 0402...[FTP SSL required on non-SSL server]
+--p----e--- OK (374 out of 1416, remaining: 04:11, took 0.011s, duration: 01:30)
+test 0405...[FTPS operation to FTP port]
+-------e--- OK (377 out of 1416, remaining: 04:09, took 0.015s, duration: 01:30)
+test 0430...[Three -K uses with --next and --data in each]
+--p----e--- OK (383 out of 1416, remaining: 04:03, took 0.012s, duration: 01:30)
+test 0431...[Two -K uses with --next and then one on cmdline]
+--p----e--- OK (384 out of 1416, remaining: 04:02, took 0.011s, duration: 01:30)
+test 0432...[Use -K with --next and --config from within]
+--p----e--- OK (385 out of 1416, remaining: 04:02, took 0.012s, duration: 01:30)
+test 0433...[Verify XDG_CONFIG_HOME use to find .curlrc]
+--pd---e--- OK (386 out of 1416, remaining: 04:01, took 0.008s, duration: 01:30)
+test 0434...[-K with a single line without newline]
+--pd---e--- OK (387 out of 1416, remaining: 04:00, took 0.008s, duration: 01:30)
+test 0435...[verify -w local/remote port+ip after connecton re-use]
+s-p----e--- OK (388 out of 1416, remaining: 03:59, took 0.010s, duration: 01:30)
+test 0490...[Two globbed HTTP PUTs]
+--pd---e--- OK (389 out of 1416, remaining: 04:04, took 2.021s, duration: 01:32)
+test 0491...[Two globbed HTTP PUTs, the second upload file is missing]
+--pd---e--- OK (390 out of 1416, remaining: 04:05, took 1.016s, duration: 01:33)
+test 0492...[Two globbed HTTP PUTs to two globbed URLs]
+--pd---e--- OK (391 out of 1416, remaining: 04:15, took 4.035s, duration: 01:37)
+test 0493...[HSTS and %{url_effective} after upgrade]
+s-p----e--- OK (392 out of 1416, remaining: 04:14, took 0.007s, duration: 01:37)
+test 0494...[skip 'macdef' when parsing netrc]
+--pd---e--- OK (393 out of 1416, remaining: 04:13, took 0.011s, duration: 01:37)
+test 0500...[simple libcurl HTTP GET tool]
+--pd--oe--- OK (394 out of 1416, remaining: 04:12, took 0.009s, duration: 01:37)
+test 0501...[simple libcurl attempt operation without URL set]
+-------e--- OK (395 out of 1416, remaining: 04:12, took 0.006s, duration: 01:37)
+test 0502...[simple multi file:// get]
+---d---e--- OK (396 out of 1416, remaining: 04:11, took 0.007s, duration: 01:37)
+test 0503...[simple multi http:// through proxytunnel with authentication info]
+--pd-P-e--- OK (397 out of 1416, remaining: 04:11, took 0.567s, duration: 01:38)
+test 0504...[simple multi through local proxy without listener]
+-------e--- OK (398 out of 1416, remaining: 04:10, took 0.005s, duration: 01:38)
+test 0505...[FTP upload with rename after transfer]
+--p-u--e--- OK (399 out of 1416, remaining: 04:10, took 0.011s, duration: 01:38)
+test 0506...[HTTP with shared cookie list (and dns cache)]
+s-----oe--- OK (400 out of 1416, remaining: 04:09, took 0.014s, duration: 01:38)
+test 0507...[multi interface get with non-existing host name]
+-------e--- OK (401 out of 1416, remaining: 04:08, took 0.009s, duration: 01:38)
+test 0508...[send HTTP POST using read callback]
+--pd---e--- OK (402 out of 1416, remaining: 04:07, took 0.062s, duration: 01:38)
+test 0509...[initialization with memory callbacks and actual usage]
+s------e--- OK (403 out of 1416, remaining: 04:06, took 0.017s, duration: 01:38)
+test 0510...[send HTTP POST using read callback, using chunked transfer-encoding]
+--pd---e--- OK (404 out of 1416, remaining: 04:08, took 1.064s, duration: 01:39)
+test 0511...[FTP with FILETIME and NOBODY but missing file]
+--p----e--- OK (405 out of 1416, remaining: 04:07, took 0.007s, duration: 01:39)
+test 0512...[simple curl_easy_duplicate() test]
+--pd---e--- OK (406 out of 1416, remaining: 04:07, took 0.060s, duration: 01:39)
+test 0513...[send HTTP POST using read callback that returns CURL_READFUNC_ABORT]
+--p----e--- OK (407 out of 1416, remaining: 04:08, took 1.020s, duration: 01:40)
+test 0514...[First set options to POST and then to make HEAD]
+--pd---e--- OK (408 out of 1416, remaining: 04:10, took 1.010s, duration: 01:41)
+test 0515...[make a POSTFIELDS set to NULL with POSTFIELDSIZE set to zero]
+--pd---e--- OK (409 out of 1416, remaining: 04:09, took 0.060s, duration: 01:41)
+test 0516...[make a HTTPPOST set to NULL]
+--pd---e--- OK (410 out of 1416, remaining: 04:09, took 0.070s, duration: 01:41)
+test 0517...[curl_getdate() testing]
+-------e--- OK (411 out of 1416, remaining: 04:08, took 0.017s, duration: 01:41)
+test 0518...[HTTP GET with more than FD_SETSIZE descriptors open]
+--pd---e--- OK (412 out of 1416, remaining: 04:07, took 0.048s, duration: 01:41)
+test 0519...[GET same URL twice with different users]
+--pd---e--- OK (413 out of 1416, remaining: 04:06, took 0.076s, duration: 01:41)
+test 0520...[FTP RETR with FILETIME]
+--pd---e--- OK (414 out of 1416, remaining: 04:06, took 0.040s, duration: 01:41)
+test 0521...[FTP dir list PASV with CURLOPT_PORT]
+--pd---e--- OK (415 out of 1416, remaining: 04:05, took 0.024s, duration: 01:41)
+test 0522...[HTTP GET with CURLOPT_PORT]
+s-p----e--- OK (416 out of 1416, remaining: 04:04, took 0.006s, duration: 01:41)
+test 0523...[HTTP GET with proxy and CURLOPT_PORT]
+s-p----e--- OK (417 out of 1416, remaining: 04:03, took 0.057s, duration: 01:41)
+test 0524...[FTP upload with target URL ending with slash]
+--p----e--- OK (418 out of 1416, remaining: 04:03, took 0.018s, duration: 01:41)
+test 0525...[FTP PORT upload using multi interface]
+--p-u--e--- OK (419 out of 1416, remaining: 04:02, took 0.039s, duration: 01:41)
+test 0526...[FTP RETR same file using different handles but same connection]
+--pd---e--- OK (420 out of 1416, remaining: 04:09, took 3.167s, duration: 01:45)
+test 0527...[FTP RETR same file using different handles but same connection]
+--pd---e--- OK (421 out of 1416, remaining: 04:15, took 3.096s, duration: 01:48)
+test 0528...[HTTP GET same file using different handles but same connection]
+--pd---e--- OK (422 out of 1416, remaining: 04:21, took 3.019s, duration: 01:51)
+test 0529...[FTP PORT upload using multi interface (weird cleanup function sequence)]
+--p-u--e--- OK (423 out of 1416, remaining: 04:20, took 0.011s, duration: 01:51)
+test 0531...[FTP PORT upload using multi interface and get 425 response]
+--p----e--- OK (424 out of 1416, remaining: 04:20, took 0.011s, duration: 01:51)
+test 0532...[FTP RETR same file using reset handles between each transfer]
+--pd---e--- OK (425 out of 1416, remaining: 04:26, took 3.141s, duration: 01:54)
+test 0533...[FTP RETR a non-existing file twice using the multi interface]
+--p----e--- OK (426 out of 1416, remaining: 04:28, took 1.026s, duration: 01:55)
+test 0534...[FTP RETR twice using multi: non-existing host and non-existing file]
+--p----e--- OK (427 out of 1416, remaining: 04:29, took 1.031s, duration: 01:56)
+test 0535...[HTTP GET multi two files with FAILONERROR]
+--pd---e--- OK (428 out of 1416, remaining: 04:30, took 1.013s, duration: 01:57)
+test 0537...[HTTP GET with a HUGE number of file descriptors open]
+--pd---e--- OK (429 out of 1416, remaining: 04:33, took 1.537s, duration: 01:58)
+test 0538...[FTP multi-interface download, failed login: PASS not valid]
+--p----e--- OK (430 out of 1416, remaining: 04:32, took 0.006s, duration: 01:58)
+test 0539...[Two FTP fetches using different CURLOPT_FTP_FILEMETHOD]
+--pd---e--- OK (431 out of 1416, remaining: 04:31, took 0.013s, duration: 01:58)
+test 0540...[HTTP proxy auth Digest multi API re-using connection]
+--pd---e--- OK (432 out of 1416, remaining: 04:30, took 0.008s, duration: 01:58)
+test 0541...[FTP upload and upload same file again without rewind]
+--p----e--- OK (433 out of 1416, remaining: 04:30, took 0.012s, duration: 01:58)
+test 0542...[FTP a file with NOBODY yes and HEADER no]
+--pd---e--- OK (434 out of 1416, remaining: 04:29, took 0.007s, duration: 01:58)
+test 0543...[curl_easy_escape]
+s------e--- OK (435 out of 1416, remaining: 04:28, took 0.005s, duration: 01:58)
+test 0544...[HTTP POST text data using CURLOPT_COPYPOSTFIELDS]
+--pd---e--- OK (436 out of 1416, remaining: 04:27, took 0.108s, duration: 01:59)
+test 0545...[HTTP POST binary with embedded zero and no trailing zero]
+--pd---e--- OK (437 out of 1416, remaining: 04:26, took 0.071s, duration: 01:59)
+test 0546...[FTP RETR a non-existing file then a found one using the multi interface]
+s-p----e--- OK (438 out of 1416, remaining: 04:28, took 1.049s, duration: 02:00)
+test 0549...[FTP RETR over proxy with CURLOPT_PROXY_TRANSFER_MODE]
+s-p----e--- OK (441 out of 1416, remaining: 04:25, took 0.058s, duration: 02:00)
+test 0550...[FTP RETR over proxy with CURLOPT_PROXY_TRANSFER_MODE and ASCII transfer]
+s-p----e--- OK (442 out of 1416, remaining: 04:25, took 0.071s, duration: 02:00)
+test 0551...[HTTP proxy auth Digest with POST data from read callback]
+--pd---e--- OK (443 out of 1416, remaining: 04:24, took 0.127s, duration: 02:00)
+test 0552...[HTTP proxy auth Digest with 70K POST data from read callback]
+--pd---e--- OK (444 out of 1416, remaining: 04:24, took 0.278s, duration: 02:00)
+test 0553...[HTTP post with huge request headers and post data from callback]
+--pd---e--- OK (445 out of 1416, remaining: 04:23, took 0.010s, duration: 02:00)
+test 0554...[HTTP multi-part formpost using read callback for the file part]
+--pd---e--- OK (446 out of 1416, remaining: 04:22, took 0.131s, duration: 02:00)
+test 0556...[send and recv HTTP]
+--pd---e--- OK (448 out of 1416, remaining: 04:21, took 0.068s, duration: 02:00)
+test 0557...[curl_mprintf() testing]
+s------e--- OK (449 out of 1416, remaining: 04:20, took 0.005s, duration: 02:00)
+test 0558 SKIPPED: curl lacks TrackMemory support
+test 0559...[use tiny CURLOPT_BUFFERSIZE]
+---d---e--- OK (451 out of 1416, remaining: 04:18, took 0.006s, duration: 02:00)
+test 0561...[FTP RETR with CURLOPT_PROXY_TRANSFER_MODE, ASCII transfer and type=i]
+s-p----e--- OK (453 out of 1416, remaining: 04:17, took 0.057s, duration: 02:01)
+test 0562...[FTP a type=A URL and CURLOPT_PORT set]
+--pd---e--- OK (454 out of 1416, remaining: 04:16, took 0.029s, duration: 02:01)
+test 0563...[FTP type=A URL and CURLOPT_PORT set and proxy]
+--p----e--- OK (455 out of 1416, remaining: 04:15, took 0.072s, duration: 02:01)
+test 0564...[FTP RETR a file over a SOCKS proxy using the multi interface]
+s-pd---e--- OK (456 out of 1416, remaining: 04:17, took 1.019s, duration: 02:02)
+test 0565...[send HTTP POST using read callback, chunked transfer-encoding and Digest]
+--pd---e--- OK (457 out of 1416, remaining: 04:18, took 1.016s, duration: 02:03)
+test 0566...[HTTP GET with CURLINFO_CONTENT_LENGTH_DOWNLOAD and 0 bytes transfer]
+--pd--oe--- OK (458 out of 1416, remaining: 04:17, took 0.006s, duration: 02:03)
+test 0567...[simple RTSP OPTIONS command]
+--pd---e--- OK (459 out of 1416, remaining: 04:18, took 1.017s, duration: 02:04)
+test 0568...[RTSP Announce (PUT and POST style) test]
+--p----e--- OK (460 out of 1416, remaining: 04:18, took 0.009s, duration: 02:04)
+test 0569...[RTSP Session ID parsing]
+--p---oe--- OK (461 out of 1416, remaining: 04:17, took 0.010s, duration: 02:04)
+test 0570...[RTSP CSeq and Session Mismatch checks]
+--p----e--- OK (462 out of 1416, remaining: 04:16, took 0.008s, duration: 02:04)
+test 0571...[RTSP RTP Interleaving Test]
+s-----oe--- OK (463 out of 1416, remaining: 04:15, took 0.011s, duration: 02:04)
+test 0572...[RTSP GET_PARAMETER (Put/Heartbeat/Post)]
+--p----e--- OK (464 out of 1416, remaining: 04:14, took 0.011s, duration: 02:04)
+test 0573...[verify connect time with multi interface]
+--pd---e--- OK (465 out of 1416, remaining: 04:14, took 0.009s, duration: 02:04)
+test 0574...[FTP wildcard download - changed fnmatch, 2x perform (Unix LIST response)]
+s-p----e--- OK (466 out of 1416, remaining: 04:14, took 0.385s, duration: 02:04)
+test 0575...[FTP wildcard download - dup_handle and multi interface]
+s-p----e--- OK (467 out of 1416, remaining: 04:14, took 0.669s, duration: 02:05)
+test 0576...[FTP wildcard download - skip/parser_correctness/CURLOPT_FNMATCH_FUNCTION (Unix)]
+s------e--- OK (468 out of 1416, remaining: 04:14, took 0.219s, duration: 02:05)
+test 0577...[Funny RTSP version in response]
+--p----e--- OK (469 out of 1416, remaining: 04:13, took 0.024s, duration: 02:05)
+test 0578...[HTTP POST lower than MAX_INITIAL_POST_SIZE with progress callback]
+---d--oe--- OK (470 out of 1416, remaining: 04:12, took 0.025s, duration: 02:05)
+test 0579...[small chunked HTTP POSTs with digest auth. and progress callback]
+---d--oe--- OK (471 out of 1416, remaining: 04:13, took 1.029s, duration: 02:06)
+test 0580...[multi interface, multiple Location: headers]
+--pd---e--- OK (472 out of 1416, remaining: 04:13, took 0.006s, duration: 02:06)
+test 0581...[multi interface, multiple Content-Type: headers]
+--pd---e--- OK (473 out of 1416, remaining: 04:12, took 0.006s, duration: 02:06)
+test 0582 SKIPPED: curl lacks sftp server support
+test 0583 SKIPPED: curl lacks sftp server support
+test 0584...[CURLOPT_MIMEPOST first set then set to NULL]
+--pd---e--- OK (476 out of 1416, remaining: 04:10, took 0.115s, duration: 02:06)
+test 0585...[socket open/close callbacks]
+--pd---e--- OK (477 out of 1416, remaining: 04:09, took 0.021s, duration: 02:06)
+test 0586...[FTP and open/close socket callbacks]
+--pd---e--- OK (478 out of 1416, remaining: 04:08, took 0.011s, duration: 02:06)
+test 0587...[HTTP multi-part formpost with aborted read callback]
+--p----e--- OK (479 out of 1416, remaining: 04:07, took 0.006s, duration: 02:06)
+test 0588...[FTP PORT upload using multi interface, EPRT doesn't work]
+--p-u--e--- OK (480 out of 1416, remaining: 04:07, took 0.010s, duration: 02:06)
+test 0589...[make a HTTP MIME POST set to NULL]
+--pd---e--- OK (481 out of 1416, remaining: 04:06, took 0.056s, duration: 02:06)
+test 0591...[FTP multi PORT and 425 on upload]
+--p----e--- OK (483 out of 1416, remaining: 04:05, took 0.024s, duration: 02:06)
+test 0592...[FTP multi PORT and 421 on upload]
+--p----e--- OK (484 out of 1416, remaining: 04:04, took 0.017s, duration: 02:06)
+test 0593...[FTP multi PORT upload, no data conn and no transient neg. reply]
+--p----e--- OK (485 out of 1416, remaining: 04:07, took 2.017s, duration: 02:08)
+test 0595...[verify close callbacks with passive FTP]
+--pd---e--- OK (486 out of 1416, remaining: 04:06, took 0.012s, duration: 02:08)
+test 0596...[verify close callbacks with active FTP]
+--pd---e--- OK (487 out of 1416, remaining: 04:05, took 0.014s, duration: 02:08)
+test 0597...[FTP connect only option]
+--p----e--- OK (488 out of 1416, remaining: 04:05, took 0.009s, duration: 02:08)
+test 0598...[curl_easy_reset with referer and other strings set]
+--pd---e--- OK (489 out of 1416, remaining: 04:04, took 0.012s, duration: 02:08)
+test 0599...[HTTP GET with progress callback and redirects changing content sizes]
+---d--oe--- OK (490 out of 1416, remaining: 04:03, took 0.013s, duration: 02:08)
+test 0600 SKIPPED: curl lacks sftp server support
+test 0601 SKIPPED: curl lacks scp server support
+test 0603 SKIPPED: curl lacks scp server support
+test 0605 SKIPPED: curl lacks scp server support
+test 0632 SKIPPED: curl lacks sftp support
+test 0643...[HTTP multi-part mimepost using read callback for the file part]
+--pd---e--- OK (534 out of 1416, remaining: 03:33, took 0.122s, duration: 02:09)
+test 0645...[HTTP multi-part chunked mimepost using read callback for the file part]
+--pd---e--- OK (535 out of 1416, remaining: 03:36, took 2.146s, duration: 02:11)
+test 0646...[SMTP multipart using mime API]
+--p-u--e--- OK (536 out of 1416, remaining: 03:37, took 1.023s, duration: 02:12)
+test 0647...[IMAP APPEND multipart using mime API]
+--p-u--e--- OK (537 out of 1416, remaining: 03:38, took 1.021s, duration: 02:13)
+test 0648...[SMTP multipart with transfer content encoders]
+--p-u--e--- OK (538 out of 1416, remaining: 03:37, took 0.010s, duration: 02:13)
+test 0649...[SMTP multipart with 7bit encoder error]
+--p-u--e--- OK (539 out of 1416, remaining: 03:36, took 0.009s, duration: 02:13)
+test 0650...[HTTP formpost using form API]
+--pd---e--- OK (540 out of 1416, remaining: 03:38, took 1.069s, duration: 02:14)
+test 0651...[curl_formadd with huge COPYCONTENTS]
+--pd---e--- OK (541 out of 1416, remaining: 03:37, took 0.063s, duration: 02:14)
+test 0652...[SMTP with encoded huge mime data contents]
+--p-u--e--- OK (542 out of 1416, remaining: 03:36, took 0.057s, duration: 02:14)
+test 0653...[Reuse of handle after altering mime data]
+--pd---e--- OK (543 out of 1416, remaining: 03:36, took 0.116s, duration: 02:14)
+test 0654...[HTTP duplicate easy handle with mime data]
+--pd---e--- OK (544 out of 1416, remaining: 03:37, took 1.135s, duration: 02:15)
+test 0655...[resolver start callback]
+---d---e--- OK (545 out of 1416, remaining: 03:37, took 0.059s, duration: 02:15)
+test 0658...[Pass URL to libcurl with CURLOPT_CURLU]
+--p----e--- OK (547 out of 1416, remaining: 03:35, took 0.017s, duration: 02:15)
+test 0659...[CURLOPT_CURLU without the path set - over proxy]
+--p----e--- OK (548 out of 1416, remaining: 03:35, took 0.005s, duration: 02:15)
+test 0660...[IMAP CONNECT_ONLY option]
+--p----e--- OK (549 out of 1416, remaining: 03:34, took 0.005s, duration: 02:15)
+test 0661...[Avoid redundant CWDs]
+--p----e--- OK (550 out of 1416, remaining: 03:33, took 0.021s, duration: 02:15)
+test 0662...[HTTP redirect with whitespace in absolute Location: URL]
+--pd---e--- OK (551 out of 1416, remaining: 03:33, took 0.007s, duration: 02:15)
+test 0663...[HTTP redirect with dotdots and whitespaces in absolute Location: URL]
+--pd---e--- OK (552 out of 1416, remaining: 03:32, took 0.007s, duration: 02:15)
+test 0666...[HTTP mime post with binary-encoded huge data contents]
+--pd---e--- OK (555 out of 1416, remaining: 03:30, took 0.084s, duration: 02:15)
+test 0667...[HTTP chunked mimepost using single-byte read callback with encoder]
+--pd---e--- OK (556 out of 1416, remaining: 03:31, took 1.073s, duration: 02:17)
+test 0668...[HTTP mimepost early end of data detection]
+--pd---e--- OK (557 out of 1416, remaining: 03:33, took 1.067s, duration: 02:18)
+test 0669...[HTTP custom Content-Type with parameter]
+--pd---e--- OK (558 out of 1416, remaining: 03:32, took 0.063s, duration: 02:18)
+test 0670...[Request pause from mime read callback: multi]
+--pd---e--- OK (559 out of 1416, remaining: 03:34, took 1.481s, duration: 02:19)
+test 0671...[Request pause from mime read callback: easy]
+--pd---e--- OK (560 out of 1416, remaining: 03:36, took 2.266s, duration: 02:21)
+test 0672...[Request pause from form read callback: multi]
+--pd---e--- OK (561 out of 1416, remaining: 03:38, took 1.667s, duration: 02:23)
+test 0673...[Request pause from form read callback: easy]
+--pd---e--- OK (562 out of 1416, remaining: 03:41, took 2.267s, duration: 02:25)
+test 0674...[Set CURLOPT_CURLU and dupe the handle]
+--p----e--- OK (563 out of 1416, remaining: 03:41, took 0.006s, duration: 02:25)
+test 0675...[HTTP connection re-use and different credentials]
+--pd---e--- OK (564 out of 1416, remaining: 03:40, took 0.113s, duration: 02:25)
+test 0676...[verify setting CURLOPT_COOKIEFILE to NULL again]
+--pd---e--- OK (565 out of 1416, remaining: 03:39, took 0.022s, duration: 02:26)
+test 0677...[IMAP with CONNECT_ONLY, custom command then exit]
+--p----e--- OK (566 out of 1416, remaining: 03:46, took 4.516s, duration: 02:30)
+test 0700...[HTTP GET via SOCKS4 proxy]
+--pd---e--- OK (568 out of 1416, remaining: 03:44, took 0.006s, duration: 02:30)
+test 0701...[HTTP GET via SOCKS5 proxy]
+--pd---e--- OK (569 out of 1416, remaining: 03:44, took 0.007s, duration: 02:30)
+test 0702...[Attempt connect to non-listening HTTP server via SOCKS4 proxy]
+-------e--- OK (570 out of 1416, remaining: 03:43, took 0.007s, duration: 02:30)
+test 0703...[Attempt connect to non-listening HTTP server via SOCKS5 proxy]
+-------e--- OK (571 out of 1416, remaining: 03:42, took 0.007s, duration: 02:30)
+test 0704...[Attempt connect to non-listening SOCKS4 proxy]
+-------e--- OK (572 out of 1416, remaining: 03:42, took 0.007s, duration: 02:30)
+test 0705...[Attempt connect to non-listening SOCKS5 proxy]
+-------e--- OK (573 out of 1416, remaining: 03:41, took 0.007s, duration: 02:30)
+test 0706...[FTP dir list PASV via SOCKS4]
+--pd---e--- OK (574 out of 1416, remaining: 03:40, took 0.014s, duration: 02:30)
+test 0707...[FTP dir list PASV via SOCKS5]
+--pd---e--- OK (575 out of 1416, remaining: 03:40, took 0.015s, duration: 02:30)
+test 0708...[HTTP GET via SOCKS4 proxy]
+--pd---e--- OK (576 out of 1416, remaining: 03:39, took 0.008s, duration: 02:30)
+test 0709...[HTTP GET via SOCKS5 set in http_proxy environment variable]
+--pd---e--- OK (577 out of 1416, remaining: 03:39, took 0.009s, duration: 02:30)
+test 0710...[HTTP GET via SOCKS5 set with --proxy]
+--pd---e--- OK (578 out of 1416, remaining: 03:38, took 0.008s, duration: 02:30)
+test 0711...[FTP fetch with all_proxy set to socks5]
+--pd---e--- OK (579 out of 1416, remaining: 03:37, took 0.014s, duration: 02:30)
+test 0712...[FTP fetch with --proxy set to socks5://]
+--pd---e--- OK (580 out of 1416, remaining: 03:37, took 0.014s, duration: 02:30)
+test 0713...[FTP fetch with --proxy set to socks5:// and with --connect-to]
+--pd---e--- OK (581 out of 1416, remaining: 03:36, took 0.014s, duration: 02:30)
+test 0714...[FTP fetch with --proxy set to http:// and with --connect-to]
+--p----e--- OK (582 out of 1416, remaining: 03:38, took 1.541s, duration: 02:32)
+test 0715...[FTP fetch with --preproxy, --proxy and --connect-to]
+--p----e--- OK (583 out of 1416, remaining: 03:40, took 2.031s, duration: 02:34)
+test 0716...[SOCKS5 proxy with too long user name]
+-------e--- OK (584 out of 1416, remaining: 03:39, took 0.006s, duration: 02:34)
+test 0717...[SOCKS5 proxy auth]
+--pd---e--- OK (585 out of 1416, remaining: 03:39, took 0.007s, duration: 02:34)
+test 0718...[HTTP proxy CONNECT (no auth) with proxy returning 407 and closing]
+--pd---e--- OK (586 out of 1416, remaining: 03:38, took 0.061s, duration: 02:34)
+test 0800...[IMAP FETCH message]
+--pd---e--- OK (587 out of 1416, remaining: 03:37, took 0.020s, duration: 02:34)
+test 0801...[IMAP FETCH message by MAILINDEX and SECTION]
+--pd---e--- OK (588 out of 1416, remaining: 03:37, took 0.008s, duration: 02:34)
+test 0802...[IMAP SELECT UIDVALIDITY Success]
+--pd---e--- OK (589 out of 1416, remaining: 03:36, took 0.009s, duration: 02:34)
+test 0803...[IMAP SELECT UIDVALIDITY Failure]
+--p----e--- OK (590 out of 1416, remaining: 03:36, took 0.009s, duration: 02:34)
+test 0804...[IMAP doesn't perform SELECT if re-using the same mailbox]
+--pd---e--- OK (591 out of 1416, remaining: 03:35, took 0.011s, duration: 02:34)
+test 0805...[IMAP APPEND message]
+--p-u--e--- OK (592 out of 1416, remaining: 03:34, took 0.010s, duration: 02:34)
+test 0806...[IMAP LIST mailbox]
+--pd---e--- OK (593 out of 1416, remaining: 03:34, took 0.009s, duration: 02:34)
+test 0807...[IMAP LSUB mailbox]
+--pd---e--- OK (594 out of 1416, remaining: 03:33, took 0.009s, duration: 02:34)
+test 0808...[IMAP EXAMINE mailbox (CUSTOMREQUEST)]
+--pd---e--- OK (595 out of 1416, remaining: 03:33, took 0.009s, duration: 02:34)
+test 0809...[IMAP mailbox STATUS (CUSTOMREQUEST)]
+--pd---e--- OK (596 out of 1416, remaining: 03:32, took 0.009s, duration: 02:34)
+test 0810...[IMAP SEARCH for NEW messages]
+--pd---e--- OK (597 out of 1416, remaining: 03:31, took 0.009s, duration: 02:34)
+test 0811...[IMAP CREATE mailbox (CUSTOMREQUEST)]
+--p----e--- OK (598 out of 1416, remaining: 03:31, took 0.008s, duration: 02:34)
+test 0812...[IMAP DELETE mailbox (CUSTOMREQUEST)]
+--p----e--- OK (599 out of 1416, remaining: 03:30, took 0.008s, duration: 02:34)
+test 0813...[IMAP RENAME mailbox (CUSTOMREQUEST)]
+--p----e--- OK (600 out of 1416, remaining: 03:30, took 0.008s, duration: 02:34)
+test 0814...[IMAP CHECK mailbox (CUSTOMREQUEST)]
+--p----e--- OK (601 out of 1416, remaining: 03:29, took 0.009s, duration: 02:34)
+test 0815...[IMAP STORE - delete message (CUSTOMREQUEST)]
+--p----e--- OK (602 out of 1416, remaining: 03:28, took 0.010s, duration: 02:34)
+test 0816...[IMAP STORE - delete message with confirmation (CUSTOMREQUEST)]
+--p----e--- OK (603 out of 1416, remaining: 03:28, took 0.010s, duration: 02:34)
+test 0817...[IMAP COPY message to mailbox (CUSTOMREQUEST)]
+--p----e--- OK (604 out of 1416, remaining: 03:27, took 0.009s, duration: 02:34)
+test 0818...[IMAP NOOP (CUSTOMREQUEST)]
+--pd---e--- OK (605 out of 1416, remaining: 03:27, took 0.009s, duration: 02:34)
+test 0819...[IMAP plain authentication]
+--pd---e--- OK (606 out of 1416, remaining: 03:26, took 0.010s, duration: 02:34)
+test 0820...[IMAP login authentication]
+--pd---e--- OK (607 out of 1416, remaining: 03:25, took 0.011s, duration: 02:34)
+test 0821...[IMAP CRAM-MD5 authentication]
+--pd---e--- OK (608 out of 1416, remaining: 03:25, took 0.011s, duration: 02:34)
+test 0824...[IMAP OAuth 2.0 (XOAUTH2) authentication]
+--pd---e--- OK (611 out of 1416, remaining: 03:23, took 0.010s, duration: 02:34)
+test 0825...[IMAP plain authentication with initial response]
+--pd---e--- OK (612 out of 1416, remaining: 03:23, took 0.010s, duration: 02:34)
+test 0826...[IMAP login authentication with initial response]
+--pd---e--- OK (613 out of 1416, remaining: 03:22, took 0.011s, duration: 02:34)
+test 0828...[IMAP OAuth 2.0 (XOAUTH2) authentication with initial response]
+--pd---e--- OK (615 out of 1416, remaining: 03:21, took 0.010s, duration: 02:34)
+test 0829...[IMAP with URL-encoded CR LF in the URL]
+-------e--- OK (616 out of 1416, remaining: 03:20, took 0.007s, duration: 02:34)
+test 0830...[IMAP CRAM-MD5 graceful cancellation]
+--p----e--- OK (617 out of 1416, remaining: 03:20, took 0.009s, duration: 02:34)
+test 0831 SKIPPED: got unexpected host name back, LD_PRELOAD failed
+test 0833...[IMAP CRAM-MD5 authentication with SASL downgrade]
+--pd---e--- OK (620 out of 1416, remaining: 03:18, took 0.011s, duration: 02:34)
+test 0834 SKIPPED: got unexpected host name back, LD_PRELOAD failed
+test 0837...[IMAP external authentication]
+--pd---e--- OK (623 out of 1416, remaining: 03:16, took 0.010s, duration: 02:34)
+test 0838...[IMAP external authentication without credentials]
+--pd---e--- OK (624 out of 1416, remaining: 03:16, took 0.010s, duration: 02:34)
+test 0839...[IMAP external authentication with initial response]
+--pd---e--- OK (625 out of 1416, remaining: 03:15, took 0.010s, duration: 02:34)
+test 0840...[IMAP external authentication with initial response without credentials]
+--pd---e--- OK (626 out of 1416, remaining: 03:15, took 0.010s, duration: 02:34)
+test 0841...[IMAP custom request doesn't check continuation data]
+--pd---e--- OK (627 out of 1416, remaining: 03:14, took 0.010s, duration: 02:34)
+test 0842...[IMAP OAuth 2.0 (OAUTHBEARER) authentication]
+--pd---e--- OK (628 out of 1416, remaining: 03:14, took 0.011s, duration: 02:34)
+test 0843...[IMAP OAuth 2.0 (OAUTHBEARER) authentication with initial response]
+--pd---e--- OK (629 out of 1416, remaining: 03:13, took 0.010s, duration: 02:34)
+test 0844...[IMAP OAuth 2.0 (OAUTHBEARER) failure as continuation]
+--p----e--- OK (630 out of 1416, remaining: 03:13, took 0.009s, duration: 02:34)
+test 0845...[IMAP OAuth 2.0 (OAUTHBEARER) failure as continuation with initial response]
+--p----e--- OK (631 out of 1416, remaining: 03:12, took 0.009s, duration: 02:34)
+test 0846...[IMAP PREAUTH response]
+--pd---e--- OK (632 out of 1416, remaining: 03:11, took 0.010s, duration: 02:34)
+test 0847...[IMAP FETCH message]
+--pd---e--- OK (633 out of 1416, remaining: 03:11, took 0.010s, duration: 02:34)
+test 0848...[IMAP plain authentication with alternative authorization identity]
+--pd---e--- OK (634 out of 1416, remaining: 03:10, took 0.010s, duration: 02:34)
+test 0849...[IMAP plain authentication with alternative authorization identity (Not authorized)]
+--p----e--- OK (635 out of 1416, remaining: 03:10, took 0.009s, duration: 02:34)
+test 0850...[POP3 RETR message]
+--pd---e--- OK (636 out of 1416, remaining: 03:11, took 1.021s, duration: 02:35)
+test 0851...[POP3 LIST one message]
+--p----e--- OK (637 out of 1416, remaining: 03:10, took 0.008s, duration: 02:35)
+test 0852...[POP3 LIST invalid message]
+--p----e--- OK (638 out of 1416, remaining: 03:09, took 0.010s, duration: 02:35)
+test 0853...[POP3 LIST messages from *SLOW* server]
+--pd---e--- OK (639 out of 1416, remaining: 03:13, took 3.324s, duration: 02:39)
+test 0854...[POP3 LIST no messages available]
+--p----e--- OK (640 out of 1416, remaining: 03:12, took 0.008s, duration: 02:39)
+test 0855...[POP3 RETR invalid message]
+--p----e--- OK (641 out of 1416, remaining: 03:12, took 0.007s, duration: 02:39)
+test 0856...[POP3 invalid login]
+--p----e--- OK (642 out of 1416, remaining: 03:11, took 0.008s, duration: 02:39)
+test 0857...[POP3 RETR message with dot-prefixed line]
+--pd---e--- OK (643 out of 1416, remaining: 03:11, took 0.010s, duration: 02:39)
+test 0858...[POP3 DELE message (CUSTOMREQUEST)]
+--p----e--- OK (644 out of 1416, remaining: 03:10, took 0.009s, duration: 02:39)
+test 0859...[POP3 STAT (CUSTOMREQUEST)]
+--p----e--- OK (645 out of 1416, remaining: 03:10, took 0.009s, duration: 02:39)
+test 0860...[POP3 NOOP (CUSTOMREQUEST)]
+--p----e--- OK (646 out of 1416, remaining: 03:09, took 0.009s, duration: 02:39)
+test 0861...[POP3 UIDL (CUSTOMREQUEST)]
+--pd---e--- OK (647 out of 1416, remaining: 03:09, took 0.010s, duration: 02:39)
+test 0862...[POP3 retrieve message header (CUSTOMREQUEST)]
+--pd---e--- OK (648 out of 1416, remaining: 03:08, took 0.009s, duration: 02:39)
+test 0863...[POP3 RSET (CUSTOMREQUEST)]
+--p----e--- OK (649 out of 1416, remaining: 03:08, took 0.009s, duration: 02:39)
+test 0864...[POP3 APOP authentication]
+--pd---e--- OK (650 out of 1416, remaining: 03:07, took 0.009s, duration: 02:39)
+test 0865...[POP3 plain authentication]
+--pd---e--- OK (651 out of 1416, remaining: 03:07, took 0.010s, duration: 02:39)
+test 0866...[POP3 login authentication]
+--pd---e--- OK (652 out of 1416, remaining: 03:06, took 0.010s, duration: 02:39)
+test 0867...[POP3 CRAM-MD5 authentication]
+--pd---e--- OK (653 out of 1416, remaining: 03:06, took 0.010s, duration: 02:39)
+test 0870...[POP3 OAuth 2.0 (XOAUTH2) authentication]
+--pd---e--- OK (656 out of 1416, remaining: 03:04, took 0.010s, duration: 02:39)
+test 0871...[POP3 plain authentication with initial response]
+--pd---e--- OK (657 out of 1416, remaining: 03:04, took 0.010s, duration: 02:39)
+test 0872...[POP3 login authentication with initial response]
+--pd---e--- OK (658 out of 1416, remaining: 03:03, took 0.010s, duration: 02:39)
+test 0874...[POP3 OAuth 2.0 (XOAUTH2) authentication with initial response]
+--pd---e--- OK (660 out of 1416, remaining: 03:02, took 0.010s, duration: 02:39)
+test 0875...[POP3 with URL-encoded CR LF in the URL]
+-------e--- OK (661 out of 1416, remaining: 03:01, took 0.007s, duration: 02:39)
+test 0876...[POP3 CRAM-MD5 graceful cancellation]
+--p----e--- OK (662 out of 1416, remaining: 03:01, took 0.009s, duration: 02:39)
+test 0877 SKIPPED: got unexpected host name back, LD_PRELOAD failed
+test 0879...[POP3 CRAM-MD5 authentication with SASL downgrade]
+--pd---e--- OK (665 out of 1416, remaining: 02:59, took 0.011s, duration: 02:39)
+test 0883...[POP3 external authentication]
+--pd---e--- OK (668 out of 1416, remaining: 02:58, took 0.010s, duration: 02:39)
+test 0884...[POP3 external authentication without credentials]
+--pd---e--- OK (669 out of 1416, remaining: 02:57, took 0.010s, duration: 02:39)
+test 0885...[POP3 external authentication with initial response]
+--pd---e--- OK (670 out of 1416, remaining: 02:57, took 0.010s, duration: 02:39)
+test 0886...[POP3 external authentication with initial response without credentials]
+--pd---e--- OK (671 out of 1416, remaining: 02:56, took 0.010s, duration: 02:39)
+test 0887...[POP3 OAuth 2.0 (OAUTHBEARER) authentication]
+--pd---e--- OK (672 out of 1416, remaining: 02:56, took 0.010s, duration: 02:39)
+test 0888...[POP3 OAuth 2.0 (OAUTHBEARER) authentication with initial response]
+--pd---e--- OK (673 out of 1416, remaining: 02:55, took 0.010s, duration: 02:39)
+test 0889...[POP3 OAuth 2.0 (OAUTHBEARER) failure as continuation]
+--p----e--- OK (674 out of 1416, remaining: 02:55, took 0.009s, duration: 02:39)
+test 0890...[POP3 OAuth 2.0 (OAUTHBEARER) failure as continuation with initial response]
+--p----e--- OK (675 out of 1416, remaining: 02:55, took 0.009s, duration: 02:39)
+test 0891...[POP3 with short authentication response]
+--p----e--- OK (676 out of 1416, remaining: 02:54, took 0.009s, duration: 02:39)
+test 0892...[POP3 plain authentication with alternative authorization identity]
+--pd---e--- OK (677 out of 1416, remaining: 02:54, took 0.010s, duration: 02:39)
+test 0893...[POP3 plain authentication with alternative authorization identity (Not authorized)]
+--p----e--- OK (678 out of 1416, remaining: 02:53, took 0.009s, duration: 02:39)
+test 0894...[POP3 with CR in username]
+-------e--- OK (679 out of 1416, remaining: 02:53, took 0.006s, duration: 02:39)
+test 0895...[IMAP with --login-options 'AUTH=*']
+--pd---e--- OK (680 out of 1416, remaining: 02:52, took 0.010s, duration: 02:39)
+test 0896...[IMAP with --login-options 'AUTH=dummy' (failing)]
+-------e--- OK (681 out of 1416, remaining: 02:52, took 0.007s, duration: 02:39)
+test 0897...[IMAP and envelope meta data after body transfer]
+--pd--oe--- OK (682 out of 1416, remaining: 02:51, took 0.011s, duration: 02:39)
+test 0900...[SMTP]
+--p-u--e--- OK (683 out of 1416, remaining: 02:51, took 0.010s, duration: 02:39)
+test 0901...[SMTP with CRLF-dot-CRLF in data]
+--p-u--e--- OK (684 out of 1416, remaining: 02:50, took 0.010s, duration: 02:39)
+test 0902...[RFC821-only SMTP server (EHLO not supported)]
+--p-u--e--- OK (685 out of 1416, remaining: 02:50, took 0.010s, duration: 02:39)
+test 0903...[SMTP plain authentication]
+--p-u--e--- OK (686 out of 1416, remaining: 02:49, took 0.011s, duration: 02:39)
+test 0904...[SMTP login authentication]
+--p-u--e--- OK (687 out of 1416, remaining: 02:49, took 0.011s, duration: 02:39)
+test 0905...[SMTP CRAM-MD5 authentication]
+--p-u--e--- OK (688 out of 1416, remaining: 02:48, took 0.011s, duration: 02:39)
+test 0908...[SMTP OAuth 2.0 (XOAUTH2) authentication]
+--p-u--e--- OK (691 out of 1416, remaining: 02:47, took 0.010s, duration: 02:39)
+test 0909...[SMTP without SIZE support]
+--p-u--e--- OK (692 out of 1416, remaining: 02:46, took 0.010s, duration: 02:39)
+test 0910...[SMTP without terminating CRLF]
+--p-u--e--- OK (693 out of 1416, remaining: 02:46, took 0.010s, duration: 02:39)
+test 0911...[SMTP with no mail data]
+--p-u--e--- OK (694 out of 1416, remaining: 02:46, took 0.009s, duration: 02:39)
+test 0912...[SMTP with SIZE support]
+--p-u--e--- OK (695 out of 1416, remaining: 02:45, took 0.010s, duration: 02:39)
+test 0913...[SMTP with large message SIZE]
+--p----e--- OK (696 out of 1416, remaining: 02:45, took 0.009s, duration: 02:39)
+test 0914...[SMTP invalid --mail-from]
+--p----e--- OK (697 out of 1416, remaining: 02:44, took 0.009s, duration: 02:39)
+test 0915...[SMTP without --mail-from]
+--p-u--e--- OK (698 out of 1416, remaining: 02:44, took 0.010s, duration: 02:39)
+test 0916...[SMTP with invalid --mail-rcpt]
+--p----e--- OK (699 out of 1416, remaining: 02:43, took 0.009s, duration: 02:39)
+test 0917...[SMTP with multiple --mail-rcpt]
+--p-u--e--- OK (700 out of 1416, remaining: 02:43, took 0.011s, duration: 02:39)
+test 0918...[SMTP with multiple and invalid --mail-rcpt]
+--p----e--- OK (701 out of 1416, remaining: 02:42, took 0.009s, duration: 02:39)
+test 0919...[SMTP plain authentication with initial response]
+--p-u--e--- OK (702 out of 1416, remaining: 02:42, took 0.010s, duration: 02:39)
+test 0920...[SMTP login authentication with initial response]
+--p-u--e--- OK (703 out of 1416, remaining: 02:41, took 0.010s, duration: 02:39)
+test 0922...[SMTP OAuth 2.0 (XOAUTH2) authentication with initial response]
+--p-u--e--- OK (705 out of 1416, remaining: 02:41, took 0.010s, duration: 02:39)
+test 0923...[SMTP VRFY]
+--p----e--- OK (706 out of 1416, remaining: 02:40, took 0.008s, duration: 02:39)
+test 0924...[SMTP ambiguous VRFY]
+--pd---e--- OK (707 out of 1416, remaining: 02:40, took 0.009s, duration: 02:39)
+test 0925...[SMTP external VRFY]
+--pd---e--- OK (708 out of 1416, remaining: 02:39, took 0.008s, duration: 02:39)
+test 0926...[SMTP unknown user VRFY]
+--p----e--- OK (709 out of 1416, remaining: 02:39, took 0.008s, duration: 02:39)
+test 0927...[SMTP mailing list EXPN (CUSTOMREQUEST)]
+--pd---e--- OK (710 out of 1416, remaining: 02:38, took 0.008s, duration: 02:39)
+test 0928...[SMTP HELP]
+--pd---e--- OK (711 out of 1416, remaining: 02:38, took 0.008s, duration: 02:39)
+test 0929...[SMTP NOOP (CUSTOMREQUEST)]
+--p----e--- OK (712 out of 1416, remaining: 02:37, took 0.008s, duration: 02:39)
+test 0930...[SMTP RSET (CUSTOMREQUEST)]
+--p----e--- OK (713 out of 1416, remaining: 02:37, took 0.008s, duration: 02:39)
+test 0931...[SMTP with URL-encoded CR LF in the URL]
+-------e--- OK (714 out of 1416, remaining: 02:37, took 0.007s, duration: 02:39)
+test 0932...[SMTP CRAM-MD5 graceful cancellation]
+--p----e--- OK (715 out of 1416, remaining: 02:36, took 0.009s, duration: 02:39)
+test 0935...[SMTP CRAM-MD5 authentication with SASL downgrade]
+--p-u--e--- OK (718 out of 1416, remaining: 02:35, took 0.011s, duration: 02:39)
+test 0939...[RFC821-only SMTP with username and password]
+--p-u--e--- OK (721 out of 1416, remaining: 02:34, took 0.010s, duration: 02:39)
+test 0940...[SMTP with username and password but no AUTH capability]
+--p-u--e--- OK (722 out of 1416, remaining: 02:33, took 0.009s, duration: 02:39)
+test 0941...[SMTP with --crlf]
+--p-u--e--- OK (723 out of 1416, remaining: 02:33, took 0.010s, duration: 02:39)
+test 0942...[SMTP external authentication]
+--p-u--e--- OK (724 out of 1416, remaining: 02:32, took 0.010s, duration: 02:39)
+test 0943...[SMTP external authentication without credentials]
+--p-u--e--- OK (725 out of 1416, remaining: 02:32, took 0.010s, duration: 02:39)
+test 0944...[SMTP external authentication with initial response]
+--p-u--e--- OK (726 out of 1416, remaining: 02:31, took 0.010s, duration: 02:39)
+test 0945...[SMTP external authentication with initial response without credentials]
+--p-u--e--- OK (727 out of 1416, remaining: 02:31, took 0.010s, duration: 02:39)
+test 0946...[SMTP OAuth 2.0 (OAUTHBEARER) authentication]
+--p-u--e--- OK (728 out of 1416, remaining: 02:31, took 0.011s, duration: 02:39)
+test 0947...[SMTP OAuth 2.0 (OAUTHBEARER) authentication with initial response]
+--p-u--e--- OK (729 out of 1416, remaining: 02:30, took 0.010s, duration: 02:39)
+test 0948...[SMTP OAuth 2.0 (OAUTHBEARER) failure as continuation]
+--p----e--- OK (730 out of 1416, remaining: 02:30, took 0.009s, duration: 02:39)
+test 0949...[SMTP OAuth 2.0 (OAUTHBEARER) failure as continuation with initial response]
+--p----e--- OK (731 out of 1416, remaining: 02:29, took 0.009s, duration: 02:39)
+test 0950...[SMTP VRFY with custom request]
+--pd---e--- OK (732 out of 1416, remaining: 02:29, took 0.008s, duration: 02:39)
+test 0951...[SMTP data with dot as first character]
+--p-u--e--- OK (733 out of 1416, remaining: 02:29, took 0.009s, duration: 02:39)
+test 0952...[SMTP data with single dot-only line]
+--p-u--e--- OK (734 out of 1416, remaining: 02:28, took 0.009s, duration: 02:39)
+test 0953...[SMTP plain authentication with alternative authorization identity]
+--p-u--e--- OK (735 out of 1416, remaining: 02:28, took 0.010s, duration: 02:39)
+test 0954...[SMTP plain authentication with alternative authorization identity (Not authorized)]
+--p----e--- OK (736 out of 1416, remaining: 02:27, took 0.009s, duration: 02:39)
+test 0955...[SMTP without SMTPUTF8 support - UTF-8 based sender (local part only)]
+--p----e--- OK (737 out of 1416, remaining: 02:27, took 0.020s, duration: 02:39)
+test 0956...[SMTP without SMTPUTF8 support - UTF-8 based recipient (local part only)]
+--p----e--- OK (738 out of 1416, remaining: 02:26, took 0.020s, duration: 02:39)
+test 0957...[SMTP VRFY without SMTPUTF8 support - UTF-8 based recipient (local part only)]
+--p----e--- OK (739 out of 1416, remaining: 02:26, took 0.019s, duration: 02:40)
+test 0958...[SMTP external VRFY without SMTPUTF8 support - UTF-8 based recipient (local part only)]
+--p----e--- OK (740 out of 1416, remaining: 02:26, took 0.019s, duration: 02:40)
+test 0959...[SMTP without SMTPUTF8 support - UTF-8 based sender (host part only)]
+--p----e--- OK (741 out of 1416, remaining: 02:25, took 0.020s, duration: 02:40)
+test 0960...[SMTP without SMTPUTF8 support - UTF-8 based recipient (host part only)]
+--p----e--- OK (742 out of 1416, remaining: 02:25, took 0.020s, duration: 02:40)
+test 0961...[SMTP external VRFY without SMTPUTF8 support - UTF-8 based recipient (host part only)]
+--p----e--- OK (743 out of 1416, remaining: 02:25, took 0.019s, duration: 02:40)
+test 0962 SKIPPED: curl lacks idn support
+test 0963 SKIPPED: curl lacks idn support
+test 0971...[Verify that options-in-versions and docs/cmdline-opts are in sync]
+-r-----e--- OK (753 out of 1416, remaining: 02:20, took 0.009s, duration: 02:40)
+test 0980...[SMTP STARTTLS pipelined server response]
+--p----e--- OK (755 out of 1416, remaining: 02:20, took 0.008s, duration: 02:40)
+test 0981...[IMAP STARTTLS pipelined server response]
+--p----e--- OK (756 out of 1416, remaining: 02:19, took 0.008s, duration: 02:40)
+test 0982...[POP3 STARTTLS pipelined server response]
+--p----e--- OK (757 out of 1416, remaining: 02:19, took 0.008s, duration: 02:40)
+test 0983...[FTP STARTTLS pipelined server response]
+--p----e--- OK (758 out of 1416, remaining: 02:19, took 0.007s, duration: 02:40)
+test 0984...[IMAP require STARTTLS with failing capabilities]
+--p----e--- OK (759 out of 1416, remaining: 02:18, took 0.007s, duration: 02:40)
+test 0985...[POP3 require STARTTLS with failing capabilities]
+--p----e--- OK (760 out of 1416, remaining: 02:18, took 0.007s, duration: 02:40)
+test 0986...[FTP require STARTTLS while preauthenticated]
+--p----e--- OK (761 out of 1416, remaining: 02:17, took 0.008s, duration: 02:40)
+test 1000...[FTP dir list PASV with -I]
+--p----e--- OK (762 out of 1416, remaining: 02:17, took 0.008s, duration: 02:40)
+test 1001...[HTTP POST --digest with PUT and resumed upload and modified method]
+--pd---e--- OK (763 out of 1416, remaining: 02:17, took 1.017s, duration: 02:41)
+test 1002...[HTTP PUT with Digest auth, resumed upload and modified method, twice]
+--pd---e--- OK (764 out of 1416, remaining: 02:19, took 2.024s, duration: 02:43)
+test 1003...[FTP with excessively large server command response line]
+--pd---e--- OK (765 out of 1416, remaining: 02:18, took 0.013s, duration: 02:43)
+test 1004...[HTTP GET with empty proxy]
+--pd---e--- OK (766 out of 1416, remaining: 02:18, took 0.007s, duration: 02:43)
+test 1005...[FTP with excessively large number of server command response lines]
+--pd---e--- OK (767 out of 1416, remaining: 02:18, took 0.015s, duration: 02:43)
+test 1006...[FTP with excessively large number of server command response lines (boundary condition)]
+--pd---e--- OK (768 out of 1416, remaining: 02:17, took 0.015s, duration: 02:43)
+test 1007...[TFTP send with invalid permission on server]
+--p----e--- OK (769 out of 1416, remaining: 02:17, took 0.006s, duration: 02:43)
+test 1009...[TFTP retrieve with --local-port]
+--pd---e--- OK (771 out of 1416, remaining: 02:16, took 0.006s, duration: 02:43)
+test 1010...[FTP dir list nocwd]
+--pd---e--- OK (772 out of 1416, remaining: 02:16, took 0.014s, duration: 02:43)
+test 1011...[HTTP POST with 301 redirect]
+--pd---e--- OK (773 out of 1416, remaining: 02:15, took 0.061s, duration: 02:43)
+test 1012...[HTTP POST with 301 redirect and --post301]
+--pd---e--- OK (774 out of 1416, remaining: 02:15, took 0.128s, duration: 02:43)
+test 1013...[Compare curl --version with curl-config --protocols]
+-------e--- OK (775 out of 1416, remaining: 02:15, took 0.019s, duration: 02:43)
+test 1015...[--data-urlencode]
+--pd---e--- OK (776 out of 1416, remaining: 02:14, took 0.059s, duration: 02:43)
+test 1016...[X-Y range on a file:// URL to stdout]
+s------e--- OK (777 out of 1416, remaining: 02:14, took 0.023s, duration: 02:43)
+test 1017...[0-Y range on a file:// URL to stdout]
+s------e--- OK (778 out of 1416, remaining: 02:14, took 0.022s, duration: 02:43)
+test 1018...[X-X range on a file:// URL to stdout]
+s------e--- OK (779 out of 1416, remaining: 02:13, took 0.020s, duration: 02:43)
+test 1019...[X- range on a file:// URL to stdout]
+s------e--- OK (780 out of 1416, remaining: 02:13, took 0.020s, duration: 02:43)
+test 1020...[-Y range on a file:// URL to stdout]
+s------e--- OK (781 out of 1416, remaining: 02:13, took 0.019s, duration: 02:43)
+test 1022...[Compare curl --version with curl-config --version]
+-------e--- OK (783 out of 1416, remaining: 02:12, took 0.026s, duration: 02:43)
+test 1023...[Compare curl --version with curl-config --vernum]
+-------e--- OK (784 out of 1416, remaining: 02:11, took 0.017s, duration: 02:43)
+test 1024...[HTTP Location: following with cookies]
+--pd---e--- OK (785 out of 1416, remaining: 02:11, took 0.008s, duration: 02:43)
+test 1025...[HTTP Location: following with command-line and server cookies]
+--pd---e--- OK (786 out of 1416, remaining: 02:11, took 0.008s, duration: 02:43)
+test 1026...[curl --manual ]
+-------e--- OK (787 out of 1416, remaining: 02:10, took 0.017s, duration: 02:43)
+test 1027...[curl --help]
+-------e--- OK (788 out of 1416, remaining: 02:10, took 0.007s, duration: 02:43)
+test 1028...[HTTP Location: redirect to FTP URL]
+s-p----e--- OK (789 out of 1416, remaining: 02:10, took 0.011s, duration: 02:43)
+test 1029...[HTTP Location: and 'redirect_url' check]
+s-p----e--- OK (790 out of 1416, remaining: 02:09, took 0.100s, duration: 02:43)
+test 1030...[HTTP PUT with --anyauth authorization (picking Digest)]
+--pd---e--- OK (791 out of 1416, remaining: 02:11, took 2.041s, duration: 02:45)
+test 1031...[HTTP Location: following to a query string]
+--pd---e--- OK (792 out of 1416, remaining: 02:10, took 0.113s, duration: 02:46)
+test 1032...[HTTP HEAD with --range]
+--pd---e--- OK (793 out of 1416, remaining: 02:10, took 0.019s, duration: 02:46)
+test 1033...[HTTP GET with 102 response!]
+--pd---e--- OK (794 out of 1416, remaining: 02:10, took 0.006s, duration: 02:46)
+test 1036...[FTP download resume from end of file]
+--p---oe--- OK (796 out of 1416, remaining: 02:09, took 0.010s, duration: 02:46)
+test 1037...[FTP download resume from end of empty file]
+--p----e--- OK (797 out of 1416, remaining: 02:08, took 0.010s, duration: 02:46)
+test 1038...[FTP PASV upload resume from end of file]
+--p-u--e--- OK (798 out of 1416, remaining: 02:08, took 0.010s, duration: 02:46)
+test 1039...[FTP PASV upload resume from end of empty file]
+--p-u--e--- OK (799 out of 1416, remaining: 02:08, took 0.010s, duration: 02:46)
+test 1040...[HTTP GET with resume from end of entirely-downloaded file]
+--pd---e--- OK (800 out of 1416, remaining: 02:07, took 0.007s, duration: 02:46)
+test 1041...[HTTP PUT with resume from end of already-uploaded file]
+--pd---e--- OK (801 out of 1416, remaining: 02:08, took 1.065s, duration: 02:47)
+test 1042...[HTTP GET beyond end of entirely-downloaded file, no server resume]
+--pd---e--- OK (802 out of 1416, remaining: 02:07, took 0.008s, duration: 02:47)
+test 1043...[HTTP GET with resume from end of file]
+--pd---e--- OK (803 out of 1416, remaining: 02:07, took 0.007s, duration: 02:47)
+test 1044...[FTP download large file info with -I]
+s-p----e--- OK (804 out of 1416, remaining: 02:07, took 0.008s, duration: 02:47)
+test 1045...[HTTP GET with numeric localhost --interface]
+--pd---e--- OK (805 out of 1416, remaining: 02:06, took 0.006s, duration: 02:47)
+test 1046...[HTTP-IPv6 GET with numeric localhost --interface]
+--pd---e--- OK (806 out of 1416, remaining: 02:06, took 0.009s, duration: 02:47)
+test 1047...[FTP dir list PASV with localhost --interface]
+--pd---e--- OK (807 out of 1416, remaining: 02:06, took 0.011s, duration: 02:47)
+test 1048...[FTP-IPv6 dir list PASV with localhost --interface]
+--pd---e--- OK (808 out of 1416, remaining: 02:05, took 0.014s, duration: 02:47)
+test 1049...[TFTP retrieve with localhost --interface]
+--pd---e--- OK (809 out of 1416, remaining: 02:05, took 0.007s, duration: 02:47)
+test 1050...[FTP-IPv6 dir list, EPRT with specified IP]
+--pd---e--- OK (810 out of 1416, remaining: 02:05, took 0.014s, duration: 02:47)
+test 1051...[HTTP PUT with Location: following]
+--pd---e--- OK (811 out of 1416, remaining: 02:06, took 2.072s, duration: 02:49)
+test 1052...[HTTP 1.0 PUT with Location: following]
+--pd---e--- OK (812 out of 1416, remaining: 02:06, took 0.115s, duration: 02:49)
+test 1053...[HTTP RFC1867-type formposting from file with Location: following]
+--pd---e--- OK (813 out of 1416, remaining: 02:05, took 0.132s, duration: 02:49)
+test 1054...[HTTP POST from file with 301 redirect and --post301]
+--pd---e--- OK (814 out of 1416, remaining: 02:05, took 0.132s, duration: 02:49)
+test 1055...[HTTP PUT Location: redirect to FTP URL]
+--pdu--e--- OK (815 out of 1416, remaining: 02:05, took 1.050s, duration: 02:50)
+test 1056...[HTTP follow redirect from IPv4 to IPv6 with scope]
+--pd---e--- OK (816 out of 1416, remaining: 02:05, took 0.134s, duration: 02:50)
+test 1057...[FTP retrieve a byte-range relative to end of file]
+--pd---e--- OK (817 out of 1416, remaining: 02:05, took 0.010s, duration: 02:50)
+test 1058...[HTTP range relative to end of file]
+--pd---e--- OK (818 out of 1416, remaining: 02:04, took 0.006s, duration: 02:50)
+test 1059...[HTTP CONNECT with proxytunnel to unsupported FTP URL]
+--p----e--- OK (819 out of 1416, remaining: 02:04, took 0.059s, duration: 02:50)
+test 1060...[HTTP proxy CONNECT auth Digest, large headers and data]
+--pd---e--- OK (820 out of 1416, remaining: 02:04, took 0.099s, duration: 02:51)
+test 1061...[HTTP proxy CONNECT auth Digest, large headers and chunked data]
+--pd---e--- OK (821 out of 1416, remaining: 02:04, took 0.062s, duration: 02:51)
+test 1062...[FTP with excessively long server command response lines, boundary condition]
+--pd---e--- OK (822 out of 1416, remaining: 02:03, took 0.013s, duration: 02:51)
+test 1063...[Invalid large X- range on a file://]
+-------e--- OK (823 out of 1416, remaining: 02:03, took 0.005s, duration: 02:51)
+test 1064...[HTTP PUT twice]
+s-p----e--- OK (824 out of 1416, remaining: 02:02, took 0.007s, duration: 02:51)
+test 1065...[HTTP PUT with one file but two URLs]
+s-p----e--- OK (825 out of 1416, remaining: 02:02, took 0.007s, duration: 02:51)
+test 1066...[HTTP --dump-header - with two URLs]
+s-p----e--- OK (826 out of 1416, remaining: 02:02, took 0.007s, duration: 02:51)
+test 1067...[HTTP Location: following with auto-referer]
+-rpd---e--- OK (827 out of 1416, remaining: 02:01, took 0.112s, duration: 02:51)
+test 1068...[HTTP PUT from stdin]
+--pd---e--- OK (828 out of 1416, remaining: 02:02, took 1.077s, duration: 02:52)
+test 1069...[HTTP 1.0 PUT from stdin with no content length]
+-------e--- OK (829 out of 1416, remaining: 02:02, took 0.006s, duration: 02:52)
+test 1070...[HTTP POST with server closing connection before (all) data is received]
+--pd---e--- OK (830 out of 1416, remaining: 02:02, took 1.065s, duration: 02:53)
+test 1071...[Downgraded HTTP PUT to HTTP 1.0 with authorization]
+--pd---e--- OK (831 out of 1416, remaining: 02:02, took 1.120s, duration: 02:54)
+test 1072...[HTTP chunked PUT to HTTP 1.0 server with authorization]
+--pd---e--- OK (832 out of 1416, remaining: 02:03, took 1.066s, duration: 02:55)
+test 1073...[HTTP chunked PUT to HTTP 1.0 server with redirect]
+--pd---e--- OK (833 out of 1416, remaining: 02:03, took 1.065s, duration: 02:56)
+test 1074...[HTTP downgrade to HTTP/1.0 on second request]
+s-p----e--- OK (834 out of 1416, remaining: 02:04, took 2.068s, duration: 02:58)
+test 1075...[HTTP PUT with --anyauth authorization (picking Basic)]
+--pd---e--- OK (835 out of 1416, remaining: 02:05, took 2.019s, duration: 03:00)
+test 1076...[HTTP POST with 302 redirect and --post302]
+--pd---e--- OK (836 out of 1416, remaining: 02:05, took 0.114s, duration: 03:00)
+test 1077...[FTP over HTTP proxy with downgrade to HTTP 1.0]
+--pd---e--- OK (837 out of 1416, remaining: 02:05, took 0.021s, duration: 03:00)
+test 1078...[HTTP 1.0 CONNECT with proxytunnel and downgrade GET to HTTP/1.0]
+s-p--P-e--- OK (838 out of 1416, remaining: 02:05, took 0.520s, duration: 03:01)
+test 1079...[HTTP retry after closed connection and empty response]
+--pd---e--- OK (839 out of 1416, remaining: 02:04, took 0.114s, duration: 03:01)
+test 1080...[HTTP Location: on two URLs 'redirect_url' check]
+s-p----e--- OK (840 out of 1416, remaining: 02:04, took 0.125s, duration: 03:01)
+test 1081...[HTTP no Location: on second URL 'redirect_url' check]
+s-p----e--- OK (841 out of 1416, remaining: 02:04, took 0.131s, duration: 03:01)
+test 1082...[HTTP GET with localhost --interface]
+--pd---e--- OK (842 out of 1416, remaining: 02:03, took 0.035s, duration: 03:01)
+test 1083...[HTTP-IPv6 GET with ip6-localhost --interface]
+--pd---e--- OK (843 out of 1416, remaining: 02:03, took 0.037s, duration: 03:01)
+test 1084...[HTTP GET with invalid --interface]
+-------e--- OK (844 out of 1416, remaining: 02:03, took 0.018s, duration: 03:01)
+test 1085...[HTTP-IPv6 GET with invalid --interface]
+-------e--- OK (845 out of 1416, remaining: 02:02, took 0.008s, duration: 03:01)
+test 1086...[FTP download with strict timeout and slow data transfer]
+--p----e--- OK (846 out of 1416, remaining: 02:10, took 12.048s, duration: 03:13)
+test 1087...[HTTP, proxy with --anyauth and Location: to new host]
+--pd---e--- OK (847 out of 1416, remaining: 02:10, took 0.116s, duration: 03:14)
+test 1088...[HTTP, proxy with --anyauth and Location: to new host using location-trusted]
+--pd---e--- OK (848 out of 1416, remaining: 02:10, took 0.131s, duration: 03:14)
+test 1089...[HTTP GET --write-out with redirected fetch]
+s-p----e--- OK (849 out of 1416, remaining: 02:09, took 0.082s, duration: 03:14)
+test 1090...[HTTP GET --write-out with redirected fetch and chunked reply]
+s-p----e--- OK (850 out of 1416, remaining: 02:09, took 0.077s, duration: 03:14)
+test 1091...[FTP URL with type=i]
+--pd---e--- OK (851 out of 1416, remaining: 02:09, took 1.028s, duration: 03:15)
+test 1092...[FTP with type=i over HTTP proxy]
+--pd---e--- OK (852 out of 1416, remaining: 02:09, took 0.062s, duration: 03:15)
+test 1093...[TFTP retrieve with mode=i]
+--pd---e--- OK (853 out of 1416, remaining: 02:09, took 0.007s, duration: 03:15)
+test 1094...[TFTP retrieve with mode=netascii]
+--pd---e--- OK (854 out of 1416, remaining: 02:08, took 0.006s, duration: 03:15)
+test 1095...[HTTP with Digest and realm with quoted quotes]
+--pd---e--- OK (855 out of 1416, remaining: 02:08, took 0.115s, duration: 03:15)
+test 1096...[Two FTP downloads, with failed RETR but re-used control connection]
+--p----e--- OK (856 out of 1416, remaining: 02:07, took 0.051s, duration: 03:15)
+test 1098...[FTP RETR twice over proxy confirming persistent connection]
+s-p----e--- OK (858 out of 1416, remaining: 02:07, took 0.029s, duration: 03:15)
+test 1099...[TFTP get first a non-existing file then an existing]
+s-p----e--- OK (859 out of 1416, remaining: 02:06, took 0.017s, duration: 03:15)
+test 1101...[NO_PROXY test, with user name in URL]
+--pd---e--- OK (861 out of 1416, remaining: 02:06, took 0.006s, duration: 03:15)
+test 1102...[FTP OS/400 server name format check]
+--p----e--- OK (862 out of 1416, remaining: 02:05, took 0.010s, duration: 03:15)
+test 1103...[FTP non-OS/400 server]
+--p----e--- OK (863 out of 1416, remaining: 02:05, took 0.009s, duration: 03:15)
+test 1104...[HTTP cookie expiry date at Jan 1 00:00:00 GMT 1970]
+--pd---e--- OK (864 out of 1416, remaining: 02:05, took 0.059s, duration: 03:15)
+test 1105...[HTTP with cookie parser and header recording]
+--pd--oe--- OK (865 out of 1416, remaining: 02:04, took 0.085s, duration: 03:15)
+test 1106...[FTP URL and with ftp_proxy environment variable set]
+--p----e--- OK (866 out of 1416, remaining: 02:04, took 0.076s, duration: 03:15)
+test 1107...[FTP RETR PASV with PRET]
+--pd---e--- OK (867 out of 1416, remaining: 02:04, took 0.041s, duration: 03:15)
+test 1108...[FTP RETR PASV with PRET not supported]
+--p----e--- OK (868 out of 1416, remaining: 02:03, took 0.027s, duration: 03:16)
+test 1109...[HTTP GET with URL that contains fragment after the path]
+--pd---e--- OK (869 out of 1416, remaining: 02:03, took 0.023s, duration: 03:16)
+test 1110...[HTTP GET with URL that contains a fragment after the query part]
+--pd---e--- OK (870 out of 1416, remaining: 02:03, took 0.022s, duration: 03:16)
+test 1111...[HTTP GET with URL whose fragment contains a # (which is illegal)]
+--pd---e--- OK (871 out of 1416, remaining: 02:02, took 0.022s, duration: 03:16)
+test 1113...[FTP wildcard download - changed fnmatch, 2x perform (DOS LIST response)]
+s-p----e--- OK (873 out of 1416, remaining: 02:02, took 0.401s, duration: 03:16)
+test 1114...[FTP wildcard download - skip/parser_correctness/CURLOPT_FNMATCH_FUNCTION (DOS)]
+s------e--- OK (874 out of 1416, remaining: 02:01, took 0.222s, duration: 03:16)
+test 1115...[HTTP GET with unexpected 1xx response]
+--pd---e--- OK (875 out of 1416, remaining: 02:01, took 0.025s, duration: 03:16)
+test 1116...[HTTP GET with chunked trailer without Trailer:]
+--pd--oe--- OK (876 out of 1416, remaining: 02:01, took 0.029s, duration: 03:16)
+test 1117...[HTTP with invalid range then another URL]
+s-p----e--- OK (877 out of 1416, remaining: 02:15, took 23.078s, duration: 03:39)
+test 1118...[URL without slash and @-letter in query]
+--pd---e--- OK (878 out of 1416, remaining: 02:14, took 0.006s, duration: 03:39)
+test 1120...[FTP with 421 timeout response]
+--p----e--- OK (879 out of 1416, remaining: 02:14, took 0.007s, duration: 03:39)
+test 1121...[HTTP multiple provided Host: headers]
+--pd---e--- OK (880 out of 1416, remaining: 02:13, took 0.006s, duration: 03:39)
+test 1122...[HTTP GET gzip transfer-encoded content]
+--pd---e--- OK (881 out of 1416, remaining: 02:13, took 0.062s, duration: 03:39)
+test 1123...[HTTP GET deflate transfer-encoded content]
+--pd---e--- OK (882 out of 1416, remaining: 02:13, took 0.036s, duration: 03:39)
+test 1124...[HTTP GET gzip+chunked transfer-encoded content]
+--pd---e--- OK (883 out of 1416, remaining: 02:12, took 0.006s, duration: 03:39)
+test 1125...[HTTP GET transfer-encoding with custom Connection:]
+--pd---e--- OK (884 out of 1416, remaining: 02:12, took 0.006s, duration: 03:39)
+test 1126...[HTTP 200 If-Modified-Since with newer document]
+--pd---e--- OK (885 out of 1416, remaining: 02:11, took 0.006s, duration: 03:39)
+test 1127...[HTTP 200 If-Modified-Since with older document]
+--pd---e--- OK (886 out of 1416, remaining: 02:11, took 0.006s, duration: 03:39)
+test 1128...[HTTP 200 If-Modified-Since with old+new documents]
+s-p----e--- OK (887 out of 1416, remaining: 02:11, took 0.007s, duration: 03:39)
+test 1129...[HTTP POST expect 100-continue with a 404]
+s-p----e--- OK (888 out of 1416, remaining: 02:10, took 0.015s, duration: 03:40)
+test 1130...[HTTP POST forced expect 100-continue with a 404]
+s-p----e--- OK (889 out of 1416, remaining: 02:10, took 0.008s, duration: 03:40)
+test 1131...[HTTP PUT expect 100-continue with a 400]
+s-p----e--- OK (890 out of 1416, remaining: 02:10, took 0.008s, duration: 03:40)
+test 1132...[Verify memory #include files in libcurl's C source files]
+-------e--- OK (891 out of 1416, remaining: 02:09, took 0.017s, duration: 03:40)
+test 1133...[HTTP RFC1867-type formposting with filename/data contains ',', ';', '"']
+--pd---e--- OK (892 out of 1416, remaining: 02:09, took 0.007s, duration: 03:40)
+test 1134...[HTTP connection re-use with different credentials]
+--pd---e--- OK (893 out of 1416, remaining: 02:08, took 0.007s, duration: 03:40)
+test 1135...[Verify CURL_EXTERN order]
+s------e--- OK (894 out of 1416, remaining: 02:08, took 0.008s, duration: 03:40)
+test 1136 SKIPPED: curl lacks PSL support
+test 1137...[FTP RETR --ignore-content-length]
+--pd---e--- OK (896 out of 1416, remaining: 02:07, took 0.009s, duration: 03:40)
+test 1138...[HTTP redirect with UTF-8 characters]
+--pd---e--- OK (897 out of 1416, remaining: 02:07, took 0.113s, duration: 03:40)
+test 1139...[Verify that all libcurl options have man pages]
+-r-----e--- OK (898 out of 1416, remaining: 02:07, took 0.064s, duration: 03:40)
+test 1140...[Verify the nroff of man pages]
+s------e--- OK (899 out of 1416, remaining: 02:06, took 0.030s, duration: 03:40)
+test 1141...[HTTP redirect to http:/// (three slashes!)]
+--pd---e--- OK (900 out of 1416, remaining: 02:06, took 0.007s, duration: 03:40)
+test 1142...[HTTP redirect to http://// (four slashes!)]
+--pd---e--- OK (901 out of 1416, remaining: 02:05, took 0.006s, duration: 03:40)
+test 1143...[HTTP URL with http:/ (one slash!)]
+--pd---e--- OK (902 out of 1416, remaining: 02:05, took 0.006s, duration: 03:40)
+test 1144...[HTTP HEAD, receive no headers only body]
+--pd---e--- OK (903 out of 1416, remaining: 02:05, took 0.057s, duration: 03:40)
+test 1145...[file:// bad host]
+-------e--- OK (904 out of 1416, remaining: 02:04, took 0.015s, duration: 03:40)
+test 1146...[--proto-default file]
+---d---e--- OK (905 out of 1416, remaining: 02:04, took 0.023s, duration: 03:40)
+test 1147...[Get -H headers from a file]
+--pd---e--- OK (906 out of 1416, remaining: 02:04, took 0.026s, duration: 03:40)
+test 1148...[progress-bar]
+--pd--oe--- OK (907 out of 1416, remaining: 02:03, took 0.024s, duration: 03:40)
+test 1149...[FTP dir list multicwd then again nocwd]
+--pd---e--- OK (908 out of 1416, remaining: 02:03, took 0.097s, duration: 03:40)
+test 1150...[HTTP proxy with URLs using different ports]
+--pd---e--- OK (909 out of 1416, remaining: 02:03, took 0.029s, duration: 03:40)
+test 1151...[HTTP with too long cookies]
+--pd--oe--- OK (910 out of 1416, remaining: 02:02, took 0.084s, duration: 03:40)
+test 1152...[FTP with uneven quote in PWD response]
+--pd---e--- OK (911 out of 1416, remaining: 02:02, took 0.042s, duration: 03:40)
+test 1153...[FTP with quoted double quotes]
+--pd---e--- OK (912 out of 1416, remaining: 02:01, took 0.042s, duration: 03:40)
+test 1154...[HTTP GET with 100K (too long) response header]
+--p----e--- OK (913 out of 1416, remaining: 02:01, took 0.060s, duration: 03:40)
+test 1155...[HTTP cookie with parameter word as name]
+--pd--oe--- OK (914 out of 1416, remaining: 02:01, took 0.007s, duration: 03:40)
+test 1156...[HTTP resume/range fail range-error content-range combinations]
+-r-----e--- OK (915 out of 1416, remaining: 02:00, took 0.010s, duration: 03:40)
+test 1157...[Get -H headers from empty file]
+--pd---e--- OK (916 out of 1416, remaining: 02:00, took 0.007s, duration: 03:40)
+test 1158...[HTTP RFC1867-type formposting with filename containing '"']
+--pd---e--- OK (917 out of 1416, remaining: 02:00, took 0.011s, duration: 03:40)
+test 1159...[HTTP Location: and 'redirect_url' with non-supported scheme]
+s-p----e--- OK (918 out of 1416, remaining: 01:59, took 0.060s, duration: 03:40)
+test 1160...[HTTP with long funny format cookie]
+--pd--oe--- OK (919 out of 1416, remaining: 01:59, took 0.029s, duration: 03:40)
+test 1161...[HTTP cookie with path set twice]
+--pd--oe--- OK (920 out of 1416, remaining: 01:59, took 0.026s, duration: 03:40)
+test 1162...[FTP wildcard with crazy pattern]
+--p----e--- OK (921 out of 1416, remaining: 01:58, took 0.080s, duration: 03:41)
+test 1163...[FTP wildcard with pattern ending with an open-bracket]
+--p----e--- OK (922 out of 1416, remaining: 01:58, took 0.040s, duration: 03:41)
+test 1164...[HTTP/0.9 GET and all zeroes]
+s-p----e--- OK (923 out of 1416, remaining: 01:58, took 0.076s, duration: 03:41)
+test 1165...[Verify configure.ac and source code CURL_DISABLE_-sync]
+-------e--- OK (924 out of 1416, remaining: 01:57, took 0.081s, duration: 03:41)
+test 1166...[HTTP response with cookies but not receiving!]
+--pd---e--- OK (925 out of 1416, remaining: 01:57, took 0.007s, duration: 03:41)
+test 1168...[HTTP redirect with credentials using # in user and password]
+--pd---e--- OK (926 out of 1416, remaining: 01:57, took 0.111s, duration: 03:41)
+test 1169...[Verify that runtests.pl accepts an -L option]
+-------e--- OK (927 out of 1416, remaining: 01:56, took 0.090s, duration: 03:41)
+test 1170...[HTTP GET transfer-encoding with removed Connection:]
+--pd---e--- OK (928 out of 1416, remaining: 01:56, took 0.007s, duration: 03:41)
+test 1171...[HTTP GET transfer-encoding with blanked Connection:]
+--pd---e--- OK (929 out of 1416, remaining: 01:56, took 0.006s, duration: 03:41)
+test 1172...[HTTP/0.9 GET response denied]
+--p----e--- OK (930 out of 1416, remaining: 01:55, took 0.056s, duration: 03:41)
+test 1173...[Man page syntax checks]
+-r-----e--- OK (931 out of 1416, remaining: 01:55, took 0.058s, duration: 03:41)
+test 1174...[HTTP/0.9 GET response denied by default]
+--p----e--- OK (932 out of 1416, remaining: 01:55, took 0.056s, duration: 03:41)
+test 1175...[Verify that symbols-in-versions and libcurl-errors.3 are in sync]
+-------e--- OK (933 out of 1416, remaining: 01:54, took 0.009s, duration: 03:41)
+test 1176...[HTTP GET]
+--p---oe--- OK (934 out of 1416, remaining: 01:54, took 0.013s, duration: 03:41)
+test 1177...[Verify that CURL_VERSION_* in headers and docs are in sync]
+-------e--- OK (935 out of 1416, remaining: 01:54, took 0.015s, duration: 03:41)
+test 1178...[HTTP proxy auth with credentials longer than 256 bytes]
+--pd---e--- OK (936 out of 1416, remaining: 01:53, took 0.069s, duration: 03:41)
+test 1179...[error when using unknown command line option]
+-r-----e--- OK (937 out of 1416, remaining: 01:53, took 0.021s, duration: 03:41)
+test 1180...[HTTP GET request with proxy and -H "Proxy-Connection: keep-alive"]
+--pd---e--- OK (938 out of 1416, remaining: 01:53, took 0.025s, duration: 03:41)
+test 1181...[HTTP GET request with proxy and --proxy-header "Proxy-Connection: Keep-Alive"]
+--pd---e--- OK (939 out of 1416, remaining: 01:52, took 0.023s, duration: 03:41)
+test 1183...[%TESTNUMBER used instead of actual test number]
+--pd---e--- OK (940 out of 1416, remaining: 01:52, took 0.023s, duration: 03:41)
+test 1188...[--write-out with %{onerror} and %{urlnum} to stderr]
+-rpd---e--- OK (941 out of 1416, remaining: 01:51, took 0.024s, duration: 03:41)
+test 1190...[MQTT SUBSCRIBE]
+--p----e--- OK (942 out of 1416, remaining: 01:52, took 1.013s, duration: 03:42)
+test 1191...[MQTT PUBLISH]
+--p----e--- OK (943 out of 1416, remaining: 01:51, took 0.007s, duration: 03:42)
+test 1192...[MQTT SUBSCRIBE 2k topic]
+--p----e--- OK (944 out of 1416, remaining: 01:51, took 0.009s, duration: 03:42)
+test 1193...[MQTT PUBLISH 2k payload]
+--p----e--- OK (945 out of 1416, remaining: 01:51, took 0.009s, duration: 03:42)
+test 1194...[MQTT SUBSCRIBE with PUBLISH befoire SUBACK]
+--p----e--- OK (946 out of 1416, remaining: 01:50, took 0.008s, duration: 03:42)
+test 1195...[MQTT SUBSCRIBE with short PUBLISH]
+--p----e--- OK (947 out of 1416, remaining: 01:50, took 0.009s, duration: 03:42)
+test 1196...[MQTT with error in CONNACK]
+--p----e--- OK (948 out of 1416, remaining: 01:50, took 0.008s, duration: 03:42)
+test 1197...[HTTP POST redirected to GET and --write-out method]
+s-p----e--- OK (949 out of 1416, remaining: 01:49, took 0.065s, duration: 03:42)
+test 1198...[MQTT PUBLISH empty payload, single space topic]
+--p----e--- OK (950 out of 1416, remaining: 01:49, took 0.019s, duration: 03:43)
+test 1199...[MQTT PUBLISH empty payload, no topic]
+--p----e--- OK (951 out of 1416, remaining: 01:49, took 0.006s, duration: 03:43)
+test 1200...[Gopher index]
+--pd---e--- OK (952 out of 1416, remaining: 01:49, took 1.129s, duration: 03:44)
+test 1201...[Gopher selector]
+--pd---e--- OK (953 out of 1416, remaining: 01:48, took 0.074s, duration: 03:44)
+test 1202...[Gopher query]
+--pd---e--- OK (954 out of 1416, remaining: 01:48, took 0.075s, duration: 03:44)
+test 1203...[Gopher IPv6 index]
+--pd---e--- OK (955 out of 1416, remaining: 01:48, took 1.131s, duration: 03:45)
+test 1204...[HTTP with WWW-Authenticate and multiple auths in a single line]
+--pd---e--- OK (956 out of 1416, remaining: 01:48, took 0.009s, duration: 03:45)
+test 1205...[HTTP GET with 18K HTTP header]
+--pd---e--- OK (957 out of 1416, remaining: 01:48, took 0.009s, duration: 03:45)
+test 1206...[FTP PORT and 425 on download]
+--p----e--- OK (958 out of 1416, remaining: 01:47, took 0.009s, duration: 03:45)
+test 1207...[FTP PORT and 421 on download]
+--p----e--- OK (959 out of 1416, remaining: 01:47, took 0.009s, duration: 03:45)
+test 1208...[FTP PORT download, no data conn and no transient negative reply]
+--p----e--- OK (960 out of 1416, remaining: 01:48, took 2.014s, duration: 03:47)
+test 1212...[noproxy setting together with socks proxy]
+--pd---e--- OK (962 out of 1416, remaining: 01:47, took 0.006s, duration: 03:47)
+test 1213...[HTTP with proxy and host-only URL]
+--pd---e--- OK (963 out of 1416, remaining: 01:47, took 0.006s, duration: 03:47)
+test 1214...[HTTP with proxy and URL with ? and no slash separator]
+--pd---e--- OK (964 out of 1416, remaining: 01:46, took 0.007s, duration: 03:47)
+test 1216...[HTTP cookie domains tailmatching the host name]
+--pd---e--- OK (966 out of 1416, remaining: 01:45, took 0.008s, duration: 03:47)
+test 1217...[FTP with rubbish before name in 257-response]
+--pd---e--- OK (967 out of 1416, remaining: 01:45, took 0.015s, duration: 03:47)
+test 1218...[HTTP cookies and domains with same prefix]
+--pd---e--- OK (968 out of 1416, remaining: 01:45, took 0.009s, duration: 03:47)
+test 1219...[FTP with no user+password required (230 response)]
+--pd---e--- OK (969 out of 1416, remaining: 01:44, took 0.010s, duration: 03:47)
+test 1220...[file:// URLs with query string]
+s------e--- OK (970 out of 1416, remaining: 01:44, took 0.006s, duration: 03:47)
+test 1223...[HTTP GET -w remote_ip and -w remote_port]
+s-p----e--- OK (971 out of 1416, remaining: 01:44, took 0.007s, duration: 03:47)
+test 1224...[FTP fetch a file from the root directory]
+--pd---e--- OK (972 out of 1416, remaining: 01:43, took 0.011s, duration: 03:47)
+test 1225...[FTP fetch two files using absolute paths]
+--pd---e--- OK (973 out of 1416, remaining: 01:43, took 0.016s, duration: 03:47)
+test 1226...[FTP fetch a file from the root directory with singlecwd]
+--pd---e--- OK (974 out of 1416, remaining: 01:43, took 0.011s, duration: 03:47)
+test 1227...[FTP fetch a file from the root directory with nocwd]
+--pd---e--- OK (975 out of 1416, remaining: 01:42, took 0.011s, duration: 03:47)
+test 1228...[HTTP cookie path match]
+--pd---e--- OK (976 out of 1416, remaining: 01:42, took 0.008s, duration: 03:47)
+test 1229...[HTTP with Digest authorization with user name needing escape]
+--pd---e--- OK (977 out of 1416, remaining: 01:42, took 0.115s, duration: 03:47)
+test 1230...[HTTP CONNECT to IPv6 numerical address]
+--pd---e--- OK (978 out of 1416, remaining: 01:42, took 0.031s, duration: 03:47)
+test 1231...[HTTP URL with dotdot removal from path]
+--pd---e--- OK (979 out of 1416, remaining: 01:41, took 0.029s, duration: 03:47)
+test 1232...[HTTP URL with dotdot removal from path using an HTTP proxy]
+--pd---e--- OK (980 out of 1416, remaining: 01:41, took 0.022s, duration: 03:47)
+test 1233...[FTP failing to connect to EPSV port, switching to PASV]
+--pd---e--- OK (981 out of 1416, remaining: 01:41, took 0.070s, duration: 03:47)
+test 1234...[abusing {}-globbing]
+-------e--- OK (982 out of 1416, remaining: 01:40, took 0.019s, duration: 03:47)
+test 1235...[multiple requests using {}{} in the URL]
+s-p----e--- OK (983 out of 1416, remaining: 01:40, took 0.038s, duration: 03:47)
+test 1236...[[] globbing overflowing the range counter]
+-------e--- OK (984 out of 1416, remaining: 01:40, took 0.017s, duration: 03:47)
+test 1237...[URL with 1000+ letter user name + password]
+--pd---e--- OK (985 out of 1416, remaining: 01:39, took 0.023s, duration: 03:47)
+test 1238...[slow TFTP retrieve cancel due to -Y and -y]
+--p----e--- OK (986 out of 1416, remaining: 01:43, took 9.072s, duration: 03:57)
+test 1239...[HTTP with -z + -w response_code and simulated 304]
+s-p----e--- OK (987 out of 1416, remaining: 01:43, took 0.008s, duration: 03:57)
+test 1240...[glob [0-1] with stuff after range (7.33.0 regression)]
+--pd---e--- OK (988 out of 1416, remaining: 01:42, took 0.007s, duration: 03:57)
+test 1241...[HTTP _without_ dotdot removal]
+--pd---e--- OK (989 out of 1416, remaining: 01:42, took 0.008s, duration: 03:57)
+test 1242...[TFTP retrieve without TFTP options requests]
+--pd---e--- OK (990 out of 1416, remaining: 01:42, took 1.017s, duration: 03:58)
+test 1243...[TFTP send without TFTP options requests]
+Warning: server logs lock timeout (2 seconds) expired
+--p-u--e--- OK (991 out of 1416, remaining: 01:42, took 2.021s, duration: 04:00)
+test 1245...[--proto deny must override --proto-redir allow]
+--pd---e--- OK (993 out of 1416, remaining: 01:42, took 0.059s, duration: 04:00)
+test 1246...[URL with '#' at end of host name instead of '/']
+--pd---e--- OK (994 out of 1416, remaining: 01:41, took 0.021s, duration: 04:00)
+test 1247...[--fail-early]
+-------e--- OK (995 out of 1416, remaining: 01:41, took 0.005s, duration: 04:00)
+test 1248...[Access a non-proxied host with using the combination of --proxy option and --noproxy option]
+--pd---e--- OK (996 out of 1416, remaining: 01:41, took 0.006s, duration: 04:00)
+test 1249...[Access a non-proxied host with using the combination of --proxy option and NO_PROXY env var]
+--pd---e--- OK (997 out of 1416, remaining: 01:40, took 0.006s, duration: 04:00)
+test 1250...[Access a non-proxied host with using the combination of http_proxy env var and --noproxy option]
+--pd---e--- OK (998 out of 1416, remaining: 01:40, took 0.006s, duration: 04:00)
+test 1251...[Access a non-proxied host with using the combination of http_proxy env var and NO_PROXY env var]
+--pd---e--- OK (999 out of 1416, remaining: 01:40, took 0.006s, duration: 04:00)
+test 1252...[Under condition using --proxy, override NO_PROXY by --nproxy and access target URL directly]
+--pd---e--- OK (1000 out of 1416, remaining: 01:39, took 0.006s, duration: 04:00)
+test 1253...[Under condition using --proxy, override NO_PROXY by --nproxy and access target URL through proxy]
+--pd---e--- OK (1001 out of 1416, remaining: 01:39, took 0.006s, duration: 04:00)
+test 1254...[Under condition using --proxy, override NO_PROXY by --nproxy and access target URL through proxy]
+--pd---e--- OK (1002 out of 1416, remaining: 01:39, took 0.006s, duration: 04:00)
+test 1255...[Under condition using http_proxy, override NO_PROXY by --nproxy and access target URL directly]
+--pd---e--- OK (1003 out of 1416, remaining: 01:38, took 0.006s, duration: 04:00)
+test 1256...[Under condition using http_proxy, override NO_PROXY by --nproxy and access target URL through proxy]
+--pd---e--- OK (1004 out of 1416, remaining: 01:38, took 0.006s, duration: 04:00)
+test 1257...[Under condition using http_proxy, override NO_PROXY by --nproxy and access target URL through proxy]
+--pd---e--- OK (1005 out of 1416, remaining: 01:38, took 0.006s, duration: 04:00)
+test 1258...[HTTP, use cookies with localhost]
+--pd---e--- OK (1006 out of 1416, remaining: 01:37, took 0.112s, duration: 04:00)
+test 1259...[HTTP URL with semicolon in password]
+--pd---e--- OK (1007 out of 1416, remaining: 01:37, took 0.076s, duration: 04:00)
+test 1260...[HTTP URL with rubbish after port number]
+-------e--- OK (1008 out of 1416, remaining: 01:37, took 0.021s, duration: 04:00)
+test 1261...['redirect_url' with --location and --max-redirs]
+s-p----e--- OK (1009 out of 1416, remaining: 01:37, took 0.077s, duration: 04:00)
+test 1262...[FTP request and denied to download an older file with -z]
+--p----e--- OK (1010 out of 1416, remaining: 01:36, took 0.028s, duration: 04:00)
+test 1263...[HTTP URL with rubbish after IPv6 bracket]
+-------e--- OK (1011 out of 1416, remaining: 01:36, took 0.021s, duration: 04:00)
+test 1264...[HTTP URL with space in host name]
+-------e--- OK (1012 out of 1416, remaining: 01:36, took 0.016s, duration: 04:00)
+test 1265...[NO_PROXY with IPv6 numerical address]
+--pd---e--- OK (1013 out of 1416, remaining: 01:35, took 0.006s, duration: 04:00)
+test 1266...[HTTP GET with a single-byte HTTP/0.9 response]
+--pd---e--- OK (1014 out of 1416, remaining: 01:35, took 0.058s, duration: 04:00)
+test 1267...[HTTP GET with a invalid HTTP/1 response line start]
+--pd---e--- OK (1015 out of 1416, remaining: 01:35, took 0.073s, duration: 04:00)
+test 1268...[file name argument looks like a flag]
+------oe--- OK (1016 out of 1416, remaining: 01:34, took 0.021s, duration: 04:00)
+test 1269...[too large --retry-delay value]
+-------e--- OK (1017 out of 1416, remaining: 01:34, took 0.019s, duration: 04:00)
+test 1270...[Basic 'redirect_url']
+s-p----e--- OK (1018 out of 1416, remaining: 01:34, took 0.024s, duration: 04:00)
+test 1271...[--write-out from file with empty file]
+--pd---e--- OK (1019 out of 1416, remaining: 01:33, took 0.073s, duration: 04:00)
+test 1273...[-f and resume transfer of an entirely-downloaded file]
+--pd---e--- OK (1021 out of 1416, remaining: 01:33, took 0.029s, duration: 04:00)
+test 1280...[simple [a-d] globbing]
+--pd---e--- OK (1022 out of 1416, remaining: 01:32, took 0.036s, duration: 04:00)
+test 1281...[reject non-numerical port number in URL]
+-------e--- OK (1023 out of 1416, remaining: 01:32, took 0.018s, duration: 04:00)
+test 1282 SKIPPED: curl lacks GSS-API support
+test 1283...[globbing range with same start and stop]
+--p---oe--- OK (1025 out of 1416, remaining: 01:31, took 0.017s, duration: 04:01)
+test 1284...[HTTP POST --digest with user-specified Content-Length header]
+--pd---e--- OK (1026 out of 1416, remaining: 01:31, took 0.007s, duration: 04:01)
+test 1285...[HTTP PUT --digest with user-specified Content-Length header]
+--pd---e--- OK (1027 out of 1416, remaining: 01:31, took 1.016s, duration: 04:02)
+test 1286...[HTTP GET --digest increasing nonce-count]
+--pd---e--- OK (1028 out of 1416, remaining: 01:31, took 0.011s, duration: 04:02)
+test 1287...[HTTP over proxy-tunnel ignore TE and CL in CONNECT 2xx responses]
+--pd-Poe--- OK (1029 out of 1416, remaining: 01:31, took 0.570s, duration: 04:02)
+test 1288...[Suppress proxy CONNECT response headers]
+s-p--P-e--- OK (1030 out of 1416, remaining: 01:31, took 0.955s, duration: 04:03)
+test 1289...[globbing with overflow and bad syntxx]
+-------e--- OK (1031 out of 1416, remaining: 01:30, took 0.005s, duration: 04:03)
+test 1290...[Verify URL globbing ignores []]
+--pd---e--- OK (1032 out of 1416, remaining: 01:30, took 0.006s, duration: 04:03)
+test 1291...[Attempt to upload 1000 files but fail immediately]
+-------e--- OK (1033 out of 1416, remaining: 01:30, took 0.010s, duration: 04:03)
+test 1292...[Replaced internal headers with a blank one]
+--pd---e--- OK (1034 out of 1416, remaining: 01:30, took 0.061s, duration: 04:03)
+test 1293...[Multipart formpost to two URLs, the first failing]
+--p----e--- OK (1035 out of 1416, remaining: 01:29, took 0.020s, duration: 04:03)
+test 1296...[HTTP URL with %0a in name part]
+--pd---e--- OK (1038 out of 1416, remaining: 01:28, took 0.006s, duration: 04:03)
+test 1297...[CONNECT to peer that returns nothing]
+--p--P-e--- OK (1039 out of 1416, remaining: 01:28, took 0.943s, duration: 04:04)
+test 1298...[HTTP GET special path with --request-target]
+--pd---e--- OK (1040 out of 1416, remaining: 01:28, took 0.006s, duration: 04:04)
+test 1299...[Send "OPTIONS *" with --request-target]
+--pd---e--- OK (1041 out of 1416, remaining: 01:28, took 0.006s, duration: 04:04)
+test 1300 SKIPPED: curl lacks unittest support
+test 1301 SKIPPED: curl lacks unittest support
+test 1302 SKIPPED: curl lacks unittest support
+test 1314...[HTTP Location: following a // prefixed url]
+--pd---e--- OK (1055 out of 1416, remaining: 01:23, took 0.007s, duration: 04:04)
+test 1315...[HTTP RFC1867-type formposting - -F with three files, one with explicit type]
+--pd---e--- OK (1056 out of 1416, remaining: 01:23, took 0.007s, duration: 04:04)
+test 1317...[HTTP with --resolve]
+--pd---e--- OK (1057 out of 1416, remaining: 01:23, took 0.006s, duration: 04:04)
+test 1318...[HTTP with --resolve and same host name using different cases]
+--pd---e--- OK (1058 out of 1416, remaining: 01:22, took 0.007s, duration: 04:04)
+test 1319...[POP3 fetch tunneled through HTTP proxy]
+--pd-P-e--- OK (1059 out of 1416, remaining: 01:22, took 0.942s, duration: 04:05)
+test 1320...[SMTP send tunneled through HTTP proxy]
+--p-uP-e--- OK (1060 out of 1416, remaining: 01:22, took 1.014s, duration: 04:06)
+test 1321...[IMAP FETCH tunneled through HTTP proxy]
+--pd-P-e--- OK (1061 out of 1416, remaining: 01:22, took 1.014s, duration: 04:07)
+test 1322...[HTTP with --resolve and hostname with trailing dot]
+--pd---e--- OK (1062 out of 1416, remaining: 01:22, took 0.006s, duration: 04:07)
+test 1324...[HTTP with --resolve and [ipv6address]]
+--pd---e--- OK (1064 out of 1416, remaining: 01:21, took 0.006s, duration: 04:07)
+test 1325...[HTTP 308-redirect with POST]
+--pd---e--- OK (1065 out of 1416, remaining: 01:21, took 0.114s, duration: 04:07)
+test 1326...[TELNET to HTTP server]
+--pd---e--- OK (1066 out of 1416, remaining: 01:21, took 0.177s, duration: 04:07)
+test 1327...[TELNET check of upload with stdout redirected]
+--p----e--- OK (1067 out of 1416, remaining: 01:21, took 0.174s, duration: 04:08)
+test 1328...[HTTP GET a globbed range with -f]
+--pd---e--- OK (1068 out of 1416, remaining: 01:20, took 0.032s, duration: 04:08)
+test 1329...[/-prefixed proxy name]
+-------e--- OK (1069 out of 1416, remaining: 01:20, took 0.019s, duration: 04:08)
+test 1331...[HTTP --proxy-anyauth and 407 with cookies]
+--pd---e--- OK (1071 out of 1416, remaining: 01:19, took 0.030s, duration: 04:08)
+test 1332...[HTTP POST with 303 redirect and --post303]
+--pd---e--- OK (1072 out of 1416, remaining: 01:19, took 0.130s, duration: 04:08)
+test 1333...[HTTP POST zero length, chunked-encoded]
+--pd---e--- OK (1073 out of 1416, remaining: 01:19, took 0.025s, duration: 04:08)
+test 1364...[HTTP GET -o fname without Content-Disposition, -D file]
+--p---oe--- OK (1104 out of 1416, remaining: 01:10, took 0.008s, duration: 04:08)
+test 1365...[HTTP GET -o fname without Content-Disposition, -D stdout]
+--p---oe--- OK (1105 out of 1416, remaining: 01:09, took 0.008s, duration: 04:08)
+test 1366...[HTTP GET -o fname and Content-Disposition, -D file]
+--p---oe--- OK (1106 out of 1416, remaining: 01:09, took 0.008s, duration: 04:08)
+test 1367...[HTTP GET -o fname and Content-Disposition, -D stdout]
+--p---oe--- OK (1107 out of 1416, remaining: 01:09, took 0.008s, duration: 04:08)
+test 1368...[HTTP GET -o fname -J without Content-Disposition, -D file]
+--p---oe--- OK (1108 out of 1416, remaining: 01:09, took 0.008s, duration: 04:08)
+test 1369...[HTTP GET -o fname -J without Content-Disposition, -D stdout]
+--p---oe--- OK (1109 out of 1416, remaining: 01:08, took 0.008s, duration: 04:08)
+test 1370...[HTTP GET -o fname -J and Content-Disposition, -D file]
+--p---oe--- OK (1110 out of 1416, remaining: 01:08, took 0.008s, duration: 04:08)
+test 1371...[HTTP GET -o fname -J and Content-Disposition, -D stdout]
+--p---oe--- OK (1111 out of 1416, remaining: 01:08, took 0.008s, duration: 04:08)
+test 1372...[HTTP GET -o fname -i without Content-Disposition, -D file]
+--p---oe--- OK (1112 out of 1416, remaining: 01:07, took 0.008s, duration: 04:08)
+test 1373...[HTTP GET -o fname -i without Content-Disposition, -D stdout]
+--p---oe--- OK (1113 out of 1416, remaining: 01:07, took 0.008s, duration: 04:08)
+test 1374...[HTTP GET -o fname -i and Content-Disposition, -D file]
+--p---oe--- OK (1114 out of 1416, remaining: 01:07, took 0.009s, duration: 04:08)
+test 1375...[HTTP GET -o fname -i and Content-Disposition, -D stdout]
+--p---oe--- OK (1115 out of 1416, remaining: 01:07, took 0.008s, duration: 04:08)
+test 1376...[HTTP GET -o fname -i without Content-Disposition, without -D]
+--p---oe--- OK (1116 out of 1416, remaining: 01:06, took 0.008s, duration: 04:08)
+test 1377...[HTTP GET -o fname -i and Content-Disposition, without -D]
+--p---oe--- OK (1117 out of 1416, remaining: 01:06, took 0.008s, duration: 04:08)
+test 1378...[FTP DL, file without Content-Disposition inside, using -o fname]
+--p---oe--- OK (1118 out of 1416, remaining: 01:06, took 0.012s, duration: 04:08)
+test 1379...[FTP DL, file without C-D inside, using -o fname -D file]
+--p---oe--- OK (1119 out of 1416, remaining: 01:05, took 0.013s, duration: 04:08)
+test 1380...[FTP DL, file without C-D inside, using -o fname -D stdout]
+--p---oe--- OK (1120 out of 1416, remaining: 01:05, took 0.013s, duration: 04:08)
+test 1381...[FTP DL, file without C-D inside, using -o fname -J -D file]
+--p---oe--- OK (1121 out of 1416, remaining: 01:05, took 0.013s, duration: 04:08)
+test 1382...[FTP DL, file without C-D inside, using -o fname -J -D stdout]
+--p---oe--- OK (1122 out of 1416, remaining: 01:05, took 0.013s, duration: 04:08)
+test 1383...[FTP DL, file without C-D inside, using -o fname -i -D file]
+--p---oe--- OK (1123 out of 1416, remaining: 01:04, took 0.013s, duration: 04:08)
+test 1384...[FTP DL, file without C-D inside, using -o fname -i -D stdout]
+--p---oe--- OK (1124 out of 1416, remaining: 01:04, took 0.013s, duration: 04:08)
+test 1385...[FTP DL, file without C-D inside, using -o fname -i, without -D]
+--p---oe--- OK (1125 out of 1416, remaining: 01:04, took 0.012s, duration: 04:08)
+test 1386...[FTP DL, file with Content-Disposition inside, using -o fname]
+--p---oe--- OK (1126 out of 1416, remaining: 01:04, took 0.013s, duration: 04:08)
+test 1387...[FTP DL, file with C-D inside, using -o fname -D file]
+--p---oe--- OK (1127 out of 1416, remaining: 01:03, took 0.014s, duration: 04:08)
+test 1388...[FTP DL, file with C-D inside, using -o fname -D stdout]
+--p---oe--- OK (1128 out of 1416, remaining: 01:03, took 0.014s, duration: 04:08)
+test 1389...[FTP DL, file with C-D inside, using -o fname -J -D file]
+--p---oe--- OK (1129 out of 1416, remaining: 01:03, took 0.014s, duration: 04:08)
+test 1390...[FTP DL, file with C-D inside, using -o fname -J -D stdout]
+--p---oe--- OK (1130 out of 1416, remaining: 01:02, took 0.013s, duration: 04:08)
+test 1391...[FTP DL, file with C-D inside, using -o fname -i -D file]
+--p---oe--- OK (1131 out of 1416, remaining: 01:02, took 0.014s, duration: 04:08)
+test 1392...[FTP DL, file with C-D inside, using -o fname -i -D stdout]
+--p---oe--- OK (1132 out of 1416, remaining: 01:02, took 0.013s, duration: 04:08)
+test 1393...[FTP DL, file with C-D inside, using -o fname -i, without -D]
+--p---oe--- OK (1133 out of 1416, remaining: 01:02, took 0.013s, duration: 04:08)
+test 1400...[--libcurl for simple HTTP GET]
+--pd--oe--- OK (1140 out of 1416, remaining: 01:00, took 0.011s, duration: 04:08)
+test 1401...[--libcurl for GET with various options]
+--pd--oe--- OK (1141 out of 1416, remaining: 00:59, took 0.011s, duration: 04:08)
+test 1402...[--libcurl for simple POST]
+--pd--oe--- OK (1142 out of 1416, remaining: 00:59, took 0.011s, duration: 04:08)
+test 1403...[--libcurl for GET with query]
+--pd--oe--- OK (1143 out of 1416, remaining: 00:59, took 0.010s, duration: 04:08)
+test 1404...[--libcurl for HTTP RFC1867-type formposting - -F with 3 files, one with explicit type & encoder]
+--pd--oe--- OK (1144 out of 1416, remaining: 00:59, took 0.016s, duration: 04:08)
+test 1405...[--libcurl for FTP with quote ops]
+--pd--oe--- OK (1145 out of 1416, remaining: 00:58, took 0.019s, duration: 04:08)
+test 1406...[--libcurl for SMTP]
+--p-u-oe--- OK (1146 out of 1416, remaining: 00:58, took 0.014s, duration: 04:08)
+test 1407...[--libcurl for POP3 LIST one message]
+--p---oe--- OK (1147 out of 1416, remaining: 00:58, took 0.012s, duration: 04:08)
+test 1408...[HTTP receive cookies over IPV6]
+--p----e--- OK (1148 out of 1416, remaining: 00:58, took 0.007s, duration: 04:08)
+test 1409...[Pass in string to -C]
+-------e--- OK (1149 out of 1416, remaining: 00:57, took 0.004s, duration: 04:08)
+test 1410...[Pass in negative number to --max-time]
+-------e--- OK (1150 out of 1416, remaining: 00:57, took 0.004s, duration: 04:08)
+test 1411...[HTTP with zero size file PUT]
+--pd---e--- OK (1151 out of 1416, remaining: 00:57, took 0.006s, duration: 04:08)
+test 1412...[HTTP GET with --anyauth with two URLs (picking Digest) ]
+--pd---e--- OK (1152 out of 1416, remaining: 00:57, took 0.218s, duration: 04:09)
+test 1413...[HTTP redirect with fragment in new URL]
+--pd---e--- OK (1153 out of 1416, remaining: 00:56, took 0.127s, duration: 04:09)
+test 1414...[FTP PORT without SIZE or EPRT support]
+--pd---e--- OK (1154 out of 1416, remaining: 00:56, took 0.082s, duration: 04:09)
+test 1415...[Delete expired cookies]
+--pd--oe--- OK (1155 out of 1416, remaining: 00:56, took 0.020s, duration: 04:09)
+test 1416...[HTTP GET with chunked Transfer-Encoding overflowed chunked size]
+--p----e--- OK (1156 out of 1416, remaining: 00:56, took 0.006s, duration: 04:09)
+test 1417...[HTTP GET with chunked encoding and chunked trailer without CRs]
+--pd--oe--- OK (1157 out of 1416, remaining: 00:55, took 0.007s, duration: 04:09)
+test 1418...[HTTP with --anyauth and connection re-use]
+--pd---e--- OK (1158 out of 1416, remaining: 00:55, took 0.009s, duration: 04:09)
+test 1419...[HTTP with --anyauth (but no auth!) and connection re-use]
+--pd---e--- OK (1159 out of 1416, remaining: 00:55, took 0.007s, duration: 04:09)
+test 1420...[--libcurl for IMAP FETCH message]
+--pd--oe--- OK (1160 out of 1416, remaining: 00:55, took 0.012s, duration: 04:09)
+test 1421...[Re-using HTTP proxy connection for two different host names]
+s-p----e--- OK (1161 out of 1416, remaining: 00:54, took 0.007s, duration: 04:09)
+test 1423...[HTTP GET -o fname without Content-Disposition (empty file)]
+--p---oe--- OK (1163 out of 1416, remaining: 00:54, took 0.008s, duration: 04:09)
+test 1424...[HTTP GET -o fname without Content-Disposition (unmet time condition)]
+--p---oe--- OK (1164 out of 1416, remaining: 00:54, took 0.007s, duration: 04:09)
+test 1427...[too large -m timeout value]
+-------e--- OK (1167 out of 1416, remaining: 00:53, took 0.004s, duration: 04:09)
+test 1428...[HTTP over proxy-tunnel with --proxy-header and --header]
+--pd-P-e--- OK (1168 out of 1416, remaining: 00:53, took 0.565s, duration: 04:10)
+test 1429...[HTTP GET with 999 response code]
+s-p----e--- OK (1169 out of 1416, remaining: 00:52, took 0.007s, duration: 04:10)
+test 1430...[HTTP GET with negative response code]
+--pd---e--- OK (1170 out of 1416, remaining: 00:52, took 0.006s, duration: 04:10)
+test 1431...[HTTP GET with single-digit response code]
+--pd---e--- OK (1171 out of 1416, remaining: 00:52, took 0.006s, duration: 04:10)
+test 1432...[HTTP GET with 100-digit response code and survive]
+--p----e--- OK (1172 out of 1416, remaining: 00:52, took 0.007s, duration: 04:10)
+test 1433...[HTTP GET with 100-digit subversion number in response]
+--p----e--- OK (1173 out of 1416, remaining: 00:51, took 0.007s, duration: 04:10)
+test 1434...[HTTP GET resume at exactly the existing file size is fine]
+--pd---e--- OK (1174 out of 1416, remaining: 00:51, took 0.008s, duration: 04:10)
+test 1435...[simple HTTP GET over Unix socket]
+--pd---e--- OK (1175 out of 1416, remaining: 00:51, took 1.017s, duration: 04:11)
+test 1436...[HTTP requests with multiple connections over Unix socket]
+s-p----e--- OK (1176 out of 1416, remaining: 00:51, took 0.009s, duration: 04:11)
+test 1437...[HTTP with duplicated WWW-Authenticate parameters]
+--pd---e--- OK (1177 out of 1416, remaining: 00:51, took 0.116s, duration: 04:11)
+test 1438...[Check if %{scheme} returns HTTP]
+s-p----e--- OK (1178 out of 1416, remaining: 00:50, took 0.007s, duration: 04:11)
+test 1439...[Check if %{http_version} returns 1.1]
+s-p----e--- OK (1179 out of 1416, remaining: 00:50, took 0.006s, duration: 04:11)
+test 1440...[Check --write-out with trailing %{]
+s------e--- OK (1180 out of 1416, remaining: 00:50, took 0.005s, duration: 04:11)
+test 1441...[Check --write-out with trailing %]
+s------e--- OK (1181 out of 1416, remaining: 00:49, took 0.006s, duration: 04:11)
+test 1442...[Check --write-out with trailing \]
+s------e--- OK (1182 out of 1416, remaining: 00:49, took 0.006s, duration: 04:11)
+test 1444...[FTP with --remote-time]
+--pd---e--- OK (1184 out of 1416, remaining: 00:49, took 0.015s, duration: 04:11)
+test 1445...[file:// with --remote-time]
+-------e--- OK (1185 out of 1416, remaining: 00:48, took 0.029s, duration: 04:11)
+test 1447...[Provide illegal proxy name ]
+-------e--- OK (1187 out of 1416, remaining: 00:48, took 0.006s, duration: 04:11)
+test 1449...[FTP download range with integer overflow]
+--p----e--- OK (1189 out of 1416, remaining: 00:47, took 0.010s, duration: 04:11)
+test 1450...[Basic DICT lookup]
+-------e--- OK (1190 out of 1416, remaining: 00:47, took 1.008s, duration: 04:12)
+test 1451 SKIPPED: Test only works if Python package impacket is installed
+test 1452...[Basic TELNET negotiation]
+s------e--- OK (1192 out of 1416, remaining: 00:47, took 1.011s, duration: 04:14)
+test 1453...[Too long tftp filename]
+-------e--- OK (1193 out of 1416, remaining: 00:47, took 0.005s, duration: 04:14)
+test 1454 SKIPPED: curl has ipv6 support
+test 1455...[HTTP GET when PROXY Protocol enabled]
+--p----e--- OK (1195 out of 1416, remaining: 00:47, took 0.007s, duration: 04:14)
+test 1456...[HTTP-IPv6 GET with PROXY protocol]
+--p----e--- OK (1196 out of 1416, remaining: 00:46, took 0.009s, duration: 04:14)
+test 1457...[Check if %{stderr} and %{stdout} switch between stdout and stderr.]
+srp----e--- OK (1197 out of 1416, remaining: 00:46, took 0.008s, duration: 04:14)
+test 1458...[HTTP with wildcard --resolve]
+--pd---e--- OK (1198 out of 1416, remaining: 00:46, took 0.008s, duration: 04:14)
+test 1459 SKIPPED: curl lacks sftp support
+test 1461...[curl important --help]
+s------e--- OK (1201 out of 1416, remaining: 00:45, took 0.006s, duration: 04:14)
+test 1462...[curl invalid category --help]
+s------e--- OK (1202 out of 1416, remaining: 00:45, took 0.007s, duration: 04:14)
+test 1463...[curl file category --help]
+s------e--- OK (1203 out of 1416, remaining: 00:45, took 0.006s, duration: 04:14)
+test 1464...[curl file category --help with lower/upper mix]
+s------e--- OK (1204 out of 1416, remaining: 00:44, took 0.006s, duration: 04:14)
+test 1465...[--libcurl for POST with binary content]
+--pd--oe--- OK (1205 out of 1416, remaining: 00:44, took 0.014s, duration: 04:14)
+test 1466...[HTTP GET with 3-digit response and only digits in reason]
+--pd---e--- OK (1206 out of 1416, remaining: 00:44, took 0.007s, duration: 04:14)
+test 1500...[curl_multi_wait]
+---d---e--- OK (1207 out of 1416, remaining: 00:44, took 0.007s, duration: 04:14)
+test 1501...[FTP with multi interface and slow LIST response ]
+--p----e--- OK (1208 out of 1416, remaining: 00:44, took 4.035s, duration: 04:18)
+test 1502...[HTTP multi with CURLOPT_RESOLVE, cleanup sequence UA]
+--pd---e--- OK (1209 out of 1416, remaining: 00:44, took 0.008s, duration: 04:18)
+test 1503...[HTTP multi with CURLOPT_RESOLVE, cleanup sequence PA]
+--pd---e--- OK (1210 out of 1416, remaining: 00:44, took 0.010s, duration: 04:18)
+test 1504...[HTTP multi with CURLOPT_RESOLVE, cleanup sequence UB]
+--pd---e--- OK (1211 out of 1416, remaining: 00:43, took 0.008s, duration: 04:18)
+test 1505...[HTTP multi with CURLOPT_RESOLVE, cleanup sequence PB]
+--pd---e--- OK (1212 out of 1416, remaining: 00:43, took 0.005s, duration: 04:18)
+test 1506...[HTTP GET connection cache limit (CURLMOPT_MAXCONNECTS)]
+--p---oe--- OK (1213 out of 1416, remaining: 00:43, took 0.014s, duration: 04:18)
+test 1507...[SMTP with multi interface and CURLE_ABORTED_BY_CALLBACK]
+--p----e--- OK (1214 out of 1416, remaining: 00:43, took 0.007s, duration: 04:18)
+test 1508...[Close a multi handle without using it]
+------oe--- OK (1215 out of 1416, remaining: 00:42, took 0.005s, duration: 04:18)
+test 1509...[simple multi http:// through proxytunnel with authentication info]
+--pd-P-e--- OK (1216 out of 1416, remaining: 00:42, took 0.565s, duration: 04:19)
+test 1511...[HTTP GET time conditions in repeated requests]
+---d---e--- OK (1217 out of 1416, remaining: 00:42, took 0.006s, duration: 04:19)
+test 1513...[return failure immediately from progress callback]
+s------e--- OK (1218 out of 1416, remaining: 00:42, took 0.005s, duration: 04:19)
+test 1514...[HTTP POST with read callback and unknown data size]
+--p----e--- OK (1219 out of 1416, remaining: 00:42, took 1.063s, duration: 04:20)
+test 1515...[caching of manual libcurl DNS entries after DNS cache timeout]
+---d---e--- OK (1220 out of 1416, remaining: 00:42, took 2.064s, duration: 04:22)
+test 1516...[caching of manual libcurl DNS entries after dead connection]
+-------e--- OK (1221 out of 1416, remaining: 00:42, took 2.065s, duration: 04:24)
+test 1517...[HTTP POST, server responds before completed send]
+--pd---e--- OK (1222 out of 1416, remaining: 00:42, took 1.014s, duration: 04:25)
+test 1518...[Extract Location: with broken URL]
+s------e--- OK (1223 out of 1416, remaining: 00:41, took 0.059s, duration: 04:25)
+test 1519...[Extract Location: with broken absolute URL]
+s------e--- OK (1224 out of 1416, remaining: 00:41, took 0.071s, duration: 04:25)
+test 1520...[SMTP with CRLF-dot-CRLF in data]
+--p-u--e--- OK (1225 out of 1416, remaining: 00:41, took 0.031s, duration: 04:25)
+test 1521...[Test all curl_easy_setopt and curl_easy_getinfo options]
+-------e--- OK (1226 out of 1416, remaining: 00:41, took 0.017s, duration: 04:25)
+test 1522...[CURLINFO_SIZE_UPLOAD with small SO_SNDBUF]
+s------e--- OK (1227 out of 1416, remaining: 00:40, took 0.092s, duration: 04:25)
+test 1523...[CURLINFO_LOW_SPEED_LIMIT]
+-------e--- OK (1228 out of 1416, remaining: 00:42, took 10.160s, duration: 04:35)
+test 1524...[HTTP PUT with 303 redirect]
+--pd---e--- OK (1229 out of 1416, remaining: 00:42, took 2.130s, duration: 04:37)
+test 1525...[CURLOPT_PROXYHEADER is ignored CURLHEADER_UNIFIED]
+--pd-P-e--- OK (1230 out of 1416, remaining: 00:42, took 1.066s, duration: 04:38)
+test 1526...[CURLOPT_PROXYHEADER: separate host/proxy headers]
+--pd-P-e--- OK (1231 out of 1416, remaining: 00:42, took 1.556s, duration: 04:40)
+test 1527...[Check same headers are generated with CURLOPT_HEADEROPT == CURLHEADER_UNIFIED]
+--pd-P-e--- OK (1232 out of 1416, remaining: 00:42, took 1.552s, duration: 04:42)
+test 1528...[Separately specified proxy/server headers sent in a proxy GET]
+---d-P-e--- OK (1233 out of 1416, remaining: 00:41, took 0.553s, duration: 04:42)
+test 1529...[HTTP request-injection in URL sent over proxy]
+-------e--- OK (1234 out of 1416, remaining: 00:41, took 0.007s, duration: 04:42)
+test 1530...[CURLOPT_OPENSOCKETFUNCTION returns bad socket]
+-------e--- OK (1235 out of 1416, remaining: 00:41, took 0.004s, duration: 04:42)
+test 1531...[CURLOPT_POSTFIELDS with binary data set after multi_add_handle]
+--p----e--- OK (1236 out of 1416, remaining: 00:41, took 0.059s, duration: 04:42)
+test 1532...[Test CURLINFO_RESPONSE_CODE]
+--p----e--- OK (1237 out of 1416, remaining: 00:40, took 0.070s, duration: 04:42)
+test 1533...[HTTP with CURLOPT_KEEP_SENDING_ON_ERROR and an early error response]
+--p----e--- OK (1238 out of 1416, remaining: 00:40, took 0.033s, duration: 04:42)
+test 1534...[CURLINFO_FILETIME init and reset]
+--p----e--- OK (1239 out of 1416, remaining: 00:40, took 0.073s, duration: 04:42)
+test 1535...[Test CURLINFO_RESPONSE_CODE CURLINFO_PROTOCOL]
+--p----e--- OK (1240 out of 1416, remaining: 00:40, took 0.074s, duration: 04:42)
+test 1536...[Test CURLINFO_RESPONSE_CODE CURLINFO_SCHEME]
+--p----e--- OK (1241 out of 1416, remaining: 00:39, took 0.074s, duration: 04:43)
+test 1537...[libcurl URL escape/unescape tests]
+s------e--- OK (1242 out of 1416, remaining: 00:39, took 0.021s, duration: 04:43)
+test 1538...[libcurl strerror API call tests]
+s------e--- OK (1243 out of 1416, remaining: 00:39, took 0.029s, duration: 04:43)
+test 1539...[HTTP 1.0 POST with read callback and unknown data size]
+-------e--- OK (1244 out of 1416, remaining: 00:39, took 0.017s, duration: 04:43)
+test 1540...[chunked with trailers and pausing the receive]
+--pd---e--- OK (1245 out of 1416, remaining: 00:38, took 0.070s, duration: 04:43)
+test 1550...[verify setting pipeling blocklisting options]
+-------e--- OK (1246 out of 1416, remaining: 00:38, took 0.019s, duration: 04:43)
+test 1551...[re-run redirected transfer without setting URL again]
+--pd---e--- OK (1247 out of 1416, remaining: 00:38, took 0.027s, duration: 04:43)
+test 1552...[IMAP multi transfer error without curl_multi_remove_handle]
+-------e--- OK (1248 out of 1416, remaining: 00:38, took 0.025s, duration: 04:43)
+test 1553...[IMAP cleanup before a connection was created]
+-------e--- OK (1249 out of 1416, remaining: 00:37, took 0.025s, duration: 04:43)
+test 1554...[HTTP with shared connection cache]
+---d---e--- OK (1250 out of 1416, remaining: 00:37, took 0.030s, duration: 04:43)
+test 1555...[verify api is protected against calls from callbacks]
+s------e--- OK (1251 out of 1416, remaining: 00:37, took 0.020s, duration: 04:43)
+test 1556...[send long HTTP headers to header callback]
+s-p----e--- OK (1252 out of 1416, remaining: 00:37, took 0.037s, duration: 04:43)
+test 1557...[Removing easy handle that's in the pending connections list doesn't leave behind a dangling entry]
+-------e--- OK (1253 out of 1416, remaining: 00:36, took 0.008s, duration: 04:43)
+test 1558...[CURLINFO_PROTOCOL for file:// transfer]
+s------e--- OK (1254 out of 1416, remaining: 00:36, took 0.005s, duration: 04:43)
+test 1559...[Set excessive URL lengths]
+s------e--- OK (1255 out of 1416, remaining: 00:36, took 0.014s, duration: 04:43)
+test 1560 SKIPPED: curl lacks ldap support
+test 1563...[Make sure redirects to CURLPROTO_GOPHER are forbidden by default]
+--p----e--- OK (1259 out of 1416, remaining: 00:35, took 0.006s, duration: 04:43)
+test 1564...[wakeup before poll with no easy handles]
+-------e--- OK (1260 out of 1416, remaining: 00:35, took 3.011s, duration: 04:46)
+test 1565...[wakeup from another thread]
+-------e--- OK (1261 out of 1416, remaining: 00:35, took 0.006s, duration: 04:46)
+test 1566...[--etag-compare that gets a 304 back shouldn't overwrite the file]
+--p---oe--- OK (1262 out of 1416, remaining: 00:34, took 0.006s, duration: 04:46)
+test 1567...[re-run redirected transfer without setting CURLU URL again]
+--pd---e--- OK (1263 out of 1416, remaining: 00:34, took 0.007s, duration: 04:46)
+test 1568...[HTTP with Digest authorization on custom CURLOPT_PORT]
+--pd---e--- OK (1264 out of 1416, remaining: 00:34, took 0.113s, duration: 04:46)
+test 1569...[FTP first type=A then regular URL]
+--p----e--- OK (1265 out of 1416, remaining: 00:34, took 0.027s, duration: 04:46)
+test 1570...[FTP first type=D then regular URL]
+--p----e--- OK (1266 out of 1416, remaining: 00:33, took 0.013s, duration: 04:46)
+test 1590...[IMAP cleanup before a connection was created]
+-------e--- OK (1267 out of 1416, remaining: 00:33, took 0.006s, duration: 04:46)
+test 1591...[HTTP PUT with trailers at the end]
+--p----e--- OK (1268 out of 1416, remaining: 00:33, took 1.063s, duration: 04:47)
+test 1592...[HTTP request, remove handle while resolving, don't block]
+-------e--- OK (1269 out of 1416, remaining: 00:33, took 0.009s, duration: 04:47)
+test 1593...[HTTP custom header overrides CURLOPT_TIMECONDITION]
+--p----e--- OK (1270 out of 1416, remaining: 00:33, took 0.059s, duration: 04:47)
+test 1594...[HTTP Retry-After header parsing and extraction]
+s-p----e--- OK (1271 out of 1416, remaining: 00:32, took 0.069s, duration: 04:47)
+test 1595...[HTTP Retry-After header extraction (without header)]
+s-p----e--- OK (1272 out of 1416, remaining: 00:32, took 0.065s, duration: 04:47)
+test 1596...[HTTP Retry-After header parsing using a date]
+s-p----e--- OK (1273 out of 1416, remaining: 00:32, took 0.073s, duration: 04:47)
+test 1613...[Send "OPTIONS *" with --request-target to a proxy]
+--pd---e--- OK (1287 out of 1416, remaining: 00:28, took 0.015s, duration: 04:47)
+test 1633...[--retry with a 429 response and Retry-After:]
+--pd---e--- OK (1293 out of 1416, remaining: 00:27, took 1.020s, duration: 04:48)
+test 1634...[--retry with a 429 response and Retry-After: and --fail]
+--pd---e--- OK (1294 out of 1416, remaining: 00:27, took 1.014s, duration: 04:49)
+test 1700...[HTTP/2 GET with Upgrade:]
+s-p----e--- OK (1303 out of 1416, remaining: 00:25, took 1.015s, duration: 04:51)
+test 1701...[HTTP/2 POST with Upgrade:]
+s-p----e--- OK (1304 out of 1416, remaining: 00:24, took 0.009s, duration: 04:51)
+test 1702...[HTTP/2 HEAD with Upgrade:]
+s-p----e--- OK (1305 out of 1416, remaining: 00:24, took 0.009s, duration: 04:51)
+test 1703 SKIPPED: curl lacks Unicode support
+test 1800...[HTTP/2 upgrade refused]
+--pd---e--- OK (1307 out of 1416, remaining: 00:24, took 0.007s, duration: 04:51)
+test 1904...[HTTP CONNECT with 204 response]
+--pd-P-e--- OK (1308 out of 1416, remaining: 00:24, took 0.566s, duration: 04:51)
+test 1905...[CURLOPT_COOKIELIST set to "FLUSH" of a shared cookie object]
+--p---oe--- OK (1309 out of 1416, remaining: 00:23, took 0.062s, duration: 04:51)
+test 1906...[CURLOPT_CURLU and CURLOPT_PORT]
+--p----e--- OK (1310 out of 1416, remaining: 00:23, took 0.072s, duration: 04:51)
+test 1907...[CURLINFO_EFFECTIVE_URL with non-scheme URL]
+s-p----e--- OK (1311 out of 1416, remaining: 00:23, took 0.070s, duration: 04:51)
+test 1909...[HTTP GET --retry-all-errors to overcome partial transfer]
+--p---oe--- OK (1313 out of 1416, remaining: 00:22, took 1.082s, duration: 04:52)
+test 1910...[HTTP credentials with newline and redirect]
+--p----e--- OK (1314 out of 1416, remaining: 00:22, took 0.006s, duration: 04:52)
+test 1911...[verify that curl_easy_setopt() rejects too long string inputs]
+-------e--- OK (1315 out of 1416, remaining: 00:22, took 0.094s, duration: 04:53)
+test 1912...[Cross validate that gcc-typecheck macros match the option types.]
+-------e--- OK (1316 out of 1416, remaining: 00:22, took 0.004s, duration: 04:53)
+test 1913...[FTP with NOBODY set, getting a missing file]
+-------e--- OK (1317 out of 1416, remaining: 00:22, took 0.006s, duration: 04:53)
+test 1914...[FTP with NOBODY and FILETIME set, getting a missing file]
+-------e--- OK (1318 out of 1416, remaining: 00:21, took 0.006s, duration: 04:53)
+test 1915...[HSTS read/write callbacks]
+s------e--- OK (1319 out of 1416, remaining: 00:21, took 0.005s, duration: 04:53)
+test 1916...[MQTT PUBLISH with no POSTFIELDSIZE set]
+--p----e--- OK (1320 out of 1416, remaining: 00:21, took 0.006s, duration: 04:53)
+test 1917...[MQTT PUBLISH with CURLOPT_POST set (no payload)]
+--p----e--- OK (1321 out of 1416, remaining: 00:21, took 0.006s, duration: 04:53)
+test 1918...[curl_easy_option_by_name() and curl_easy_option_by_id()]
+-------e--- OK (1322 out of 1416, remaining: 00:20, took 0.005s, duration: 04:53)
+test 2000...[FTP RETR followed by FILE]
+s-p----e--- OK (1327 out of 1416, remaining: 00:19, took 0.011s, duration: 04:53)
+test 2001...[HTTP GET followed by FTP RETR followed by FILE]
+s-p----e--- OK (1328 out of 1416, remaining: 00:19, took 0.013s, duration: 04:53)
+test 2002...[HTTP GET followed by FTP RETR followed by FILE followed by TFTP RRQ]
+s-p----e--- OK (1329 out of 1416, remaining: 00:19, took 0.014s, duration: 04:53)
+test 2003...[HTTP GET followed by FTP RETR followed by FILE followed by TFTP RRQ then again in reverse order]
+s-p----e--- OK (1330 out of 1416, remaining: 00:18, took 0.020s, duration: 04:53)
+test 2036...[HTTP, -O with no slash at all in the URL]
+-------e--- OK (1344 out of 1416, remaining: 00:15, took 0.004s, duration: 04:53)
+test 2039...[FTP (optional .netrc with 'default' override; no user/pass) dir list PASV]
+--pd---e--- OK (1347 out of 1416, remaining: 00:15, took 0.010s, duration: 04:53)
+test 2040...[HTTP Basic authorization, then without authorization]
+s-p----e--- OK (1348 out of 1416, remaining: 00:14, took 0.007s, duration: 04:53)
+test 2043 SKIPPED: curl lacks Schannel support
+test 2044...[Attempt to set a default protocol that does not exist]
+-------e--- OK (1352 out of 1416, remaining: 00:13, took 0.004s, duration: 04:53)
+test 2045...[Set the default protocol to ftp for a schemeless URL]
+-------e--- OK (1353 out of 1416, remaining: 00:13, took 0.006s, duration: 04:53)
+test 2049...[Connect to specific host]
+--pd---e--- OK (1357 out of 1416, remaining: 00:12, took 0.008s, duration: 04:53)
+test 2050...[Connect to specific host via HTTP proxy (switch to tunnel mode automatically)]
+--pd-P-e--- OK (1358 out of 1416, remaining: 00:12, took 0.515s, duration: 04:53)
+test 2051...[Connect to specific host: Re-use existing connections if possible]
+s-p----e--- OK (1359 out of 1416, remaining: 00:12, took 0.008s, duration: 04:53)
+test 2052...[Connect to specific host: Do not mix connections with and without a "connect to host"]
+s-p----e--- OK (1360 out of 1416, remaining: 00:12, took 0.008s, duration: 04:53)
+test 2053...[Connect to specific host with IP addresses]
+--pd---e--- OK (1361 out of 1416, remaining: 00:11, took 0.008s, duration: 04:53)
+test 2054...[Connect to specific host: use the first "connect-to" string that matches]
+--pd---e--- OK (1362 out of 1416, remaining: 00:11, took 0.011s, duration: 04:53)
+test 2055...[Connect to specific host via SOCKS proxy and HTTP proxy (switch to tunnel mode automatically)]
+--pd-P-e--- OK (1363 out of 1416, remaining: 00:11, took 0.970s, duration: 04:54)
+test 2056 SKIPPED: curl lacks GSS-API support
+test 2057 SKIPPED: curl lacks GSS-API support
+test 2058...[HTTP POST --digest with PUT, resumed upload, modified method and SHA-256]
+--pd---e--- OK (1366 out of 1416, remaining: 00:10, took 1.016s, duration: 04:55)
+test 2059...[HTTP POST --digest with PUT, resumed upload, modified method, SHA-512-256 and userhash=true]
+--pd---e--- OK (1367 out of 1416, remaining: 00:10, took 1.016s, duration: 04:56)
+test 2060...[HTTP POST --digest with PUT, resumed upload, modified method, SHA-512-256 and userhash=false]
+--pd---e--- OK (1368 out of 1416, remaining: 00:10, took 1.016s, duration: 04:57)
+test 2061...[HTTP with RFC7616 SHA256 Digest authorization]
+--pd---e--- OK (1369 out of 1416, remaining: 00:10, took 0.115s, duration: 04:57)
+test 2062...[HTTP with RFC7616 SHA-512-256 Digest authorization and userhash=false]
+--pd---e--- OK (1370 out of 1416, remaining: 00:10, took 0.128s, duration: 04:58)
+test 2063...[HTTP with RFC7616 SHA-512-256 Digest authorization and userhash=true]
+--pd---e--- OK (1371 out of 1416, remaining: 00:09, took 0.134s, duration: 04:58)
+test 2064...[HTTP with RFC7616 Digest authorization with bad password and SHA256]
+--pd---e--- OK (1372 out of 1416, remaining: 00:09, took 0.032s, duration: 04:58)
+test 2065...[HTTP with RFC7616 Digest authorization with bad password, SHA-512-256 and userhash=false]
+--pd---e--- OK (1373 out of 1416, remaining: 00:09, took 0.031s, duration: 04:58)
+test 2066...[HTTP with RFC7616 Digest authorization with bad password, SHA-512-256 and userhash=true]
+--pd---e--- OK (1374 out of 1416, remaining: 00:09, took 0.029s, duration: 04:58)
+test 2067...[HTTP POST --digest with SHA256 and user-specified Content-Length header]
+--pd---e--- OK (1375 out of 1416, remaining: 00:08, took 0.029s, duration: 04:58)
+test 2068...[HTTP POST --digest with SHA-512-256, userhash=false and user-specified Content-Length header]
+--pd---e--- OK (1376 out of 1416, remaining: 00:08, took 0.029s, duration: 04:58)
+test 2069...[HTTP POST --digest with SHA-512-256, userhash=true and user-specified Content-Length header]
+--pd---e--- OK (1377 out of 1416, remaining: 00:08, took 0.029s, duration: 04:58)
+test 2070 SKIPPED: curl lacks Schannel support
+test 2071...[basic file:// file with "127.0.0.1" hostname]
+---d---e--- OK (1379 out of 1416, remaining: 00:08, took 0.020s, duration: 04:58)
+test 2072...[file:// with unix path resolution behavior for the case of extra slashes]
+---d---e--- OK (1380 out of 1416, remaining: 00:07, took 0.030s, duration: 04:58)
+test 2073...[HTTP form posts with handle reset]
+--pd---e--- OK (1381 out of 1416, remaining: 00:07, took 0.028s, duration: 04:58)
+test 2074...[HTTP GET]
+--pd---e--- OK (1382 out of 1416, remaining: 00:07, took 0.023s, duration: 04:58)
+test 2075...[Verify usernames are not allowed in url]
+-------e--- OK (1383 out of 1416, remaining: 00:07, took 0.017s, duration: 04:58)
+test 2076...[HTTP with digest auth and URI contains query]
+--pd---e--- OK (1384 out of 1416, remaining: 00:06, took 0.130s, duration: 04:58)
+test 2080...[config file with overly long option]
+-------e--- OK (1387 out of 1416, remaining: 00:06, took 0.026s, duration: 04:58)
+test 2081...[Automatic referrer credential and anchor stripping check]
+s-p----e--- OK (1388 out of 1416, remaining: 00:06, took 0.130s, duration: 04:58)
+test 2200...[MQTT SUBSCRIBE with user and password]
+--p----e--- OK (1390 out of 1416, remaining: 00:05, took 0.027s, duration: 04:58)
+test 2201...[MQTT PUBLISH with user and password valid]
+--p----e--- OK (1391 out of 1416, remaining: 00:05, took 0.018s, duration: 04:58)
+test 2202...[MQTT PUBLISH with invalid user and password]
+--p----e--- OK (1392 out of 1416, remaining: 00:05, took 0.006s, duration: 04:58)
+test 2203...[MQTT with error in CONNACK]
+--p----e--- OK (1393 out of 1416, remaining: 00:04, took 0.006s, duration: 04:58)
+test 2204...[MQTT SUBSCRIBE with user and password]
+--p----e--- OK (1394 out of 1416, remaining: 00:04, took 0.006s, duration: 04:58)
+test 2205...[MQTT with very long user name]
+-------e--- OK (1395 out of 1416, remaining: 00:04, took 0.006s, duration: 04:58)
+test 3002...[SMTP with multiple and invalid (first) --mail-rcpt and --mail-rcpt-allowfails]
+--p-u--e--- OK (1398 out of 1416, remaining: 00:03, took 0.008s, duration: 04:58)
+test 3003...[SMTP with multiple and invalid (last) --mail-rcpt and --mail-rcpt-allowfails]
+--p-u--e--- OK (1399 out of 1416, remaining: 00:03, took 0.008s, duration: 04:58)
+test 3004...[SMTP with multiple and invalid (middle) --mail-rcpt and --mail-rcpt-allowfails]
+--p-u--e--- OK (1400 out of 1416, remaining: 00:03, took 0.007s, duration: 04:58)
+test 3005...[SMTP with multiple and invalid (all but one) --mail-rcpt and --mail-rcpt-allowfails]
+--p-u--e--- OK (1401 out of 1416, remaining: 00:03, took 0.008s, duration: 04:58)
+test 3006...[SMTP with multiple invalid (all) --mail-rcpt and --mail-rcpt-allowfails]
+--p----e--- OK (1402 out of 1416, remaining: 00:02, took 0.007s, duration: 04:58)
+test 3007...[SMTP with invalid --mail-rcpt and --mail-rcpt-allowfails]
+--p----e--- OK (1403 out of 1416, remaining: 00:02, took 0.007s, duration: 04:58)
+test 3008...[--output-dir]
+--p---oe--- OK (1404 out of 1416, remaining: 00:02, took 0.006s, duration: 04:58)
+test 3009...[--output-dir a non-existing directory]
+--p----e--- OK (1405 out of 1416, remaining: 00:02, took 0.006s, duration: 04:58)
+test 3010...[HTTP retry-after reset]
+s------e--- OK (1406 out of 1416, remaining: 00:02, took 0.006s, duration: 04:58)
+test 3011...[--output-dir with --create-dirs]
+--p---oe--- OK (1407 out of 1416, remaining: 00:01, took 0.006s, duration: 04:58)
+test 3012...[--output-dir with -J]
+--p---oe--- OK (1408 out of 1416, remaining: 00:01, took 0.006s, duration: 04:58)
+test 3013...[Two --output-dir with --next in between]
+--p---oe--- OK (1409 out of 1416, remaining: 00:01, took 0.007s, duration: 04:58)
+test 3014...[Check if %{num_headers} returns correct number of headers]
+s-p----e--- OK (1410 out of 1416, remaining: 00:01, took 0.006s, duration: 04:58)
+test 3015...[HTTP GET -w num_headers with redirected fetch (2 connects)]
+s-p----e--- OK (1411 out of 1416, remaining: 00:01, took 0.007s, duration: 04:58)
+test 3016...[GET a directory using file://]
+-------e--- OK (1412 out of 1416, remaining: 00:00, took 0.005s, duration: 04:58)
+test 3017...[MQTT SUBSCRIBE with pathological PUBLISH length]
+--p----e--- OK (1413 out of 1416, remaining: 00:00, took 0.007s, duration: 04:58)
+test 3018...[MQTT SUBSCRIBE with PUBLISH larger than --max-filesize]
+--p----e--- OK (1414 out of 1416, remaining: 00:00, took 0.007s, duration: 04:58)
+test 3019...[HTTP with invalid --resolve syntax]
+-------e--- OK (1415 out of 1416, remaining: 00:00, took 0.005s, duration: 04:58)
+test 3020...[HTTP with invalid --connect-to syntax]
+-------e--- OK (1416 out of 1416, remaining: 00:00, took 0.005s, duration: 04:58)
+TESTDONE: 1434 tests were considered during 299 seconds.
+TESTINFO: 300 tests were skipped due to these restraints:
+TESTINFO: "curl lacks debug support" 94 times (67, 68, 69, 81, 89, 90, 91, 150, 155 and 85 more)
+TESTINFO: "no stunnel" 45 times (300, 301, 302, 303, 304, 305, 306, 307, 308 and 36 more)
+TESTINFO: "curl lacks unittest support" 40 times (1300, 1301, 1302, 1303, 1304, 1305, 1306, 1308, 1309 and 31 more)
+TESTINFO: "curl lacks sftp server support" 37 times (582, 583, 600, 602, 604, 606, 608, 609, 610 and 28 more)
+TESTINFO: "configured as DISABLED" 18 times (323, 594, 836, 882, 938, 1014, 1035, 1119, 1167 and 9 more)
+TESTINFO: "got unexpected host name back, LD_PRELOAD failed" 16 times (831, 834, 877, 880, 933, 936, 2023, 2024, 2025 and 7 more)
+TESTINFO: "curl lacks idn support" 13 times (165, 962, 963, 964, 965, 966, 967, 968, 969 and 4 more)
+TESTINFO: "curl lacks scp server support" 12 times (601, 603, 605, 607, 617, 619, 621, 623, 629 and 3 more)
+TESTINFO: "curl lacks GSS-API support" 5 times (1282, 2056, 2057, 2077, 2078)
+TESTINFO: "no gnutls-serv" 4 times (320, 321, 322, 324)
+TESTINFO: "curl lacks brotli support" 3 times (314, 315, 316)
+TESTINFO: "curl lacks TrackMemory support" 2 times (96, 558)
+TESTINFO: "curl lacks zstd support" 2 times (396, 397)
+TESTINFO: "curl lacks Schannel support" 2 times (2043, 2070)
+TESTINFO: "curl lacks sftp support" 2 times (632, 1459)
+TESTINFO: "Test only works if Python package impacket is installed" 1 time (1451)
+TESTINFO: "curl lacks PSL support" 1 time (1136)
+TESTINFO: "curl has ipv6 support" 1 time (1454)
+TESTINFO: "curl lacks Unicode support" 1 time (1703)
+TESTINFO: "curl lacks ldap support" 1 time (1560)
+TESTDONE: 1134 tests out of 1134 reported OK: 100%
