@@ -170,7 +170,7 @@ def write_result():
             writer.writerow(row)
 
         # Write the geo. mean
-        row = ["geo\\\\\_mean", geomean]
+        row = ["Geomean", geomean]
         writer.writerow(row)
 
 #
