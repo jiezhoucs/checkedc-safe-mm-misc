@@ -108,6 +108,8 @@ def write_result():
 
         checked_rss_norm, cets_rss_norm = [], []
         checked_wss_norm, cets_wss_norm = [], []
+        # The next two lists are Checked C data only including CETS-compiled programs.
+        checked_rss_cets_norm, checked_wss_cets_norm = [], []
         for prog in benchmarks:
             row = [prog]
             # Add rss data
@@ -127,6 +129,7 @@ def write_result():
                 cets_rss_norm += [normalized]
                 # Add normalized CETS memory consumption (X)
                 row += [normalized]
+                checked_rss_cets_norm += [checked_rss_norm[-1]]
 
             # Add wss data
             baseline_wss_max = mem_data["baseline"]["wss_max"][prog]
@@ -145,6 +148,7 @@ def write_result():
                 cets_wss_norm += [normalized]
                 # Add normalized CETS memory consumption (X)
                 row += [normalized]
+                checked_wss_cets_norm += [checked_wss_norm[-1]]
             writer.writerow(row)
 
         # Compute the geomean of Checked C's and CETS' RSS and WSS.
@@ -153,6 +157,8 @@ def write_result():
         cets_rss_geomean = round(np.array(cets_rss_norm).prod() ** (1.0 / cets_len), 2)
         checked_wss_geomean = round(np.array(checked_wss_norm).prod() ** (1.0 / checked_len), 2)
         cets_wss_geomean = round(np.array(cets_wss_norm).prod() ** (1.0 / cets_len), 2)
+        checked_rss_cets_geomean = round(np.array(checked_rss_cets_norm).prod() ** (1.0 / cets_len), 2)
+        checked_wss_cets_geomean = round(np.array(checked_wss_cets_norm).prod() ** (1.0 / cets_len), 2)
 
         row = ["geomean", "", checked_rss_geomean, cets_rss_geomean,\
                 "", checked_wss_geomean, cets_wss_geomean]
@@ -163,6 +169,8 @@ def write_result():
         print("CETS RSS Geomean:      " + str(cets_rss_geomean))
         print("Checked C WSS Geomean: " + str(checked_wss_geomean))
         print("CETS RSS Geomean:      " + str(cets_wss_geomean))
+        print("Checked C (CETS prog only) RSS Geomean: " + str(checked_rss_cets_geomean))
+        print("Checked C (CETS prog only) WSS Geomean: " + str(checked_wss_cets_geomean))
 
         # Close result file.
         mem_csv.close()
