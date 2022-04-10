@@ -2,15 +2,14 @@
 
 . common.sh
 
-LLVM_DIR="$ROOT_DIR/llvm-vanilla"
-LLVM_BIN_DIR="$LLVM_DIR/build/bin"
-TEST_SUITE_SRC="$LLVM_DIR/llvm/projects/test-suite"
-TEST_SUITE_BUILD="$ROOT_DIR/benchmark-build/spec/baseline"
+TEST_SUITE_SRC="$LLVM_SRC/projects/test-suite"
+TEST_SUITE_BUILD="$ROOT_DIR/benchmark-build/spec/checked"
 SPEC_SRC="/home/jie/projects/common/cpu2017"
 
-CC="$LLVM_BIN_DIR/clang"
 # CFLAGS="-flto"
 # LDFLAGS="-fuse-ld=lld"
+
+LDFLAGS="$CHECKEDC_LIB/libsafemm.a -lstdc++ $CHECKEDC_LIB/libporting.a"
 
 if [[ ! -d $TEST_SUITE_BUILD ]]; then
     mkdir -p $TEST_SUITE_BUILD
