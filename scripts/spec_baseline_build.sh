@@ -6,9 +6,10 @@ LLVM_DIR="$ROOT_DIR/llvm-vanilla"
 LLVM_BIN_DIR="$LLVM_DIR/build/bin"
 TEST_SUITE_SRC="$LLVM_DIR/llvm/projects/test-suite"
 TEST_SUITE_BUILD="$ROOT_DIR/benchmark-build/spec/baseline"
-SPEC_SRC="/home/jie/projects/common/cpu2017"
+SPEC_SRC="/home/jie/projects/common/spec-cpu2006"
 
 CC="$LLVM_BIN_DIR/clang"
+# LTO has almost no improvement on 429.mcf.
 # CFLAGS="-flto"
 # LDFLAGS="-fuse-ld=lld"
 
@@ -23,6 +24,6 @@ cmake -DCMAKE_C_COMPILER="$CC"                      \
       -DCMAKE_C_FLAGS="$CFLAGS"                     \
       -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS"           \
       -DCMAKE_BUILD_TYPE=Release                    \
-      -DTEST_SUITE_SPEC2017_ROOT="$SPEC_SRC"        \
-      -DTEST_SUITE_RUN_TYPE=train                   \
+      -DTEST_SUITE_SPEC2006_ROOT="$SPEC_SRC"        \
+      -DTEST_SUITE_RUN_TYPE=ref                     \
       "$TEST_SUITE_SRC"
