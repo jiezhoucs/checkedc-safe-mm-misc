@@ -148,7 +148,9 @@ for_any(T) mm_ptr<T> mm_alloc(size_t size) {
 
     print_ptr_info("mm_alloc", safe_ptr.p, key);
 
+#ifdef PORTING
     insert_mmsafe_ptr(safe_ptr.p);
+#endif
 
     key++;
 
@@ -177,7 +179,9 @@ for_any(T) mm_array_ptr<T> mm_array_alloc(size_t array_size) {
 
     print_ptr_info("mm_array_alloc", safe_ptr.p, key);
 
+#ifdef PORTING
     insert_mmsafe_ptr(safe_ptr.p);
+#endif
 
     key++;
 
@@ -203,7 +207,9 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
       fprintf(stderr, "[mm_array_realloc] Calling mm_array_alloc()\n");
 #endif
       mm_array_ptr<void> new_p = MM_ARRAY_ALLOC(void, size);
-      /* insert_mmsafe_ptr((void *)new_p); */
+#ifdef PORTING
+      insert_mmsafe_ptr((void *)new_p);
+#endif
       return *(mm_array_ptr<T> *)&new_p;
     }
 
@@ -232,7 +238,9 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
 
     // Allocated to a new place. We need remove the old ptr from the set.
     print_free_info("mm_array_realloc", old_raw_ptr + EXTRA_HEAP_MEM);
+#ifdef PORTING
     erase_mmsafe_ptr(old_raw_ptr + EXTRA_HEAP_MEM);
+#endif
 
     // The new object is placed in a different location and the old one is freed.
     new_raw_ptr += HEAP_PADDING;
@@ -240,7 +248,9 @@ for_any(T) mm_array_ptr<T> mm_array_realloc(mm_array_ptr<T> p, size_t size) {
     _MMSafe_ptr_Rep safe_ptr = {.p = new_raw_ptr + LOCK_MEM, .key_offset = key};
     safe_ptr.key_offset <<= 32;
 
+#ifdef PORTING
     insert_mmsafe_ptr(safe_ptr.p);
+#endif
 
     key++;
 
@@ -271,7 +281,9 @@ for_any(T) mm_array_ptr<T> mm_calloc(size_t nmemb, size_t size) {
     safe_ptr.key_offset <<= 32;
     key++;
 
+#ifdef PORTING
     insert_mmsafe_ptr(safe_ptr.p);
+#endif
 
     print_ptr_info("mm_calloc", safe_ptr.p, key - 1);
 
@@ -296,7 +308,9 @@ for_any(T) mm_ptr<T> mm_single_calloc(size_t size) {
     safe_ptr.key_offset <<= 32;
     key++;
 
+#ifdef PORTING
     insert_mmsafe_ptr(safe_ptr.p);
+#endif
 
     print_ptr_info("mm_single_calloc", safe_ptr.p, key - 1);
 
@@ -358,12 +372,14 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
     // statement.
     volatile _MMSafe_ptr_Rep *mm_ptr_ptr = (_MMSafe_ptr_Rep *)&p;
 
+#ifdef PORTING
     // Check if p actually points to something from the original malloc() etc.
     // This may happen when a union has both checked and unchecked ptr.
     if (!is_an_mmsafe_ptr(mm_ptr_ptr->p)) {
       free(mm_ptr_ptr->p);
       return;
     }
+#endif
 
     // Do two temporal memory safety checks.
     // First, check if the offset is zero. A non-zero offset means an invalid free.
@@ -392,7 +408,9 @@ for_any(T) void mm_free(mm_ptr<const T> const p) {
 
     print_free_info("mm_free", mm_ptr_ptr->p);
 
+#ifdef PORTING
     erase_mmsafe_ptr(mm_ptr_ptr->p);
+#endif
 }
 
 //
@@ -408,12 +426,14 @@ for_any(T) void mm_array_free(mm_array_ptr<const T> const p) {
 
     volatile _MMSafe_ptr_Rep *mm_array_ptr_ptr = (_MMSafe_ptr_Rep *)&p;
 
+#ifdef PORTING
     // Check if p actually points to something from the original malloc() etc.
     // This may happen when a union has both checked and unchecked ptr.
     if (!is_an_mmsafe_ptr(mm_array_ptr_ptr->p)) {
       free(mm_array_ptr_ptr->p);
       return;
     }
+#endif
 
     // Do two temporal memory safety checks.
     // First, check if the offset is zero. A non-zero offset means an invalid free.
@@ -441,7 +461,9 @@ for_any(T) void mm_array_free(mm_array_ptr<const T> const p) {
 
     print_free_info("mm_array_free", mm_array_ptr_ptr->p);
 
+#ifdef PORTING
     erase_mmsafe_ptr(mm_array_ptr_ptr->p);
+#endif
 }
 
 
@@ -633,5 +655,8 @@ for_any(T) void **_marshal_mm_ptr(mm_array_ptr<mm_ptr<T>> p, size_t size) {
 mm_array_ptr<char> mmize_str(char *p) {
   mm_array_ptr<char> safe_p = mm_strdup_from_raw(p);
   free(p);
+  if (safe_p == NULL) {
+    printf("WTF???\n");
+  }
   return safe_p;
 }
