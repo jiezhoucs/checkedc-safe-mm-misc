@@ -20,6 +20,7 @@ thttpd_dir = Benchmark_dir + "/thttpd-2.29"
 parson_dir = Benchmark_dir + "/parson"
 lzfse_dir = Benchmark_dir + "/lzfse-1.0/src"
 curl_dir = Benchmark_dir + "/curl"
+mcf_dir = Root_dir + "/../common/spec-cpu2006/benchspec/CPU2006/429.mcf"
 
 mmsafe_ptr = ["mm_ptr", "mm_array_ptr"]
 mm_alloc = ["mm_alloc", "mm_array_alloc", "mm_array_realloc", "mm_strdup",\
@@ -50,6 +51,8 @@ def count(benchmark, target):
         cwd = lzfse_dir
     elif benchmark == "curl":
         cwd = curl_dir
+    elif benchmark == "mcf":
+        cwd = mcf_dir
     else:
         print("Unknown benchmark name!")
         sys.exit()
