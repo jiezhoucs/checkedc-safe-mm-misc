@@ -16,7 +16,7 @@ PROGRAMS=(
     # "470.lbm"
 )
 
-ITER=10
+ITER=20
 
 #
 # Run
