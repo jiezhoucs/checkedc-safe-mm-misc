@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 #
-# This script runs 505.mcf_r and 519.lbm_r of SPEC CPU2017
+# This script runs 429.mcf and 470.lbm of SPEC CPU2006
+#
+# $1 - "baseline" or "checked"(optional).
 #
 
 . common.sh
@@ -10,9 +12,11 @@ BUILD_DIR="$ROOT_DIR/benchmark-build/spec"
 DATA_DIR="$DATA_DIR/spec"
 
 PROGRAMS=(
-    "505.mcf_r"
-    "519.lbm_r"
+    "429.mcf"
+    # "470.lbm"
 )
+
+ITER=10
 
 #
 # Run
@@ -29,9 +33,11 @@ run() {
     rm -rf $DATA_DIR/*
 
     cd $BUILD_DIR
-    for prog in ${PROGRAMS[@]}; do
-        echo "Running $prog..."
-        $LIT -vv --filter $prog -o $DATA_DIR/$prog.json .
+    for i in $(seq 1 $ITER); do
+        for prog in ${PROGRAMS[@]}; do
+            echo "Running $prog..."
+            $LIT -vv --filter $prog -o $DATA_DIR/$prog.$i.json .
+        done
     done
 }
 
