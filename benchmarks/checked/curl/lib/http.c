@@ -2282,7 +2282,7 @@ CURLcode Curl_http_target(struct Curl_easy *data,
 }
 
 CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
-                        Curl_HttpReq httpreq, mm_array_ptr<const char> *tep)
+                        Curl_HttpReq httpreq, const char **tep)
 {
   CURLcode result = CURLE_OK;
   mm_array_ptr<const char> ptr = NULL;
@@ -3018,7 +3018,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
   CURLcode result = CURLE_OK;
   mm_ptr<struct HTTP> http = NULL;
   Curl_HttpReq httpreq;
-  mm_array_ptr<const char> te = ""; /* transfer-encoding */
+  const char *te = ""; /* transfer-encoding */
   mm_array_ptr<const char> request = NULL;
   const char *httpstring;
   struct dynbuf req;
@@ -3215,7 +3215,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
 #else
                   "",
 #endif
-                  _GETCHARPTR(te),
+                  te,
                   altused ? _GETCHARPTR(altused) : ""
       );
 
