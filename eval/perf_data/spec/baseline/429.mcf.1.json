@@ -1,0 +1,47 @@
+{
+  "__version__": [
+    0, 
+    8, 
+    0
+  ], 
+  "elapsed": 184.82562494277954, 
+  "tests": [
+    {
+      "code": "PASS", 
+      "elapsed": 184.77823400497437, 
+      "metrics": {
+        "compile_time": 0.44580000000000003, 
+        "exec_time": 184.3096, 
+        "hash": "395f7bdb7bb5669525debd7554e1bb8c", 
+        "link_time": 0.0098, 
+        "size": 30744, 
+        "size..bss": 11944, 
+        "size..comment": 83, 
+        "size..data": 16, 
+        "size..dynamic": 400, 
+        "size..dynsym": 576, 
+        "size..eh_frame": 1308, 
+        "size..eh_frame_hdr": 236, 
+        "size..fini": 13, 
+        "size..fini_array": 8, 
+        "size..gnu.hash": 36, 
+        "size..gnu.version": 48, 
+        "size..gnu.version_r": 48, 
+        "size..got": 16, 
+        "size..got.plt": 160, 
+        "size..hash": 200, 
+        "size..init": 27, 
+        "size..init_array": 8, 
+        "size..interp": 28, 
+        "size..note.ABI-tag": 32, 
+        "size..note.gnu.property": 192, 
+        "size..plt": 288, 
+        "size..rodata": 848, 
+        "size..text": 9829, 
+        "size..tm_clone_table": 0
+      }, 
+      "name": "test-suite :: External/SPEC/CINT2006/429.mcf/429.mcf.test", 
+      "output": "\n/home/jie/projects/checkedc/benchmark-build/spec/baseline/tools/timeit-target --limit-core 0 --limit-cpu 7200 --timeout 7200 --limit-file-size 104857600 --limit-rss-size 838860800 --redirect-stdout /home/jie/projects/checkedc/benchmark-build/spec/baseline/External/SPEC/CINT2006/429.mcf/inp.out --redirect-input /dev/null --chdir /home/jie/projects/checkedc/benchmark-build/spec/baseline/External/SPEC/CINT2006/429.mcf --summary /home/jie/projects/checkedc/benchmark-build/spec/baseline/External/SPEC/CINT2006/429.mcf/Output/429.mcf.test.time /home/jie/projects/checkedc/benchmark-build/spec/baseline/External/SPEC/CINT2006/429.mcf/429.mcf data/ref/input/inp.in\ncd /home/jie/projects/checkedc/benchmark-build/spec/baseline/External/SPEC/CINT2006/429.mcf ; /home/jie/projects/checkedc/benchmark-build/spec/baseline/tools/fpcmp-target data/ref/output/inp.out inp.out\ncd /home/jie/projects/checkedc/benchmark-build/spec/baseline/External/SPEC/CINT2006/429.mcf ; /home/jie/projects/checkedc/benchmark-build/spec/baseline/tools/fpcmp-target data/ref/output/mcf.out mcf.out"
+    }
+  ]
+}
