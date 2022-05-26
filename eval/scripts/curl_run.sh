@@ -9,7 +9,7 @@
 
 # Excluded tests.
 EXCLUDED="!1014 !1119 !1135 !1167"
-ITER=10
+ITER=20
 DATA_DIR="$DATA_DIR/curl"
 
 #

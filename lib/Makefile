@@ -14,6 +14,7 @@ RANLIB = $(LLVM_DIR)/llvm-ranlib
 LIB_SRC = safe_mm_checked.c mm_libc.c mm_common.c
 LIB_SAFEMM = libsafemm
 LIB_SAFEMM_LTO = $(LIB_SAFEMM)_lto
+PORT_SRC = porting_helper.cpp
 
 .PHONY: libsafemm clean
 
@@ -44,7 +45,7 @@ lto: $(LIB_SRC)
 CXX := clang++
 CXXFLAGS := -fPIC $(OPT)
 LIB_PORTING := libporting
-port: porting_helper.cpp
+port: $(PORT_SRC)
 	$(CXX) $(CXXFLAGS) -c $^ -o $(LIB_PORTING).o
 	llvm-ar -rc $(LIB_PORTING).a $(LIB_PORTING).o
 	llvm-ranlib $(LIB_PORTING).a

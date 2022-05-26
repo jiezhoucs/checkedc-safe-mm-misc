@@ -24,6 +24,8 @@
 #define mm_unlink(p) unlink(_GETCHARPTR(p))
 #define mm_write(f,b,c) write(f,_GETCHARPTR(b),c)
 #define mm_fwrite(p,size,n,stream) fwrite(_GETCHARPTR(p),size,n,stream)
+/* Other syscalls. */
+#define mm_chdir(p) chdir(_GETCHARPTR(p))
 
 mm_array_ptr<char> mm_strchr(mm_array_ptr<const char> p, int c);
 mm_array_ptr<char> mm_strrchr(mm_array_ptr<const char> p, int c);

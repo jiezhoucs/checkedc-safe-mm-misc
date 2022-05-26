@@ -7,7 +7,7 @@ UNAME_S := $(shell uname -s)
 
 OPT=-O3
 CFLAGS = $(OPT) -I../include
-LDFLAGS = -L../lib -lsafemm -ldebug -rdynamic
+LDFLAGS = -L../lib -lsafemm -lstdc++ -lporting -ldebug -rdynamic
 ifeq ($(UNAME_S), Darwin)
 	LDFLAGS += -Xlinker -syslibroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
 else ifeq ($(UNAME_S), Linux)
