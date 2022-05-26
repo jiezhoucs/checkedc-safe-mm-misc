@@ -40,6 +40,7 @@ static struct timespec timer_start;
 static struct timespec timer_end;
 static uint64_t exe_time;
 
+#if 0
 /* Data files that only take very short time to be processed. */
 const char *short_data[] = {
     "albums", "books", "covers", "countries-small", "profiles", "restaurant",
@@ -59,6 +60,7 @@ void sleep_for_mem_measure(const char *data_file) {
         }
     }
 }
+#endif
 
 /*
  * Construct the path of each data file.
