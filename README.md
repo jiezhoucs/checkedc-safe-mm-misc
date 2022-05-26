@@ -1,36 +1,39 @@
 # Miscellaneous stuffs about the Checked C Temporal Memory Safety Project
 
-This repository contains miscellaneous stuffs, small test programs,
-development experience, handy scripts, etc., about the Checked C
-temporal memory safety project.
+This repository contains miscellaneous stuffs about the temporal memory safety
+for Checked C project.
 
-## Experiment Suggestions
-I suggest that you put all the related files about the project in one
-big directory so that the relative paths in the scripts would work
-for everyone.
+## Experimental Setup
 
 ### Directory Organization
-Please organize your sub-directories in the Checked C project directory
-in the following hierarchy:
+The directories of the whole project is organized in the following hierarchy:
 
 ```shell
-checkedc                    # root directory for the whole project
-|-- build                   # build directory of the LLVM compiler
-|-- llvm                    # LLVM src
-|-- misc                    # the safe-mm-misc repo
-|   |-- scripts             # scripts that build programs and compute results
-|   |-- benchmarks          # non-llvm-test-suite applications
-|   |-- eval                # for evaluation
-|       |-- scripts         # scripts that run experiements
-|       |-- data            # evalaution data
-|   |-- include             # Checked C header files
-|   |-- lib                 # our own Checked C libraries
+checkedc                    # Root directory for the whole project
+|-- build                   # Build directory of the LLVM compiler
+|-- llvm                    # LLVM src (including clang)
+|-- misc                    # This safe-mm-misc repo
+|   |-- benchmarks          # Baseline and checked src code of application benchmarks
+|   |-- eval                # For performance and memory overhead evaluation
+|       |-- json_dataset    # JSON data set for parson
+|       |-- lzfse_dataset   # The Silesia corpus and enwik9 data for lzfse
+|       |-- mem_data        # Memory consumption data
+|       |-- perf_data       # Performance data
+|       |-- scripts         # Scripts for running perf/mem experiements and collect resulsts
+|       |-- wss             # The wss submodule (https://github.com/brendangregg/wss)
+|   |-- include             # Runtime library header files
+|   |-- lib                 # Runtime library
+|   |-- prog_data           # Empirical data about programs in Table 1 of the paper
+|   |-- scripts             # Misc scripts
+|       |-- analysis        # Scripts for analyzing programs for prog_data
+|       |-- cets            # Scripts for configuring and running LLVM test-suite for CETS
+|       |-- other scripts   # Configure, build, run compiler/benchmarks (and etc.)
 |-- tests
-|   |-- test-suite          # modified Checked C LLVM test-suite
-|   |-- ts-build            # build directory of the modified LLVM test-suite.
-|   |-- test-suite-origin   # original LLVM test-suite code
-|   |-- ts-build-origin     # build directory of the original LLVM test-suite
-|-- benchmark-build         # build directories for non-llvm-test-suite apps
+|   |-- test-suite          # LLVM test-suite for Checked C (with checked Olden)
+|   |-- ts-build            # Build directory of the modified LLVM test-suite.
+|   |-- test-suite-origin   # Original LLVM test-suite code
+|   |-- ts-build-origin     # Build directory of the original LLVM test-suite
+|-- benchmark-build         # build directories for thttpd and SPEC
 ```
 
 ### Build the Compiler
