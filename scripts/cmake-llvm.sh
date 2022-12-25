@@ -1,10 +1,13 @@
 #!/bin/bash
 
+# This script generates the Makefiles for the Checked C compiler.
+# It is supposed to be invoked in the `root_dir/build` directory and it assumes
+# that the Checked C src code is in `root_dir/llvm`.
 
 rm -rf CMakeCache.txt
 
 Build_Type="Debug"
-if [[`uname` == "Linux" ]]; then
+if [[ `uname` == "Linux" ]]; then
     Build_Type="Release"
 fi
 
@@ -26,4 +29,4 @@ cmake -G "Unix Makefiles"                    \
       -DCMAKE_BUILD_TYPE="$Build_Type"       \
       -DLLVM_ENABLE_ASSERTIONS=ON            \
       -DLLVM_OPTIMIZED_TABLEGEN=ON           \
-      "$LLVM_SRC"
+      "../llvm"
