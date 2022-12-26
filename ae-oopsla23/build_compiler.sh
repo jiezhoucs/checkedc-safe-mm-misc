@@ -22,7 +22,7 @@ CHECKEDC_CLANG_REPO="https://github.com/jzhou76/checkedc-clang.git"
 CHECKEDC_REPO="https://github.com/jzhou76/checkedc.git"
 WSS_REPO="https://github.com/brendangregg/wss.git"
 CETS_REPO="https://github.com/jzhou76/CETS-llvm8.git"
-OOPSLA23_TAG="OOPSLA23-AE"
+OOPSLA23_BRANCH="AE-OOPSLA23"
 
 PARALLEL=`lscpu | grep "^CPU(s)" | cut -d ':' -f2 | echo "$(cat -)" | bc`
 
@@ -63,11 +63,11 @@ prepare() {
     if [[ ! -d "llvm" ]]; then
         echo "Pulling the Checked C compiler repo..."
         git clone "$CHECKEDC_LLVM_REPO" llvm
-        cd llvm; git checkout $OOPSLA23_TAG; cd -
+        cd llvm; git checkout $OOPSLA23_BRANCH; cd -
         git clone "$CHECKEDC_CLANG_REPO" llvm/tools/clang
-        cd llvm/tools/clang; git checkout $OOPSLA23_TAG; cd -
+        cd llvm/tools/clang; git checkout $OOPSLA23_BRANCH; cd -
         git clone "$CHECKEDC_REPO" llvm/projects/checkedc-wrapper/checkedc
-        cd llvm/projects/checkedc-wrapper/checkedc; git checkout $OOPSLA23_TAG; cd -
+        cd llvm/projects/checkedc-wrapper/checkedc; git checkout $OOPSLA23_BRANCH; cd -
     fi
 
     # Check if the CETS compiler exists.
@@ -75,6 +75,7 @@ prepare() {
         echo "Pulling the CETS compiler repo..."
         mkdir cets
         git clone "$CETS_REPO" cets/llvm
+        cd cets/llvm; git checkout $OOPSLA23_BRANCH
     fi
 }
 
