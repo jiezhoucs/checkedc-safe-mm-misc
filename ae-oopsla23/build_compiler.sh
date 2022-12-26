@@ -4,8 +4,9 @@
 
 REQUIRED_DEPS=(
     "cmake"      # For building llvm
-    "python3"    # For processing experimental data
     "git"        # For downloading repos.
+    "git-lfs"    # For pulling down large input data files for evaluation.
+    "python3"    # For processing experimental data
 )
 
 ROOT_DIR=`realpath .`
@@ -19,6 +20,7 @@ MISC_REPO="https://github.com/jzhou76/checkedc-safe-mm-misc.git"
 CHECKEDC_LLVM_REPO="https://github.com/jzhou76/checkedc-llvm.git"
 CHECKEDC_CLANG_REPO="https://github.com/jzhou76/checkedc-clang.git"
 CHECKEDC_REPO="https://github.com/jzhou76/checkedc.git"
+WSS_REPO="https://github.com/brendangregg/wss.git"
 CETS_REPO="https://github.com/jzhou76/CETS-llvm8.git"
 OOPSLA23_TAG="OOPSLA23-AE"
 
@@ -47,7 +49,14 @@ prepare() {
     # Check if the misc directory exists.
     if [[ ! -d "misc" ]]; then
         echo "Pulling the checkedc-mm-safe-misc repo..."
-        git clone --recurse-submodules "$MISC_REPO" misc
+        git clone "$MISC_REPO" misc
+        # The misc repo has a wss submodule in it for memory overhead eval,
+        # the the submodule was clone by @jzhou76 using ssh.
+        # Just in case the user of this script does not set up ssh for git,
+        # here we pull the wss repo separately.
+        git clone "$WSS_REPO" "misc/eval/wss"
+        cd "misc/eval/wss"; git checkout 8951296
+        cd -
     fi
 
     # Check if the Checked C compiler exists. git clone if not.
