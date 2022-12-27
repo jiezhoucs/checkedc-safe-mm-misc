@@ -17,6 +17,8 @@ CETS_DIR="$ROOT_DIR/cets"
 # Github repos
 #
 MISC_REPO="https://github.com/jzhou76/checkedc-safe-mm-misc.git"
+LLVM_VANILLA_SRC="https://releases.llvm.org/8.0.0/llvm-8.0.0.src.tar.xz"
+CLANG_VANILLA_SRC="https://releases.llvm.org/8.0.0/cfe-8.0.0.src.tar.xz"
 CHECKEDC_LLVM_REPO="https://github.com/jzhou76/checkedc-llvm.git"
 CHECKEDC_CLANG_REPO="https://github.com/jzhou76/checkedc-clang.git"
 CHECKEDC_REPO="https://github.com/jzhou76/checkedc.git"
@@ -59,6 +61,18 @@ prepare() {
         cd -
     fi
 
+    # Check if the vanilla LLVM 8.0.0 compiler exists.
+    if [[ ! -d "llvm-vanilla" ]]; then
+        mkdir -p llvm-vanilla; cd llvm-vanilla
+        wget $LLVM_VANILLA_SRC
+        tar -xf llvm-8.0.0.src.tar.xz; mv llvm-8.0.0.src llvm
+        wget $CLANG_VANILLA_SRC
+        tar -xf cfe-8.0.0.src.tar.xz; mv cfe-8.0.0.src llvm/tools/clang
+        rm llvm-8.0.0.src.tar.xz cfe-8.0.0.src.tar.xz
+        cd -
+    fi
+
+
     # Check if the Checked C compiler exists. git clone if not.
     if [[ ! -d "llvm" ]]; then
         echo "Pulling the Checked C compiler repo..."
@@ -85,6 +99,22 @@ prepare() {
 usage() {
     # TODO
     echo "Help"
+}
+
+#
+# Build the Checked C compiler.
+#
+build_baseline() {
+    echo "Building the baseline LLVM compiler"
+    if [[ -f "llvm-vanilla/build/bin/clang" ]]; then
+        cd llvm-vanilla/build
+        make clang -j$PARALLEL
+    else
+        mkdir -p llvm-vanilla/build; cd llvm-vanilla/build
+        cp "$SCRIPTS_DIR/cmake-llvm.sh" ./
+        ./cmake-llvm.sh
+        make clang -j$PARALLEL
+    fi
 }
 
 #
@@ -142,6 +172,8 @@ else
         build_checkedc
     elif [[ $1 == "cets" ]]; then
         build_cets
+    elif [[ $1 == "baseline" ]]; then
+        build_baseline
     elif [[ $1 == "-h" ]]; then
         usage
     else
