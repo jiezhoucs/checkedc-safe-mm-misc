@@ -6,6 +6,7 @@ REQUIRED_DEPS=(
     "cmake"      # For building llvm
     "git"        # For downloading repos.
     "git-lfs"    # For pulling down large input data files for evaluation.
+    "wget"       # For downloading the baseline llvm compiler
     "python3"    # For processing experimental data
 )
 
@@ -69,6 +70,10 @@ prepare() {
         wget $CLANG_VANILLA_SRC
         tar -xf cfe-8.0.0.src.tar.xz; mv cfe-8.0.0.src llvm/tools/clang
         rm llvm-8.0.0.src.tar.xz cfe-8.0.0.src.tar.xz
+
+        # Quick fix for potential compile errors.
+        sed -i '7 #include <cstdint>' llvm/include/llvm/Demangle/MicrosoftDemangleNodes.h
+        sed -i '7 #include <string>' llvm/include/llvm/Demangle/MicrosoftDemangleNodes.h
         cd -
     fi
 
