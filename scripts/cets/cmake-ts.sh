@@ -11,7 +11,7 @@
 # Load the common paths and variables.
 . common.sh
 
-TESTSUITE_DIR="$TESTS_DIR/test-suite-cets"
+TESTSUITE_DIR="$TESTS_DIR/test-suite-baseline"
 # THe lld in the CFLAGS is to make clang invoke lld; the default ld cannot link
 # CETS libraries correctly
 CFLAGS="-O3 -mllvm -enable-softboundcets -mllvm -softboundcets_disable_spatial_safety"
