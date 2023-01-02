@@ -27,13 +27,15 @@ CHECKEDC_REPO="https://github.com/jzhou76/checkedc.git"
 WSS_REPO="https://github.com/brendangregg/wss.git"
 CETS_REPO="https://github.com/jzhou76/CETS-llvm8.git"
 OOPSLA23_BRANCH="AE-OOPSLA23"
+BUILD_FILES="build cets/build llvm-test-suite/ts-build* llvm-vanilla/build"
 
-PARALLEL=`lscpu | grep "^CPU(s)" | cut -d ':' -f2 | echo "$(cat -)" | bc`
+PARALLEL=`lscpu | grep "^CPU(s)" | cut -d ':' -f2` # | echo "$(cat -)" | bc`
 
 #
 # Check dependency
 #
 check_dep() {
+    echo "Checking dependencies..."
     for dep in ${REQUIRED_DEPS[@]}; do
         echo "Checking $dep..."
         if [[ ! `which $dep` ]]; then
@@ -41,6 +43,8 @@ check_dep() {
             exit
         fi
     done
+
+    echo ""
 }
 
 #
@@ -73,8 +77,8 @@ prepare() {
         rm llvm-8.0.0.src.tar.xz cfe-8.0.0.src.tar.xz
 
         # Quick fix for potential compile errors.
-        sed -i '7 #include <cstdint>' llvm/include/llvm/Demangle/MicrosoftDemangleNodes.h
-        sed -i '7 #include <string>' llvm/include/llvm/Demangle/MicrosoftDemangleNodes.h
+        sed -i '7i #include <cstdint>' llvm/include/llvm/Demangle/MicrosoftDemangleNodes.h
+        sed -i '7i #include <string>' llvm/include/llvm/Demangle/MicrosoftDemangleNodes.h
         cd -
     fi
 
@@ -182,6 +186,8 @@ else
         build_cets
     elif [[ $1 == "baseline" ]]; then
         build_baseline
+    elif [[ $1 == "clean-all" ]]; then
+        rm -rf "$BUILD_FILES"
     elif [[ $1 == "-h" ]]; then
         usage
     else
