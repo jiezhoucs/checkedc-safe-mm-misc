@@ -16,6 +16,8 @@
 
 #include "porting_helper.h"
 #include <unordered_set>
+#include <cstdint>
+#include <stdlib.h>
 
 using namespace std;
 
