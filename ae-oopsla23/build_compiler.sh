@@ -101,6 +101,8 @@ prepare() {
         git clone "$CETS_REPO" cets/llvm
         cd cets/llvm; git checkout $OOPSLA23_BRANCH
     fi
+
+    cd $ROOT_DIR
 }
 
 #
@@ -111,7 +113,11 @@ usage() {
     echo "Help"
 }
 
-BUILD_COMPILER="make clang -j$PARALLEL; make llvm-ar; make llvm-size;"
+build_compiler() {
+    make clang -j$PARALLEL
+    make llvm-ar
+    make llvm-size
+}
 
 #
 # Build the Checked C compiler.
@@ -120,12 +126,12 @@ build_baseline() {
     echo "Building the baseline LLVM compiler"
     if [[ -f "llvm-vanilla/build/bin/clang" ]]; then
         cd llvm-vanilla/build
-        make clang -j$PARALLEL
+        build_compiler
     else
         mkdir -p llvm-vanilla/build; cd llvm-vanilla/build
         cp "$SCRIPTS_DIR/cmake-llvm.sh" ./
         ./cmake-llvm.sh
-        $BUILD_COMPILER
+        build_compiler
     fi
 }
 
@@ -136,12 +142,12 @@ build_checkedc() {
     echo "Building the Checked C compiler"
     if [[ -f "build/bin/clang" ]]; then
         cd build
-        make clang -j$PARALLEL
+        build_compiler
     else
         mkdir -p build; cd build
         cp "$SCRIPTS_DIR/cmake-llvm.sh" ./
         ./cmake-llvm.sh
-        $BUILD_COMPILER
+        build_compiler
         make llvm-ranlib
     fi
 }
@@ -153,12 +159,12 @@ build_cets() {
     echo "Building the CETS compiler"
     if [[ -f "cets/build/bin/clang" ]]; then
         cd cets/build
-        make clang -j$PARALLEL
+        build_compiler
     else
         mkdir -p cets/build; cd cets/build
         cp "$SCRIPTS_DIR/cets/cmake-llvm.sh" ./
         ./cmake-llvm.sh
-        $BUILD_COMPILER
+        build_compiler
         make lld -j$PARALLEL
     fi
 
@@ -177,6 +183,7 @@ if [[ $# > 1 ]]; then
         usage
     exit
 elif [[ $# == 0 ]]; then
+    build_baseline
     build_checkedc
     build_cets
 else
