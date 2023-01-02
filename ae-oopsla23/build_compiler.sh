@@ -8,6 +8,7 @@ REQUIRED_DEPS=(
     "git-lfs"    # For pulling down large input data files for evaluation.
     "wget"       # For downloading the baseline llvm compiler
     "python3"    # For processing experimental data
+    "ab"         # For evaluating thttpd
 )
 
 ROOT_DIR=`realpath .`
@@ -106,6 +107,8 @@ usage() {
     echo "Help"
 }
 
+BUILD_COMPILER="make clang -j$PARALLEL; make llvm-ar; make llvm-size;"
+
 #
 # Build the Checked C compiler.
 #
@@ -118,7 +121,7 @@ build_baseline() {
         mkdir -p llvm-vanilla/build; cd llvm-vanilla/build
         cp "$SCRIPTS_DIR/cmake-llvm.sh" ./
         ./cmake-llvm.sh
-        make clang -j$PARALLEL
+        $BUILD_COMPILER
     fi
 }
 
@@ -134,7 +137,8 @@ build_checkedc() {
         mkdir -p build; cd build
         cp "$SCRIPTS_DIR/cmake-llvm.sh" ./
         ./cmake-llvm.sh
-        make clang -j$PARALLEL
+        $BUILD_COMPILER
+        make llvm-ranlib
     fi
 }
 
@@ -150,9 +154,8 @@ build_cets() {
         mkdir -p cets/build; cd cets/build
         cp "$SCRIPTS_DIR/cets/cmake-llvm.sh" ./
         ./cmake-llvm.sh
-        make clang -j$PARALLEL
+        $BUILD_COMPILER
         make lld -j$PARALLEL
-        make llvm-ar -j$PARALLEL
     fi
 
     # Build the CETS runtime lib.
