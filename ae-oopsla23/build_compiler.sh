@@ -26,6 +26,7 @@ CHECKEDC_CLANG_REPO="https://github.com/jzhou76/checkedc-clang.git"
 CHECKEDC_REPO="https://github.com/jzhou76/checkedc.git"
 WSS_REPO="https://github.com/brendangregg/wss.git"
 CETS_REPO="https://github.com/jzhou76/CETS-llvm8.git"
+LLD_REPO="https://github.com/llvm-mirror/lld.git"
 OOPSLA23_BRANCH="AE-OOPSLA23"
 BUILD_FILES="build cets/build llvm-test-suite/ts-build* llvm-vanilla/build"
 
@@ -75,11 +76,14 @@ prepare() {
         wget $CLANG_VANILLA_SRC
         tar -xf cfe-8.0.0.src.tar.xz; mv cfe-8.0.0.src llvm/tools/clang
         rm llvm-8.0.0.src.tar.xz cfe-8.0.0.src.tar.xz
+        # Get lld
+        git clone "$LLD_REPO" llvm/tools/lld; cd llvm/tools/lld; git checkout c51c3bc61
+        cd -
 
         # Quick fix for potential compile errors.
         sed -i '7i #include <cstdint>' llvm/include/llvm/Demangle/MicrosoftDemangleNodes.h
         sed -i '7i #include <string>' llvm/include/llvm/Demangle/MicrosoftDemangleNodes.h
-        cd -
+        cd "$ROOT_DIR"
     fi
 
 
@@ -92,6 +96,9 @@ prepare() {
         cd llvm/tools/clang; git checkout $OOPSLA23_BRANCH; cd -
         git clone "$CHECKEDC_REPO" llvm/projects/checkedc-wrapper/checkedc
         cd llvm/projects/checkedc-wrapper/checkedc; git checkout $OOPSLA23_BRANCH; cd -
+        # Get lld
+        cp -r "$ROOT_DIR/llvm-vanilla/llvm/tools/lld" llvm/tools/lld
+        cd "$ROOT_DIR"
     fi
 
     # Check if the CETS compiler exists.
