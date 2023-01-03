@@ -35,7 +35,7 @@ init() {
 
     # Compile libsafemm
     cd "$ROOT_DIR/misc/lib"
-    if [[ -f "libsafemm.a" ]]; then
+    if [[ ! -f "libsafemm.a" ]]; then
         make
     fi
 }

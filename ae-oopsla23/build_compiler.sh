@@ -115,6 +115,7 @@ usage() {
 
 build_compiler() {
     make clang -j$PARALLEL
+    make lld -j$PARALLEL
     make llvm-ar
     make llvm-size
 }
@@ -123,6 +124,7 @@ build_compiler() {
 # Build the Checked C compiler.
 #
 build_baseline() {
+    cd $ROOT_DIR
     echo "Building the baseline LLVM compiler"
     if [[ -f "llvm-vanilla/build/bin/clang" ]]; then
         cd llvm-vanilla/build
@@ -139,6 +141,7 @@ build_baseline() {
 # Build the Checked C compiler.
 #
 build_checkedc() {
+    cd $ROOT_DIR
     echo "Building the Checked C compiler"
     if [[ -f "build/bin/clang" ]]; then
         cd build
@@ -156,6 +159,7 @@ build_checkedc() {
 # Build the CETS compiler.
 #
 build_cets() {
+    cd $ROOT_DIR
     echo "Building the CETS compiler"
     if [[ -f "cets/build/bin/clang" ]]; then
         cd cets/build
@@ -165,7 +169,6 @@ build_cets() {
         cp "$SCRIPTS_DIR/cets/cmake-llvm.sh" ./
         ./cmake-llvm.sh
         build_compiler
-        make lld -j$PARALLEL
     fi
 
     # Build the CETS runtime lib.
