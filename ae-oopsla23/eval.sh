@@ -8,11 +8,19 @@ CETS_DIR="$ROOT_DIR/cets"
 TEST_SUITE_REPO="https://github.com/jzhou76/test-suite.git"
 
 init() {
+    # Compile libsafemm
+    cd "$ROOT_DIR/misc/lib"
+    if [[ ! -f "libsafemm.a" ]]; then
+        make
+        # Compile libsafemm_lto
+        make lto
+    fi
+
     mkdir -p llvm-test-suite; cd llvm-test-suite
     if [[ ! -d test-suite ]]; then
         git clone "$TEST_SUITE_REPO"
         cd "$SCRIPTS_DIR"
-        ./cmake-ts.sh
+        ./cmake-ts.sh lto
         cd -
     fi
 
@@ -24,19 +32,13 @@ init() {
 
         # Generate the test-suite build files for CETS
         cd "$SCRIPTS_DIR"
-        ./cmake-ts-baseline.sh
+        ./cmake-ts-baseline.sh lto
         cd "$ROOT_DIR/llvm-test-suite"
 
         # Generate the test-suite build files for CETS
         cd "$SCRIPTS_DIR/cets"
         ./cmake-ts.sh lto
         cd "$ROOT_DIR"
-    fi
-
-    # Compile libsafemm
-    cd "$ROOT_DIR/misc/lib"
-    if [[ ! -f "libsafemm.a" ]]; then
-        make
     fi
 }
 
