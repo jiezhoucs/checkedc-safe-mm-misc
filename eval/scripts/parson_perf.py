@@ -64,7 +64,7 @@ def compile_parson():
         sp.run(["make", "eval"])
 
     if not os.path.exists(CHECKED_PARSON_DIR + "eval"):
-        os.chdir(BASELINE_PARSON_DIR)
+        os.chdir(CHECKED_PARSON_DIR)
         sp.run(["make", "eval"])
 
 #
