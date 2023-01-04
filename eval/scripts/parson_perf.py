@@ -56,6 +56,18 @@ exe_times_baseline = { }      # file:[exe_time_in_each_run]
 exe_times_checked = { }
 
 #
+# Compile parson if not exists.
+#
+def compile_parson():
+    if not os.path.exists(BASELINE_PARSON_DIR + "eval"):
+        os.chdir(BASELINE_PARSON_DIR)
+        sp.run(["make", "eval"])
+
+    if not os.path.exists(CHECKED_PARSON_DIR + "eval"):
+        os.chdir(BASELINE_PARSON_DIR)
+        sp.run(["make", "eval"])
+
+#
 # Main body of this script.
 #
 # Run parson ITERATION number of times and put execution time to a dictionary.
@@ -177,6 +189,8 @@ def write_result():
 # Entrance of this script
 #
 def main():
+    compile_parson()
+
     run("baseline")
     run("checked")
 
