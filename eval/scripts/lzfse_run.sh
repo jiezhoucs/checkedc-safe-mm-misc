@@ -77,6 +77,9 @@ run() {
             input="$INPUT_DIR/$input"
             output="/tmp/compressed"
             ./lzfse -v -encode -i "$input" -o $output >& $result_file
+            if [[ ! -f "$input.encoded" ]]; then
+                mv $output "$input.encoded"
+            fi
             rm -f $output
         done
         echo "Done compressing all files."
