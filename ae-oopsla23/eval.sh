@@ -6,6 +6,7 @@ EVAL_SCRIPTS_DIR="$ROOT_DIR/misc/eval/scripts"
 CETS_DIR="$ROOT_DIR/cets"
 
 TEST_SUITE_REPO="https://github.com/jzhou76/test-suite.git"
+ENWIK9_URL="http://mattmahoney.net/dc/enwik9.zip"
 
 init() {
     # Compile libsafemm
@@ -16,6 +17,7 @@ init() {
         make lto
     fi
 
+    cd "$ROOT_DIR"
     mkdir -p llvm-test-suite; cd llvm-test-suite
     if [[ ! -d test-suite ]]; then
         git clone "$TEST_SUITE_REPO"
@@ -39,6 +41,13 @@ init() {
         cd "$SCRIPTS_DIR/cets"
         ./cmake-ts.sh lto
         cd "$ROOT_DIR"
+    fi
+
+    # Download enwik9
+    cd "$ROOT_DIR/misc/eval/lzfse_dataset"
+    if [[ ! -f enwik9 ]]; then
+        wget http://mattmahoney.net/dc/enwik9.zip
+        unzip enwik9.zip
     fi
 }
 
@@ -98,6 +107,28 @@ parson_eval() {
 }
 
 #
+# lzfse eval.
+#
+lzfse_eval() {
+    echo ""
+    cd $EVAL_SCRIPTS_DIR
+    echo "Evaluating Checked C performance overhead on lzfse"
+    ./lzfse_run.sh baseline
+    ./lzfse_run.sh checked
+
+    echo "Evaluating Checked C memory overhead on lzfse"
+    cd mem
+    ./lzfse_run.sh baseline
+    ./lzfse_run.sh checked
+
+    # Compute results.
+    cd ..
+    ./lzfse_perf.py
+    cd mem
+    ./lzfse_mem.py
+}
+
+#
 # Entrance of this script
 #
 init
@@ -119,8 +150,7 @@ else
             parson_eval
             ;;
         "lzfse")
-            lzfse_perf
-            lzfse_mem
+            lzfse_eval
             ;;
         *)
             echo "Unknown benchmark names."\
