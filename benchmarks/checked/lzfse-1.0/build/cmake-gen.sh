@@ -6,7 +6,7 @@ BUILD_DIR=`realpath .`
 LLVM_BIN="$ROOT_DIR/build/bin"
 CC="$LLVM_BIN/clang"
 CFLAGS="-O3 -I$MISC_DIR/include"
-export LDFLAGS="-L$MISC_DIR/lib -lsafemm"  # CMAKE_LINKER_EXE does not work.
+export LDFLAGS="-fuse-ld=lld -L$MISC_DIR/lib -lsafemm"  # CMAKE_LINKER_EXE does not work.
 
 rm -rf CMakeCache.txt
 
