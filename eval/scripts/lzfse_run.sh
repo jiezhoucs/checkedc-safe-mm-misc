@@ -54,6 +54,7 @@ init() {
     # Check if the binary executable exists.
     cd $BIN_DIR
     if [[ ! -f "$BIN_DIR/lzfse" ]]; then
+        ./cmake-gen.sh
         make
     fi
 }
