@@ -81,6 +81,21 @@ olden_mem() {
     ./olden_mem.py
 }
 
+#
+# parson eval.
+#
+parson_eval() {
+    echo ""
+    cd $EVAL_SCRIPTS_DIR
+    echo "Evaluating Checked C's performance overhead on parson"
+    ./parson_perf.py
+
+    echo "Evaluating Checked C's memory overhead on parson"
+    cd mem
+    ./parson_run.sh baseline
+    ./parson_run.sh checked
+    ./parson_mem.py
+}
 
 #
 # Entrance of this script
@@ -101,8 +116,7 @@ else
             thttpd_mem
             ;;
         "parson")
-            parson_perf
-            parson_mem
+            parson_eval
             ;;
         "lzfse")
             lzfse_perf
