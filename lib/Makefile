@@ -47,7 +47,7 @@ CXXFLAGS := -fPIC $(OPT)
 LIB_PORTING := libporting
 port: $(PORT_SRC)
 	$(CXX) $(CXXFLAGS) -c $^ -o $(LIB_PORTING).o
-	$AR -rc $(LIB_PORTING).a $(LIB_PORTING).o
+	$(AR) -rc $(LIB_PORTING).a $(LIB_PORTING).o
 	llvm-ranlib $(LIB_PORTING).a
 	@rm -f *.o
 
