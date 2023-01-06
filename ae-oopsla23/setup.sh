@@ -262,6 +262,74 @@ prepare_benchmark() {
 #------------------------------------------------------------------------------#
 
 #
+# Check if all required artifacts have been installed successfully.
+#
+post_build_check() {
+    echo ""
+    echo "Post-build checking..."
+
+    compilers=(
+        "baseline"
+        "Checked-C"
+        "CETS"
+    )
+
+    tools=(
+        "clang"
+        "lld"
+        "llvm-ar"
+        "llvm-lit"
+    )
+
+    cd "$ROOT_DIR"
+    # Checking compilers and related tools.
+    for compiler in ${compilers[@]}; do
+        if [[ $compiler == "baseline" ]]; then
+            cd "$ROOT_DIR/llvm-vanilla"
+        elif [[ $compiler == "CETS" ]]; then
+            cd "$ROOT_DIR/cets"
+        else
+            cd "$ROOT_DIR"
+        fi
+
+        for tool in ${tools[@]}; do
+            echo -n "Checking $compiler $tool..."
+            if [[ -f "build/bin/$tool" ]]; then
+                echo "found."
+            else
+                echo "not found. Something wrong happened building $tool."
+            fi
+        done
+    done
+
+    # Checking the Checked C's and CETS' runtime libs
+    cd $ROOT_DIR
+    echo -n "Checking Checked C's runtime lib..."
+    if [[ -f "misc/lib/libsafemm.a" &&  -f "misc/lib/libsafemm_lto.a" ]]; then
+        echo "found."
+    else
+        echo "not found. Something wrong happened building Checked C's runtime library."
+    fi
+
+    echo -n "Checking CETS' runtime lib..."
+    if [[ -f "cets/llvm/libsoftboundcets/lto/libsoftboundcets_rt.a" ]]; then
+        echo "found."
+    else
+        echo "not found. Something wrong happened building CETS' runtime library."
+    fi
+
+    # Check if wss and enwik9 have been downloaded
+    cd $ROOT_DIR
+    if [[ ! -f "misc/eval/wss/wss.pl" ]]; then
+        echo "wss was missing!"
+    fi
+
+    if [[ ! -f "misc/eval/lzfse_dataset/enwik9" ]]; then
+        echo "enwik9 was missing!"
+    fi
+}
+
+#
 # Entrance of this script
 #
 if [[ $# > 1 ]]; then
@@ -291,3 +359,5 @@ else
         exit
     fi
 fi
+
+post_build_check
