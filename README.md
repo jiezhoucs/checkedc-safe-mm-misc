@@ -1,72 +1,37 @@
-# Miscellaneous stuffs about the Checked C Temporal Memory Safety Project
+# Miscellaneous stuff of Temporal Memory Safety for Checked C Project
 
-This repository contains miscellaneous stuffs about the temporal memory safety
-for Checked C project.
+Note that in this document, "Checked C" refers to our extended Checked C with
+temporal memory safety, instead of the original spatially-memory-safe Checked C.
 
-## Experimental Setup
-
-### Directory Organization
+## Directory Organization
 The directories of the whole project is organized in the following hierarchy:
 
 ```shell
 checkedc                    # Root directory for the whole project
-|-- build                   # Build directory of the LLVM compiler
-|-- llvm                    # LLVM src (including clang)
+|-- build                   # Build directory of the Checked C compiler
+|-- llvm                    # src of the Checked C compiler
 |-- misc                    # This safe-mm-misc repo
-|   |-- benchmarks          # Baseline and checked src code of application benchmarks
+|   |-- ae-oopsla23         # The scripts for OOPSLA'23 artifact evaluation
+|   |-- benchmarks          # Baseline and checked src of application benchmarks
 |   |-- eval                # For performance and memory overhead evaluation
 |       |-- json_dataset    # JSON data set for parson
-|       |-- lzfse_dataset   # The Silesia corpus and enwik9 data for lzfse
-|       |-- mem_data        # Memory consumption data
-|       |-- perf_data       # Performance data
-|       |-- scripts         # Scripts for running perf/mem experiements and collect resulsts
-|       |-- wss             # The wss submodule (https://github.com/brendangregg/wss)
-|   |-- include             # Runtime library header files
-|   |-- lib                 # Runtime library
+|       |-- lzfse_dataset   # The Silesia corpus for lzfse
+|       |-- mem_data        # Memory consumption overhead data
+|       |-- perf_data       # Performance overhead data
+|       |-- scripts         # Scripts for running perf/mem experiements and collecting resulsts
+|       |-- wss             # For measuring memory usage (https://github.com/brendangregg/wss)
+|   |-- include             # Checed C runtime library header files
+|   |-- lib                 # Checked C runtime library and debugging facilities
 |   |-- prog_data           # Empirical data about programs in Table 1 of the paper
-|   |-- scripts             # Misc scripts
+|   |-- scripts             # Misc scripts for environment setup and eval
 |       |-- analysis        # Scripts for analyzing programs for prog_data
-|       |-- cets            # Scripts for configuring and running LLVM test-suite for CETS
+|       |-- cets            # Scripts for building and running the CETS compiler
 |       |-- other scripts   # Configure, build, run compiler/benchmarks (and etc.)
-|-- tests
+|-- llvm-test-suite         # LLVM test-suite (to be created by the user)
 |   |-- test-suite          # LLVM test-suite for Checked C (with checked Olden)
 |   |-- ts-build            # Build directory of the modified LLVM test-suite.
-|   |-- test-suite-origin   # Original LLVM test-suite code
-|   |-- ts-build-origin     # Build directory of the original LLVM test-suite
+|   |-- test-suite-baseline # Original LLVM test-suite code
+|   |-- ts-build-origin     # test-suite build directory for the baseline llvm
+|   |-- ts-build-cets       # test-suite build directory for CETS
 |-- benchmark-build         # build directories for thttpd and SPEC
 ```
-
-### Build the Compiler
-
-We have a `cmake` script `scripts/cmake-llvm.sh` to generate Makefiles for
-building the project. If you're working on a \*nix system running on a
-X86 processor, just copy the script to a build directory and run it.
-
-Suggested building procedure:
-```
-cd checkedc-project-root-directory
-
-git clone https://github.com/jzhou76/checkedc-safe-mm-misc.git misc
-
-git clone https://github.com/jzhou76/checkedc-llvm llvm
-
-cd llvm/tools
-
-git clone https://github.com/jzhou76/checkedc-clang.git clang
-
-cd ../projects/checkedc-wrapper
-
-git clone https://github.com/jzhou76/checkedc.git
-
-cd ../../.. ; mkdir build ; cd build
-
-cp ../misc/scripts/cmake-llvm.sh ./
-
-./cmake-llvm.sh
-
-make clang -jn
-```
-
-Here is Microsoft instructions on building the compiler: [Setting up your
-machine and building
-clang](https://github.com/microsoft/checkedc-clang/blob/master/clang/docs/checkedc/Setup-and-Build.md)
