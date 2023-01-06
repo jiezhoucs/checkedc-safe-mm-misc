@@ -25,7 +25,6 @@ fi
 
 cmake -DCMAKE_C_COMPILER="$CC_VANILLA"                                         \
       -DCMAKE_C_FLAGS="$CFLAGS"                                                \
-      -DCMAKE_CXX_FLAGS="$CFLAGS"                                              \
       -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS"                                      \
       -C"$TESTSUITE_ORIGIN_DIR"/cmake/caches/O3.cmake                          \
       -DEXTRA_LARGE_PROBLEM_SIZE=1                                             \
