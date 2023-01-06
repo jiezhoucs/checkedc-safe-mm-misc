@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 
-# This script downloads and builds the Checked C compiler and the CETS compiler.
+#
+# This script sets up the experiemental environment for the artifact evaluation
+# of the OOPSLA'23 Checked C paper.
+#
 
 REQUIRED_DEPS=(
     "cmake"      # For building llvm
     "git"        # For downloading repos
     "git-lfs"    # For pulling down large input data files for evaluation
     "wget"       # For downloading the baseline llvm compiler
-    "python2"    # llvm-lit uses `#/usr/bin/env python`, which dould be python2
+    "unzip"      # For unpackaging enwik9.
+    "python2"    # llvm-lit uses `#/usr/bin/env python`, which could be python2
     "python3"    # For processing experimental data
     "pip3"       # For the use of numpy
     "ab"         # For evaluating thttpd. Available in "apache2-utils"
@@ -16,9 +20,10 @@ REQUIRED_DEPS=(
 ROOT_DIR=`realpath .`
 SCRIPTS_DIR="$ROOT_DIR/misc/scripts"
 CETS_DIR="$ROOT_DIR/cets"
+EVAL_SCRIPTS_DIR="$ROOT_DIR/misc/eval/scripts"
 
 #
-# Github repos
+# Compiler and benchmark sources.
 #
 MISC_REPO="https://github.com/jzhou76/checkedc-safe-mm-misc.git"
 LLVM_VANILLA_SRC="https://releases.llvm.org/8.0.0/llvm-8.0.0.src.tar.xz"
@@ -29,9 +34,11 @@ CHECKEDC_REPO="https://github.com/jzhou76/checkedc.git"
 WSS_REPO="https://github.com/brendangregg/wss.git"
 CETS_REPO="https://github.com/jzhou76/CETS-llvm8.git"
 LLD_REPO="https://github.com/llvm-mirror/lld.git"
+TEST_SUITE_REPO="https://github.com/jzhou76/test-suite.git"
+ENWIK9_URL="http://mattmahoney.net/dc/enwik9.zip"
+
 OOPSLA23_BRANCH="AE-OOPSLA23"
 BUILD_FILES="build cets/build llvm-test-suite/ts-build* llvm-vanilla/build"
-
 PARALLEL=`lscpu | grep "^CPU(s)" | cut -d ':' -f2` # | echo "$(cat -)" | bc`
 
 #
@@ -61,8 +68,8 @@ check_dep() {
 #
 # Prepare for building compilers.
 #
-prepare() {
-    # Check if dependent software exists.
+prepare_compiler() {
+    # Check if dependency software exists.
     check_dep
 
     # Check if the misc directory exists.
@@ -78,7 +85,7 @@ prepare() {
         cd -
     fi
 
-    # Check if the vanilla LLVM 8.0.0 compiler exists.
+    # Prepare the vanilla LLVM 8.0.0 compiler.
     if [[ ! -d "llvm-vanilla" ]]; then
         mkdir -p llvm-vanilla; cd llvm-vanilla
         wget $LLVM_VANILLA_SRC
@@ -97,7 +104,7 @@ prepare() {
     fi
 
 
-    # Check if the Checked C compiler exists. git clone if not.
+    # Prepare the Checked C compiler.
     if [[ ! -d "llvm" ]]; then
         echo "Pulling the Checked C compiler repo..."
         git clone "$CHECKEDC_LLVM_REPO" llvm
@@ -111,7 +118,7 @@ prepare() {
         cd "$ROOT_DIR"
     fi
 
-    # Check if the CETS compiler exists.
+    # Prepare the CETS compiler.
     if [[ ! -d "cets" ]]; then
         echo "Pulling the CETS compiler repo..."
         mkdir cets
@@ -170,6 +177,17 @@ build_checkedc() {
         build_compiler
         make llvm-ranlib
     fi
+
+    # Compile libsafemm
+    cd "$ROOT_DIR/misc/lib"
+    if [[ ! -f "libsafemm.a" ]]; then
+        make
+    fi
+    if [[ ! -f "libsafemm_lto.a" ]]; then
+        # Compile libsafemm_lto
+        make lto
+    fi
+
 }
 
 #
@@ -193,19 +211,69 @@ build_cets() {
     make lto
 }
 
+build_all_compilers() {
+    build_baseline
+    build_checkedc
+    build_cets
+}
+
+#------------------------------------------------------------------------------#
+
+#
+# Prepare the benchmarks, including setting up llvm test-suite and downloading
+# data inputs.
+#
+prepare_benchmark() {
+    cd "$ROOT_DIR"
+    mkdir -p llvm-test-suite; cd llvm-test-suite
+    # Download our modified llvm test-suite repo. The default branch contains
+    # the Checked C version of Olden benchmarks.
+    if [[ ! -d test-suite ]]; then
+        git clone "$TEST_SUITE_REPO"
+        cd "$SCRIPTS_DIR"
+        ./cmake-ts.sh lto
+        cd -
+    fi
+
+    if [[ ! -d test-suite-baseline ]]; then
+        # Make a copy and checkout the baseline test-suite code.
+        cp -r test-suite test-suite-baseline
+        cd test-suite-baseline
+        git checkout baseline
+
+        # Generate the test-suite build files for baseline llvm.
+        cd "$SCRIPTS_DIR"
+        ./cmake-ts-baseline.sh lto
+
+        # Generate the test-suite build files for CETS
+        cd "$SCRIPTS_DIR/cets"
+        ./cmake-ts.sh lto
+    fi
+
+    # Download enwik9 for lzfse. We download this data input separately because
+    # it is very large and it is better to avoid store it directly in github.
+    cd "$ROOT_DIR/misc/eval/lzfse_dataset"
+    if [[ ! -f enwik9 ]]; then
+        wget http://mattmahoney.net/dc/enwik9.zip
+        unzip enwik9.zip
+    fi
+}
+
+#------------------------------------------------------------------------------#
+
 #
 # Entrance of this script
 #
-prepare
-
 if [[ $# > 1 ]]; then
     echo "Unknown arguments"
         usage
     exit
 elif [[ $# == 0 ]]; then
-    build_baseline
-    build_checkedc
-    build_cets
+    prepare_compiler
+
+    build_all_compilers
+
+    prepare_benchmark
 else
     if [[ $1 == "checkedc" ]]; then
         build_checkedc

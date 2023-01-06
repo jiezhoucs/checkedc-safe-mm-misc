@@ -5,51 +5,6 @@ SCRIPTS_DIR="$ROOT_DIR/misc/scripts"
 EVAL_SCRIPTS_DIR="$ROOT_DIR/misc/eval/scripts"
 CETS_DIR="$ROOT_DIR/cets"
 
-TEST_SUITE_REPO="https://github.com/jzhou76/test-suite.git"
-ENWIK9_URL="http://mattmahoney.net/dc/enwik9.zip"
-
-init() {
-    # Compile libsafemm
-    cd "$ROOT_DIR/misc/lib"
-    if [[ ! -f "libsafemm.a" ]]; then
-        make
-        # Compile libsafemm_lto
-        make lto
-    fi
-
-    cd "$ROOT_DIR"
-    mkdir -p llvm-test-suite; cd llvm-test-suite
-    if [[ ! -d test-suite ]]; then
-        git clone "$TEST_SUITE_REPO"
-        cd "$SCRIPTS_DIR"
-        ./cmake-ts.sh lto
-        cd -
-    fi
-
-    if [[ ! -d test-suite-baseline ]]; then
-        # Make a copy and checkout the baseline test-suite code.
-        cp -r test-suite test-suite-baseline
-        cd test-suite-baseline
-        git checkout baseline
-
-        # Generate the test-suite build files for CETS
-        cd "$SCRIPTS_DIR"
-        ./cmake-ts-baseline.sh lto
-        cd "$ROOT_DIR/llvm-test-suite"
-
-        # Generate the test-suite build files for CETS
-        cd "$SCRIPTS_DIR/cets"
-        ./cmake-ts.sh lto
-        cd "$ROOT_DIR"
-    fi
-
-    # Download enwik9
-    cd "$ROOT_DIR/misc/eval/lzfse_dataset"
-    if [[ ! -f enwik9 ]]; then
-        wget http://mattmahoney.net/dc/enwik9.zip
-        unzip enwik9.zip
-    fi
-}
 
 #
 # Olden performance evaluation.
