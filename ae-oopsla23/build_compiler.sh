@@ -1,14 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script downloads and builds the Checked C compiler and the CETS compiler.
 
 REQUIRED_DEPS=(
     "cmake"      # For building llvm
-    "git"        # For downloading repos.
-    "git-lfs"    # For pulling down large input data files for evaluation.
+    "git"        # For downloading repos
+    "git-lfs"    # For pulling down large input data files for evaluation
     "wget"       # For downloading the baseline llvm compiler
     "python3"    # For processing experimental data
-    "ab"         # For evaluating thttpd
+    "pip3"       # For the use of numpy
+    "ab"         # For evaluating thttpd. Available in "apache2-utils"
 )
 
 ROOT_DIR=`realpath .`
@@ -38,14 +39,22 @@ PARALLEL=`lscpu | grep "^CPU(s)" | cut -d ':' -f2` # | echo "$(cat -)" | bc`
 check_dep() {
     echo "Checking dependencies..."
     for dep in ${REQUIRED_DEPS[@]}; do
-        echo "Checking $dep..."
+        echo -n "Looking for $dep..."
         if [[ ! `which $dep` ]]; then
-            echo "$dep not found. Please install $dep"
+            echo "not found. Please install $dep"
             exit
+        else
+            echo "found."
         fi
     done
 
-    echo ""
+    echo -n "Looking for numpy..."
+    if [[ ! `pip3 list | grep numpy` ]]; then
+        echo "not found. Please install the numpy package of Python3."
+        exit
+    else
+        echo "found."
+    fi
 }
 
 #

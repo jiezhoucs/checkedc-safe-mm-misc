@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 ROOT_DIR=`realpath .`
 SCRIPTS_DIR="$ROOT_DIR/misc/scripts"
