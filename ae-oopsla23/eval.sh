@@ -84,11 +84,24 @@ lzfse_eval() {
 }
 
 #
+# Evaluating on all benchmakrs.
+#
+eval_all() {
+    olden_perf
+    olden_mem
+
+    parson_eval
+
+    lzfse_eval
+
+    # TODO: thttpd and curl
+}
+
+#
 # Entrance of this script
 #
-if [[ $# != 1 ]]; then
-    echo "Unknown argument."\
-         "Please choose \"olden\", \"thttpd\", \"parson\", or \"lzfse\"."
+if [[ $# == 0 ]]; then
+    eval_all
 else
     case $1 in
         "olden")
