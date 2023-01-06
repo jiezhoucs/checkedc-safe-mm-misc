@@ -86,8 +86,6 @@ lzfse_eval() {
 #
 # Entrance of this script
 #
-init
-
 if [[ $# != 1 ]]; then
     echo "Unknown argument."\
          "Please choose \"olden\", \"thttpd\", \"parson\", or \"lzfse\"."
@@ -113,5 +111,3 @@ else
             ;;
     esac
 fi
-
-
