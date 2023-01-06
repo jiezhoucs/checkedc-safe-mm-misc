@@ -39,7 +39,7 @@ ENWIK9_URL="http://mattmahoney.net/dc/enwik9.zip"
 
 OOPSLA23_BRANCH="AE-OOPSLA23"
 BUILD_FILES="build cets/build llvm-test-suite/ts-build* llvm-vanilla/build"
-PARALLEL=`lscpu | grep "^CPU(s)" | cut -d ':' -f2` # | echo "$(cat -)" | bc`
+PARALLEL=`lscpu | grep "^CPU(s):" | cut -d ':' -f2` # | echo "$(cat -)" | bc`
 
 #
 # Check dependency
