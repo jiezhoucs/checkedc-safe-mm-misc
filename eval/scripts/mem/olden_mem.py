@@ -164,16 +164,38 @@ def write_result():
                 "", checked_wss_geomean, cets_wss_geomean]
         writer.writerow(row)
 
+
         # Print the summarized data.
-        print("Checked C RSS Geomean: " + str(checked_rss_geomean))
-        print("CETS RSS Geomean:      " + str(cets_rss_geomean))
-        print("Checked C WSS Geomean: " + str(checked_wss_geomean))
-        print("CETS RSS Geomean:      " + str(cets_wss_geomean))
-        print("Checked C (CETS prog only) RSS Geomean: " + str(checked_rss_cets_geomean))
-        print("Checked C (CETS prog only) WSS Geomean: " + str(checked_wss_cets_geomean))
+
+        print("Checked C RSS overhead:")
+        print("Geomean = " + to_percent(checked_rss_geomean))
+        print("Max = " + to_percent(max(checked_rss_norm)))
+        print("Min = " + to_percent(min(checked_rss_norm)))
+        print("")
+        print("CETS RSS overhead:")
+        print("Geomean: " + to_percent(cets_rss_geomean))
+        print("Max = " + to_percent(max(cets_rss_norm)))
+        print("Min = " + to_percent(min(cets_rss_norm)))
+
+        print("")
+        print("Checked C WSS overhead:")
+        print("Geomean = " + to_percent(checked_wss_geomean))
+        print("Max = " + to_percent(max(checked_wss_norm)))
+        print("Min = " + to_percent(min(checked_wss_norm)))
+        print("")
+        print("CETS WSS overhead:")
+        print("Geomean: " + to_percent(cets_wss_geomean))
+        print("Max = " + to_percent(max(cets_wss_norm)))
+        print("Min = " + to_percent(min(cets_wss_norm)))
+
+        # print("Checked C (CETS prog only) RSS Geomean: " + str(checked_rss_cets_geomean))
+        # print("Checked C (CETS prog only) WSS Geomean: " + str(checked_wss_cets_geomean))
 
         # Close result file.
         mem_csv.close()
+
+def to_percent(num):
+    return str(int((num - 1) * 100)) + "%"
 
 #
 # Entrance of this script
