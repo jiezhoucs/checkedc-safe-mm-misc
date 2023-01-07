@@ -90,6 +90,19 @@ eval.sh olden
 ```
 
 will run all `olden` benchmarks and generate performance and memory consumption
-data. It will also compute the final results based on the raw data. Both the
-raw data and the summarized data will be put in `misc/eval/perf_data` and
-`misc/eval/mem_data`.
+data. It will also compute the final results based on the raw data.
+
+### Collecting Data
+
+Both the raw data and the summarized data will be put in `misc/eval/perf_data`
+and `misc/eval/mem_data`. `misc/eval/perf_data/benchmark/perf.csv` contains
+the data that were used to draw the Figures in Fig. 5 of the paper. Similarly,
+`misc/eval/mem_data/benchmark/mem.csv` is used to for Table 4 of the paper.
+To show the experimental data separate, run
+
+```shell
+./print_results.sh benchmark  # benchmark: "olden", parson", "lzfse"
+```
+
+For example, `./print_results.sh olden` prints out the data of the Fig. 5(a)
+and the `Olden` entries in Table 4 of the paper.
