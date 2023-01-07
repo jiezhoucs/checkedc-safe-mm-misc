@@ -193,6 +193,9 @@ build_checkedc() {
         # Compile libsafemm_lto
         make lto
     fi
+    if [[ ! -f "libporting.a" ]]; then
+        make port
+    fi
 
 }
 
