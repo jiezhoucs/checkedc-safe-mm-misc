@@ -48,7 +48,7 @@ LIB_PORTING := libporting
 port: $(PORT_SRC)
 	$(CXX) $(CXXFLAGS) -c $^ -o $(LIB_PORTING).o
 	$(AR) -rc $(LIB_PORTING).a $(LIB_PORTING).o
-	llvm-ranlib $(LIB_PORTING).a
+	$(RANLIB) $(LIB_PORTING).a
 	@rm -f *.o
 
 #
@@ -73,8 +73,8 @@ ll: $(LIB_SRC)
 # Compile libdebug
 debuglib: debug.c
 	$(CC) -c $^ -o $@.o
-	ar -rc libdebug.a $@.o
-	@ranlib libdebug.a
+	$(AR) -rc libdebug.a $@.o
+	@$(RANLIB) libdebug.a
 	@rm -f $@.o
 
 debuglib_so: debug.c
