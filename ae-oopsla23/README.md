@@ -14,8 +14,9 @@ our software.
 This artifact has the following scripts:
 
 ```shell
-- setup.sh   # Set up the experimental environment.
-- eval.sh    # Compile and run the benchmarks.
+- setup.sh            # Set up the experimental environment.
+- eval.sh             # Compile and run the benchmarks.
+- print_results.sh    # Print out evaluation results.
 ```
 
 ### Important Repositories
@@ -26,9 +27,9 @@ This artifact has the following scripts:
 - [llvm test-suite](https://github.com/jzhou76/test-suite)
 
 Our Checked C compiler repositories were forked from Microsoft's Checked C
-compiler repos. They record our complete development history of our extension
+compiler repos. They record the complete development history of our extension
 to the original Checked C compiler. In addition, the [misc](https://github.com/jzhou76/checkedc-safe-mm-misc)
-repo and the [test-suite](https://github.com/jzhou76/test-suite) record the
+repo and the [test-suite](https://github.com/jzhou76/test-suite) contain the
 porting history of the benchmarks (except `429.mcf` which belongs to SPEC 2006)
 used in the paper.
 
@@ -41,15 +42,15 @@ The scripts mentioned in the **Overview** section requires the following
 dependencies:
 
 ```shell
--  cmake       # For building llvm, llvm test-suite, and lzfse
--  git         # For downloading repos
--  git-lfs     # For pulling down large input data files for evaluation
--  wget        # For downloading the baseline llvm compiler
--  unzip       # For unpackaging enwik9.
--  python2     # llvm-lit uses `#/usr/bin/env python`, which could be python2
--  python3     # For processing experimental data
--  pip3        # For checking (and installing) numpy
--  ab          # For evaluating thttpd. Available in "apache2-utils"
+- cmake       # For building llvm, llvm test-suite, and lzfse
+- git         # For downloading repos
+- git-lfs     # For pulling down large input data files for evaluation
+- wget        # For downloading the baseline llvm compiler
+- unzip       # For unpackaging enwik9.
+- python2     # llvm-lit uses `#/usr/bin/env python`, which could be python2
+- python3     # For processing experimental data
+- pip3        # For checking (and installing) numpy
+- ab          # For evaluating thttpd. Available in "apache2-utils"
 ```
 
 In addition, we assumed that the host system has a C/C++ compiler. We recommend
@@ -104,5 +105,25 @@ To show the experimental data separate, run
 ./print_results.sh benchmark  # benchmark: "olden", parson", "lzfse"
 ```
 
-For example, `./print_results.sh olden` prints out the data of the Fig. 5(a)
-and the `Olden` entries in Table 4 of the paper.
+Specifically,
+
+```shell
+./print_results.sh olden   # For Fig. 5(a) and Table 4
+
+./print_results parson     # For Fig. 5(c) and Table 4
+
+./print_results lzfse      # For Fig. 5(d) and Table 4
+```
+
+#### Data Inconsistencies
+Due to the short execution time, there may be noticeable differences between
+what users get on their machine and Fig. 5(c) and Table 4 for `parson`.
+
+In addition, we use fixed time interval (details in the scripts in
+`misc/eval/scripts/mem`) to measure memory overhead, and therefore in a
+different environment, users may observe different memory consumption partially
+because of the different execution time of a program.
+
+### Work in Progress
+We are still working on `thttpd` and `curl` to make them easy-to-use on a
+new system.
