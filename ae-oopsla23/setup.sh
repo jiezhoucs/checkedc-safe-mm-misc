@@ -83,6 +83,12 @@ prepare_compiler() {
         git clone "$WSS_REPO" "misc/eval/wss"
         cd "misc/eval/wss"; git checkout 8951296
         cd -
+
+        # Replace the scripts with a soft link to the ones in the misc repo.
+        rm -f setup.sh eval.sh print_results.sh
+        ln -s misc/ae-oopsla23/setup.sh setup.sh
+        ln -s misc/ae-oopsla23/eval.sh eval.sh
+        ln -s misc/ae-oopsla23/print_results.sh print_results.sh
     fi
 
     # Prepare the vanilla LLVM 8.0.0 compiler.
