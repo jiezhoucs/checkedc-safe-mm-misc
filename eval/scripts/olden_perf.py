@@ -143,17 +143,37 @@ def write_result():
         row = ['Geomean', '', '', geomean_checked, '', geomean_cets]
         writer.writerow(row)
 
+    # Print detailed data
+    print_normalized(normalized_checked, "checked")
     # Print summarized results.
-    print("For Checked C:")
+    print("Checked C's summarized performance overhead:")
     print("Min = " + str(round((min_checked - 1) * 100, 1)) + "%")
     print("Max = " + str(round((max_checked - 1) * 100, 1)) + "%")
     print("Geomean = " + str(round((geomean_checked - 1) * 100, 1)) + "%")
-    print("CETS-only Geomean = " + str(round((geomean_checked_cets - 1) * 100, 1)) + "%")
+    # print("CETS-only Geomean = " + str(round((geomean_checked_cets - 1) * 100, 1)) + "%")
+
     print("")
-    print("For CETS:")
+    print_normalized(normalized_cets, "cets")
+    print("CETS' summarized performance overhead:")
     print("Min = " + str(round((min_cets - 1) * 100, 1)) + "%")
     print("Max = " + str(round((max_cets - 1) * 100, 1)) + "%")
     print("Geomean " + str(round((geomean_cets - 1) * 100, 1)) + "%")
+
+#
+# Print the normalized execution time
+#
+def print_normalized(data, compiler):
+    if compiler == "checked":
+        print("Checked C's normalized execution time:")
+    else:
+        print("CETS's normalized execution time:")
+
+    for prog in benchmarks:
+        if compiler == "cets" and prog in CETS_SKIPPED:
+            continue
+        print(prog + ": " + str(round(data[prog], 2)))
+    print("")
+
 
 #
 # Entrance of this script
