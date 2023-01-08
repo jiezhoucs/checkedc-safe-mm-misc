@@ -77,6 +77,8 @@ for storing directly on Github (Github charges for extra large files).
 - Olden (located in `llvm-test-suite`)
 - parson
 - lzfse
+- thttpd
+- curl
 
 We did not include `429.mcf` as it belongs to the SPEC CPU2006, which is a
 proprietary benchmark suite.
@@ -113,6 +115,8 @@ Specifically,
 ./print_results parson     # For Fig. 5(c) and Table 4
 
 ./print_results lzfse      # For Fig. 5(d) and Table 4
+
+./print_results curl       # For Section 6.3.5 and Table 4
 ```
 
 #### Data Inconsistencies
@@ -125,5 +129,6 @@ different environment, users may observe different memory consumption partially
 because of the different execution time of a program.
 
 ### Work in Progress
-We are still working on `thttpd` and `curl` to make them easy-to-use on a
-new system.
+Building and running `thttpd` is more complicated than other benchmarks.
+We are still working on `thttpd` to make it as easy-to-use as possible in
+a new system.

@@ -67,11 +67,11 @@ parson_eval() {
 lzfse_eval() {
     echo ""
     cd $EVAL_SCRIPTS_DIR
-    echo "Evaluating Checked C performance overhead on lzfse"
+    echo "Evaluating Checked C's performance overhead on lzfse"
     ./lzfse_run.sh baseline
     ./lzfse_run.sh checked
 
-    echo "Evaluating Checked C memory overhead on lzfse"
+    echo "Evaluating Checked C's memory overhead on lzfse"
     cd mem
     ./lzfse_run.sh baseline
     ./lzfse_run.sh checked
@@ -81,6 +81,27 @@ lzfse_eval() {
     ./lzfse_perf.py
     cd mem
     ./lzfse_mem.py
+}
+
+#
+# curl eval.
+#
+curl_eval() {
+    echo ""
+    cd $EVAL_SCRIPTS_DIR
+    echo "Evaluating Checked C performance overhead on curl"
+    ./curl_run.sh baseline
+    ./curl_run.sh checked
+
+    echo "Evaluating Checked C memory overhead on curl"
+    cd mem
+    ./curl_run.sh
+
+    # Compute results.
+    cd ..
+    ./curl_perf.sh
+    cd mem
+    ./curl_mem.py
 }
 
 #
@@ -94,7 +115,9 @@ eval_all() {
 
     lzfse_eval
 
-    # TODO: thttpd and curl
+    # TODO: thttpd
+
+    curl_eval
 }
 
 #
@@ -117,6 +140,9 @@ else
             ;;
         "lzfse")
             lzfse_eval
+            ;;
+        "curl")
+            curl_eval
             ;;
         *)
             echo "Unknown benchmark names."\
