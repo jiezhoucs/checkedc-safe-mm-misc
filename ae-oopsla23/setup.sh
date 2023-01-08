@@ -89,6 +89,7 @@ prepare_compiler() {
         ln -s misc/ae-oopsla23/setup.sh setup.sh
         ln -s misc/ae-oopsla23/eval.sh eval.sh
         ln -s misc/ae-oopsla23/print_results.sh print_results.sh
+        ln -s misc/ae-oopsla23/thttpd.sh thttpd.sh
     fi
 
     # Prepare the vanilla LLVM 8.0.0 compiler.
