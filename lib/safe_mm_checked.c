@@ -654,7 +654,11 @@ for_any(T) void **_marshal_mm_ptr(mm_array_ptr<mm_ptr<T>> p, size_t size) {
 /* Duplicate a string on the heap and return an mm_array_ptr<char> to it.*/
 mm_array_ptr<char> mmize_str(char *p) {
   mm_array_ptr<char> safe_p = mm_strdup_from_raw(p);
+#ifdef PORTING
+  uncertain_free(p);
+#else
   free(p);
+#endif
   if (safe_p == NULL) {
     printf("WTF???\n");
   }
