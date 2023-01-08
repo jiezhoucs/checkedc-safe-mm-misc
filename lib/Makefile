@@ -62,7 +62,7 @@ debug: a port;
 #
 # libsafemm with "PORTING" defined.
 #
-lib_porting: $(LIB_SRC)
+safemm_porting: $(LIB_SRC)
 	rm -f *.o
 	$(CC) -DPORTING -Wno-implicit-function-declaration -c $(LIB_SRC)
 	$(AR) -rc $(LIB_SAFEMM_PORTING).a *.o

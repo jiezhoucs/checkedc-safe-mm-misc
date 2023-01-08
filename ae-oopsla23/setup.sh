@@ -196,6 +196,9 @@ build_checkedc() {
     if [[ ! -f "libporting.a" ]]; then
         make port
     fi
+    if [[ ! -f "libsafemm_porting" ]]; then
+        make safemm_porting
+    fi
 
 }
 
