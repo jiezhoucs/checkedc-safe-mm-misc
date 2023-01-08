@@ -17,6 +17,7 @@ This artifact has the following scripts:
 - setup.sh            # Set up the experimental environment.
 - eval.sh             # Compile and run the benchmarks.
 - print_results.sh    # Print out evaluation results.
+- thttpd.sh           # Build, install, and run thttpd.
 ```
 
 ### Important Repositories
@@ -51,6 +52,7 @@ dependencies:
 - python3     # For processing experimental data
 - pip3        # For checking (and installing) numpy
 - ab          # For evaluating thttpd. Available in "apache2-utils"
+- autoconf    # For generating Makefile for curl
 ```
 
 In addition, we assumed that the host system has a C/C++ compiler. We recommend
@@ -83,7 +85,25 @@ for storing directly on Github (Github charges for extra large files).
 We did not include `429.mcf` as it belongs to the SPEC CPU2006, which is a
 proprietary benchmark suite.
 
-### Running
+#### thttpd
+We handle `thttpd` specially because it requires the root privilege to install
+it. We understand that it could be extremely uncomfortable to run a stranger's
+script with root privilege, and we sincerely apologize for this inconvenience.
+To minimize the concern of the users, we have a separate script for `thttpd`.
+It is small so it will be easier for users to manually inspect it. Only the
+installation step requires the root privilege, specifically,
+
+```shell
+sudo ./thttpd.sh install
+```
+
+What it does internally is to `cd` to the source directory of `thttpd` and
+execute `make install` to install `thttpd`.
+
+The build process (`./thttpd.sh build`) and evaluation (`./thttpd.sh eval`)
+does not need the root privilege.
+
+### Evaluation
 
 Running the `eval.sh` script without any arguments will run all benchmarks.
 One can choose to run a specific benchmark, e.g.,
@@ -117,6 +137,8 @@ Specifically,
 ./print_results lzfse      # For Fig. 5(d) and Table 4
 
 ./print_results curl       # For Section 6.3.5 and Table 4
+
+./print_result thttpd      # For Fig. 5(b) and Table 4
 ```
 
 #### Data Inconsistencies
@@ -127,8 +149,3 @@ In addition, we use fixed time interval (details in the scripts in
 `misc/eval/scripts/mem`) to measure memory overhead, and therefore in a
 different environment, users may observe different memory consumption partially
 because of the different execution time of a program.
-
-### Work in Progress
-Building and running `thttpd` is more complicated than other benchmarks.
-We are still working on `thttpd` to make it as easy-to-use as possible in
-a new system.

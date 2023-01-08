@@ -115,7 +115,7 @@ eval_all() {
 
     lzfse_eval
 
-    # TODO: thttpd
+    ./thttpd.sh
 
     curl_eval
 }
@@ -132,8 +132,7 @@ else
             olden_mem
             ;;
         "thttpd")
-            thttpd_perf
-            thttpd_mem
+            ./thttpd.sh
             ;;
         "parson")
             parson_eval
@@ -146,7 +145,7 @@ else
             ;;
         *)
             echo "Unknown benchmark names."\
-                "Please choose \"olden\", \"thttpd\", \"parson\", or \"lzfse\"."
+                "Please choose \"olden\", \"thttpd\", \"parson\", \"lzfse\", or \"curl\"."
             ;;
     esac
 fi

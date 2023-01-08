@@ -24,12 +24,29 @@ run() {
         echo "Memory overhead on parson:"
         cat ../mem_data/parson/mem.csv
     elif [[ $1 == "lzfse" ]]; then
+        cd $EVAL_SCRIPTS_DIR
         echo "Performance overhead on lzfse:"
         ./lzfse_perf.py
         echo ""
         echo "Memory overhead on parson:"
         cd mem
         ./lzfse_mem.py
+    elif [[ $1 == "thttpd" ]]; then
+        cd $EVAL_SCRIPTS_DIR
+        echo "Performance overhead on thttpd:"
+        ./thttpd_perf.py
+        echo ""
+        echo "Memory overhead on thttpd:"
+        cd mem
+        ./thttpd_mem.py
+    elif [[ $1 == "curl" ]]; then
+        cd $EVAL_SCRIPTS_DIR
+        echo "Performance overhead on curl:"
+        ./curl_perf.sh
+        echo ""
+        echo "Memory overhead on curl:"
+        cd mem
+        ./curl_mem.py
     else
         echo "Unknown benchmark name. Please choose one in "olden", "parson", lzfse".
     fi
@@ -38,7 +55,7 @@ run() {
 #
 # Entranche of this script
 if [[ $# == 0 ]]; then
-    echo "Please specify one benchmark: olden, parson, or lzfse"
+    echo "Please specify one benchmark: olden, parson, lzfse, thttpd, or curl."
     exit
 else
     run $1
