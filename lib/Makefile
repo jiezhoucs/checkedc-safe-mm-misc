@@ -14,6 +14,7 @@ RANLIB = $(LLVM_DIR)/llvm-ranlib
 LIB_SRC = safe_mm_checked.c mm_libc.c mm_common.c
 LIB_SAFEMM = libsafemm
 LIB_SAFEMM_LTO = $(LIB_SAFEMM)_lto
+LIB_SAFEMM_PORTING = libsafemm_porting
 PORT_SRC = porting_helper.cpp
 
 .PHONY: libsafemm clean
@@ -57,6 +58,17 @@ port: $(PORT_SRC)
 debug: CFLAGS += -O0 -g -DMM_DEBUG
 debug: CXXFLAGS += -O0 -g -DMM_DEBUG
 debug: a port;
+
+#
+# libsafemm with "PORTING" defined.
+#
+lib_porting: $(LIB_SRC)
+	rm -f *.o
+	$(CC) -DPORTING -Wno-implicit-function-declaration -c $(LIB_SRC)
+	$(AR) -rc $(LIB_SAFEMM_PORTING).a *.o
+	$(RANLIB) $(LIB_SAFEMM_PORTING).a
+	@rm -f *.o
+
 
 #
 # Compile the lib to a shared libray. Note that on MacOS .dylib is the
