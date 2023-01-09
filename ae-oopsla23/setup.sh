@@ -85,7 +85,7 @@ prepare_compiler() {
         cd -
 
         # Replace the scripts with a soft link to the ones in the misc repo.
-        rm -f setup.sh eval.sh print_results.sh
+        rm -f setup.sh eval.sh print_results.sh thttpd.sh
         ln -s misc/ae-oopsla23/setup.sh setup.sh
         ln -s misc/ae-oopsla23/eval.sh eval.sh
         ln -s misc/ae-oopsla23/print_results.sh print_results.sh
