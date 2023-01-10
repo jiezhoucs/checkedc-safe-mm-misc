@@ -15,6 +15,7 @@ REQUIRED_DEPS=(
     "python3"    # For processing experimental data
     "pip3"       # For the use of numpy
     "ab"         # For evaluating thttpd. Available in "apache2-utils"
+    "openssl"    # For building curl.
 )
 
 ROOT_DIR=`realpath .`
