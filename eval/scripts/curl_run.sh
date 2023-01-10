@@ -18,11 +18,9 @@ DATA_DIR="$DATA_DIR/curl"
 #
 run() {
     if [[ $1 == "baseline" ]]; then
-        echo "Run the baseline curl"
         CURL_DIR="$BENCHMARKS_DIR/baseline/curl"
         DATA_DIR="$DATA_DIR/baseline"
     else
-        echo "Run the checked curl"
         CURL_DIR="$BENCHMARKS_DIR/checked/curl"
         DATA_DIR="$DATA_DIR/checked"
     fi
@@ -35,19 +33,24 @@ run() {
 
     cd $CURL_DIR
     # Check if executables exist, and build them if not.
+    if [[ ! -f Makefile ]]; then
+        ./curl_build.sh
+    fi
     if [[ ! -f src/curl ]]; then
         make -j
     fi
     # Check and build tests.
     cd tests
-    make -j
+    if [[ ! -f "libtest/chkhostname" ]]; then
+        make -j
+    fi
 
     # Run.
     for i in $(seq 1 $ITER); do
         echo "Running runtests.pl to evaluate curl."
         echo "Iteration $i..."
         ./runtests.pl $EXCLUDED > "$DATA_DIR/result.$i"
-        echo "Finished iteration %1."
+        echo "Finished iteration $1."
     done
 }
 
