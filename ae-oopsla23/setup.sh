@@ -5,6 +5,8 @@
 # of the OOPSLA'23 Checked C paper.
 #
 
+set -e
+
 REQUIRED_DEPS=(
     "cmake"      # For building llvm
     "git"        # For downloading repos

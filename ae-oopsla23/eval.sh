@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# This scripts invokes scripts to run benchmarks for evaluations.
+
+set -e
+
 ROOT_DIR=`realpath .`
 SCRIPTS_DIR="$ROOT_DIR/misc/scripts"
 EVAL_SCRIPTS_DIR="$ROOT_DIR/misc/eval/scripts"
