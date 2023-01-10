@@ -15,7 +15,6 @@ CFLAGS="-O3 -Wall"
 
 SRC_DIR=`realpath .`
 BUILD_DIR="$SRC_DIR/build"
-OPENSSL_DIR=/home/linuxbrew/.linuxbrew/Cellar/openssl@1.1/1.1.1l_1
 
 #
 # Run configure to create build files.
@@ -37,7 +36,7 @@ config_configure() {
     ./configure  --prefix="$BUILD_DIR"                                         \
                  --disable-shared                                              \
                  --disable-threaded-resolver                                   \
-                 --with-openssl="$OPENSSL_DIR"                                 \
+                 --with-ssl                                                    \
                  CC="$CC"                                                      \
                  CFLAGS="$CFLAGS"
 }

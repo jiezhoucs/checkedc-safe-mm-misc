@@ -10,13 +10,12 @@ ROOT_DIR=$(realpath ../../../../)
 MISC_DIR=$ROOT_DIR/misc
 
 CC=$ROOT_DIR/build/bin/clang
-CFLAGS="-O3 -Wall"
+CFLAGS="-O3 -mllvm -checkedc-in-porting -Wall"
 CFLAGS="$CFLAGS -I$MISC_DIR/include"
-LDFLAGS="-L$MISC_DIR/lib -lsafemm -lstdc++ -lporting -ldebug"
+LDFLAGS="-L$MISC_DIR/lib -lsafemm_porting -lstdc++ -lporting"
 
 SRC_DIR=`realpath .`
 BUILD_DIR="$SRC_DIR/build"
-OPENSSL_DIR=/home/linuxbrew/.linuxbrew/Cellar/openssl@1.1/1.1.1l_1
 
 #
 # Run configure to create build files.
@@ -38,7 +37,7 @@ config_configure() {
     ./configure  --prefix="$BUILD_DIR"                                         \
                  --disable-shared                                              \
                  --disable-threaded-resolver                                   \
-                 --with-openssl="$OPENSSL_DIR"                                 \
+                 --with-ssl                                                    \
                  CC="$CC"                                                      \
                  CFLAGS="$CFLAGS"                                              \
                  LD="$CC"                                                      \
