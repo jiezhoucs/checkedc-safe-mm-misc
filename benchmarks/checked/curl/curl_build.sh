@@ -12,7 +12,7 @@ MISC_DIR=$ROOT_DIR/misc
 CC=$ROOT_DIR/build/bin/clang
 CFLAGS="-O3 -mllvm -checkedc-in-porting -Wall"
 CFLAGS="$CFLAGS -I$MISC_DIR/include"
-LDFLAGS="-L$MISC_DIR/lib -lsafemm_porting -lstdc++ -lporting"
+LDFLAGS="-fuse-ld=lld -L$MISC_DIR/lib -lsafemm_porting -lstdc++ -lporting"
 
 SRC_DIR=`realpath .`
 BUILD_DIR="$SRC_DIR/build"
