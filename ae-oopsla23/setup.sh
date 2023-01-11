@@ -20,6 +20,11 @@ REQUIRED_DEPS=(
     "openssl"    # For building curl.
 )
 
+REQUIRED_PYTHON_LIB=(
+    "numpy"
+    "impacket"
+)
+
 ROOT_DIR=`realpath .`
 SCRIPTS_DIR="$ROOT_DIR/misc/scripts"
 CETS_DIR="$ROOT_DIR/cets"
@@ -59,13 +64,16 @@ check_dep() {
         fi
     done
 
-    echo -n "Looking for numpy..."
-    if [[ ! `pip3 list | grep numpy` ]]; then
-        echo "not found. Please install the numpy package of Python3."
-        exit
-    else
-        echo "found."
-    fi
+    # Checking for numpy and impacket
+    for lib in ${REQUIRED_PYTHON_LIB[@]}; do
+        echo -n "Looking for $lib..."
+        if [[ ! `pip3 list | grep $lib` ]]; then
+            echo "not found. Please install the $lib package of Python3."
+            exit
+        else
+            echo "found."
+        fi
+    done
 }
 
 #

@@ -43,6 +43,7 @@ The scripts mentioned in the **Overview** section requires the following
 dependencies:
 
 ```shell
+# Software
 - cmake       # For building llvm, llvm test-suite, and lzfse
 - git         # For downloading repos
 - git-lfs     # For pulling down large input data files for evaluation
@@ -53,6 +54,11 @@ dependencies:
 - pip3        # For checking (and installing) numpy
 - ab          # For evaluating thttpd. Available in "apache2-utils"
 - autoconf    # For generating Makefile for curl
+- openssl     # For building curl
+
+# Python library
+- numpy       # For computing results
+- impacket    # Required by curl
 ```
 
 In addition, we assumed that the host system has a C/C++ compiler. We recommend
