@@ -3,6 +3,7 @@
 #
 # This script starts a local thttpd server and tests it by transfering files.
 #
+# $1: "baseline" or "checked"
 
 EVAL_DIR=`realpath ../eval`
 DATA_DIR=$EVAL_DIR/data/thttpd
@@ -63,18 +64,11 @@ init() {
 }
 
 #
-# Run multiple iterations to collect bandwidth data
-#
-# run() {
-#     # to-do
-# }
-
-#
-# for debugging purpose
+# A quick run for testing and debugging.
 #
 debug() {
     echo "Testing ......"
-    ab -c $CONS -n $REQUESTS $FILES/file-4096
+    ab -c $CONS -n $REQUESTS $FILES/file-16384
 }
 
 #
