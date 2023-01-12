@@ -34,10 +34,5 @@ CXX_VANILLA="$LLVM_VANILLA_BIN/clang++"
 #
 OS=`uname`
 
-# Set the compile parallel level to be #ofLogicalCore - 2.
-PARA_LEVEL=
-if [[ $OS == "Linux" ]]; then
-    PARA_LEVEL=`lscpu | grep "^CPU(s):" | cut -d ':' -f2"` # | echo "$(cat -)-2" | bc`
-elif [[ $OS == "Darwin" ]]; then
-    PARA_LEVEL=`sysctl -n hw.ncpu | echo "$(cat -)-2" | bc`
-fi
+# Set the compile parallel level to be #ofLogicalCore
+PARA_LEVEL=`lscpu | grep "^CPU(s):" | cut -d ':' -f2` # | echo "$(cat -)-2" | bc`
