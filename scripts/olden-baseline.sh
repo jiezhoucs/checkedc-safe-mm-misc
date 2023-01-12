@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# This scritps run the benchmarks of the original Olden test suite.
+# This scritps run the benchmarks of the baseline Olden test suite.
 #
 
 # load common directory paths and variables
@@ -54,13 +54,14 @@ run_all() {
 # Clean all compiled binaries.
 #
 clean() {
-    echo "Cleaning all original Olden benchmark binaries..."
+    echo "Cleaning all baseline Olden benchmark binaries..."
     for prog in ${PROGRAMS[@]}; do
         echo "Cleaning $prog"
         cd "$BIN_DIR/$prog"
         find . -name "*.o" -delete
         rm -f "$prog" "$prog.stripped"
     done
+    echo ""
 }
 
 #
