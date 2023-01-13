@@ -40,6 +40,13 @@ CETS_BENCHMARKS=(
 # memory consumption data.
 #
 run() {
+    # To prevent `pgrep` getting the pid of `gsd-power` when processing the
+    # power benchmark. This may happen in machines where gsd-power was started
+    # by the current user instead of gdm.
+    # JZ: I'm confused why this still happens even if we have `-n` in the
+    # pgrep command  that finds the pid of the power benchmark.
+    pkill gsd-power
+
     cd $SCRIPTS_DIR
 
     # Prepare script and data directory.
