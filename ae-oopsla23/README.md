@@ -8,6 +8,15 @@ This artifact is a virtual machine of Ubuntu 20.04 that contains
 
 All materials used in this AE are in directory `/home/ae1/ae`.
 
+### Important Scripts
+There are three scripts that the users will need to run:
+
+```shell
+- dryrun_mini.sh  # Quick test on compilers and benchmarks.
+- eval.sh         # Main script for evaluation.
+- update.sh       # An auxiliary script to `git pull` changes in the `misc` repo.
+```
+
 ### Password of the account ae1
 `checkedc`
 
