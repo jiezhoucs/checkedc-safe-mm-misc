@@ -88,6 +88,28 @@ lzfse_eval() {
 }
 
 #
+# thttpd eval.
+#
+thttpd_eval() {
+    echo ""
+    cd "$EVAL_SCRIPTS_DIR"
+    echo "Evaluating Checked C performance overhead on thttpd"
+    ./thttpd_run.sh baseline
+    ./thttpd_run.sh checked
+
+    echo "Evaluating Checked C memory overhead on thttpd"
+    cd mem
+    ./thttpd_run.sh baseline
+    ./thttpd_run.sh checked
+
+    # Compute results
+    cd ..
+    ./thttpd_perf.py
+    cd mem
+    ./thttpd_mem.py
+}
+
+#
 # curl eval.
 #
 curl_eval() {
@@ -119,7 +141,7 @@ eval_all() {
 
     lzfse_eval
 
-    ./thttpd.sh
+    thttpd_eval
 
     curl_eval
 }
@@ -136,7 +158,7 @@ else
             olden_mem
             ;;
         "thttpd")
-            ./thttpd.sh
+            thttpd_eval
             ;;
         "parson")
             parson_eval
