@@ -64,6 +64,9 @@ run_lzfse() {
     cd "$BENCHMARKS_DIR"
     echo "Testing compiling and running baseline lzfse with input dickens..."
     cd baseline/lzfse-1.0/build
+    if [[ ! -f Makefile ]]; then
+        ./cmake-gen.sh
+    fi
     make clean
     make
     ./lzfse -v -encode -i "$EVAL_DIR/lzfse_dataset/dickens" -o /tmp/dickens.encoded
@@ -75,6 +78,9 @@ run_lzfse() {
     echo ""
     echo "Testing compiling and running Checked C lzfse with input dickens..."
     cd "$BENCHMARKS_DIR/checked/lzfse-1.0/build"
+    if [[ ! -f Makefile ]]; then
+        ./cmake-gen.sh
+    fi
     make clean
     make
     ./lzfse -v -encode -i "$EVAL_DIR/lzfse_dataset/dickens" -o /tmp/dickens.encoded
