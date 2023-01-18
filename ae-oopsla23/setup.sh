@@ -18,6 +18,7 @@ REQUIRED_DEPS=(
     "pip3"       # For the use of numpy
     "ab"         # For evaluating thttpd. Available in "apache2-utils"
     "openssl"    # For building curl.
+    "autoconf"   # For generating Makefile for curl.
 )
 
 REQUIRED_PYTHON_LIB=(
@@ -96,11 +97,11 @@ prepare_compiler() {
         cd -
 
         # Replace the scripts with a soft link to the ones in the misc repo.
-        rm -f setup.sh eval.sh print_results.sh thttpd.sh
+        rm -f setup.sh eval.sh print_results.sh dryrun_mini.sh
         ln -s misc/ae-oopsla23/setup.sh setup.sh
         ln -s misc/ae-oopsla23/eval.sh eval.sh
         ln -s misc/ae-oopsla23/print_results.sh print_results.sh
-        ln -s misc/ae-oopsla23/thttpd.sh thttpd.sh
+        ln -s misc/ae-oopsla23/dryrun_mini.sh dryrun_mini.sh
     fi
 
     # Prepare the vanilla LLVM 8.0.0 compiler.
