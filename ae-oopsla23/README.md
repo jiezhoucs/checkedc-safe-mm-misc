@@ -1,24 +1,42 @@
 # Artifact Evaluation Instructions for the OOPSLA'23 Checked C Paper
 
 ## Overview
-This artifact is a virtual machine of Ubuntu 20.04 that contains
+
+We provide two artifacts: a virtual machine and a Docker image, both of which
+run a Ubuntu 20.04 OS.
+Both the artifact contain the whole development environment used in the paper.
+In particular, they contain
 
 - the three compilers (baseline LLVM, our Checked C, and CETS)
-- all the scripts that run benchmarks, collects data, and computes results
+- all the scripts that run benchmarks, collects data, and compute results
 
-All materials used in this AE are in directory `/home/ae1/ae`.
+All materials used in this AE are in directory `/home/ae1/ae` of the VM,
+and `/ae` of the Docker image.
+
+### Recommended Host Machine
+
+First we recommend using the Docker image than the VM because there are
+a few known issues, such as limited disk space and broken `curl` tests, that
+only exist in the VM but not in the Docker image.
+
+Second, if possible, we highly recommend using the Docker image on a x86-64
+machine. We observed noticeable performance loss of running it on an Apple
+Silicon machine compared to a x86-64 machine. Users may observe significant
+differences in experimental results when running it on an Apple Silicon machine.
+
+### Password of the Account ae1 of the VM.
+`checkedc`
 
 ### Important Scripts
+
 There are three scripts that the users will need to run:
 
 ```shell
-- dryrun_mini.sh  # Quick test on compilers and benchmarks.
-- eval.sh         # Main script for evaluation.
-- update.sh       # An auxiliary script to `git pull` changes in the `misc` repo.
+- dryrun_mini.sh    # Quick test on compilers and benchmarks.
+- eval.sh           # Main script for evaluation.
+- print_results.sh  # Print out summarized perf and memory overhead results.
+- update.sh         # An auxiliary script to `git pull` changes of the `misc` repo.
 ```
-
-### Password of the account ae1
-`checkedc`
 
 ### Important Repositories
 
@@ -35,6 +53,7 @@ porting history of the benchmarks (except `429.mcf` which belongs to SPEC 2006)
 used in the paper.
 
 ### Project Organization
+
 The whole project is organized as the README of the `checkedc-safe-mm-misc`
 repository shows https://github.com/jzhou76/checkedc-safe-mm-misc#directory-organization
 
@@ -51,6 +70,22 @@ repository shows https://github.com/jzhou76/checkedc-safe-mm-misc#directory-orga
 We did not include `429.mcf` as it belongs to the SPEC CPU2006, which is a
 proprietary benchmark suite.
 
+### Load the Docker Image and Run a Container
+
+#### Load the Image to Docker:
+
+
+```shell
+docker load < ae1-oopsla23.tar
+```
+
+#### Run
+
+```shell
+docker run --platform linux/amd64 -it --entrypoint "/bin/bash" ae1-oopsla23
+```
+
+You can omit `--platform linux/amd64` if you are running a `x86-64` machine.
 
 ### Min Dryrun
 
@@ -69,14 +104,14 @@ output is very verbose, which would hinder the readability of the output of the
 execution of the benchmarks.
 
 Without any command line argument, this script will compile and run all
-benchmarks.  However, we recommend users to provide the name of a benchmark
-as the first argument, e.g.,
+benchmarks. However, we recommend users to provide the name of a benchmark
+as the first argument to run benchmarks individually, e.g.,
 
 ```shell
 dryrun_mini.sh olden
 ```
 
-will test a single benchmark and it is easier to examine the output.
+It will test a single benchmark and it is easier to examine the output.
 The benchmarks have clear output to show weather they finish successfully.
 
 ### Evaluation
@@ -93,7 +128,7 @@ data. It will also compute the final results based on the raw data.
 
 ### Collecting Data
 
-Both the raw data and the summarized data will be put in `misc/eval/perf_data`
+Both the raw data and the summarized data will be written to `misc/eval/perf_data`
 and `misc/eval/mem_data`. `misc/eval/perf_data/benchmark/perf.csv` contains
 the data that were used to draw the figures in Fig. 5 of the paper. Similarly,
 those `misc/eval/mem_data/benchmark/mem.csv` were used for Table 4 of the paper.
@@ -122,7 +157,7 @@ Specifically,
 Due to the short execution time, there may be noticeable differences between
 what users get on their machine and Fig. 5(c) and Table 4 for `parson`.
 
-In addition, we use fixed time interval (details in the scripts in
+In addition, we used fixed time interval (details in the scripts in
 `misc/eval/scripts/mem`) to measure memory overhead, and therefore in a
 different environment, users may observe different memory consumption largely
 due to the different execution time of a program.
