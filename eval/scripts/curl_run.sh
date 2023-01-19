@@ -50,7 +50,8 @@ run() {
         echo "Running runtests.pl to evaluate curl."
         echo "Iteration $i..."
         ./runtests.pl $EXCLUDED > "$DATA_DIR/result.$i"
-        echo "Finished iteration $1."
+        echo "Finished iteration $i."
+        echo ""
     done
 }
 
