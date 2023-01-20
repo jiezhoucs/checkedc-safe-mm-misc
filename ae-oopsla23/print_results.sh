@@ -19,10 +19,11 @@ run() {
     elif [[ $1 == "parson" ]]; then
         echo "Performance overhead on parson:"
         cd $EVAL_SCRIPTS_DIR
-        cat ../perf_data/parson/perf.csv
+        ./parson_perf.py
         echo ""
         echo "Memory overhead on parson:"
-        cat ../mem_data/parson/mem.csv
+        cd mem
+        ./parson_mem.py
     elif [[ $1 == "lzfse" ]]; then
         cd $EVAL_SCRIPTS_DIR
         echo "Performance overhead on lzfse:"

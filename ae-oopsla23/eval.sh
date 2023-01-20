@@ -56,7 +56,7 @@ parson_eval() {
     echo ""
     cd $EVAL_SCRIPTS_DIR
     echo "Evaluating Checked C's performance overhead on parson"
-    ./parson_perf.py
+    ./parson_run.py
 
     echo "Evaluating Checked C's memory overhead on parson"
     cd mem
