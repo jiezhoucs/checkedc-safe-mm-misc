@@ -139,11 +139,33 @@ def write_result():
         writer.writerow(row)
 
         # Print the summarized data.
-        print("Checked C RSS Geomean: " + str(checked_rss_geomean))
-        print("Checked C WSS Geomean: " + str(checked_wss_geomean))
+        print("Checked C's RSS overhead on parson:")
+        print_max_min(checked_rss_norm, "RSS Min = ", True)
+        print_max_min(checked_rss_norm, "RSS Max = ", False)
+        print_geomean(checked_rss_geomean)
+        print()
+        print("Checked C's WSS overhead on parson:")
+        print_max_min(checked_wss_norm, "RSS Min = ", True)
+        print_max_min(checked_wss_norm, "RSS Max = ", False)
+        print_geomean(checked_wss_geomean)
 
         # Close result file.
         mem_csv.close()
+
+#
+# Print the min/max of RSS/WSS overhead.
+#
+def print_max_min(data, msg, is_min):
+    if is_min:
+        print(msg + " = " + str(round((min(data) - 1) * 100, 2)) + "%")
+    else:
+        print(msg + " = " + str(round((max(data) - 1) * 100, 2)) + "%")
+
+#
+# Print the geomean of RSS/WSS overhead.
+#
+def print_geomean(data):
+    print("Geomean = " + str(round((data - 1) * 100, 2)) + "%")
 
 #
 # Entrance of this script
@@ -153,10 +175,10 @@ def main():
     collect_data("baseline")
     collect_data("checked")
 
-    print(mem_data["baseline"]["rss_max"])
-    print(mem_data["checked"]["rss_max"])
-    print(mem_data["baseline"]["wss"])
-    print(mem_data["checked"]["wss"])
+    # print(mem_data["baseline"]["rss_max"])
+    # print(mem_data["checked"]["rss_max"])
+    # print(mem_data["baseline"]["wss"])
+    # print(mem_data["checked"]["wss"])
 
     # Write results to a csv file
     write_result()
