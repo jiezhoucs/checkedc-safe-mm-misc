@@ -123,13 +123,15 @@ def write_result():
 
         row = ["geomean", "", "", rss_geomean, "", "", wss_geomean]
         writer.writerow(row)
-
-        # Print the summarized data.
-        print("Checked C RSS Geomean: " + str(rss_geomean))
-        print("Checked C WSS Geomean: " + str(wss_geomean))
-
         # Close result file.
         mem_csv.close()
+
+        # Print the summarized data.
+        print(rss_norm)
+        print("Checked C's RSS overhead on thttpd:")
+        print("Min = " + str(round((min(rss_norm) - 1) * 100, 2)) + "%")
+        print("Max = " + str(round((max(rss_norm) - 1) * 100, 2)) + "%")
+        print("Geomean = " + str(round((rss_geomean - 1) * 100, 2)) + "%")
 
 #
 # Entrance of this script
