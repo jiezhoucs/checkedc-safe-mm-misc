@@ -67,17 +67,32 @@ def compute():
             print("The checked thttpd outperms the original one!")
 
         normalized += [mean_checked / mean_baseline]
-        print("mean_baseline: " + str(mean_baseline) + "; mean_checked: " + str(mean_checked))
-        print("std_baseline = " + str(std_baseline) + "; std_checked = " + str(std_checked))
-        print("overhead = " + str(overhead) + "%")
-        print()
+        # print("mean_baseline: " + str(mean_baseline) + "; mean_checked: " + str(mean_checked))
+        # print("std_baseline = " + str(std_baseline) + "; std_checked = " + str(std_checked))
+        # print("overhead = " + str(overhead) + "%")
+        # print()
 
     geomean = round((1 - (np.array(normalized).prod() ** (1.0 / len(normalized)))) * 100, 1)
-    Min = round((1 - min(normalized)) * 100, 1)
-    Max = round((1 - max(normalized)) * 100, 1)
-    print("Min: " + str(Min) + "%")
-    print("Max: " + str(Max) + "%")
-    print("Geo Mean: " + str(geomean) + "%")
+
+    print("Checked C's normalized file transfer rate:")
+    for i in range(2, 2 + len(normalized)):
+        input_size = 2**i
+        input_name = str(input_size)
+        if input_size >= 2**10:
+            input_name = str(int(input_size / 1024)) + " MB"
+        else:
+            input_name += " KB"
+        print(input_name + ": " + str(round(normalized[i - 2], 3)))
+
+    # Print summarized results.
+    print()
+    print("Performance overhead summary:")
+    Min = round((1 - max(normalized)) * 100, 1)
+    Max = round((1 - min(normalized)) * 100, 1)
+    print("Min =  " + str(Min) + "%")
+    print("Max = " + str(Max) + "%")
+    print("Geomean = " + str(geomean) + "%")
+
     perf_file.close()
 
 #
