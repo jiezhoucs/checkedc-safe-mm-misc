@@ -200,7 +200,6 @@ def write_result():
 
         # Print the summarized data.
 
-        print("")
         print("Checked C's RSS overhead on lzfse encoding:")
         print_max_min(en_rss_norm, "RSS Min", True)
         print_max_min(en_rss_norm, "RSS Max", False)

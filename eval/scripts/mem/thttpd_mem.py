@@ -127,7 +127,6 @@ def write_result():
         mem_csv.close()
 
         # Print the summarized data.
-        print(rss_norm)
         print("Checked C's RSS overhead on thttpd:")
         print("Min = " + str(round((min(rss_norm) - 1) * 100, 2)) + "%")
         print("Max = " + str(round((max(rss_norm) - 1) * 100, 2)) + "%")
