@@ -21,9 +21,9 @@ perf() {
     checked=`grep considered * | cut -d' ' -f7 | paste  -sd+ - | bc`
     checked=`echo "$checked/$ITER" | bc`
 
-    echo "baseline = $baseline s, checked = $checked s"
+    echo "baseline = "$baseline"s, checked = "$checked"s"
 
-    result=`echo "scale=4;$checked/$baseline" | bc`
+    result=`echo "scale=3;$checked/$baseline" | bc`
     echo "Checked C's normalized execution time = $result"
 }
 
