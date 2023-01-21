@@ -100,14 +100,14 @@ def write_result():
         writer.writerow(row)
 
         # Print the summarized data
-        print("RSS: ")
-        print("Min = " + str(min(checked_rss_norm)) + ", ", end="")
-        print("Max = " + str(max(checked_rss_norm)) + ", ", end="")
-        print("Geomean: " + str(checked_rss_geomean))
-        print("WSS: ")
-        print("Min = " + str(min(checked_wss_norm)) + ", ", end="")
-        print("Max = " + str(max(checked_wss_norm)) + ", ", end="")
-        print("Geomean: " + str(checked_wss_geomean))
+        print("Checked C's RSS overhead on curl: ")
+        print("Min = " + str(round((min(checked_rss_norm) - 1) * 100, 2)) + "%")
+        print("Max = " + str(round((max(checked_rss_norm) - 1) * 100, 2)) + "%")
+        print("Geomean = " + str(round((checked_rss_geomean - 1) * 100, 2)) + "%")
+        # print("WSS: ")
+        # print("Min = " + str(min(checked_wss_norm)) + ", ", end="")
+        # print("Max = " + str(max(checked_wss_norm)) + ", ", end="")
+        # print("Geomean: " + str(checked_wss_geomean))
 
 
 #
