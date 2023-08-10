@@ -3,12 +3,20 @@
 #
 # This scritps run the benchmarks of the modified Olden test suite.
 #
+# $1: 
+#   - 'h' for help message
+#   - "clean" to delete all existing benchmark binaries
+#   - Olden benchmark name. When it is omitted, this script runs all benchmarks.
+#
+
+set -e
 
 # load common directory paths and variables
 . common.sh
 
 #
 # Olden-specific paths
+#
 BUILD_DIR="$TESTS_DIR/ts-build"
 DATA_DIR="$DATA_DIR/olden/checked"
 BIN_DIR="$BUILD_DIR/MultiSource/Benchmarks/Olden"
@@ -23,19 +31,36 @@ PROGRAMS=(
     "power"
     "treeadd"
     "tsp"
-    # "voronoi"
 )
 
-cd $BUILD_DIR
+cd "$BUILD_DIR"
+
+#
+# Check if a user-provided benchmark name is valid
+#
+benchmark_exists() {
+    for  prog in ${PROGRAMS[@]}; do
+        if [[ $prog == $1 ]]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
 
 #
 # Run one single benchmark program.
 #
-run_one() {
+run_benchmark() {
+    if ! benchmark_exists $1; then
+        echo "Invalid Olden benchmark name!"
+        exit 1
+    fi
+
     # Compile the benchmark if its binary does not exist.
     if [[ ! -f "$BIN_DIR/$1/$1" ]]; then
         echo "Compiling $1..."
-        make -j$PARA_LEVEL $1
+        make -j$PARA_LEVEL $1 || { echo "Failed to compile $1!"; exit 1; }
     fi
 
     $LIT -v --filter $1 -o $DATA_DIR/$1.json .
@@ -46,7 +71,7 @@ run_one() {
 #
 run_all() {
     for prog in ${PROGRAMS[@]}; do
-        run_one $prog
+        run_benchmark $prog
     done
 }
 
@@ -78,9 +103,9 @@ usage() {
 #
 # Entrance of this script
 #
-
+#
 # mkdir the data directory if it does not exist.
-[[ -d $DATA_DIR ]] || mkdir -p $DATA_DIR
+mkdir -p "$DATA_DIR"
 
 if [[ $# == 1 ]]; then
     if [[ $1 == "-h" || $1 == "--help" ]]; then
@@ -88,7 +113,7 @@ if [[ $# == 1 ]]; then
     elif [[ $1 == "clean" ]]; then
         clean
     else
-        run_one $1
+        run_benchmark $1
     fi
 else
     run_all
