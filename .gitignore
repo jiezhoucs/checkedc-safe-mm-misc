@@ -23,9 +23,9 @@ tests/addrof
 
 tests/hello.c
 
-# evaluation related
-eval/data/olden/checkedc
-eval/data/olden/origin
+# evaluation data
+eval/perf_data
+eval/mem_data
 
 # benchmark related files
 benchmarks/**/*.cache
