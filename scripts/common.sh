@@ -3,8 +3,9 @@
 #
 # project paths
 #
-ROOT_DIR=`realpath ../../`
+ROOT_DIR="$(realpath $(dirname ${BASH_SOURCE[0]})/../../)"
 MISC_DIR="$ROOT_DIR/misc"
+MISC_SCRIPTS="$MISC_DIR/scripts"
 LLVM_SRC="$ROOT_DIR/llvm"
 LLVM_BIN_DIR="$ROOT_DIR/build/bin"
 LLVM_RELEASE_BIN_DIR="$ROOT_DIR/build-release/bin"
@@ -13,7 +14,6 @@ TESTS_DIR="$ROOT_DIR/llvm-test-suite"
 TESTSUITE_DIR="$TESTS_DIR/test-suite"
 TESTSUITE_BUILD_DIR="$TESTS_DIR/ts-build"
 OLDEN_DIR="$LLVM_TESTSUITE_DIR/MultiSource/Benchmarks/Olden"
-PTRDIST_DIR="$LLVM_TESTSUITE_DIR/MultiSource/Benchmarks/Ptrdist"
 DATA_DIR="$MISC_DIR/eval/perf_data"
 
 #
@@ -25,9 +25,10 @@ CHECKEDC_INC=$MISC_DIR/include
 CHECKEDC_LIB=$MISC_DIR/lib
 CC_RELEASE="$LLVM_RELEASE_BIN_DIR/clang"
 LLVM_VANILLA_BIN="$ROOT_DIR/llvm-vanilla/build/bin"
-# Original LLVM compiler
 CC_VANILLA="$LLVM_VANILLA_BIN/clang"
 CXX_VANILLA="$LLVM_VANILLA_BIN/clang++"
+CETS_ROOT="$ROOT_DIR/cets"
+CETS_BIN="$CETS_ROOT/build/bin"
 
 #
 # Others

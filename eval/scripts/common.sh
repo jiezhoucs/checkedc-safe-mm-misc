@@ -3,8 +3,9 @@
 #
 # project paths
 #
-ROOT_DIR=`realpath ../../..`
+ROOT_DIR="$(realpath $(dirname ${BASH_SOURCE[0]})/../../../)"
 MISC_DIR="$ROOT_DIR/misc"
+MISC_SCRIPTS="$MISC_DIR/scripts"
 LLVM_SRC="$ROOT_DIR/llvm"
 LLVM_RELEASE_BIN_DIR="$ROOT_DIR/build-release/bin"
 TESTS_DIR="$ROOT_DIR/tests"
