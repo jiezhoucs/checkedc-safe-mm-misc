@@ -19,6 +19,6 @@ cmake -DCMAKE_C_COMPILER="$CC"                                                 \
       -DCMAKE_BUILD_TYPE=Release                                               \
       -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS"                                      \
       -DTEST_SUITE_SPEC2017_ROOT="$SPEC_SRC"                                   \
-      -DTEST_SUITE_RUN_TYPE=train                                              \
+      -DTEST_SUITE_RUN_TYPE=ref                                              \
       "$TEST_SUITE_SRC"
 

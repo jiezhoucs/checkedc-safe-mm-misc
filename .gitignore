@@ -21,7 +21,6 @@ tests/cast
 tests/array
 tests/addrof
 
-tests/hello.c
 
 # evaluation data
 eval/perf_data
@@ -31,3 +30,6 @@ eval/mem_data
 benchmarks/**/*.cache
 benchmarks/**/*.log
 benchmarks/**/*.status
+
+# others
+eval/json_dataset/unused
