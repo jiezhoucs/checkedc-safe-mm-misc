@@ -1,96 +1,93 @@
 #
-# LLVM build directory
-LLVM_DIR = ../../build/bin
-
-OPT=-O3
-CFLAGS = $(OPT) -I../include -Wall -mrdrnd -fPIC
+# Compiler and other tool settings
+#
+ROOT_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))/../..
+MISC_DIR := $(ROOT_DIR)/misc
+LLVM_DIR := $(ROOT_DIR)/build/bin
+CC 		 := $(LLVM_DIR)/clang
+OPT 	 := -O3
+CFLAGS   := $(OPT) -I$(MISC_DIR)/include -Wall -mrdrnd -fPIC
+# Have to use a native clang++. The one in the Checked C directory somehow breaks.
+CXX 	 := clang++
+CXXFLAGS := $(OPT) -fPIC 
+AR 		 := $(LLVM_DIR)/llvm-ar
+RANLIB   := $(LLVM_DIR)/llvm-ranlib
 
 #
-# Checked-C Clang
-CC = $(LLVM_DIR)/clang $(CFLAGS)
-AR = $(LLVM_DIR)/llvm-ar
-RANLIB = $(LLVM_DIR)/llvm-ranlib
-
-LIB_SRC = safe_mm_checked.c mm_libc.c mm_common.c
-LIB_SAFEMM = libsafemm
-LIB_SAFEMM_LTO = $(LIB_SAFEMM)_lto
-LIB_SAFEMM_PORTING = libsafemm_porting
-PORT_SRC = porting_helper.cpp
-
-.PHONY: libsafemm clean
-
-# Compile both a static library and a dynamic library.
-all: a port # lto
+# Source code
+#
+LIB_SRC   := safe_mm_checked.c mm_libc.c mm_common.c
+PORT_SRC  := porting_helper.cpp
+DEBUG_SRC := debug.c
 
 #
-# Compile the lib to a static library.
-a: $(LIB_SRC)
-	rm -f $(LIB_SAFEMM).a $(LIB_SAFEMM).so *.o
-	$(CC) -c $(LIB_SRC)
-	$(AR) -rc $(LIB_SAFEMM).a *.o
-	$(RANLIB) $(LIB_SAFEMM).a
-	@rm -f *.o
+# Buld targets
+#
+LIB_SAFEMM     	   := libsafemm
+LIB_SAFEMM_LTO     := $(LIB_SAFEMM)_lto
+LIB_SAFEMM_PORTING := libsafemm_porting
+LIB_PORTING  	   := libporting
+LIB_DEBUG		   := libdebug
 
-lto: $(LIB_SRC)
-	rm -rf $(LIB_SAFEMM_LTO).a $(LIB_SAFEMM_LTO).so
-	$(CC) -flto -c $(LIB_SRC)
-	$(AR) -rc $(LIB_SAFEMM_LTO).a *.o
-	$(RANLIB) $(LIB_SAFEMM_LTO).a
+#
+# Function: Compile C/C++ source and archive objective files into a static library.
+#
+# Parameters:
+#   1: Compiler (clang or clang++)
+#	2: List of Source files
+#	3: C/CXX flags
+#	4: Target name of the static library
+# 
+define build_target
+	@echo "Bulding$(4) ..."
+	$(1) $(2) -c $(3)
+	$(AR) -rc $(4).a *.o
+	$(RANLIB) $(4).a
 	@rm -f *.o
+	@echo "Finished building$(4)\n"
+endef
 
+all: $(LIB_SAFEMM) $(LIB_PORTING) $(LIB_SAFEMM_PORTING)
+
+#
+# Compile the libsafemm to a static library.
+#
+$(LIB_SAFEMM): $(LIB_SRC)
+	$(call build_target, $(CC), $^, $(CFLAGS), $@)
+
+$(LIB_SAFEMM_LTO): $(LIB_SRC)
+	$(call build_target, $(CC), $^, $(CFLAGS) -flto, $@)
 
 #
 # Compile the CPP lib for porting assistance.
 #
-# Have to use a native clang++; the one in the Checked C directory breaks.
-CXX := clang++
-CXXFLAGS := -fPIC $(OPT)
-LIB_PORTING := libporting
-port: $(PORT_SRC)
-	$(CXX) $(CXXFLAGS) -c $^ -o $(LIB_PORTING).o
-	$(AR) -rc $(LIB_PORTING).a $(LIB_PORTING).o
-	$(RANLIB) $(LIB_PORTING).a
-	@rm -f *.o
+$(LIB_PORTING): $(PORT_SRC)
+	$(call build_target, $(CXX), $^, $(CXXFLAGS), $@)
+
+#
+# libsafemm with "PORTING" defined.
+#
+$(LIB_SAFEMM_PORTING): $(LIB_SRC)
+	$(call build_target, $(CC), $^, $(CFLAGS) -DPORTING, $@)
 
 #
 # Compile libsafemm and libporting for debugging.
 #
 debug: CFLAGS += -O0 -g -DMM_DEBUG
 debug: CXXFLAGS += -O0 -g -DMM_DEBUG
-debug: a port;
-
-#
-# libsafemm with "PORTING" defined.
-#
-safemm_porting: $(LIB_SRC)
-	rm -f *.o
-	$(CC) -DPORTING -Wno-implicit-function-declaration -c $(LIB_SRC)
-	$(AR) -rc $(LIB_SAFEMM_PORTING).a *.o
-	$(RANLIB) $(LIB_SAFEMM_PORTING).a
-	@rm -f *.o
-
-
-#
-# Compile the lib to a shared libray. Note that on MacOS .dylib is the
-# native format for shared library, and .so is for compatibility.
-so: $(LIB_SRC)
-	$(CC) -shared -fPIC -o $(LIB_SAFEMM).so $^
-
-#
-# Compile to LLVM IR code for debugging purpose.
-ll: $(LIB_SRC)
-	$(CC) -S -emit-llvm $^
+debug: all;
 
 #
 # Compile libdebug
-debuglib: debug.c
-	$(CC) -c $^ -o $@.o
-	$(AR) -rc libdebug.a $@.o
-	@$(RANLIB) libdebug.a
-	@rm -f $@.o
+#
+libdebug: debug.c
+	$(call build_target, $(CC), $^, $(CFLAGS), $@)
 
-debuglib_so: debug.c
-	$(CC) -shared -fPIC -o libdebug.so $^
+#
+# Compile libsafemm to LLVM IR code for debugging.
+#
+ll: $(LIB_SRC)
+	$(CC) $(CFLAGS) -S -emit-llvm $^
 
 clean:
 	rm -rf *.o *.so *.a *.s *.ll

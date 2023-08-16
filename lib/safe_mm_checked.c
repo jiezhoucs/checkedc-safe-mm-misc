@@ -1,20 +1,20 @@
 /** safe_mm_checked.c - Runtime library of the temporal memory safe Checked C.
  *
- * This files defines the runtime library for the Checked C project, including
+ * This file defines the runtime library for the Checked C project, including
  * customized memory allocators and deallocators for memory objects pointed
  * by mm_ptr and mm_array_ptr.
  *
- * Note that the current implementation assumes a 32-32 key-offset metadata
- * design for mmsafe ptr. In the paper we say that we support two
- * key-offset schemes: 32-32 and 40-24. Also it is not totally clear to us
- * which is faster key-offset or offset-key. For the 32-32 option it might
- * be the same but the key-offset one might be a little faster for
- * the 40-24 one because the constant used in an "and" instruction can be
- * hardcoded in the instruction instead of loading from another register.
+ * @note The current implementation uses a 32-32 key-offset metadata
+ * design for mmsafe ptr. Supporting different key-offset allotment, as described
+ * in the OOPSLA23 paper, is in future work.
+ * 
+ * Furthermore, it is not totally clear to us which is faster: key-offset or
+ * offset-key. For the 32-32 option it might be the same but the key-offset one
+ * might be a little faster for the 40-24 allotment because the constant used
+ * in an "and" instruction can be hardcoded in the instruction instead of
+ * loading from another register.
  *
  * */
-
-#include "safe_mm_checked.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include <immintrin.h>   /* for _rdrand32_step() */
 
+#include "safe_mm_checked.h"
 #include "porting_helper.h"
 
 #define __INLINE __attribute__((always_inline))
@@ -660,7 +661,8 @@ mm_array_ptr<char> mmize_str(char *p) {
   free(p);
 #endif
   if (safe_p == NULL) {
-    printf("WTF???\n");
+    fprintf(stderr, "Failed to duplicate a string.");
+    exit(1);
   }
   return safe_p;
 }

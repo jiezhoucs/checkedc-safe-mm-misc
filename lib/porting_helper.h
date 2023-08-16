@@ -8,6 +8,7 @@ extern "C" {
 bool is_an_mmsafe_ptr(void *p);
 void insert_mmsafe_ptr(void *p);
 void erase_mmsafe_ptr(void *p);
+void uncertain_free(void *p);
 
 #if defined __cplusplus
 }

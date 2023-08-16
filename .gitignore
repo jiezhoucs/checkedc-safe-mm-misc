@@ -33,3 +33,4 @@ benchmarks/**/*.status
 
 # others
 eval/json_dataset/unused
+.vscode
