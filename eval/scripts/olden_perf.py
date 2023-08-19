@@ -1,23 +1,24 @@
 #!/usr/bin/env python3
 
 '''
-This script collects Olden performance data and compute performance overhead
-of Checked C and CETS.
+This script collects Olden performance data, computes performance overhead
+of Checked C and CETS, and writes the results to three files
+    - checked.csv
+    - cets.csv
+    - perf.csv (containing both checked and cets data)
 '''
 
 import numpy as np
 import json
 import csv
+import subprocess
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parent/"../perf_data/olden"
+EVAL_DIR = Path(__file__).resolve().parent/".."
+DATA_DIR = EVAL_DIR/"perf_data/olden"
+OLDEN_RUN_SH = EVAL_DIR/"scripts/olden_run.sh"
 
-JSON_SUFFIX = ".json"
-CSV_SUFFIX  = ".csv"
-
-ITERATION = 20
-
-benchmarks = [
+BENCHMARKS = [
     "bh",
     "bisort",
     "em3d",
@@ -34,71 +35,111 @@ CETS_SKIPPED = ["bh", "em3d", "mst"]
 exec_time_baseline, exec_time_checked, exec_time_cets = {}, {}, {}
 normalized_checked, normalized_cets = {}, {}
 
-#
-# Collect performance data.
-#
-def collect_data():
+def get_iter_number():
+    ''' Get the iteration number used by olden_run.sh '''
+    cmd = f"grep 'ITER=' {OLDEN_RUN_SH} | cut -d '=' -f2"
+    return int(subprocess.run(cmd, stdout=subprocess.PIPE, shell=True).stdout)
+
+def load_output_json(path):
+    '''A helper function to load a json data file'''
+    with open(path, 'r') as f:
+        return json.load(f)
+
+def compute_geomean(data):
+    ''' A helper function to compute the geomean of an array of perf overhead '''
+    return round(np.array(data).prod() ** (1.0 / len(data)), 3)
+
+def collect_data(iter):
+    ''' Collect performance data '''
     global exec_time_baseline, exec_time_checked, exec_time_cets
     global normalized_checked, normalized_cets
-    # Initialize the execution time
-    for prog in benchmarks:
-        exec_time_baseline[prog], exec_time_checked[prog] = 0, 0
+
+    # Initialize the execution time to 0
+    for prog in BENCHMARKS:
+        exec_time_baseline[prog] = exec_time_checked[prog] = 0
         if prog not in CETS_SKIPPED:
             exec_time_cets[prog] = 0
     
-    # A heler lambda to compute the path of the output json file.
-    output_json = lambda target, prog, i: DATA_DIR / target / f"{prog}.{i}{JSON_SUFFIX}"
+    # A heler lambda to compute the path of the output JSON file.
+    output_json = lambda target, prog, i: DATA_DIR / target / f"{prog}.{i}.json"
 
-    # Use Python's json module to extract the execution time.
-    for prog in benchmarks:
-        for i in range(1, ITERATION + 1):
-            data = json.load(open(output_json("baseline", prog, i)))
+    # Use Python's JSON module to extract the execution time.
+    for prog in BENCHMARKS:
+        for i in range(1, iter + 1):
+            data = load_output_json(output_json("baseline", prog, i))
             exec_time_baseline[prog] += float(data['tests'][0]['metrics']['exec_time'])
-            data = json.load(open(output_json("checked", prog, i)))
+
+            data = load_output_json(output_json("checked", prog, i))
             exec_time_checked[prog] += float(data['tests'][0]['metrics']['exec_time'])
+
             if prog not in CETS_SKIPPED:
-                data = json.load(open(output_json("cets", prog, i)))
+                data = load_output_json(output_json("cets", prog, i))
                 exec_time_cets[prog] += float(data['tests'][0]['metrics']['exec_time'])
 
-    # Calculate the arithemetic mean of execution time.
-    for prog in benchmarks:
-        exec_time_baseline[prog] /= ITERATION
-        exec_time_checked[prog] /= ITERATION
+    # Calculate arithemetic mean of execution time and normalize the result
+    for prog in BENCHMARKS:
+        exec_time_baseline[prog] /= iter
+        exec_time_checked[prog] /= iter
         normalized_checked[prog] = exec_time_checked[prog] / exec_time_baseline[prog]
+
         if prog not in CETS_SKIPPED:
-            exec_time_cets[prog] /= ITERATION
+            exec_time_cets[prog] /= iter
             normalized_cets[prog] = exec_time_cets[prog] / exec_time_baseline[prog]
 
-#
-# Write the result to three files:
-#  - checked.csv
-#  - cets.csv
-#  - perf.csv (containing both checked and cets data)
-#
-def write_result():
+def convert_normalized_to_percent(val):
+    ''' Convert a normalized execution time to a percentage, e.g., 1.21 -> 21.0%'''
+    return f"{round((val - 1) * 100, 1)}%"
 
-    # Write Checked C's result to a csv file
+def print_normalized(data, compiler):
+    ''' Print normalized execution time '''
+    benchmarks = (
+        BENCHMARKS if compiler == "Checked C"
+        else [prog for prog in BENCHMARKS if prog not in CETS_SKIPPED]
+    ) 
+
+    aligned_length = max(len(prog) for prog in data)
+
+    print(f"{compiler}'s normalized execution time:")
+    for prog in benchmarks:
+        print(f"{prog:<{aligned_length}} : {round(data[prog], 2)}")
+    print("")
+
+def print_summarized(min_time, max_time, geomean, compiler):
+    ''' Print summarized performance overhead '''
+    print(f"{compiler}'s summarized performance overhead:")
+    print(f"Min     = {convert_normalized_to_percent(min_time)}")
+    print(f"Max     = {convert_normalized_to_percent(max_time)}")
+    print(f"Geomean = {convert_normalized_to_percent(geomean)}")
+
+def write_result():
+    '''
+    Compute geomean of perf overhead and  write the result to three files.
+    '''
+
+    # Write Checked C's result to a CSV file
     with open(DATA_DIR / "checked.csv", "w") as checked_csv:
         writer = csv.writer(checked_csv)
         header = ["program", "baseline(s)", "checked(s)", "normalized(x)", "overhead(%)"]
         writer.writerow(header)
 
-        for prog in benchmarks:
+        # Write normalized execution time of each benchmark
+        for prog in BENCHMARKS:
             row = [prog]
             row += [round(exec_time_baseline[prog], 2)]
             row += [round(exec_time_checked[prog], 2)]
             row += [round(normalized_checked[prog], 3)]
             row += [round((row[-1] - 1) * 100, 1)]
             writer.writerow(row)
-        # Write the geo.mean
-        norm, norm_checked_cets = [], []
-        for prog in benchmarks:
-            norm += [normalized_checked[prog]]
+
+        # Compute and write geomean
+        overhead_checked, overhead_checked_cets = [], []
+        for prog in BENCHMARKS:
+            overhead_checked += [normalized_checked[prog]]
             if prog not in CETS_SKIPPED:
-                norm_checked_cets += [norm[-1]]
-        geomean_checked = round(np.array(norm).prod() ** (1.0 / len(benchmarks)), 3)
-        geomean_checked_cets = round(np.array(norm_checked_cets).prod() ** (1.0 / len(norm_checked_cets)), 3)
-        min_checked, max_checked = min(norm), max(norm)
+                overhead_checked_cets += [overhead_checked[-1]]
+        geomean_checked = compute_geomean(overhead_checked)
+        geomean_checked_cets = compute_geomean(overhead_checked_cets)
+        min_checked, max_checked = min(overhead_checked), max(overhead_checked)
         row = ["Geomean", '', '', geomean_checked, round((geomean_checked - 1) * 100, 1)]
         writer.writerow(row)
 
@@ -108,7 +149,7 @@ def write_result():
         header = ["program", "baseline(s)", "cets(s)", "normalized(x)", "overhead(%)"]
         writer.writerow(header)
 
-        for prog in benchmarks:
+        for prog in BENCHMARKS:
             row = [prog]
             if prog in CETS_SKIPPED:
                 row += ['', '', '', '']
@@ -118,12 +159,14 @@ def write_result():
                 row += [round(normalized_cets[prog], 3)]
                 row += [round((row[-1] - 1) * 100, 1)]
             writer.writerow(row)
-        normalized = []
-        for prog in benchmarks:
+
+        # Compute and write geomean
+        overhead_cets = []
+        for prog in BENCHMARKS:
             if prog not in CETS_SKIPPED:
-                normalized += [normalized_cets[prog]]
-        geomean_cets = round(np.array(normalized).prod() ** (1.0 / len(normalized_cets)), 3)
-        min_cets, max_cets = min(normalized), max(normalized)
+                overhead_cets += [normalized_cets[prog]]
+        geomean_cets = compute_geomean(overhead_cets)
+        min_cets, max_cets = min(overhead_cets), max(overhead_cets)
         row = ["Geomean", '', '', geomean_cets, round((geomean_cets - 1) * 100, 1)]
         writer.writerow(row)
 
@@ -131,10 +174,10 @@ def write_result():
     with open(DATA_DIR / "perf.csv", "w") as perf_csv:
         writer = csv.writer(perf_csv)
         header = ["program", "baseline(s)", "checked(s)", "normalized_checked(x)",\
-                "cets(s)", "normalized_cets(x)"]
+                  "cets(s)", "normalized_cets(x)"]
         writer.writerow(header)
 
-        for prog in benchmarks:
+        for prog in BENCHMARKS:
             row = [prog]
             row += [round(exec_time_baseline[prog], 2)]
             row += [round(exec_time_checked[prog], 2)]
@@ -149,44 +192,21 @@ def write_result():
         writer.writerow(row)
 
     # Print detailed data
-    print_normalized(normalized_checked, "checked")
-    # Print summarized results.
-    print("Checked C's summarized performance overhead:")
-    print("Min = " + str(round((min_checked - 1) * 100, 1)) + "%")
-    print("Max = " + str(round((max_checked - 1) * 100, 1)) + "%")
-    print("Geomean = " + str(round((geomean_checked - 1) * 100, 1)) + "%")
-    # print("CETS-only Geomean = " + str(round((geomean_checked_cets - 1) * 100, 1)) + "%")
+    print_normalized(normalized_checked, "Checked C")
+    print_summarized(min_checked, max_checked, geomean_checked, "Checked C")
+    print(f"CETS-only Geomean = {convert_normalized_to_percent(geomean_checked_cets)}")
 
     print("")
-    print_normalized(normalized_cets, "cets")
-    print("CETS' summarized performance overhead:")
-    print("Min = " + str(round((min_cets - 1) * 100, 1)) + "%")
-    print("Max = " + str(round((max_cets - 1) * 100, 1)) + "%")
-    print("Geomean " + str(round((geomean_cets - 1) * 100, 1)) + "%")
+
+    print_normalized(normalized_cets, "CETS")
+    print_summarized(min_cets, max_cets, geomean_cets, "CETS")
 
 #
-# Print the normalized execution time
+#  Entrance of this script
 #
-def print_normalized(data, compiler):
-    if compiler == "checked":
-        print("Checked C's normalized execution time:")
-    else:
-        print("CETS's normalized execution time:")
+if __name__ == "__main__":
+    iter = get_iter_number()
 
-    for prog in benchmarks:
-        if compiler == "cets" and prog in CETS_SKIPPED:
-            continue
-        print(prog + ": " + str(round(data[prog], 2)))
-    print("")
-
-
-#
-# Entrance of this script
-#
-def main():
-    collect_data()
+    collect_data(iter)
 
     write_result()
-
-if __name__ == "__main__":
-    main()
