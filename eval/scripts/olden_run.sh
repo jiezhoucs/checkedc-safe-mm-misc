@@ -50,7 +50,7 @@ main() {
 
         # Rename result files.
         for benchmark in ${BENCHMARKS[@]}; do
-            if [[ -f $benchmark.json ]]; then
+            if [[ -f "$data_dir/$benchmark.json" ]]; then
                 mv "$data_dir/$benchmark.json" "$data_dir/$benchmark.$i.json"
             fi
         done

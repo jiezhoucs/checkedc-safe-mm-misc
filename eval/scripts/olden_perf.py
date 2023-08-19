@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 
-#
-# This script collects Olden performance data.
-#
+'''
+This script collects Olden performance data and compute performance overhead
+of Checked C and CETS.
+'''
 
 import numpy as np
-import os
 import json
 import csv
+from pathlib import Path
 
-ROOT_DIR = os.path.abspath(os.getcwd() + "/../..")
-DATA_DIR = ROOT_DIR + "/eval/perf_data/olden/"
+DATA_DIR = Path(__file__).resolve().parent/"../perf_data/olden"
+
+JSON_SUFFIX = ".json"
+CSV_SUFFIX  = ".csv"
 
 ITERATION = 20
 
@@ -31,7 +34,6 @@ CETS_SKIPPED = ["bh", "em3d", "mst"]
 exec_time_baseline, exec_time_checked, exec_time_cets = {}, {}, {}
 normalized_checked, normalized_cets = {}, {}
 
-
 #
 # Collect performance data.
 #
@@ -43,16 +45,19 @@ def collect_data():
         exec_time_baseline[prog], exec_time_checked[prog] = 0, 0
         if prog not in CETS_SKIPPED:
             exec_time_cets[prog] = 0
+    
+    # A heler lambda to compute the path of the output json file.
+    output_json = lambda target, prog, i: DATA_DIR / target / f"{prog}.{i}{JSON_SUFFIX}"
 
     # Use Python's json module to extract the execution time.
     for prog in benchmarks:
         for i in range(1, ITERATION + 1):
-            data = json.load(open(DATA_DIR + "baseline/" + prog + "." + str(i) + ".json"))
+            data = json.load(open(output_json("baseline", prog, i)))
             exec_time_baseline[prog] += float(data['tests'][0]['metrics']['exec_time'])
-            data = json.load(open(DATA_DIR + "checked/" + prog + "." + str(i) + ".json"))
+            data = json.load(open(output_json("checked", prog, i)))
             exec_time_checked[prog] += float(data['tests'][0]['metrics']['exec_time'])
             if prog not in CETS_SKIPPED:
-                data = json.load(open(DATA_DIR + "cets/" + prog + "." + str(i) + ".json"))
+                data = json.load(open(output_json("cets", prog, i)))
                 exec_time_cets[prog] += float(data['tests'][0]['metrics']['exec_time'])
 
     # Calculate the arithemetic mean of execution time.
@@ -73,7 +78,7 @@ def collect_data():
 def write_result():
 
     # Write Checked C's result to a csv file
-    with open(DATA_DIR + "/checked.csv", "w") as checked_csv:
+    with open(DATA_DIR / "checked.csv", "w") as checked_csv:
         writer = csv.writer(checked_csv)
         header = ["program", "baseline(s)", "checked(s)", "normalized(x)", "overhead(%)"]
         writer.writerow(header)
@@ -98,7 +103,7 @@ def write_result():
         writer.writerow(row)
 
     # Write CETS's results to a CSV file
-    with open(DATA_DIR + "/cets.csv", "w") as cets_csv:
+    with open(DATA_DIR / "cets.csv", "w") as cets_csv:
         writer = csv.writer(cets_csv)
         header = ["program", "baseline(s)", "cets(s)", "normalized(x)", "overhead(%)"]
         writer.writerow(header)
@@ -123,7 +128,7 @@ def write_result():
         writer.writerow(row)
 
     # Write the summarized Checked C vs. CETS data to a csv file
-    with open(DATA_DIR + "/perf.csv", "w") as perf_csv:
+    with open(DATA_DIR / "perf.csv", "w") as perf_csv:
         writer = csv.writer(perf_csv)
         header = ["program", "baseline(s)", "checked(s)", "normalized_checked(x)",\
                 "cets(s)", "normalized_cets(x)"]
