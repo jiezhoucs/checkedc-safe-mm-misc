@@ -8,6 +8,7 @@
 *.dylib
 *.o
 *.s
+__pycache__/
 
 *.dSYM
 

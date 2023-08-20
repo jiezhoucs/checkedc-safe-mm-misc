@@ -8,15 +8,11 @@ of Checked C and CETS, and writes the results to three files
     - perf.csv (containing both checked and cets data)
 '''
 
-import numpy as np
+from evallib import *
 import json
-import csv
-import subprocess
-from pathlib import Path
 
-EVAL_DIR = Path(__file__).resolve().parent/".."
-DATA_DIR = EVAL_DIR/"perf_data/olden"
-OLDEN_RUN_SH = EVAL_DIR/"scripts/olden_run.sh"
+DATA_DIR = DATA_ROOT_DIR / "olden"
+OLDEN_RUN_SH = SCRIPTS_DIR / "olden_run.sh"
 
 BENCHMARKS = [
     "bh",
@@ -35,19 +31,10 @@ CETS_SKIPPED = ["bh", "em3d", "mst"]
 exec_time_baseline, exec_time_checked, exec_time_cets = {}, {}, {}
 normalized_checked, normalized_cets = {}, {}
 
-def get_iter_number():
-    ''' Get the iteration number used by olden_run.sh '''
-    cmd = f"grep 'ITER=' {OLDEN_RUN_SH} | cut -d '=' -f2"
-    return int(subprocess.run(cmd, stdout=subprocess.PIPE, shell=True).stdout)
-
 def load_output_json(path):
     '''A helper function to load a json data file'''
     with open(path, 'r') as f:
         return json.load(f)
-
-def compute_geomean(data):
-    ''' A helper function to compute the geomean of an array of perf overhead '''
-    return round(np.array(data).prod() ** (1.0 / len(data)), 3)
 
 def collect_data(iter):
     ''' Collect performance data '''
@@ -85,10 +72,6 @@ def collect_data(iter):
         if prog not in CETS_SKIPPED:
             exec_time_cets[prog] /= iter
             normalized_cets[prog] = exec_time_cets[prog] / exec_time_baseline[prog]
-
-def convert_normalized_to_percent(val):
-    ''' Convert a normalized execution time to a percentage, e.g., 1.21 -> 21.0%'''
-    return f"{round((val - 1) * 100, 1)}%"
 
 def print_normalized(data, compiler):
     ''' Print normalized execution time '''
@@ -205,8 +188,6 @@ def write_result():
 #  Entrance of this script
 #
 if __name__ == "__main__":
-    iter = get_iter_number()
-
-    collect_data(iter)
+    collect_data(get_iter_number(OLDEN_RUN_SH))
 
     write_result()
