@@ -1,7 +1,0 @@
-LZFSE decode
-Input: /home/jie/projects/checkedc/misc/eval/lzfse_dataset/osdb.encoded
-Output: /tmp/origin
-Input size: 3498565 B
-Output size: 10085684 B
-Compression ratio: 2.883
-Speed: 1.73 ns/B, 549.88 MB/s

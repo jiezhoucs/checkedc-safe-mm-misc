@@ -1,7 +1,0 @@
-LZFSE decode
-Input: /home/jie/projects/checkedc/misc/eval/lzfse_dataset/reymont.encoded
-Output: /tmp/origin
-Input size: 2009293 B
-Output size: 6627202 B
-Compression ratio: 3.298
-Speed: 2.65 ns/B, 359.37 MB/s

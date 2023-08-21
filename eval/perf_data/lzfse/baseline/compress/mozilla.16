@@ -1,7 +1,0 @@
-LZFSE encode
-Input: /home/jie/projects/checkedc/misc/eval/lzfse_dataset/mozilla
-Output: /tmp/compressed
-Input size: 51220480 B
-Output size: 18798780 B
-Compression ratio: 2.725
-Speed: 13.42 ns/B, 71.06 MB/s

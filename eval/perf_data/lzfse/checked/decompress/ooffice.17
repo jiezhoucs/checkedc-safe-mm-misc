@@ -1,7 +1,0 @@
-LZFSE decode
-Input: /home/jie/projects/checkedc/misc/eval/lzfse_dataset/ooffice.encoded
-Output: /tmp/origin
-Input size: 3109891 B
-Output size: 6152192 B
-Compression ratio: 1.978
-Speed: 2.85 ns/B, 334.47 MB/s
