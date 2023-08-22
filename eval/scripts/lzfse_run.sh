@@ -4,6 +4,8 @@
 # This script runs the baseline and the checked lzfse for performance evaluation.
 #
 
+set -e
+
 . common.sh
 
 INPUTS=(
@@ -25,29 +27,28 @@ INPUTS=(
 ITER=20
 INPUT_DIR="$EVAL_DIR/lzfse_dataset"
 DATA_DIR="$DATA_DIR/lzfse"
-BIN_DIR="$BENCHMARKS_DIR"
 
 #
 # Initialize the evaluation environment
 #
 init() {
+    case $1 in
+        "baseline"|"checked")
+            target=$1
+            ;;
+        *)
+            echo "Unknow target!"
+            exit 1
+            ;;
+    esac
+
     # Prepare directories
-    if [[ $1 == "baseline" ]]; then
-        echo "Run the baseline lzfse"
-        DATA_DIR="$DATA_DIR/baseline"
-        BIN_DIR="$BIN_DIR/baseline/lzfse-1.0/build"
-    else
-        echo "Run the checked lzfse"
-        DATA_DIR="$DATA_DIR/checked"
-        BIN_DIR="$BIN_DIR/checked/lzfse-1.0/build"
-    fi
+    DATA_DIR="$DATA_DIR/$target"
+    BIN_DIR="$BENCHMARKS_DIR/$target/lzfse-1.0/build"
 
     # Create and clean data directories if needed.
-    if [[ ! -d $DATA_DIR ]]; then
-        mkdir -p $DATA_DIR
-        mkdir "$DATA_DIR/compress"
-        mkdir "$DATA_DIR/decompress"
-    fi
+    mkdir -p "$DATA_DIR/compress"
+    mkdir -p "$DATA_DIR/decompress"
     rm -rf $DATA_DIR/compress/*
     rm -rf $DATA_DIR/decompress/*
 
@@ -57,16 +58,18 @@ init() {
         ./cmake-gen.sh
         make
     fi
+
+    if [[ ! -f "lzfse" ]]; then
+        echo "Cannot find or make the executable, please compile it first."
+        exit 1
+    fi
 }
 
 #
 # Run lzfse
 #
 run() {
-    if [[ ! -f "lzfse" ]]; then
-        echo "Cannot find the executable, please compile it first."
-        exit
-    fi
+    echo "Run the $target lzfse"
 
     for i in $(seq 1 $ITER); do
         # Compression
