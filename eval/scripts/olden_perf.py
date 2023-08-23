@@ -11,7 +11,7 @@ of Checked C and CETS, and writes the results to three files
 from evallib import *
 import json
 
-DATA_DIR = DATA_ROOT_DIR / "olden"
+DATA_DIR = DATA_DIR_ROOT / "olden"
 OLDEN_RUN_SH = SCRIPTS_DIR / "olden_run.sh"
 
 BENCHMARKS = [
@@ -80,23 +80,14 @@ def print_normalized(data, compiler):
         else [prog for prog in BENCHMARKS if prog not in CETS_SKIPPED]
     ) 
 
-    aligned_length = max(len(prog) for prog in data)
-
     print(f"{compiler}'s normalized execution time:")
     for prog in benchmarks:
-        print(f"{prog:<{aligned_length}} : {round(data[prog], 2)}")
+        print(f"{prog:<{compute_aligned_len(data)}} : {round(data[prog], 2)}")
     print("")
-
-def print_summarized(min_time, max_time, geomean, compiler):
-    ''' Print summarized performance overhead '''
-    print(f"{compiler}'s summarized performance overhead:")
-    print(f"Min     = {convert_normalized_to_percent(min_time)}")
-    print(f"Max     = {convert_normalized_to_percent(max_time)}")
-    print(f"Geomean = {convert_normalized_to_percent(geomean)}")
 
 def write_result():
     '''
-    Compute geomean of perf overhead and  write the result to three files.
+    Compute geomean of perf overhead and write the result to three files.
     '''
 
     # Write Checked C's result to a CSV file
@@ -176,13 +167,13 @@ def write_result():
 
     # Print detailed data
     print_normalized(normalized_checked, "Checked C")
-    print_summarized(min_checked, max_checked, geomean_checked, "Checked C")
-    print(f"CETS-only Geomean = {convert_normalized_to_percent(geomean_checked_cets)}")
+    print_summarized_overhead(min_checked, max_checked, geomean_checked, "Checked C")
+    print(f"CETS-only Geomean = {convert_normalized_to_overhead(geomean_checked_cets)}")
 
     print("")
 
     print_normalized(normalized_cets, "CETS")
-    print_summarized(min_cets, max_cets, geomean_cets, "CETS")
+    print_summarized_overhead(min_cets, max_cets, geomean_cets, "CETS")
 
 #
 #  Entrance of this script
