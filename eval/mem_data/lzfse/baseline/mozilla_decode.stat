@@ -1,7 +1,0 @@
-Watching PID 510112 page references for every 0.05 seconds...
-Est(s)     RSS(MB)    PSS(MB)    Ref(MB)
-0.050        45.20      44.09      32.67
-0.051        68.13      67.02      30.95
-0.051        68.13      67.02      46.62
-0.051         1.35       0.24       0.12
-ERROR: can't open /proc/510112/smaps: No such file or directory at /home/jie/projects/checkedc/misc/eval/wss/wss.pl line 226.
