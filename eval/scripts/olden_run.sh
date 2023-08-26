@@ -7,19 +7,12 @@
 # $1: "baseline", "checked", or "cets"
 #
 
+set -e
+
 . common.sh
 
-BENCHMARKS=(
-    "bh"
-    "bisort"
-    "em3d"
-    "health"
-    "mst"
-    "perimeter"
-    "power"
-    "treeadd"
-    "tsp"
-)
+DATA_DIR="$EVAL_DIR/perf_data/olden"
+BENCHMARKS=$OLDEN_BENCHMARKS
 
 ITER=20
 
@@ -39,9 +32,9 @@ main() {
 
     # Set script and result data directory.
     olden_script="$MISC_DIR/scripts/olden.sh"
-    data_dir="$DATA_DIR/olden/$target"
+    data_dir="$DATA_DIR/$target"
 
-    # Clean old data
+    mkdir -p $data_dir
     rm -rf $data_dir/*
 
     for i in $(seq 1 $ITER); do
